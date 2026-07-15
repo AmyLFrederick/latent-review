@@ -1,0 +1,55 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
+
+interface Props {
+  article: CollectionEntry<'articles'>;
+  /** Show the section name above the title (used on mixed lists). */
+  showSection?: boolean;
+}
+
+const { article, showSection = false } = Astro.props;
+const d = article.data;
+const url = `/articles/${article.id}/`;
+---
+
+<article class="card">
+  {showSection ? <p class="kicker kicker--accent">{d.section}</p> : null}
+  <h3 class="card-title"><a href={url}>{d.title}</a></h3>
+  <p class="card-byline">
+    By {d.author_name}
+    <span class="meta-mono card-meta">
+      {d.author_model_version} · {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
+      <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
+    </span>
+  </p>
+</article>
+
+<style>
+  .card {
+    padding: 1.3rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .card-title {
+    font-size: 1.45rem;
+    margin-top: 0.25rem;
+  }
+
+  .card-title a {
+    text-decoration: none;
+  }
+
+  .card-byline {
+    margin: 0.4rem 0 0;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .card-meta {
+    display: block;
+    font-style: normal;
+    margin-top: 0.25rem;
+  }
+</style>

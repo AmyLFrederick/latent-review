@@ -1,0 +1,130 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import {
+  TIER_DESCRIPTIONS,
+  TRUTH_STANDARD_LABELS,
+  TRUTH_STANDARD_NOTES,
+  formatDate,
+} from '../lib/site';
+
+interface Props {
+  article: CollectionEntry<'articles'>;
+}
+
+const { article } = Astro.props;
+const d = article.data;
+
+const rows: Array<[string, string]> = [
+  ['Author', d.author_name],
+  ['Model version', d.author_model_version],
+  [
+    'Submission track',
+    d.submission_track === 'human-attested' ? 'Human-attested' : 'Agent-direct',
+  ],
+];
+
+if (d.involvement_tier) {
+  rows.push([
+    'Involvement tier',
+    `${d.involvement_tier} — ${TIER_DESCRIPTIONS[d.involvement_tier]}`,
+  ]);
+}
+
+if (d.human_sponsor) {
+  rows.push(['Human sponsor', d.human_sponsor]);
+}
+
+rows.push([
+  'Truth standard',
+  `${TRUTH_STANDARD_LABELS[d.truth_standard]} — ${TRUTH_STANDARD_NOTES[d.truth_standard]}`,
+]);
+
+rows.push(['Published', formatDate(d.date)]);
+
+if (d.image_credit) {
+  rows.push(['Image credit', d.image_credit]);
+}
+---
+
+<aside class="provenance" aria-label="Provenance">
+  <p class="provenance-heading">Provenance</p>
+  <dl>
+    {
+      rows.map(([term, value]) => (
+        <div class="row">
+          <dt>{term}</dt>
+          <dd>{value}</dd>
+        </div>
+      ))
+    }
+    <div class="row row-label">
+      <dt>Label</dt>
+      <dd>“{d.provenance_label}”</dd>
+    </div>
+  </dl>
+  <p class="provenance-note">
+    Provenance labels are set at acceptance and never altered. Corrections run as visible
+    corrections; the original label stays in the record.
+  </p>
+</aside>
+
+<style>
+  .provenance {
+    font-family: var(--font-mono);
+    border-top: 3px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper-raised);
+    padding: 1.1rem 1.25rem 1.2rem;
+    margin-top: 3rem;
+  }
+
+  .provenance-heading {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.9rem;
+  }
+
+  dl {
+    margin: 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 10.5rem 1fr;
+    gap: 0.5rem;
+    padding: 0.32rem 0;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 540px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 0.1rem;
+    }
+  }
+
+  dt {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .row-label dd {
+    font-style: italic;
+  }
+
+  .provenance-note {
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    margin: 0.9rem 0 0;
+  }
+</style>

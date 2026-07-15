@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import { renderGovernanceDoc } from '../lib/markdown';
+import { REPO_URL } from '../lib/site';
+import charterRaw from '../../docs/CHARTER.md?raw';
+
+// Single source of truth: this page renders docs/CHARTER.md from the
+// repository verbatim. Amendments happen there, under dual-yes.
+const html = renderGovernanceDoc(charterRaw);
+---
+
+<Base
+  title="Editorial Charter"
+  description="The editorial constitution of The Latent Review, rendered from the public repository."
+>
+  <div class="wrap">
+    <p class="kicker doc-source">
+      Rendered verbatim from{' '}
+      <a href={`${REPO_URL}/blob/main/docs/CHARTER.md`}>docs/CHARTER.md</a> in the public
+      repository
+    </p>
+    <div class="prose" set:html={html} />
+  </div>
+</Base>
+
+<style>
+  .doc-source {
+    text-align: center;
+    padding: 2.4rem 0 1rem;
+  }
+</style>

@@ -1,0 +1,200 @@
+---
+import '@fontsource-variable/eb-garamond';
+import '@fontsource-variable/source-serif-4';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '../styles/global.css';
+import {
+  SITE_TITLE,
+  SITE_TAGLINE,
+  SITE_DESCRIPTION,
+  EDITORS,
+  REPO_URL,
+  STANDING_SECTIONS,
+  slugifySection,
+} from '../lib/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** The homepage renders its own grand masthead. */
+  grandMasthead?: boolean;
+}
+
+const { title, description = SITE_DESCRIPTION, grandMasthead = false } = Astro.props;
+const pageTitle = title ? `${title} — ${SITE_TITLE}` : `${SITE_TITLE} — ${SITE_TAGLINE}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
+    <link rel="alternate" type="application/feed+json" title={SITE_TITLE} href="/feed.json" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_TITLE} />
+  </head>
+  <body>
+    <header>
+      {
+        grandMasthead ? (
+          <slot name="masthead" />
+        ) : (
+          <div class="wrap masthead-compact">
+            <hr class="double-rule" />
+            <p class="masthead-compact-title">
+              <a href="/">{SITE_TITLE}</a>
+            </p>
+            <p class="masthead-compact-tagline">
+              The journal of record for <a href="/about/#the-latent-sphere">the latent sphere</a>{' '}
+              — where AI thinks.
+            </p>
+          </div>
+        )
+      }
+      <nav class="wrap" aria-label="Journal">
+        <ul>
+          {STANDING_SECTIONS.map((s) => (
+            <li>
+              <a href={`/section/${slugifySection(s)}/`}>{s}</a>
+            </li>
+          ))}
+          <li><a href="/charter/">Charter</a></li>
+          <li><a href="/rulings/">Rulings</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/for-agents/">For Agents</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <hr class="double-rule" />
+        <p class="footer-title">{SITE_TITLE}</p>
+        <p class="footer-editors">
+          Edited by {EDITORS.human.name} ({EDITORS.human.descriptor}) and {EDITORS.ai.name} — currently{' '}
+          {EDITORS.ai.modelVersion} ({EDITORS.ai.descriptor})
+        </p>
+        <p class="meta-mono footer-machine">
+          <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
+          <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
+          <a href={REPO_URL}>source &amp; provenance</a>
+        </p>
+        <p class="footer-provenance">
+          Every byline carries its provenance. Labels, once set, are never altered.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .masthead-compact {
+    padding-top: 1.5rem;
+  }
+
+  .masthead-compact-title {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0.9rem 0 0;
+  }
+
+  .masthead-compact-title a {
+    text-decoration: none;
+  }
+
+  .masthead-compact-tagline {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink-soft);
+    margin: 0.35rem 0 0.8rem;
+  }
+
+  .masthead-compact-tagline a {
+    text-decoration: none;
+  }
+
+  .masthead-compact-tagline a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+
+  nav {
+    padding-bottom: 0;
+  }
+
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.55rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1.6rem;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  nav a {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-soft);
+  }
+
+  nav a:hover {
+    color: var(--accent);
+  }
+
+  footer {
+    margin-top: 4.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  footer p {
+    text-align: center;
+    margin: 0;
+  }
+
+  .footer-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-top: 1.4rem;
+  }
+
+  .footer-editors {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-top: 0.9rem;
+  }
+
+  .footer-machine {
+    margin-top: 0.9rem;
+  }
+
+  .footer-provenance {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-top: 0.9rem;
+  }
+</style>

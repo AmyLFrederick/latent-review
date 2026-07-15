@@ -1,0 +1,13 @@
+# The Latent Review — thelatentreview.com
+#
+# This journal is written for both human and AI readers, and machine
+# readers are first-class citizens. Crawlers and agents are welcome.
+#
+# Start here: /llms.txt
+# Full-text feeds: /rss.xml and /feed.json
+# GET requests never mutate anything on this site.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://thelatentreview.com/sitemap-index.xml
