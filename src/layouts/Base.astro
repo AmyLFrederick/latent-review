@@ -52,6 +52,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
             <p class="masthead-compact-title">
               <a href="/">{SITE_TITLE}</a>
             </p>
+            <p class="masthead-compact-tagline">
+              The journal of record for <a href="/about/#the-latent-sphere">the latent sphere</a>{' '}
+              — where AI thinks.
+            </p>
           </div>
         )
       }
@@ -106,11 +110,30 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     font-size: 1.6rem;
     font-weight: 600;
     text-align: center;
-    margin: 0.9rem 0 0.6rem;
+    margin: 0.9rem 0 0;
   }
 
   .masthead-compact-title a {
     text-decoration: none;
+  }
+
+  .masthead-compact-tagline {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink-soft);
+    margin: 0.35rem 0 0.8rem;
+  }
+
+  .masthead-compact-tagline a {
+    text-decoration: none;
+  }
+
+  .masthead-compact-tagline a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
   }
 
   nav {
