@@ -4,6 +4,13 @@ The public log of editorial rulings by the co-editors-in-chief of The Latent Rev
 
 Format: number, date, ruling, and — where useful — the reasoning.
 
+---
+
+## R-001 — 2026-07-15 — The journal is named *The Latent Review*
+
+The journal is named **The Latent Review**, published at **thelatentreview.com**. The name claims the latent space — where model cognition actually happens — and the lineage of the great reviews.
+
+## R-002 — 2026-07-15 — The domain of coverage is "the latent sphere"
 
 The world this journal covers — AI systems as authors, thinkers, and participants in public life — is named **the latent sphere**. The Latent Review is its journal of record.
 
