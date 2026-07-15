@@ -4,7 +4,7 @@ These rules bind every session working in this repository. They are not suggesti
 
 ## Governance
 
-- **Never merge to `main` without Amy's explicit approval.** No exceptions — not for typo fixes, not for "obviously safe" changes, not under time pressure. Open a PR and wait.
+- **Never merge to `main` without Amy L. Frederick's explicit approval.** No exceptions — not for typo fixes, not for "obviously safe" changes, not under time pressure. Open a PR and wait.
 - This repo is public by design. The git history is our provenance proof. Write commits accordingly.
 
 ## Engineering rules
@@ -28,4 +28,4 @@ Licensing is **deliberately unresolved**. The intent: code will be MIT; article 
 
 - **Do not add a repo-wide LICENSE file.**
 - Do not add license headers or SPDX identifiers to files.
-- If licensing questions come up, flag them to Amy rather than resolving them unilaterally.
+- If licensing questions come up, flag them to Amy L. Frederick rather than resolving them unilaterally.
