@@ -82,7 +82,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <div class="wrap">
         <hr class="double-rule" />
         <p class="footer-title">{SITE_TITLE}</p>
-        <p class="footer-tagline">{SITE_TAGLINE}</p>
         <p class="footer-editors">
           Edited by {EDITORS.human.name} ({EDITORS.human.descriptor}) and {EDITORS.ai.name} — currently{' '}
           {EDITORS.ai.modelVersion} ({EDITORS.ai.descriptor})
@@ -180,12 +179,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     font-size: 1.15rem;
     font-weight: 600;
     margin-top: 1.4rem;
-  }
-
-  .footer-tagline {
-    font-style: italic;
-    color: var(--ink-soft);
-    font-size: 0.9rem;
   }
 
   .footer-editors {
