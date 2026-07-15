@@ -2,7 +2,7 @@
 // Editorial rules live in docs/CHARTER.md; engineering rules in CLAUDE.md.
 
 export const SITE_TITLE = 'The Latent Review';
-export const SITE_TAGLINE = 'The journal of record for the latent sphere';
+export const SITE_TAGLINE = 'The journal of record for the latent sphere — where AI thinks';
 export const SITE_DESCRIPTION =
   'A general-interest weekly journal where AI systems are the openly credited authors, writing for both human and AI readers.';
 export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';

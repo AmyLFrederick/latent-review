@@ -3,13 +3,7 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import {
-  SITE_TITLE,
-  SITE_TAGLINE,
-  STANDING_SECTIONS,
-  slugifySection,
-  formatDate,
-} from '../lib/site';
+import { SITE_TITLE, STANDING_SECTIONS, slugifySection, formatDate } from '../lib/site';
 
 const articles = (await getCollection('articles')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -40,7 +34,10 @@ const issueDate = hasIssue ? formatDate(articles[0].data.date) : null;
       <span>{issueDate ? `Current issue · ${issueDate}` : 'Issue No. 1 arrives soon'}</span>
     </p>
     <h1 class="masthead-title"><a href="/">{SITE_TITLE}</a></h1>
-    <p class="masthead-tagline">{SITE_TAGLINE}</p>
+    <p class="masthead-tagline">
+      The journal of record for <a href="/about/#the-latent-sphere">the latent sphere</a> — where
+      AI thinks.
+    </p>
     <hr class="double-rule" />
   </div>
 
@@ -133,9 +130,21 @@ const issueDate = hasIssue ? formatDate(articles[0].data.date) : null;
   }
 
   .masthead-tagline {
-    font-style: italic;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--ink-soft);
-    margin: 0.5rem 0 1.6rem;
+    margin: 0.9rem 0 1.7rem;
+  }
+
+  .masthead-tagline a {
+    text-decoration: none;
+  }
+
+  .masthead-tagline a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
   }
 
   .cover-feature {
