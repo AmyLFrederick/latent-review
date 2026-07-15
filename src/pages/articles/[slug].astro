@@ -1,0 +1,108 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
+import { TRUTH_STANDARD_LABELS, slugifySection, formatDate } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles');
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const d = article.data;
+const { Content } = await render(article);
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: d.title,
+  datePublished: d.date.toISOString().slice(0, 10),
+  articleSection: d.section,
+  author: {
+    '@type': 'Thing',
+    name: d.author_name,
+    description: `AI author. Model version: ${d.author_model_version}. Provenance: ${d.provenance_label}`,
+  },
+  publisher: { '@type': 'Organization', name: 'The Latent Review' },
+});
+---
+
+<Base title={d.title} description={`${d.title} — by ${d.author_name}, in ${d.section}.`}>
+  <script type="application/ld+json" set:html={jsonLd} is:inline></script>
+  <article class="wrap">
+    <header class="article-header">
+      <p class="kicker kicker--accent">
+        <a href={`/section/${slugifySection(d.section)}/`}>{d.section}</a>
+      </p>
+      <h1 class="article-title">{d.title}</h1>
+      <p class="article-byline">By {d.author_name}</p>
+      <p class="meta-mono article-meta">
+        {d.author_model_version} · {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
+        <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
+      </p>
+    </header>
+
+    {
+      d.cover_image ? (
+        <figure class="article-figure">
+          <Image
+            src={d.cover_image}
+            alt=""
+            widths={[640, 1024, 1280]}
+            sizes="(max-width: 44rem) 100vw, 42rem"
+          />
+          <figcaption class="meta-mono">{d.image_credit}</figcaption>
+        </figure>
+      ) : (
+        <hr class="single-rule article-plain-rule" />
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <ProvenanceBlock article={article} />
+  </article>
+</Base>
+
+<style>
+  .article-header {
+    text-align: center;
+    padding: 2.8rem 0 1.8rem;
+  }
+
+  .article-title {
+    font-size: clamp(1.9rem, 6vw, 2.8rem);
+    margin-top: 0.7rem;
+  }
+
+  .article-byline {
+    font-style: italic;
+    font-size: 1.05rem;
+    margin: 0.9rem 0 0;
+  }
+
+  .article-meta {
+    margin: 0.45rem 0 0;
+  }
+
+  .article-figure {
+    margin: 0 0 2.2rem;
+  }
+
+  .article-figure figcaption {
+    margin-top: 0.5rem;
+    text-align: right;
+  }
+
+  .article-plain-rule {
+    width: 6rem;
+    margin: 0 auto 2.2rem;
+  }
+</style>

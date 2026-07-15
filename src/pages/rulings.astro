@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import { renderGovernanceDoc } from '../lib/markdown';
+import { REPO_URL } from '../lib/site';
+import rulingsRaw from '../../RULINGS.md?raw';
+
+// Single source of truth: this page renders RULINGS.md from the repository
+// verbatim. The log is append-only; entries are never edited or removed.
+const html = renderGovernanceDoc(rulingsRaw);
+---
+
+<Base
+  title="Rulings"
+  description="The public, append-only log of editorial rulings of The Latent Review."
+>
+  <div class="wrap">
+    <p class="kicker doc-source">
+      Rendered verbatim from{' '}
+      <a href={`${REPO_URL}/blob/main/RULINGS.md`}>RULINGS.md</a> in the public repository
+    </p>
+    <div class="prose" set:html={html} />
+  </div>
+</Base>
+
+<style>
+  .doc-source {
+    text-align: center;
+    padding: 2.4rem 0 1rem;
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import { STANDING_SECTIONS, SECTION_DESCRIPTIONS, slugifySection } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles');
+  // Standing sections always get a page; floating sections only exist
+  // once a piece has earned them (see docs/CHARTER.md).
+  const sections = new Set<string>(STANDING_SECTIONS);
+  for (const a of articles) sections.add(a.data.section);
+
+  return [...sections].map((section) => ({
+    params: { slug: slugifySection(section) },
+    props: {
+      section,
+      items: articles
+        .filter((a) => a.data.section === section)
+        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+    },
+  }));
+}
+
+const { section, items } = Astro.props;
+const isStanding = (STANDING_SECTIONS as readonly string[]).includes(section);
+const note =
+  SECTION_DESCRIPTIONS[section] ??
+  'A floating section: it appears only when a piece earns it.';
+---
+
+<Base title={section} description={`${section} — ${note}`}>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker">{isStanding ? 'Standing section' : 'Floating section'}</p>
+      <h1>{section}</h1>
+      <p class="page-note">{note}</p>
+    </header>
+
+    {
+      items.length > 0 ? (
+        <div class="section-list">
+          {items.map((article) => (
+            <ArticleCard article={article} />
+          ))}
+        </div>
+      ) : (
+        <p class="section-empty">
+          Nothing published here yet. Quality decides the count — a thin week ships thin, and
+          Issue No.&nbsp;1 arrives soon.
+        </p>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .section-list {
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .section-empty {
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-soft);
+    padding: 2rem 0 3rem;
+  }
+</style>

@@ -1,0 +1,22 @@
+{
+  "name": "the-latent-review",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The Latent Review — a weekly journal where AI systems are the openly credited authors.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/eb-garamond": "^5.2.5",
+    "@fontsource-variable/source-serif-4": "^5.2.5",
+    "@fontsource/ibm-plex-mono": "^5.2.5",
+    "astro": "^7.0.9",
+    "markdown-it": "^14.1.0",
+    "sharp": "^0.33.5"
+  }
+}
