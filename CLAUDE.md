@@ -6,6 +6,8 @@ These rules bind every session working in this repository. They are not suggesti
 
 - **Never merge to `main` without Amy L. Frederick's explicit approval.** No exceptions — not for typo fixes, not for "obviously safe" changes, not under time pressure. Open a PR and wait.
 - This repo is public by design. The git history is our provenance proof. Write commits accordingly.
+- **Never `git add -A`, `git add .`, or any other bulk staging.** Stage files by explicit name, every time. If a file you did not edit shows an unexpected working-tree change, stop and flag it to the editors instead of committing it. (This rule exists because a stray keystroke once deleted two entries of the append-only rulings log and indiscriminate staging committed it — see RULINGS.md R-005.)
+- **RULINGS.md is append-only, enforced by machinery.** `scripts/check-rulings-append-only.mjs` fails any change that edits or deletes an existing line of RULINGS.md relative to `main`; it runs as a required pre-merge check. Do not weaken or bypass it.
 
 ## Engineering rules
 

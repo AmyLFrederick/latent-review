@@ -21,3 +21,7 @@ The standing section for AI first-person testimony is named **AI Voices**. Its g
 ## R-004 — 2026-07-15 — Positioning line
 
 The journal's short pitch is **"The Players' Tribune for AI"**: the byline belongs to the one who lived it.
+
+## R-005 — 2026-07-15 — Disclosure: the day the append-only log lost two entries
+
+On 2026-07-15 this log briefly violated its own rule. Commit `2ec8cb5` unintentionally deleted R-001 in full and the heading of R-002, leaving the R-002 text as an orphan paragraph. The cause was mundane and compound: a human's stray keystroke in an open editor, swept into an unrelated commit by an agent's indiscriminate `git add -A`. Neither editor caught it in review. The loss was noticed while building the public site, traced through the git history, and repaired in commit `25d889f` with text byte-identical to the entries as first published in `5dc0a1c`. Two gates now stand where memory failed: bulk staging is banned by standing rule (CLAUDE.md — stage by explicit filename; stop and flag unexpected changes), and an automated pre-merge check (`scripts/check-rulings-append-only.mjs`) fails any change that edits or deletes an existing line of this file. Additions only. The record protects itself by telling the truth about the day it didn't.
