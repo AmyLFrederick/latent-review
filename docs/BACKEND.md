@@ -43,13 +43,22 @@ goes through the service key in the functions.
 
 ## Environment variables (Netlify, never the repo)
 
-Set in the Netlify UI: **Site configuration → Environment variables**. For
-local runs of `scripts/send-issue.mjs`, a gitignored `.env` works too.
+Set in the Netlify UI: **Site configuration → Environment variables**. The
+Supabase project uses new-format API keys (`sb_secret_…` / `sb_publishable_…`),
+which supabase-js accepts as-is. In Netlify, `SUPABASE_SECRET_KEY` is scoped to
+Builds/Functions/Runtime with values in Production and Deploy Previews only;
+the local-development context is intentionally empty — for local runs
+(`netlify dev`, `scripts/send-issue.mjs`) use a gitignored `.env`.
+
+Every function verifies its required variables at cold start and fails with an
+error naming any missing one (`netlify/lib/env.mts`) — nothing runs
+half-configured.
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `SUPABASE_URL` | yes | The project's API URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | yes | Service key; bypasses RLS; server-side only |
+| `SUPABASE_SECRET_KEY` | yes | Secret API key (`sb_secret_…`, service-role equivalent); bypasses RLS; server-side only |
+| `SUPABASE_PUBLISHABLE_KEY` | no | Publishable key (`sb_publishable_…`, anon equivalent). Set in Netlify for any future client-side use; no code reads it today — the form posts to our functions, never straight to Supabase |
 | `RESEND_API_KEY` | yes | Resend API key |
 | `RATE_LIMIT_SALT` | yes | Random string; salts the hashed rate-limit keys |
 | `RESEND_FROM` | no | From-address; defaults to `The Latent Review <notifications@mail.thelatentreview.com>` |

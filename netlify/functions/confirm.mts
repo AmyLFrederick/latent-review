@@ -1,8 +1,12 @@
 import type { Config } from '@netlify/functions';
 import { serviceClient } from '../lib/supabase.mts';
 import { page, actionPage } from '../lib/pages.mts';
+import { requireEnv } from '../lib/env.mts';
 
 export const config: Config = { path: '/api/confirm' };
+
+// Verified at cold start — fail loudly and by name, never run half-configured.
+requireEnv('SUPABASE_URL', 'SUPABASE_SECRET_KEY');
 
 // GET never mutates (house rule): the emailed link renders a page whose
 // button POSTs the token back here. Mail scanners that prefetch links

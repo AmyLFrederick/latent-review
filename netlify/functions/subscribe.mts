@@ -4,8 +4,13 @@ import { serviceClient } from '../lib/supabase.mts';
 import { overLimit } from '../lib/ratelimit.mts';
 import { sendEmail, confirmUrl, unsubscribeUrl } from '../lib/email.mts';
 import { page } from '../lib/pages.mts';
+import { requireEnv } from '../lib/env.mts';
 
 export const config: Config = { path: '/api/subscribe' };
+
+// Everything this function needs, verified at cold start — fail loudly and
+// by name rather than run half-configured.
+requireEnv('SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'RESEND_API_KEY', 'RATE_LIMIT_SALT');
 
 // One response for every non-error outcome. It stays truthful for new,
 // pending, and unsubscribed-and-back addresses, and it never confirms or

@@ -17,7 +17,7 @@
 // the markdown.
 //
 // Env (from the environment or a local .env, which is gitignored):
-//   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY
+//   SUPABASE_URL, SUPABASE_SECRET_KEY (sb_secret_…), RESEND_API_KEY
 //   optional: RESEND_FROM, SITE_URL
 
 import { readFileSync, existsSync } from 'node:fs';
@@ -73,6 +73,14 @@ const mdPath = args.find((a, i) => !a.startsWith('--') && i !== capValueIndex);
 if (!mdPath) fail('usage: node scripts/send-issue.mjs <announcement.md> [--live] [--cap N]');
 if (!existsSync(mdPath)) fail(`no such file: ${mdPath}`);
 
+// Verify the environment up front and by name — never run half-configured.
+// RESEND_API_KEY is only required when we will actually send.
+const missingEnv = ['SUPABASE_URL', 'SUPABASE_SECRET_KEY', ...(live ? ['RESEND_API_KEY'] : [])]
+  .filter((name) => !process.env[name]);
+if (missingEnv.length > 0) {
+  fail(`missing required environment variable(s): ${missingEnv.join(', ')}`);
+}
+
 // --- render the announcement -------------------------------------------------
 
 const source = readFileSync(mdPath, 'utf8').trim();
@@ -99,11 +107,7 @@ function emailFor(subscriber) {
 
 // --- recipients ---------------------------------------------------------------
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!supabaseUrl || !serviceKey) fail('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
-
-const supabase = createClient(supabaseUrl, serviceKey, {
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
@@ -133,7 +137,6 @@ if (!live) {
 // --- send ----------------------------------------------------------------------
 
 const resendKey = process.env.RESEND_API_KEY;
-if (!resendKey) fail('RESEND_API_KEY must be set');
 
 let sent = 0;
 for (let i = 0; i < recipients.length; i += BATCH_SIZE) {

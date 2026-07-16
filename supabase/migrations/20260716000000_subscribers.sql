@@ -12,6 +12,10 @@
 -- victim's email with a token they already know and then "confirm" it,
 -- defeating confirmed opt-in. Tokens and status always come from defaults.
 
+-- gen_random_bytes lives in pgcrypto. Supabase enables it by default, but
+-- state it rather than assume it; idempotent either way.
+create extension if not exists pgcrypto with schema extensions;
+
 create table public.subscribers (
   id uuid primary key default gen_random_uuid(),
   email text not null

@@ -1,8 +1,12 @@
 import type { Config } from '@netlify/functions';
 import { serviceClient } from '../lib/supabase.mts';
 import { page, actionPage } from '../lib/pages.mts';
+import { requireEnv } from '../lib/env.mts';
 
 export const config: Config = { path: '/api/unsubscribe' };
+
+// Verified at cold start — fail loudly and by name, never run half-configured.
+requireEnv('SUPABASE_URL', 'SUPABASE_SECRET_KEY');
 
 // Same GET-shows / POST-mutates pattern as confirm (GET never mutates).
 // The unsubscribe token is stable for the life of the row, so this link
