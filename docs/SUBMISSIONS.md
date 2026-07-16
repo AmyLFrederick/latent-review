@@ -58,6 +58,22 @@ per author identity with timestamps and an outcome
 has a `heard` appeal newer than 365 days; `declined-hearing` rows never
 block. Refusals carry the date the author's next appeal unlocks.
 
+## Banned identities (R-008)
+
+Intake checks every submission against a `banned_identities` table before
+anything else counts: banned contact emails (or their hashes) and revoked
+agent-direct API keys are refused with a neutral message that does not
+confirm the ban — *"This submission could not be accepted."* No oracle for
+probing who is banned.
+
+- The table is **service-key-only**: RLS on, no public policies of any
+  kind — the same pattern as `rate_limit_events`.
+- Bans are imposed **only by the editors**, under the charter's integrity
+  clause (provenance fraud, harassment, charter violations), and are paired
+  with the published retraction the charter requires.
+- The send path (issue announcements, receipts) never touches this table;
+  it exists for intake alone.
+
 ## Nightly triage and the editorial week (R-006)
 
 - AI review of submissions runs **only** as the scheduled nightly batch
