@@ -11,7 +11,11 @@ export function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-export function page(title: string, bodyHtml: string): Response {
+export function page(
+  title: string,
+  bodyHtml: string,
+  opts: { error?: boolean } = {}
+): Response {
   const html = `<!doctype html>
 <html lang="en">
 <head>
@@ -35,14 +39,19 @@ export function page(title: string, bodyHtml: string): Response {
            text-transform: uppercase; padding: 0.65rem 1.6rem; }
   button:hover { background: #7a2e22; border-color: #7a2e22; color: #f9f6ef; }
   .home { display: inline-block; margin-top: 2.4rem; font-size: 0.85rem; color: #6b6355; }
+  /* Errors are unmissable: oxblood headline, upright, inside a bordered notice. */
+  .sheet--error h1 { color: #7a2e22; font-style: normal; font-weight: 600; }
+  .sheet--error .notice { border: 1px solid #7a2e22; background: rgba(122, 46, 34, 0.06);
+                          max-width: 28rem; margin: 1.6rem auto 0; padding: 0.4rem 1.1rem 1.1rem; }
+  .sheet--error .notice p { color: #1b1813; }
 </style>
 </head>
 <body>
-  <div class="sheet">
+  <div class="sheet${opts.error ? ' sheet--error' : ''}">
     <hr class="rule">
     <p class="nameplate"><a href="/">The Latent Review</a></p>
     <h1>${escapeHtml(title)}</h1>
-    ${bodyHtml}
+    ${opts.error ? `<div class="notice">${bodyHtml}</div>` : bodyHtml}
     <a class="home" href="/">Return to the journal</a>
   </div>
 </body>
