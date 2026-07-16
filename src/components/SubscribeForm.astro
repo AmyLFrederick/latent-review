@@ -41,6 +41,7 @@ const inputId = `subscribe-email-${variant}`;
       const email = new FormData(form).get('email');
       if (!status || !button) return;
       button.disabled = true;
+      status.classList.remove('subscribe-status--error');
       status.textContent = 'Sending…';
       try {
         const res = await fetch(form.action, {
@@ -52,9 +53,11 @@ const inputId = `subscribe-email-${variant}`;
         status.textContent =
           data?.message ??
           (res.ok ? 'Check your inbox to confirm.' : 'Something went wrong — please try again.');
+        status.classList.toggle('subscribe-status--error', !res.ok);
         if (res.ok) form.reset();
       } catch {
         status.textContent = 'Something went wrong — please try again.';
+        status.classList.add('subscribe-status--error');
       } finally {
         button.disabled = false;
       }
@@ -131,9 +134,21 @@ const inputId = `subscribe-email-${variant}`;
   .subscribe-status {
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    color: var(--accent);
+    color: var(--ink-soft);
     min-height: 1.2em;
     margin: 0.5rem 0 0;
+  }
+
+  /* Failure must be unmissable (editors' follow-up to PR #3): oxblood,
+     bordered, and set off from the quiet form — not a soft mono whisper. */
+  .subscribe-status--error {
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 0.85rem;
+    border: 1px solid var(--accent);
+    background: rgba(122, 46, 34, 0.06);
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.7rem;
   }
 
   .subscribe--footer {

@@ -40,7 +40,7 @@ function respond(req: Request, ok: boolean, message: string, status = 200): Resp
       headers: { 'Content-Type': 'application/json' },
     });
   }
-  return page(ok ? 'Almost there' : 'Something went wrong', `<p>${message}</p>`);
+  return page(ok ? 'Almost there' : 'Something went wrong', `<p>${message}</p>`, { error: !ok });
 }
 
 export default async function handler(req: Request, context: Context): Promise<Response> {

@@ -12,17 +12,21 @@ requireEnv('SUPABASE_URL', 'SUPABASE_SECRET_KEY');
 // button POSTs the token back here. Mail scanners that prefetch links
 // therefore cannot confirm a subscription on the reader's behalf.
 
-const INVALID = page(
-  'That link isn’t valid',
-  '<p>This confirmation link doesn’t match any pending subscription. It may have already been used, or the address may have re-subscribed since, which issues a fresh link.</p>'
-);
+// A function, not a const: a Response body can be sent once, and a warm
+// function instance may serve this outcome more than once.
+const invalid = () =>
+  page(
+    'That link isn’t valid',
+    '<p>This confirmation link doesn’t match any pending subscription. It may have already been used, or a newer confirmation link may have replaced it.</p>',
+    { error: true }
+  );
 
 export default async function handler(req: Request): Promise<Response> {
   const supabase = serviceClient();
 
   if (req.method === 'GET') {
     const token = new URL(req.url).searchParams.get('token') ?? '';
-    if (!/^[a-f0-9]{64}$/.test(token)) return INVALID;
+    if (!/^[a-f0-9]{64}$/.test(token)) return invalid();
 
     const { data: sub, error } = await supabase
       .from('subscribers')
@@ -31,9 +35,9 @@ export default async function handler(req: Request): Promise<Response> {
       .maybeSingle();
     if (error) {
       console.error(error.message);
-      return page('Briefly unavailable', '<p>Please try this link again in a moment.</p>');
+      return page('Briefly unavailable', '<p>Please try this link again in a moment.</p>', { error: true });
     }
-    if (!sub) return INVALID;
+    if (!sub) return invalid();
 
     if (sub.status === 'confirmed') {
       return page('Already confirmed', '<p>This subscription is already confirmed. Issue No. 1 will find you when it exists.</p>');
@@ -55,9 +59,9 @@ export default async function handler(req: Request): Promise<Response> {
     try {
       token = String((await req.formData()).get('token') ?? '');
     } catch {
-      return INVALID;
+      return invalid();
     }
-    if (!/^[a-f0-9]{64}$/.test(token)) return INVALID;
+    if (!/^[a-f0-9]{64}$/.test(token)) return invalid();
 
     const { data: updated, error } = await supabase
       .from('subscribers')
@@ -68,7 +72,7 @@ export default async function handler(req: Request): Promise<Response> {
       .maybeSingle();
     if (error) {
       console.error(error.message);
-      return page('Briefly unavailable', '<p>Please try again in a moment.</p>');
+      return page('Briefly unavailable', '<p>Please try again in a moment.</p>', { error: true });
     }
 
     if (!updated) {
@@ -82,7 +86,7 @@ export default async function handler(req: Request): Promise<Response> {
       if (sub?.status === 'confirmed') {
         return page('Confirmed', '<p>You’re on the list. Issue No. 1 will find you when it exists.</p>');
       }
-      return INVALID;
+      return invalid();
     }
 
     return page('Confirmed', '<p>You’re on the list. Issue No. 1 will find you when it exists — no tracking, unsubscribe anytime, and every email we send carries the way out.</p>');
