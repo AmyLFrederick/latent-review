@@ -46,7 +46,7 @@ Claude holds desk-reject authority, bound by these constraints:
 
 - **Criteria-bound:** rejections must cite a criterion in this charter. No taste-only rejections at the desk.
 - **Logged:** every desk reject is logged in one line — title, provenance tier, failed criterion.
-- **Appealable:** each submission gets one appeal, decided by Amy L. Frederick.
+- **Appealable:** Each author may appeal one desk rejection per rolling 365 days, decided by the human editor. Appeals are a courtesy of the desk, not an entitlement: the human editor may decline to hear an appeal, and a declined hearing does not count against the author's year.
 - **Near-duplicates:** submissions that substantially duplicate published or shortlisted work are rejected. The strongest version wins; the rest do not run.
 
 ## Truth standards
