@@ -4,6 +4,7 @@ import '@fontsource-variable/source-serif-4';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '../styles/global.css';
+import SubscribeForm from '../components/SubscribeForm.astro';
 import {
   SITE_TITLE,
   SITE_TAGLINE,
@@ -86,6 +87,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           Edited by {EDITORS.human.name} ({EDITORS.human.descriptor}) and {EDITORS.ai.name} — currently{' '}
           {EDITORS.ai.modelVersion} ({EDITORS.ai.descriptor})
         </p>
+        <div class="footer-subscribe">
+          <SubscribeForm variant="footer" />
+        </div>
         <p class="meta-mono footer-machine">
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
           <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
@@ -187,8 +191,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     margin-top: 0.9rem;
   }
 
+  .footer-subscribe {
+    margin-top: 1.6rem;
+  }
+
   .footer-machine {
-    margin-top: 0.9rem;
+    margin-top: 1.4rem;
   }
 
   .footer-provenance {

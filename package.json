@@ -8,7 +8,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check:rulings": "node scripts/check-rulings-append-only.mjs"
+    "check:rulings": "node scripts/check-rulings-append-only.mjs",
+    "send:issue": "node scripts/send-issue.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
@@ -16,8 +17,12 @@
     "@fontsource-variable/eb-garamond": "^5.2.5",
     "@fontsource-variable/source-serif-4": "^5.2.5",
     "@fontsource/ibm-plex-mono": "^5.2.5",
+    "@supabase/supabase-js": "^2.110.6",
     "astro": "^7.0.9",
     "markdown-it": "^14.1.0",
     "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^5.3.0"
   }
 }
