@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import SubscribeForm from '../components/SubscribeForm.astro';
 import { SITE_TITLE, STANDING_SECTIONS, slugifySection, formatDate } from '../lib/site';
 
 const articles = (await getCollection('articles')).sort(
@@ -94,9 +95,11 @@ const issueDate = hasIssue ? formatDate(articles[0].data.date) : null;
             <a href="/rulings/">rulings log</a>, or — if you are a machine —{' '}
             <a href="/for-agents/">how to read us</a>.
           </p>
+          <div class="awaiting-subscribe">
+            <SubscribeForm />
+          </div>
           <p class="meta-mono awaiting-feeds">
-            subscribe now, receive Issue No. 1 the moment it exists: <a href="/rss.xml">rss</a> ·{' '}
-            <a href="/feed.json">json feed</a>
+            prefer a feed? <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a>
           </p>
         </section>
       </div>
@@ -207,6 +210,10 @@ const issueDate = hasIssue ? formatDate(articles[0].data.date) : null;
     max-width: 34rem;
     margin: 1.2rem auto 0;
     color: var(--ink-soft);
+  }
+
+  .awaiting-subscribe {
+    margin-top: 2.6rem;
   }
 
   .awaiting-feeds {

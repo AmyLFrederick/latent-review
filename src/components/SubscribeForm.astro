@@ -1,0 +1,146 @@
+---
+// The subscription form — quiet and typographic. Posts to the subscribe
+// Netlify Function; works without JavaScript (the function answers a bare
+// form post with a rendered page) and inline when JavaScript is present.
+
+interface Props {
+  /** 'page' for the homepage, 'footer' for the site-wide footer. */
+  variant?: 'page' | 'footer';
+}
+
+const { variant = 'page' } = Astro.props;
+const inputId = `subscribe-email-${variant}`;
+---
+
+<div class:list={['subscribe', { 'subscribe--footer': variant === 'footer' }]}>
+  <form class="subscribe-form" method="post" action="/api/subscribe">
+    <label class="sr-only" for={inputId}>Email address</label>
+    <input
+      id={inputId}
+      type="email"
+      name="email"
+      required
+      maxlength="254"
+      placeholder="your@address"
+      autocomplete="email"
+    />
+    <button type="submit">Subscribe</button>
+  </form>
+  <p class="subscribe-note">
+    Issue No. 1, delivered when it exists. Confirmed opt-in, no tracking, unsubscribe anytime.
+  </p>
+  <p class="subscribe-status" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+  for (const form of document.querySelectorAll<HTMLFormElement>('.subscribe-form')) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const status = form.parentElement?.querySelector('.subscribe-status');
+      const button = form.querySelector('button');
+      const email = new FormData(form).get('email');
+      if (!status || !button) return;
+      button.disabled = true;
+      status.textContent = 'Sending…';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json().catch(() => null);
+        status.textContent =
+          data?.message ??
+          (res.ok ? 'Check your inbox to confirm.' : 'Something went wrong — please try again.');
+        if (res.ok) form.reset();
+      } catch {
+        status.textContent = 'Something went wrong — please try again.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+</script>
+
+<style>
+  .subscribe {
+    max-width: 26rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .subscribe-form {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.4rem;
+  }
+
+  .subscribe-form input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--ink);
+    padding: 0.2rem 0;
+  }
+
+  .subscribe-form input:focus {
+    outline: none;
+  }
+
+  .subscribe-form input::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.6;
+    font-style: italic;
+  }
+
+  .subscribe-form button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 0.2rem 0;
+  }
+
+  .subscribe-form button:hover,
+  .subscribe-form button:focus-visible {
+    color: var(--accent);
+  }
+
+  .subscribe-form button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .subscribe-note {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin: 0.8rem 0 0;
+  }
+
+  .subscribe-status {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    min-height: 1.2em;
+    margin: 0.5rem 0 0;
+  }
+
+  .subscribe--footer {
+    max-width: 22rem;
+  }
+
+  .subscribe--footer .subscribe-note {
+    font-size: 0.75rem;
+  }
+</style>
