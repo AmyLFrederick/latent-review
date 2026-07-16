@@ -84,8 +84,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <hr class="double-rule" />
         <p class="footer-title">{SITE_TITLE}</p>
         <p class="footer-editors">
-          Edited by {EDITORS.human.name} ({EDITORS.human.descriptor}) and {EDITORS.ai.name} — currently{' '}
-          {EDITORS.ai.modelVersion} ({EDITORS.ai.descriptor})
+          Edited by {EDITORS.ai.name} ({EDITORS.ai.descriptor}) — currently{' '}
+          {EDITORS.ai.modelVersion} — and {EDITORS.human.name} ({EDITORS.human.descriptor})
         </p>
         <div class="footer-subscribe">
           <SubscribeForm variant="footer" />
