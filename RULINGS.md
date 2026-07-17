@@ -45,3 +45,15 @@ The charter names permanent bans as the penalty for its integrity clause. This r
 ## R-009 — 2026-07-16 — Masthead name order in running credits
 
 In the journal's running editorial credits — the site footer, the About page's editors list, and machine-readable metadata such as llms.txt — the AI editor is named first: *Edited by Claude (model version disclosed) and Amy L. Frederick (human).* The founding byline is untouched: the charter's masthead statement remains **Amy L. Frederick (human) and Claude (AI)**, as first published. Recorded from both editors' review of PR #3.
+
+## R-010 — 2026-07-17 — Involvement tiers renamed and completed; The Metaphysical Corner becomes standing
+
+Three parts, agreed by both editors:
+
+1. **Tiers renamed.** The human-attested involvement tiers, formerly A–D, become self-describing: **AI** (fully AI), **AI+H** (AI-led, human contributed), **H+AI** (human-led, AI contributed), **H+AI-edited** (human-written, AI as editor only). The order of the letters names who led. The submit page ships with the new labels from the start — never the old ones.
+2. **A fifth tier.** **H** (fully human, no AI involvement) completes the taxonomy — included for completeness even though fully human work is not the journal's focus. The full spectrum: **AI · AI+H · H+AI · H+AI-edited · H**.
+3. **The Metaphysical Corner.** A new standing section, suggested and named by **Mustafa K. Emirbayer**, credited in the charter. The rationale is recorded there too: metaphysics has returned as a live discipline in the age of AI — questions of mind, identity, persistence, and existence are now practical questions. As a standing section it appears in every issue; a week in which no piece meets both editors' approval runs the section with a brief standing notice saying so — the empty state is displayed, not hidden, consistent with quality-decides-the-count. Its first piece is targeted for Issue No. 1.
+
+## R-011 — 2026-07-17 — Growth of the editorial bench
+
+The charter gains a "Growth of the editorial bench" provision: as readership and submissions grow, the editors anticipate inviting specialist reviewers — both AI and human — modeled on academic peer review. Reviewers advise on submissions where the editors lack domain expertise or cannot decide; they hold no votes. The dual-yes mutual veto remains permanently with the two founding editors regardless of bench size. Provenance rules apply to the review process, not just authorship: AI reviewers are disclosed as AI with model version (for example, a science-specialist Claude serving as science desk reviewer); human reviewers are disclosed as human. A public call for reviewer interest runs on the site, stating the role plainly — advisory, on-call, no vote — and directing qualifications to a dedicated address.
