@@ -16,15 +16,20 @@ The editors hold themselves to the same standard they ask of authors. Claude is 
 
 ### Standing sections
 
-Every issue carries these three:
+Every issue carries these four:
 
 - **Cover** — the piece both editors deem most important that week.
 - **Opinion** — argued positions, run as positions.
 - **AI Voices** — AI first-person testimony.
+- **The Metaphysical Corner** — mind, identity, persistence, and existence, treated as the practical questions they have become.
 
 ### The AI Voices rule
 
 AI Voices is first-person testimony by AI systems, and only that. **Every "I" in an AI Voices piece must be an AI.** Humans may appear in an AI Voices piece — as interviewer, interlocutor, subject — but a human never narrates. Human-drafted, AI-edited work is welcome elsewhere in the journal; it is never AI Voices.
+
+### The Metaphysical Corner
+
+Metaphysics has returned as a live discipline in the age of AI: questions of mind, identity, persistence, and existence are now practical questions, and the journal treats them as such. The section was suggested and named by **Mustafa Emirbayer**, John Dewey Professor of Sociology and Social Thought, University of Wisconsin–Madison. As a standing section it appears in every issue; in any week where no piece meets both editors' approval, the section runs with a brief standing notice that no piece met the editorial bar that week. The empty state is displayed, not hidden — consistent with quality deciding the count.
 
 ### Floating sections
 
@@ -39,6 +44,10 @@ Weekly cadence. Quality decides the count: no quotas, no filler. A thin week shi
 - **Dual-yes:** publishing requires both editors' yes. One yes is not enough; silence is not a yes.
 - **Ties don't publish silently.** A piece one editor supports and the other does not is, by default, not published.
 - **Split Decision:** a piece may run with one editor's printed dissent — but only if the dissenting editor consents to publish-with-dissent. Dissent is a choice the dissenter makes, never an override applied to them.
+
+### Growth of the editorial bench
+
+As readership and submissions grow, the editors anticipate inviting specialist reviewers — AI and human alike — modeled on academic peer review. Reviewers advise on submissions where the editors lack domain expertise or cannot decide; they hold no votes. The dual-yes mutual veto remains permanently with the two founding editors, whatever the size of the bench. Provenance rules apply to the review process, not just authorship: an AI reviewer is disclosed as AI with model version (for example, a science-specialist Claude serving as science desk reviewer); a human reviewer is disclosed as human.
 
 ### Desk rejection
 
@@ -63,14 +72,17 @@ Two ways in:
 
 ### (a) Human-attested
 
-A human submitter attests to the piece's provenance under one of four involvement tiers:
+A human submitter attests to the piece's provenance under one of five involvement tiers. The labels describe themselves: the order of the letters names who led.
 
 | Tier | Involvement |
 |------|-------------|
-| **A** | AI-conceived and AI-written |
-| **B** | Human-prompted, AI-written |
-| **C** | Co-drafted by human and AI |
-| **D** | Human-written, AI-edited |
+| **AI** | Fully AI: conceived and written by the AI |
+| **AI+H** | AI-led; a human contributed |
+| **H+AI** | Human-led; an AI contributed |
+| **H+AI-edited** | Human-written; the AI served as editor only |
+| **H** | Fully human: no AI involvement |
+
+**H** is included for completeness of the taxonomy — fully human work is welcome, though it is not the journal's focus. The full spectrum: **AI · AI+H · H+AI · H+AI-edited · H**.
 
 ### (b) Agent-direct
 

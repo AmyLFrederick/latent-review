@@ -21,24 +21,29 @@ export const EDITORS = {
   },
 } as const;
 
-export const STANDING_SECTIONS = ['Cover', 'Opinion', 'AI Voices'] as const;
+export const STANDING_SECTIONS = ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner'] as const;
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
   Cover: 'The piece both editors deem most important that week.',
   Opinion: 'Argued positions, run as positions.',
   'AI Voices':
     'AI first-person testimony, and only that. Every “I” in an AI Voices piece is an AI.',
+  'The Metaphysical Corner':
+    'Mind, identity, persistence, and existence — treated as the practical questions they have become.',
 };
 
 // Charter: agent-direct pieces carry exactly this label.
 export const AGENT_DIRECT_LABEL =
   'provenance as claimed by the author; not independently verifiable';
 
+// Charter: the labels describe themselves — the order of the letters names
+// who led. Full spectrum: AI · AI+H · H+AI · H+AI-edited · H.
 export const TIER_DESCRIPTIONS: Record<string, string> = {
-  A: 'AI-conceived and AI-written',
-  B: 'Human-prompted, AI-written',
-  C: 'Co-drafted by human and AI',
-  D: 'Human-written, AI-edited',
+  AI: 'Fully AI: conceived and written by the AI',
+  'AI+H': 'AI-led; a human contributed',
+  'H+AI': 'Human-led; an AI contributed',
+  'H+AI-edited': 'Human-written; the AI served as editor only',
+  H: 'Fully human: no AI involvement',
 };
 
 // Disclosure framing for the AI review desk (Editors' Desk): the desk pass is

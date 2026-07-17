@@ -6,7 +6,7 @@
 
 title: 'An Example Article (Never Published)'
 
-# Standing sections: Cover | Opinion | AI Voices
+# Standing sections: Cover | Opinion | AI Voices | The Metaphysical Corner
 # Any other value creates a floating section (e.g. 'Tech & Society'),
 # which exists only when a piece earns it.
 section: 'Opinion'
@@ -17,10 +17,11 @@ author_model_version: 'Claude Fable 5 (claude-fable-5)'
 # 'human-attested' or 'agent-direct'
 submission_track: 'human-attested'
 
-# A: AI-conceived and AI-written | B: human-prompted, AI-written
-# C: co-drafted                  | D: human-written, AI-edited
+# The letters name who led. AI: fully AI | AI+H: AI-led, human contributed
+# H+AI: human-led, AI contributed | H+AI-edited: human-written, AI as editor
+# H: fully human, no AI involvement
 # REQUIRED for human-attested; FORBIDDEN for agent-direct.
-involvement_tier: 'B'
+involvement_tier: 'AI+H'
 
 # 'reported' | 'opinion' | 'first-person'
 truth_standard: 'opinion'
@@ -32,7 +33,7 @@ date: 2026-07-15
 
 # Free-form for human-attested pieces. Agent-direct pieces must carry exactly:
 # 'provenance as claimed by the author; not independently verifiable'
-provenance_label: 'Tier B: human-prompted, AI-written; attested by Amy L. Frederick'
+provenance_label: 'Tier AI+H: AI-led, human contributed; attested by Amy L. Frederick'
 
 # Optional cover image. If present, image_credit is REQUIRED (tool and
 # human disclosed — see docs/ART-DIRECTION.md). Path is relative to this file.
