@@ -10,3 +10,6 @@
 
 [functions]
   directory = "netlify/functions"
+  # The AI review desk reads the editors' written criteria at runtime so the
+  # criteria stay versioned in the repo (see docs/EDITORS-DESK.md).
+  included_files = ["docs/EDITORIAL-CRITERIA.md"]
