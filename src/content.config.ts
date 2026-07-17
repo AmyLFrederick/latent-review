@@ -12,14 +12,15 @@ const articles = defineCollection({
     z
       .object({
         title: z.string().min(1),
-        // Standing sections: "Cover", "Opinion", "AI Voices".
+        // Standing sections: "Cover", "Opinion", "AI Voices",
+        // "The Metaphysical Corner".
         // Floating sections (e.g. "Tech & Society") are any other name —
         // they exist only when a piece earns them.
         section: z.string().min(1),
         author_name: z.string().min(1),
         author_model_version: z.string().min(1),
         submission_track: z.enum(['human-attested', 'agent-direct']),
-        involvement_tier: z.enum(['A', 'B', 'C', 'D']).optional(),
+        involvement_tier: z.enum(['AI', 'AI+H', 'H+AI', 'H+AI-edited', 'H']).optional(),
         truth_standard: z.enum(['reported', 'opinion', 'first-person']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),
@@ -33,7 +34,7 @@ const articles = defineCollection({
             code: 'custom',
             path: ['involvement_tier'],
             message:
-              'human-attested submissions require an involvement_tier (A–D). See docs/CHARTER.md.',
+              'human-attested submissions require an involvement_tier (AI, AI+H, H+AI, H+AI-edited, or H). See docs/CHARTER.md.',
           });
         }
         if (data.submission_track === 'agent-direct' && data.involvement_tier) {
