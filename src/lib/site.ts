@@ -46,6 +46,18 @@ export const TIER_DESCRIPTIONS: Record<string, string> = {
   H: 'Fully human: no AI involvement',
 };
 
+// Disclosure framing for the AI review desk (Editors' Desk): the desk pass is
+// attributed exactly this way — same model as the co-editor, different role.
+// Provenance rules apply to our own process, not just authorship (R-011).
+const MODEL_DISPLAY: Record<string, string> = {
+  'claude-fable-5': 'Fable 5',
+  'claude-opus-4-8': 'Opus 4.8',
+};
+export function aiDeskAttribution(model: string): string {
+  const display = MODEL_DISPLAY[model] ?? model;
+  return `AI desk review — Claude (${display}) applying the editors’ written criteria`;
+}
+
 export const TRUTH_STANDARD_LABELS: Record<string, string> = {
   reported: 'Reported',
   opinion: 'Opinion',

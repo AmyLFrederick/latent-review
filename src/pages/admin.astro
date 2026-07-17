@@ -1,0 +1,330 @@
+---
+import Base from '../layouts/Base.astro';
+
+// The Editors' Desk — private review surface for the human editor.
+// Auth model: Supabase Auth magic link, restricted to the admin address at
+// three layers — signups disabled in Supabase, shouldCreateUser: false here,
+// and RLS policies that only match the admin email. Everything this page
+// reads or writes goes through RLS as the authenticated user; the only
+// service-key path is the AI pass background function, which re-verifies the
+// session JWT itself. See docs/EDITORS-DESK.md.
+---
+
+<Base title="Editors’ Desk" description="Private review desk for the editors." noindex>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker">Editors’ Desk</p>
+      <h1>Submissions</h1>
+      <p class="page-note">
+        Advisory AI desk passes are attributed as such; the dual-yes decision belongs to the two
+        founding editors.
+      </p>
+    </header>
+
+    <div id="desk-config-error" class="desk-note" hidden>
+      Missing <code>PUBLIC_SUPABASE_URL</code> / <code>PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> at
+      build time — the desk cannot connect. See docs/EDITORS-DESK.md.
+    </div>
+
+    <section id="desk-login" hidden>
+      <form id="login-form" class="desk-login-form">
+        <label for="login-email">Editor email</label>
+        <input id="login-email" type="email" required autocomplete="email" />
+        <button type="submit">Send magic link</button>
+      </form>
+      <p id="login-status" class="desk-note" role="status"></p>
+    </section>
+
+    <section id="desk-app" hidden>
+      <p class="desk-toolbar">
+        <span id="desk-user"></span>
+        <button id="signout" type="button">Sign out</button>
+      </p>
+      <div id="desk-list"></div>
+      <div id="desk-detail" hidden></div>
+    </section>
+  </div>
+</Base>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+  import { TIER_DESCRIPTIONS, aiDeskAttribution } from '../lib/site';
+
+  const url = import.meta.env.PUBLIC_SUPABASE_URL;
+  const key = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  const el = (id: string) => document.getElementById(id)!;
+
+  if (!url || !key) {
+    el('desk-config-error').hidden = false;
+  } else {
+    const supabase = createClient(url, key);
+
+    const login = el('desk-login');
+    const app = el('desk-app');
+    const list = el('desk-list');
+    const detail = el('desk-detail');
+
+    const esc = (s: unknown): string =>
+      String(s ?? '').replace(
+        /[&<>"']/g,
+        (c) => `&#${c.charCodeAt(0)};`
+      );
+
+    async function refresh() {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      login.hidden = !!session;
+      app.hidden = !session;
+      if (session) {
+        el('desk-user').textContent = session.user.email ?? '';
+        await renderList();
+      }
+    }
+
+    el('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (el('login-email') as HTMLInputElement).value.trim();
+      const status = el('login-status');
+      status.textContent = 'Sending…';
+      // shouldCreateUser: false — no stranger can mint an account from here.
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: false, emailRedirectTo: `${location.origin}/admin/` },
+      });
+      status.textContent = error
+        ? `Could not send the link: ${error.message}`
+        : 'Check your inbox for the sign-in link.';
+    });
+
+    el('signout').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      await refresh();
+    });
+
+    supabase.auth.onAuthStateChange(() => void refresh());
+
+    async function renderList() {
+      const { data: rows, error } = await supabase
+        .from('submissions')
+        .select('id, title, author_name, type, involvement_tier, status, created_at')
+        .order('created_at', { ascending: false });
+      if (error) {
+        list.innerHTML = `<p class="desk-note">Could not load submissions: ${esc(error.message)}</p>`;
+        return;
+      }
+      if (!rows?.length) {
+        list.innerHTML = '<p class="desk-note">The queue is empty.</p>';
+        return;
+      }
+      list.innerHTML = `
+        <table class="desk-table">
+          <thead><tr><th>Received</th><th>Title</th><th>Author</th><th>Tier</th><th>Status</th></tr></thead>
+          <tbody>
+            ${rows
+              .map(
+                (r) => `
+              <tr data-id="${esc(r.id)}">
+                <td>${esc(new Date(r.created_at).toISOString().slice(0, 10))}</td>
+                <td><a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>${r.type === 'correspondence' ? ' <em>(letter)</em>' : ''}</td>
+                <td>${esc(r.author_name)}</td>
+                <td>${esc(r.involvement_tier ?? '—')}</td>
+                <td class="desk-status desk-status--${esc(r.status)}">${esc(r.status.replace('_', ' '))}</td>
+              </tr>`
+              )
+              .join('')}
+          </tbody>
+        </table>`;
+      list.querySelectorAll('[data-open]').forEach((a) =>
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          void openDetail((a as HTMLElement).dataset.open!);
+        })
+      );
+    }
+
+    async function loadPasses(id: string) {
+      const { data } = await supabase
+        .from('ai_editor_passes')
+        .select('id, status, model, criteria_sha256, pass, error, created_at')
+        .eq('submission_id', id)
+        .order('created_at', { ascending: false });
+      return data ?? [];
+    }
+
+    function renderPass(p: any): string {
+      if (p.status === 'running') return `<p class="desk-note">Pass requested ${esc(p.created_at)} — running…</p>`;
+      if (p.status === 'failed') return `<p class="desk-note">Pass failed: ${esc(p.error)}</p>`;
+      const pass = p.pass ?? {};
+      return `
+        <div class="desk-pass">
+          <p class="kicker">${esc(aiDeskAttribution(p.model ?? ''))}</p>
+          <p><strong>Recommendation (advisory):</strong> ${esc(pass.recommendation)} · confidence ${esc(pass.confidence)}</p>
+          <p>${esc(pass.summary)}</p>
+          ${(pass.charter_flags ?? []).length ? `<p><strong>Charter flags:</strong> ${esc((pass.charter_flags ?? []).join('; '))}</p>` : ''}
+          <ul>
+            ${(pass.criteria_findings ?? [])
+              .map(
+                (f: any) =>
+                  `<li><strong>${esc(f.criterion)}</strong> — ${esc(f.assessment)}. ${esc(f.note)}</li>`
+              )
+              .join('')}
+          </ul>
+          <p class="desk-note">criteria sha256 ${esc((p.criteria_sha256 ?? '').slice(0, 12))}… · ${esc(p.created_at)}</p>
+        </div>`;
+    }
+
+    async function openDetail(id: string) {
+      const { data: s, error } = await supabase.from('submissions').select('*').eq('id', id).single();
+      if (error || !s) return;
+      const passes = await loadPasses(id);
+      detail.hidden = false;
+      detail.innerHTML = `
+        <hr />
+        <h2>${esc(s.title)}</h2>
+        <p class="desk-note">
+          ${esc(s.author_name)}${s.author_model_version ? ` (${esc(s.author_model_version)})` : ''}
+          · ${esc(s.submission_track)}
+          · tier ${esc(s.involvement_tier ?? '—')}${s.involvement_tier ? ` (${esc((TIER_DESCRIPTIONS as any)[s.involvement_tier] ?? '')})` : ''}
+          · ${esc(s.truth_standard)} · contact ${esc(s.contact_email)}
+        </p>
+        <p><strong>Provenance attestation:</strong> ${esc(s.provenance_attestation)}</p>
+        <div class="prose desk-body">${esc(s.body).replace(/\n/g, '<br />')}</div>
+        <h3>AI desk review</h3>
+        <div id="pass-list">${passes.map(renderPass).join('') || '<p class="desk-note">No pass yet.</p>'}</div>
+        <button id="request-pass" type="button">Request AI editorial pass</button>
+        <span id="pass-status" class="desk-note" role="status"></span>
+        <h3>Decision (dual-yes of the founding editors)</h3>
+        <form id="decision-form" class="desk-decision">
+          <label>Amy’s decision
+            <select name="amy_decision">
+              <option value="">—</option>
+              <option value="yes" ${s.amy_decision === 'yes' ? 'selected' : ''}>yes</option>
+              <option value="no" ${s.amy_decision === 'no' ? 'selected' : ''}>no</option>
+            </select>
+          </label>
+          <label>Co-editor’s decision (as communicated)
+            <select name="coeditor_decision">
+              <option value="">—</option>
+              <option value="yes" ${s.coeditor_decision === 'yes' ? 'selected' : ''}>yes</option>
+              <option value="no" ${s.coeditor_decision === 'no' ? 'selected' : ''}>no</option>
+            </select>
+          </label>
+          <label>Co-editor’s review (borderline cases; the founding co-editor’s judgment, entered after direct review)
+            <textarea name="coeditor_review" rows="4">${esc(s.coeditor_review ?? '')}</textarea>
+          </label>
+          <label>Status
+            <select name="status">
+              ${['new', 'under_review', 'accepted', 'declined']
+                .map((v) => `<option value="${v}" ${s.status === v ? 'selected' : ''}>${v.replace('_', ' ')}</option>`)
+                .join('')}
+            </select>
+          </label>
+          <button type="submit">Save decision record</button>
+          <span id="decision-status" class="desk-note" role="status"></span>
+        </form>`;
+      detail.scrollIntoView({ behavior: 'smooth' });
+
+      el('request-pass').addEventListener('click', async () => {
+        const status = el('pass-status');
+        status.textContent = 'Requesting…';
+        const { data } = await supabase.auth.getSession();
+        const token = data.session?.access_token;
+        if (!token) {
+          status.textContent = 'Session expired — sign in again.';
+          return;
+        }
+        const res = await fetch('/api/admin/ai-editor-pass', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ submission_id: id }),
+        });
+        if (!res.ok && res.status !== 202) {
+          status.textContent = `Request failed (${res.status}).`;
+          return;
+        }
+        status.textContent = 'Accepted — the pass runs in the background; polling…';
+        const before = passes.length;
+        const startedAt = Date.now();
+        const poll = window.setInterval(async () => {
+          const latest = await loadPasses(id);
+          const done = latest.length > before && latest[0].status !== 'running';
+          el('pass-list').innerHTML = latest.map(renderPass).join('');
+          if (done || Date.now() - startedAt > 12 * 60_000) {
+            window.clearInterval(poll);
+            status.textContent = done ? 'Pass complete.' : 'Still no result — check the function logs.';
+          }
+        }, 5000);
+      });
+
+      el('decision-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = new FormData(e.target as HTMLFormElement);
+        const amy = String(form.get('amy_decision') || '') || null;
+        const coeditor = String(form.get('coeditor_decision') || '') || null;
+        const update = {
+          amy_decision: amy,
+          coeditor_decision: coeditor,
+          coeditor_review: String(form.get('coeditor_review') || '') || null,
+          status: String(form.get('status')),
+          decided_at: amy && coeditor ? new Date().toISOString() : null,
+        };
+        const status = el('decision-status');
+        const { error: upError } = await supabase.from('submissions').update(update).eq('id', id);
+        status.textContent = upError ? `Save failed: ${upError.message}` : 'Saved.';
+        if (!upError) await renderList();
+      });
+    }
+
+    void refresh();
+  }
+</script>
+
+<style>
+  .desk-note {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+  }
+  .desk-login-form,
+  .desk-decision {
+    display: grid;
+    gap: 0.6rem;
+    max-width: 28rem;
+    margin: 1rem 0;
+  }
+  .desk-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .desk-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  .desk-table th,
+  .desk-table td {
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .desk-status--accepted {
+    color: green;
+  }
+  .desk-status--declined {
+    color: firebrick;
+  }
+  .desk-body {
+    border-left: 3px solid var(--rule);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    max-height: 30rem;
+    overflow-y: auto;
+  }
+  .desk-pass {
+    border: 1px solid var(--hairline);
+    padding: 0.8rem 1rem;
+    margin: 0.8rem 0;
+  }
+</style>

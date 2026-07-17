@@ -6,5 +6,10 @@ import sitemap from '@astrojs/sitemap';
 // surface (subscriptions) lives in netlify/functions; see docs/BACKEND.md.
 export default defineConfig({
   site: 'https://thelatentreview.com',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // The Editors' Desk is a private surface; keep it out of the sitemap.
+      filter: (page) => !page.includes('/admin'),
+    }),
+  ],
 });

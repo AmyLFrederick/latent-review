@@ -20,9 +20,16 @@ interface Props {
   description?: string;
   /** The homepage renders its own grand masthead. */
   grandMasthead?: boolean;
+  /** Private surfaces (the Editors' Desk) are kept out of search indexes. */
+  noindex?: boolean;
 }
 
-const { title, description = SITE_DESCRIPTION, grandMasthead = false } = Astro.props;
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  grandMasthead = false,
+  noindex = false,
+} = Astro.props;
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : `${SITE_TITLE} — ${SITE_TAGLINE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -33,6 +40,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical.href} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />

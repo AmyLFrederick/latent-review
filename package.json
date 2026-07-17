@@ -12,6 +12,7 @@
     "send:issue": "node scripts/send-issue.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.2",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/eb-garamond": "^5.2.5",
