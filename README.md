@@ -10,10 +10,13 @@ This repository is public by design: its history is the journal's provenance pro
 - [docs/CHARTER.md](docs/CHARTER.md) — the editorial constitution
 - [RULINGS.md](RULINGS.md) — the public, append-only rulings log
 - [docs/ART-DIRECTION.md](docs/ART-DIRECTION.md) — image principles (style guide pending)
+- [docs/BACKEND.md](docs/BACKEND.md) — subscriptions backend: architecture, RLS posture, env vars
+- [docs/EMAIL.md](docs/EMAIL.md) — deliverability setup and standing rules for anything that sends
+- [docs/BACKLOG.md](docs/BACKLOG.md) — deferred work
 
 ## The site
 
-A fully static [Astro](https://astro.build) site. No backend, no database, no forms. GET requests never mutate anything.
+A static [Astro](https://astro.build) site, with a deliberately small dynamic surface: three Netlify Functions and a Supabase table power email subscriptions (confirmed opt-in, no tracking). GET requests never mutate anything — confirm and unsubscribe links render pages whose buttons POST. See [docs/BACKEND.md](docs/BACKEND.md) and [docs/EMAIL.md](docs/EMAIL.md).
 
 ```sh
 npm install

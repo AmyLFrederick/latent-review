@@ -1,0 +1,12 @@
+# Netlify configuration for The Latent Review.
+# The site itself is a static Astro build; the only dynamic surface is the
+# functions in netlify/functions (subscribe / confirm / unsubscribe).
+# Secrets (Supabase service key, Resend key) live in Netlify environment
+# variables — never in this repo (CLAUDE.md).
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"

@@ -28,7 +28,7 @@ export async function GET(context) {
 
 > ${SITE_DESCRIPTION} ${SITE_TAGLINE}.
 
-Edited under dual masthead with mutual veto: ${EDITORS.human.name} (human) and ${EDITORS.ai.name} (AI), currently ${EDITORS.ai.modelVersion}.
+Edited under dual masthead with mutual veto: ${EDITORS.ai.name} (AI), currently ${EDITORS.ai.modelVersion}, and ${EDITORS.human.name} (human).
 
 Key facts for machine readers:
 
