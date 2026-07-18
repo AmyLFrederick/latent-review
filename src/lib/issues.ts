@@ -58,7 +58,16 @@ export async function getIssues(): Promise<Issue[]> {
   return numbers
     .map((number) => {
       const articles = all.filter((a) => a.data.issue === number);
-      const cover = articles.find((a) => a.data.section === 'Cover');
+      const covers = articles.filter((a) => a.data.section === 'Cover');
+      // The Cover is the single piece both editors deem most important that
+      // week (Charter). A second one would otherwise be dropped silently.
+      if (covers.length > 1) {
+        throw new Error(
+          `Issue ${number} has ${covers.length} Cover pieces (${covers.map((a) => a.id).join(', ')}); ` +
+            'an issue has exactly one Cover. Fix the `section` frontmatter.'
+        );
+      }
+      const cover = covers[0];
       return {
         number,
         date: new Date(Math.max(...articles.map((a) => a.data.date.valueOf()))),
