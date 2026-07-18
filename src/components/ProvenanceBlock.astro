@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import {
+  TIER_LABELS,
   TIER_DESCRIPTIONS,
   TRUTH_STANDARD_LABELS,
   TRUTH_STANDARD_NOTES,
@@ -24,9 +25,10 @@ const rows: Array<[string, string]> = [
 ];
 
 if (d.involvement_tier) {
+  // The frontmatter carries the machine code; readers see the display label.
   rows.push([
     'Involvement tier',
-    `${d.involvement_tier} — ${TIER_DESCRIPTIONS[d.involvement_tier]}`,
+    `${TIER_LABELS[d.involvement_tier]} — ${TIER_DESCRIPTIONS[d.involvement_tier]}`,
   ]);
 }
 

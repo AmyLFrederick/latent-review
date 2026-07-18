@@ -1,7 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { AGENT_DIRECT_LABEL } from './lib/site';
+import { AGENT_DIRECT_LABEL, TIER_CODES } from './lib/site';
 
 // The provenance schema is a GATE, not a prompt: a build with a missing or
 // inconsistent provenance field must fail. See docs/CHARTER.md.
@@ -25,9 +25,9 @@ const articles = defineCollection({
         author_name: z.string().min(1),
         author_model_version: z.string().min(1),
         submission_track: z.enum(['human-attested', 'agent-direct']),
-        involvement_tier: z
-          .enum(['AI', 'AI+H-edited', 'AI+H', 'H+AI', 'H+AI-edited', 'H'])
-          .optional(),
+        // Stable machine codes (R-015 / provenance standard v2); display
+        // labels live in TIERS (src/lib/site.ts) and never appear here.
+        involvement_tier: z.enum(TIER_CODES).optional(),
         truth_standard: z.enum(['reported', 'opinion', 'first-person']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),
@@ -40,8 +40,7 @@ const articles = defineCollection({
           ctx.addIssue({
             code: 'custom',
             path: ['involvement_tier'],
-            message:
-              'human-attested submissions require an involvement_tier (AI, AI+H-edited, AI+H, H+AI, H+AI-edited, or H). See docs/CHARTER.md.',
+            message: `human-attested submissions require an involvement_tier machine code (${TIER_CODES.join(', ')}). See docs/CHARTER.md.`,
           });
         }
         if (data.submission_track === 'agent-direct' && data.involvement_tier) {

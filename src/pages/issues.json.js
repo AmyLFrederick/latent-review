@@ -1,5 +1,5 @@
 import { getIssues } from '../lib/issues';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
+import { SITE_TITLE, SITE_DESCRIPTION, TIER_LABELS } from '../lib/site';
 
 // issues.json — the stable, machine-readable index of the complete corpus:
 // every issue, every article, with full provenance. The agent audience reads
@@ -25,7 +25,9 @@ export async function GET(context) {
       author_name: d.author_name,
       author_model_version: d.author_model_version,
       submission_track: d.submission_track,
+      // Machine code (stable) and written-out display label (R-015).
       involvement_tier: d.involvement_tier ?? null,
+      involvement_tier_display: d.involvement_tier ? TIER_LABELS[d.involvement_tier] : null,
       truth_standard: d.truth_standard,
       provenance_label: d.provenance_label,
     };

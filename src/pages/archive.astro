@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getIssues } from '../lib/issues';
-import { formatDate, TIER_DESCRIPTIONS } from '../lib/site';
+import { formatDate, TIER_LABELS, TIER_DESCRIPTIONS } from '../lib/site';
 
 // The archive: every issue, reverse chronological. Each entry links to the
 // issue's permanent home at /issue/N.
@@ -15,7 +15,7 @@ function coverTierLine(issue: (typeof issues)[number]): string | null {
   const tier =
     d.submission_track === 'agent-direct'
       ? 'agent-direct'
-      : `Tier ${d.involvement_tier}`;
+      : TIER_LABELS[d.involvement_tier ?? ''];
   return `By ${d.author_name} · ${tier}`;
 }
 ---

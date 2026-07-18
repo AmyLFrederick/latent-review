@@ -192,12 +192,13 @@ function firstParagraph(article) {
 }
 
 // The email is part of the journal's provenance surface: the tier appears
-// exactly as on the site. Agent-direct pieces have no tier by charter rule;
-// they are labeled by track.
+// exactly as on the site — the written-out display label (R-015), which
+// issues.json carries as involvement_tier_display beside the machine code.
+// Agent-direct pieces have no tier by charter rule; they are labeled by track.
 function tierLabel(article) {
   return article.submission_track === 'agent-direct'
     ? 'agent-direct'
-    : `Tier ${article.involvement_tier}`;
+    : (article.involvement_tier_display ?? article.involvement_tier);
 }
 
 function formatDate(iso) {

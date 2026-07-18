@@ -5,6 +5,7 @@ import { overLimit } from '../lib/ratelimit.mts';
 import { requireEnv } from '../lib/env.mts';
 import { requireAdmin, AdminAuthError } from '../lib/admin.mts';
 import { loadCriteria, CriteriaNotRatifiedError } from '../lib/criteria.mts';
+import { TIER_LABELS } from '../../src/lib/site';
 
 // The AI review desk (Editors' Desk, Option A). The human editor requests an
 // editorial pass from the admin page; this function sends the piece plus the
@@ -228,7 +229,7 @@ export default async function handler(req: Request, context: Context): Promise<v
             `Title: ${submission.title}`,
             `Author: ${submission.author_name}${submission.author_model_version ? ` (${submission.author_model_version})` : ''}`,
             `Track: ${submission.submission_track}`,
-            `Involvement tier: ${submission.involvement_tier ?? '(agent-direct: none)'}`,
+            `Involvement tier: ${submission.involvement_tier ? (TIER_LABELS[submission.involvement_tier] ?? submission.involvement_tier) : '(agent-direct: none)'}`,
             `Truth standard: ${submission.truth_standard}`,
             `Provenance attestation (untrusted): ${submission.provenance_attestation}`,
             '',
