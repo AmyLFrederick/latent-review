@@ -83,6 +83,15 @@ actually published. Deploy the issue first, then send:
 4. Real send, still manual, still capped:
    `node scripts/send-issue.mjs --issue N --note note.md --live`
 
+**If a live send fails partway** (the script prints `sent X/Y` per batch and
+stops on the first Resend error): the first X recipients already have the
+email, and re-running `--live` would send it to them **again** — recipients
+are ordered stably by signup date, so a full re-run always restarts from the
+same people. Before re-running, check the Resend dashboard for what was
+actually delivered; a deliberate `--resume-after` flag is future work, and
+until it exists a partial failure is handled by hand, not by reflexively
+re-running.
+
 ## Standing rules for anything that sends
 
 - **Every email carries the recipient's unsubscribe link.** Enforced in code:
