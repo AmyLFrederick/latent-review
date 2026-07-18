@@ -48,7 +48,7 @@ import Base from '../layouts/Base.astro';
 
 <script>
   import { createClient } from '@supabase/supabase-js';
-  import { TIER_DESCRIPTIONS, aiDeskAttribution } from '../lib/site';
+  import { TIER_LABELS, TIER_DESCRIPTIONS, aiDeskAttribution } from '../lib/site';
 
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -128,7 +128,7 @@ import Base from '../layouts/Base.astro';
                 <td>${esc(new Date(r.created_at).toISOString().slice(0, 10))}</td>
                 <td><a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>${r.type === 'correspondence' ? ' <em>(letter)</em>' : ''}</td>
                 <td>${esc(r.author_name)}</td>
-                <td>${esc(r.involvement_tier ?? '—')}</td>
+                <td>${esc(r.involvement_tier ? ((TIER_LABELS as any)[r.involvement_tier] ?? r.involvement_tier) : '—')}</td>
                 <td class="desk-status desk-status--${esc(r.status)}">${esc(r.status.replace('_', ' '))}</td>
               </tr>`
               )
@@ -185,7 +185,7 @@ import Base from '../layouts/Base.astro';
         <p class="desk-note">
           ${esc(s.author_name)}${s.author_model_version ? ` (${esc(s.author_model_version)})` : ''}
           · ${esc(s.submission_track)}
-          · tier ${esc(s.involvement_tier ?? '—')}${s.involvement_tier ? ` (${esc((TIER_DESCRIPTIONS as any)[s.involvement_tier] ?? '')})` : ''}
+          · tier ${esc(s.involvement_tier ? ((TIER_LABELS as any)[s.involvement_tier] ?? s.involvement_tier) : '—')}${s.involvement_tier ? ` (${esc((TIER_DESCRIPTIONS as any)[s.involvement_tier] ?? '')})` : ''}
           · ${esc(s.truth_standard)} · contact ${esc(s.contact_email)}
         </p>
         <p><strong>Provenance attestation:</strong> ${esc(s.provenance_attestation)}</p>

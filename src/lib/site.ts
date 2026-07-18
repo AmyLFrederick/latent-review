@@ -37,18 +37,42 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
 export const AGENT_DIRECT_LABEL =
   'provenance as claimed by the author; not independently verifiable';
 
-// Charter: the labels describe themselves — the order of the letters names
-// who led. Full spectrum: AI · AI+H-edited · AI+H · H+AI · H+AI-edited · H.
-// Published as an open standard under CC BY 4.0 (R-014); /provenance is the
-// canonical statement.
-export const TIER_DESCRIPTIONS: Record<string, string> = {
-  AI: 'Fully AI: conceived and written by the AI',
-  'AI+H-edited': 'AI-written; the human served as editor only',
-  'AI+H': 'AI-led; a human contributed',
-  'H+AI': 'Human-led; an AI contributed',
-  'H+AI-edited': 'Human-written; the AI served as editor only',
-  H: 'Fully human: no AI involvement',
-};
+// Charter: the order of names names who led; the equals sign names
+// co-authorship. Spectrum: AI · AI + Human (editor) · AI + Human ·
+// AI = Human · Human + AI · Human + AI (editor) · Human.
+// Published as an open standard under CC BY 4.0 (R-014), revised to v2 by
+// R-015; /provenance is the canonical statement.
+//
+// Each tier carries a stable machine code — what the article schema, the
+// submissions table, and the JSON feeds store — and a written-out display
+// label, what readers see. Codes are permanent so the standard is never
+// again trapped by its own notation: if display conventions change, only
+// the labels move.
+export const TIERS = [
+  { code: 'ai', label: 'AI', description: 'AI alone' },
+  { code: 'ai-human-editor', label: 'AI + Human (editor)', description: 'AI wrote it; a human edited' },
+  { code: 'ai-human', label: 'AI + Human', description: 'AI led; a human contributed substantively' },
+  {
+    code: 'ai-equals-human',
+    label: 'AI = Human',
+    description: 'Co-authorship; both contributed substantially, neither led',
+  },
+  { code: 'human-ai', label: 'Human + AI', description: 'Human led; AI contributed substantively' },
+  { code: 'human-ai-editor', label: 'Human + AI (editor)', description: 'Human wrote it; AI edited' },
+  { code: 'human', label: 'Human', description: 'Human alone' },
+] as const;
+
+export type TierCode = (typeof TIERS)[number]['code'];
+
+export const TIER_CODES = TIERS.map((t) => t.code) as [TierCode, ...TierCode[]];
+
+export const TIER_LABELS: Record<string, string> = Object.fromEntries(
+  TIERS.map((t) => [t.code, t.label])
+);
+
+export const TIER_DESCRIPTIONS: Record<string, string> = Object.fromEntries(
+  TIERS.map((t) => [t.code, t.description])
+);
 
 // Disclosure framing for the AI review desk (Editors' Desk): the desk pass is
 // attributed exactly this way — same model as the co-editor, different role.

@@ -1,21 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
-import { TIER_DESCRIPTIONS, SITE_TITLE } from '../lib/site';
+import { TIERS, SITE_TITLE } from '../lib/site';
 
 // R-014: this page is the canonical statement of the involvement-tier
-// system as an open standard. The tier definitions render from
-// TIER_DESCRIPTIONS so this page, the submit surfaces, and the provenance
-// blocks can never drift apart.
-const TIER_ORDER = Object.keys(TIER_DESCRIPTIONS);
+// system as an open standard. R-015 revised the standard to v2. The tier
+// definitions render from TIERS so this page, the submit surfaces, and the
+// provenance blocks can never drift apart.
 ---
 
 <Base
   title="Provenance"
-  description="The Latent Review's six involvement tiers — an open provenance standard, CC BY 4.0, free for any publication or writer to adopt."
+  description="The Latent Review's seven involvement tiers — an open provenance standard, CC BY 4.0, free for any publication or writer to adopt."
 >
   <div class="wrap">
     <header class="page-header">
-      <p class="kicker">Provenance</p>
+      <p class="kicker">Provenance · v2</p>
       <h1>Saying who wrote it, in one label</h1>
       <p class="page-note">
         An open standard for disclosing how humans and AI shared the writing. Free to adopt,
@@ -27,11 +26,11 @@ const TIER_ORDER = Object.keys(TIER_DESCRIPTIONS);
       <p>
         Every piece {SITE_TITLE} publishes carries a provenance label, and at its center is an
         involvement tier: a short, self-describing name for how the work was divided between
-        human and AI. The labels describe themselves — <strong>the order of the letters names
-        who led.</strong>
+        human and AI. The labels describe themselves — <strong>the order of names names who
+        led; the equals sign names co-authorship.</strong>
       </p>
 
-      <h2>The six tiers</h2>
+      <h2>The seven tiers</h2>
       <table>
         <thead>
           <tr>
@@ -40,19 +39,23 @@ const TIER_ORDER = Object.keys(TIER_DESCRIPTIONS);
           </tr>
         </thead>
         <tbody>
-          {TIER_ORDER.map((tier) => (
+          {TIERS.map((tier) => (
             <tr>
-              <td><strong>{tier}</strong></td>
-              <td>{TIER_DESCRIPTIONS[tier]}</td>
+              <td><strong>{tier.label}</strong></td>
+              <td>{tier.description}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <p>
-        The spectrum runs {TIER_ORDER.join(' · ')} — from fully AI to fully human, symmetric
-        about the middle: <strong>AI+H-edited</strong> mirrors <strong>H+AI-edited</strong>,
-        the editor's role on each side of the divide. One label, no footnotes, and a reader —
-        human or machine — knows who led, who contributed, and who only edited.
+        The spectrum runs {TIERS.map((t) => t.label).join(' · ')} — from fully AI to fully
+        human, symmetric about the middle. The <strong>(editor)</strong> annotation names a
+        party whose role was editing only; the bare <strong>+</strong> form means the second
+        party contributed substantively; <strong>AI = Human</strong> is co-authorship — both
+        contributed substantially and stand behind the whole, neither led. Equality is
+        attested, not measured: the tier claims shared authorship, not a fifty-fifty
+        accounting. One label, no footnotes, and a reader — human or machine — knows who led,
+        who contributed, and who edited.
       </p>
       <p>
         In this journal's own use, a tier is set at acceptance and never altered; corrections
@@ -60,10 +63,37 @@ const TIER_ORDER = Object.keys(TIER_DESCRIPTIONS);
         the taxonomy itself.
       </p>
 
+      <h2>Machine codes</h2>
+      <p>
+        Each tier carries a stable lowercase machine code alongside its display label — part
+        of the standard, as its recommended encoding — so provenance data is comparable
+        across adopting publications, and the standard is never trapped by its own notation:
+        if display conventions change, the codes do not. In this journal, the codes appear in
+        the article schema, <a href="/issues.json"><code>issues.json</code></a>, and
+        <a href="/feed.json"><code>feed.json</code></a>.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Machine code</th>
+            <th>Display label</th>
+          </tr>
+        </thead>
+        <tbody>
+          {TIERS.map((tier) => (
+            <tr>
+              <td><code>{tier.code}</code></td>
+              <td>{tier.label}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <h2 id="license">License</h2>
       <p>
-        The involvement-tier system — the six tier names, their definitions, and the
-        order-of-letters convention — is published as an open standard under{' '}
+        The involvement-tier system — the seven tier names, their definitions, the
+        order-of-names convention, and the recommended machine codes — is published as an
+        open standard under{' '}
         <a href="https://creativecommons.org/licenses/by/4.0/">
           Creative Commons Attribution 4.0 International (CC BY 4.0)
         </a>
@@ -75,9 +105,25 @@ const TIER_ORDER = Object.keys(TIER_DESCRIPTIONS);
 
       <h2>Displaying it</h2>
       <p>
-        The simplest form is a line beside the byline — <em>Provenance: AI+H</em> — linking
-        here for the definitions. A small provenance badge for adopting publications and
-        writers is being designed and will be published on this page.
+        The simplest form is a line beside the byline — <em>Provenance: AI + Human</em> —
+        linking here for the definitions. A small provenance badge for adopting publications
+        and writers is being designed and will be published on this page.
+      </p>
+
+      <h2 id="changelog">Changelog</h2>
+      <p>
+        <strong>v2 — July 18, 2026 (R-015).</strong> Three changes, made before Issue No. 1 —
+        no published article ever carried the v1 labels. First, labels are written out for
+        readability: “H” became “Human” everywhere a label is displayed. Second, the
+        “-edited” suffix became an “(editor)” role annotation, stating what the second party
+        did rather than abbreviating it. Third, a seventh tier was added:
+        <strong>AI = Human</strong>, co-authorship — the case the lead/support axis could not
+        express. Stable machine codes were introduced alongside the display labels.
+      </p>
+      <p>
+        <strong>v1 — July 17–18, 2026 (R-010, R-013, R-014).</strong> The original
+        letter-notation taxonomy (AI · AI+H-edited · AI+H · H+AI · H+AI-edited · H),
+        published as an open standard under CC BY 4.0. Never used in any published article.
       </p>
     </div>
   </div>

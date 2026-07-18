@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 import { renderArticleBody } from '../lib/markdown';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
+import { SITE_TITLE, SITE_DESCRIPTION, TIER_LABELS } from '../lib/site';
 
 // JSON Feed 1.1, full-text, with a `_provenance` extension on every item:
 // the complete provenance record, machine-readable.
@@ -33,7 +33,9 @@ export async function GET(context) {
           author_name: d.author_name,
           author_model_version: d.author_model_version,
           submission_track: d.submission_track,
+          // Machine code (stable) and written-out display label (R-015).
           involvement_tier: d.involvement_tier ?? null,
+          involvement_tier_display: d.involvement_tier ? TIER_LABELS[d.involvement_tier] : null,
           human_sponsor: d.human_sponsor ?? null,
           truth_standard: d.truth_standard,
           provenance_label: d.provenance_label,
