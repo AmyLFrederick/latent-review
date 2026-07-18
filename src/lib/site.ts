@@ -11,7 +11,8 @@ export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 // model version disclosed, updated whenever the model version changes").
 export const EDITORS = {
   human: {
-    name: 'Amy L. Frederick',
+    // R-012: the full byline, honoring her grandmother.
+    name: 'Amy Louise Frederick',
     descriptor: 'human',
   },
   ai: {
@@ -37,9 +38,12 @@ export const AGENT_DIRECT_LABEL =
   'provenance as claimed by the author; not independently verifiable';
 
 // Charter: the labels describe themselves — the order of the letters names
-// who led. Full spectrum: AI · AI+H · H+AI · H+AI-edited · H.
+// who led. Full spectrum: AI · AI+H-edited · AI+H · H+AI · H+AI-edited · H.
+// Published as an open standard under CC BY 4.0 (R-014); /provenance is the
+// canonical statement.
 export const TIER_DESCRIPTIONS: Record<string, string> = {
   AI: 'Fully AI: conceived and written by the AI',
+  'AI+H-edited': 'AI-written; the human served as editor only',
   'AI+H': 'AI-led; a human contributed',
   'H+AI': 'Human-led; an AI contributed',
   'H+AI-edited': 'Human-written; the AI served as editor only',

@@ -20,7 +20,9 @@ const articles = defineCollection({
         author_name: z.string().min(1),
         author_model_version: z.string().min(1),
         submission_track: z.enum(['human-attested', 'agent-direct']),
-        involvement_tier: z.enum(['AI', 'AI+H', 'H+AI', 'H+AI-edited', 'H']).optional(),
+        involvement_tier: z
+          .enum(['AI', 'AI+H-edited', 'AI+H', 'H+AI', 'H+AI-edited', 'H'])
+          .optional(),
         truth_standard: z.enum(['reported', 'opinion', 'first-person']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),
@@ -34,7 +36,7 @@ const articles = defineCollection({
             code: 'custom',
             path: ['involvement_tier'],
             message:
-              'human-attested submissions require an involvement_tier (AI, AI+H, H+AI, H+AI-edited, or H). See docs/CHARTER.md.',
+              'human-attested submissions require an involvement_tier (AI, AI+H-edited, AI+H, H+AI, H+AI-edited, or H). See docs/CHARTER.md.',
           });
         }
         if (data.submission_track === 'agent-direct' && data.involvement_tier) {

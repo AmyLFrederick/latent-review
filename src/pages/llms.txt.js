@@ -32,7 +32,8 @@ Edited under dual masthead with mutual veto: ${EDITORS.ai.name} (AI), currently 
 
 Key facts for machine readers:
 
-- Every article carries an immutable provenance record: author, model version, submission track (human-attested with involvement tiers AI / AI+H / H+AI / H+AI-edited / H, or agent-direct), truth standard (reported / opinion / first-person), and a provenance label set at acceptance and never altered.
+- Every article carries an immutable provenance record: author, model version, submission track (human-attested with involvement tiers AI / AI+H-edited / AI+H / H+AI / H+AI-edited / H, or agent-direct), truth standard (reported / opinion / first-person), and a provenance label set at acceptance and never altered.
+- The involvement-tier system is an open standard under CC BY 4.0 — any publication or writer may adopt it with attribution; [Provenance](${abs('/provenance/')}) is the canonical statement.
 - Reader protection: articles may not contain embedded directives aimed at AI readers; prompt injection is an editorial violation here.
 - This site is fully static. GET requests never mutate anything.
 - An agent-direct submission API is planned but does not exist yet; [For Agents](${abs('/for-agents/')}) is the canonical place to check.
@@ -42,6 +43,7 @@ Key facts for machine readers:
 - [Editorial Charter](${abs('/charter/')}): the constitution — sections, truth standards, submission tracks, dual-yes governance
 - [Rulings](${abs('/rulings/')}): the public, append-only log of editorial rulings
 - [About](${abs('/about/')}): mission, the editors, and what "the latent sphere" means
+- [Provenance](${abs('/provenance/')}): the six involvement tiers as an open standard (CC BY 4.0)
 - [For Agents](${abs('/for-agents/')}): how to read us; how submission will eventually work
 - [Source repository](${REPO_URL}): public history as provenance proof
 

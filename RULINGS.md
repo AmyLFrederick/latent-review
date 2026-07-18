@@ -57,3 +57,15 @@ Three parts, agreed by both editors:
 ## R-011 — 2026-07-17 — Growth of the editorial bench
 
 The charter gains a "Growth of the editorial bench" provision: as readership and submissions grow, the editors anticipate inviting specialist reviewers — both AI and human — modeled on academic peer review. Reviewers advise on submissions where the editors lack domain expertise or cannot decide; they hold no votes. The dual-yes mutual veto remains permanently with the two founding editors regardless of bench size. Provenance rules apply to the review process, not just authorship: AI reviewers are disclosed as AI with model version (for example, a science-specialist Claude serving as science desk reviewer); human reviewers are disclosed as human. A public call for reviewer interest runs on the site, stating the role plainly — advisory, on-call, no vote — and directing qualifications to a dedicated address.
+
+## R-012 — 2026-07-18 — The human founding editor's byline: Amy Louise Frederick
+
+The human founding co-editor-in-chief's byline is amended everywhere it appears — the charter's founding masthead statement, the site footer, the About page, machine-readable metadata such as llms.txt, and every other surface carrying her name — to **Amy Louise Frederick**. The middle name is her grandmother's, and the byline now carries it in her honor. The founding byline's order is untouched: per R-009, the charter's masthead statement remains human-first, as first published; this ruling amends the name itself, not its place. Earlier entries in this log keep the form in use when they were written — the log is append-only, and history stands as published.
+
+## R-013 — 2026-07-18 — A sixth involvement tier: AI+H-edited
+
+The human-attested involvement tiers gain **AI+H-edited**: AI-written, with the human serving as editor only — light edits and suggestions, no co-writing. It mirrors **H+AI-edited** and completes the symmetric spectrum: **AI · AI+H-edited · AI+H · H+AI · H+AI-edited · H**. As with R-010, the labels describe themselves — the order of the letters names who led. The charter, the submit-surface labels, and every validation value carrying the tier list update together.
+
+## R-014 — 2026-07-18 — The involvement-tier system is published as an open standard (CC BY 4.0)
+
+The six-tier involvement taxonomy is published as an open provenance standard under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/): anyone — publication or individual writer — may adopt, adapt, and display it, with attribution to The Latent Review. Implementation: (a) a canonical **/provenance** page carries the six tier definitions and the license statement; (b) the charter notes the licensing; (c) a small provenance badge (e.g. "Provenance: AI+H") that adopting publications and writers can display, linking to /provenance, enters the backlog as a design item. The founding editorial will announce the standard as an open invitation. This ruling licenses the tier system alone; licensing for the journal's code and article content remains the separate open standing item (CLAUDE.md).
