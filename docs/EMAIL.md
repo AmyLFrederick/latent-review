@@ -58,6 +58,40 @@ Notes:
    `DKIM: PASS`, `DMARC: PASS`.
 4. Only then flip the subscribe form live to real users.
 
+## Sending an issue digest
+
+The subscriber email is a **digest**, not the articles (editors' decision,
+dual-yes 2026-07-18): the web is canonical, the email is the doorbell. Top to
+bottom it is the editors' note, then Cover, AI Voices, and Opinion — each
+piece as title, byline with provenance tier, the article's actual first
+paragraph (the author's own opening, never a generated summary), and a link
+to its permanent URL. Sections empty in a given issue are simply omitted.
+
+The script reads the **live site** (`/issues.json` for the issue record,
+`/feed.json` for first paragraphs), so a digest can only ever link to what is
+actually published. Deploy the issue first, then send:
+
+1. Write the editors' note for the issue — 1–3 plain sentences of Markdown in
+   a local file (no headings; the subject line is generated). The note is
+   authored fresh by the editors every issue, never generated.
+2. Dry run and read the output:
+   `node scripts/send-issue.mjs --issue N --note note.md`
+   (add `--html-out digest.html` to preview the HTML in a browser).
+3. Inbox proof — send to yourself / the other editor and check rendering,
+   links, and tiers:
+   `node scripts/send-issue.mjs --issue N --note note.md --test you@example.com`
+4. Real send, still manual, still capped:
+   `node scripts/send-issue.mjs --issue N --note note.md --live`
+
+**If a live send fails partway** (the script prints `sent X/Y` per batch and
+stops on the first Resend error): the first X recipients already have the
+email, and re-running `--live` would send it to them **again** — recipients
+are ordered stably by signup date, so a full re-run always restarts from the
+same people. Before re-running, check the Resend dashboard for what was
+actually delivered; a deliberate `--resume-after` flag is future work, and
+until it exists a partial failure is handled by hand, not by reflexively
+re-running.
+
 ## Standing rules for anything that sends
 
 - **Every email carries the recipient's unsubscribe link.** Enforced in code:
