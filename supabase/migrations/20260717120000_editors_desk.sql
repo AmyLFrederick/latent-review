@@ -148,18 +148,64 @@ create policy ai_editor_passes_admin_select on public.ai_editor_passes
 grant select, update on table public.submissions to service_role;
 grant select, insert, update on table public.ai_editor_passes to service_role;
 
--- Fail loudly in the migration itself if the grants did not take.
+-- Fail loudly in the migration itself if the grants did not take — naming
+-- exactly what is missing. Column-restricted grants must be probed with
+-- has_column_privilege(): has_table_privilege() answers "on the whole
+-- table?" and ignores column-level grants, so probing anon's deliberately
+-- column-restricted INSERT at table granularity raises even when every
+-- grant applied — and in a single-transaction run (Supabase SQL editor,
+-- supabase db push) that raise rolls the entire migration back.
 do $$
+declare
+  missing text[] := '{}';
+  col text;
 begin
-  if not (
-    has_table_privilege('service_role', 'public.submissions', 'select')
-    and has_table_privilege('service_role', 'public.submissions', 'update')
-    and has_table_privilege('anon', 'public.submissions', 'insert')
-    and has_table_privilege('authenticated', 'public.submissions', 'select')
-    and has_table_privilege('service_role', 'public.ai_editor_passes', 'insert')
-    and has_table_privilege('service_role', 'public.ai_editor_passes', 'update')
-    and has_table_privilege('authenticated', 'public.ai_editor_passes', 'select')
-  ) then
-    raise exception 'editors-desk grants did not apply — the review desk will fail';
+  -- anon: column-restricted INSERT — exactly the intake columns.
+  foreach col in array array[
+    'type', 'title', 'author_name', 'author_model_version', 'submission_track',
+    'involvement_tier', 'truth_standard', 'provenance_attestation', 'body',
+    'contact_email'
+  ] loop
+    if not has_column_privilege('anon', 'public.submissions', col, 'insert') then
+      missing := missing || format('anon insert on submissions.%s', col);
+    end if;
+  end loop;
+
+  -- authenticated: table-level SELECT; column-restricted UPDATE on the
+  -- decision fields.
+  if not has_table_privilege('authenticated', 'public.submissions', 'select') then
+    missing := missing || 'authenticated select on submissions'::text;
+  end if;
+  foreach col in array array[
+    'status', 'amy_decision', 'coeditor_decision', 'coeditor_review', 'decided_at'
+  ] loop
+    if not has_column_privilege('authenticated', 'public.submissions', col, 'update') then
+      missing := missing || format('authenticated update on submissions.%s', col);
+    end if;
+  end loop;
+  if not has_table_privilege('authenticated', 'public.ai_editor_passes', 'select') then
+    missing := missing || 'authenticated select on ai_editor_passes'::text;
+  end if;
+
+  -- service_role: table-level grants.
+  if not has_table_privilege('service_role', 'public.submissions', 'select') then
+    missing := missing || 'service_role select on submissions'::text;
+  end if;
+  if not has_table_privilege('service_role', 'public.submissions', 'update') then
+    missing := missing || 'service_role update on submissions'::text;
+  end if;
+  if not has_table_privilege('service_role', 'public.ai_editor_passes', 'select') then
+    missing := missing || 'service_role select on ai_editor_passes'::text;
+  end if;
+  if not has_table_privilege('service_role', 'public.ai_editor_passes', 'insert') then
+    missing := missing || 'service_role insert on ai_editor_passes'::text;
+  end if;
+  if not has_table_privilege('service_role', 'public.ai_editor_passes', 'update') then
+    missing := missing || 'service_role update on ai_editor_passes'::text;
+  end if;
+
+  if array_length(missing, 1) > 0 then
+    raise exception 'editors-desk grants did not apply — missing: %',
+      array_to_string(missing, '; ');
   end if;
 end $$;
