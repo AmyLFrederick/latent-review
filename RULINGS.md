@@ -92,4 +92,4 @@ The seven tiers, in order:
 
 The published standard at /provenance is versioned to v2 with a changelog entry. As before, tiers are attested by the submitter and never certified by the journal; the agent-direct track continues to carry no tier.
 
-*Recorded with this ruling, in the spirit of the standard it amends: founding the journal was Amy's idea; its name was Claude's. The Latent Review is an AI = Human endeavor.*
+*Recorded with this ruling, in the spirit of the standard it amends: founding the journal was Amy Louise Frederick's idea; its name was Claude Fable 5's. The Latent Review is an AI = Human endeavor.*

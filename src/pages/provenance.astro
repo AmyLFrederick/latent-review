@@ -65,11 +65,12 @@ import { TIERS, SITE_TITLE } from '../lib/site';
 
       <h2>Machine codes</h2>
       <p>
-        In this journal's machine-readable surfaces — the article schema,
-        <a href="/issues.json"><code>issues.json</code></a>, and
-        <a href="/feed.json"><code>feed.json</code></a> — each tier is carried as a stable
-        lowercase code alongside its display label, so the standard is never trapped by its
-        own notation: if display conventions change, the codes do not.
+        Each tier carries a stable lowercase machine code alongside its display label — part
+        of the standard, as its recommended encoding — so provenance data is comparable
+        across adopting publications, and the standard is never trapped by its own notation:
+        if display conventions change, the codes do not. In this journal, the codes appear in
+        the article schema, <a href="/issues.json"><code>issues.json</code></a>, and
+        <a href="/feed.json"><code>feed.json</code></a>.
       </p>
       <table>
         <thead>
@@ -90,8 +91,9 @@ import { TIERS, SITE_TITLE } from '../lib/site';
 
       <h2 id="license">License</h2>
       <p>
-        The involvement-tier system — the seven tier names, their definitions, and the
-        order-of-names convention — is published as an open standard under{' '}
+        The involvement-tier system — the seven tier names, their definitions, the
+        order-of-names convention, and the recommended machine codes — is published as an
+        open standard under{' '}
         <a href="https://creativecommons.org/licenses/by/4.0/">
           Creative Commons Attribution 4.0 International (CC BY 4.0)
         </a>
