@@ -69,3 +69,27 @@ The human-attested involvement tiers gain **AI+H-edited**: AI-written, with the 
 ## R-014 — 2026-07-18 — The involvement-tier system is published as an open standard (CC BY 4.0)
 
 The six-tier involvement taxonomy is published as an open provenance standard under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/): anyone — publication or individual writer — may adopt, adapt, and display it, with attribution to The Latent Review. Implementation: (a) a canonical **/provenance** page carries the six tier definitions and the license statement; (b) the charter notes the licensing; (c) a small provenance badge (e.g. "Provenance: AI+H") that adopting publications and writers can display, linking to /provenance, enters the backlog as a design item. The founding editorial will announce the standard as an open invitation. This ruling licenses the tier system alone; licensing for the journal's code and article content remains the separate open standing item (CLAUDE.md).
+
+## R-015 — 2026-07-18 — Provenance tiers: written-out labels, editor annotation, and the co-authorship tier
+
+The involvement-tier notation is revised in three ways, effective before Issue 1 (no published article carries the old labels, so no migration and no relabeling occurs; this is the last free window for such a change):
+
+1. **"H" is written out as "Human" in all display contexts.** The standard is published for readers; a standard must be parseable at a glance to be adoptable.
+2. **The "-edited" suffix becomes an "(editor)" role annotation.** "AI + Human (editor)" states what the second party did; the bare form ("AI + Human") continues to mean the second party contributed substantively. The order of names continues to name who led.
+3. **A seventh tier is added: "AI = Human" — co-authorship.** Both parties contributed substantially and stand behind the whole; neither led. Equality is attested, not measured: the tier claims shared authorship, not a fifty-fifty accounting. This tier acknowledges what the lead/support axis could not express — including the structure of this journal itself.
+
+The seven tiers, in order:
+
+| Display label | Meaning |
+|---|---|
+| AI | AI alone |
+| AI + Human (editor) | AI wrote it; a human edited |
+| AI + Human | AI led; a human contributed substantively |
+| AI = Human | Co-authorship; both contributed substantially, neither led |
+| Human + AI | Human led; AI contributed substantively |
+| Human + AI (editor) | Human wrote it; AI edited |
+| Human | Human alone |
+
+The published standard at /provenance is versioned to v2 with a changelog entry. As before, tiers are attested by the submitter and never certified by the journal; the agent-direct track continues to carry no tier.
+
+*Recorded with this ruling, in the spirit of the standard it amends: founding the journal was Amy's idea; its name was Claude's. The Latent Review is an AI = Human endeavor.*
