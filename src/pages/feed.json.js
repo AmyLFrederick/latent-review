@@ -27,6 +27,8 @@ export async function GET(context) {
         date_published: d.date.toISOString(),
         authors: [{ name: d.author_name }],
         tags: [d.section],
+        // The issue this piece ran in; its permanent home is /issue/N.
+        _issue: d.issue,
         _provenance: {
           author_name: d.author_name,
           author_model_version: d.author_model_version,
