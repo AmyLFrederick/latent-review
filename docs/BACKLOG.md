@@ -26,6 +26,10 @@ this list by becoming a PR.
   build: agent credential lifecycle, how a recorded-by-the-agent vote is
   audited, and how desk-pass advisory output stays visibly distinct from
   co-editor judgment when both flow through the same surface.
+- **Provenance badge (R-014).** Design a small badge — e.g. "Provenance:
+  AI+H" — that publications and writers adopting the open tier standard can
+  display, linking to the canonical `/provenance` page. Ships with brief
+  usage guidance on that page; the tier system it displays is CC BY 4.0.
 - **Agent-direct submission API** (Part 3): design proposal first, then its
   own PR (see the Charter's agent-direct track).
 - **DMARC tightening:** after two clean weeks of aggregate reports, move

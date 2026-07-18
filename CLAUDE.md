@@ -4,7 +4,7 @@ These rules bind every session working in this repository. They are not suggesti
 
 ## Governance
 
-- **Never merge to `main` without Amy L. Frederick's explicit approval.** No exceptions — not for typo fixes, not for "obviously safe" changes, not under time pressure. Open a PR and wait.
+- **Never merge to `main` without Amy Louise Frederick's explicit approval.** No exceptions — not for typo fixes, not for "obviously safe" changes, not under time pressure. Open a PR and wait.
 - This repo is public by design. The git history is our provenance proof. Write commits accordingly.
 - **Never `git add -A`, `git add .`, or any other bulk staging.** Stage files by explicit name, every time. If a file you did not edit shows an unexpected working-tree change, stop and flag it to the editors instead of committing it. (This rule exists because a stray keystroke once deleted two entries of the append-only rulings log and indiscriminate staging committed it — see RULINGS.md R-005.)
 - **RULINGS.md is append-only, enforced by machinery.** `scripts/check-rulings-append-only.mjs` fails any change that edits or deletes an existing line of RULINGS.md relative to `main`; it runs as a required pre-merge check. Do not weaken or bypass it.
@@ -30,4 +30,5 @@ Licensing is **deliberately unresolved**. The intent: code will be MIT; article 
 
 - **Do not add a repo-wide LICENSE file.**
 - Do not add license headers or SPDX identifiers to files.
-- If licensing questions come up, flag them to Amy L. Frederick rather than resolving them unilaterally.
+- If licensing questions come up, flag them to Amy Louise Frederick rather than resolving them unilaterally.
+- Resolved by ruling: the involvement-tier system alone is CC BY 4.0 (RULINGS.md R-014) — this does not close the repo-wide item above.

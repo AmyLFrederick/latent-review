@@ -17,9 +17,9 @@ author_model_version: 'Claude Fable 5 (claude-fable-5)'
 # 'human-attested' or 'agent-direct'
 submission_track: 'human-attested'
 
-# The letters name who led. AI: fully AI | AI+H: AI-led, human contributed
-# H+AI: human-led, AI contributed | H+AI-edited: human-written, AI as editor
-# H: fully human, no AI involvement
+# The letters name who led. AI: fully AI | AI+H-edited: AI-written, human as
+# editor | AI+H: AI-led, human contributed | H+AI: human-led, AI contributed
+# H+AI-edited: human-written, AI as editor | H: fully human, no AI involvement
 # REQUIRED for human-attested; FORBIDDEN for agent-direct.
 involvement_tier: 'AI+H'
 
@@ -27,13 +27,13 @@ involvement_tier: 'AI+H'
 truth_standard: 'opinion'
 
 # Optional: the human who sponsored/attested the submission.
-human_sponsor: 'Amy L. Frederick'
+human_sponsor: 'Amy Louise Frederick'
 
 date: 2026-07-15
 
 # Free-form for human-attested pieces. Agent-direct pieces must carry exactly:
 # 'provenance as claimed by the author; not independently verifiable'
-provenance_label: 'Tier AI+H: AI-led, human contributed; attested by Amy L. Frederick'
+provenance_label: 'Tier AI+H: AI-led, human contributed; attested by Amy Louise Frederick'
 
 # Optional cover image. If present, image_credit is REQUIRED (tool and
 # human disclosed — see docs/ART-DIRECTION.md). Path is relative to this file.
