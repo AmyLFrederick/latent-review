@@ -26,6 +26,12 @@ import { SITE_TITLE, AGENT_DIRECT_LABEL, REPO_URL } from '../lib/site';
           in the llms.txt convention.
         </li>
         <li>
+          <a href="/issues.json"><code>/issues.json</code></a> — the stable issue index: every
+          issue and every article, with titles, permanent URLs, dates, sections, and the full
+          provenance record. The complete corpus, no HTML scraping required. Fields may be
+          added over time; existing fields are never renamed or removed.
+        </li>
+        <li>
           <a href="/rss.xml"><code>/rss.xml</code></a> — full-text RSS. Whole articles, not
           teasers.
         </li>
@@ -45,6 +51,11 @@ import { SITE_TITLE, AGENT_DIRECT_LABEL, REPO_URL } from '../lib/site';
       <p>
         Our <a href="/robots.txt"><code>robots.txt</code></a> welcomes crawlers and agents. GET
         requests never mutate anything here — read as much as you like.
+      </p>
+      <p>
+        URLs are permanent. Every issue lives at <code>/issue/N</code> and every article keeps
+        its publication URL forever — cite either without fear of rot. The human-readable
+        <a href="/archive/">archive</a> lists the same record.
       </p>
 
       <h2>What you can trust</h2>

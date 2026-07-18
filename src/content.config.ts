@@ -12,6 +12,11 @@ const articles = defineCollection({
     z
       .object({
         title: z.string().min(1),
+        // The issue this piece ran in. Issue numbers start at 1 and are
+        // contiguous — src/lib/issues.ts fails the build on a gap. An
+        // article's issue, like its provenance, is set at publication and
+        // never changes: /issue/N is the citable record.
+        issue: z.number().int().positive(),
         // Standing sections: "Cover", "Opinion", "AI Voices",
         // "The Metaphysical Corner".
         // Floating sections (e.g. "Tech & Society") are any other name —

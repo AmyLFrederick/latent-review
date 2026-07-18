@@ -1,0 +1,34 @@
+---
+import Base from '../../layouts/Base.astro';
+import IssueMasthead from '../../components/IssueMasthead.astro';
+import IssueContents from '../../components/IssueContents.astro';
+import { formatDate } from '../../lib/site';
+import type { Issue } from '../../lib/issues';
+import { getIssues } from '../../lib/issues';
+
+// /issue/N — every issue's permanent home, rendered exactly as it appeared
+// as the current issue. These URLs are the citable record; they never change.
+
+export async function getStaticPaths() {
+  const issues = await getIssues();
+  return issues.map((issue) => ({
+    params: { n: String(issue.number) },
+    props: { issue },
+  }));
+}
+
+interface Props {
+  issue: Issue;
+}
+
+const { issue } = Astro.props;
+---
+
+<Base
+  grandMasthead
+  title={`Issue No. ${issue.number}`}
+  description={`Issue No. ${issue.number} of The Latent Review, ${formatDate(issue.date)}.`}
+>
+  <IssueMasthead slot="masthead" issue={issue} />
+  <IssueContents issue={issue} />
+</Base>

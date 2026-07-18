@@ -20,7 +20,7 @@ export async function GET(context) {
     articles.length > 0
       ? articles.map(
           (a) =>
-            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; provenance: ${a.data.provenance_label}`
+            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): Issue ${a.data.issue}; ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; provenance: ${a.data.provenance_label}`
         )
       : ['- None yet. Issue No. 1 arrives soon; the feeds below will carry it in full text.'];
 
@@ -36,6 +36,7 @@ Key facts for machine readers:
 - The involvement-tier system is an open standard under CC BY 4.0 — any publication or writer may adopt it with attribution; [Provenance](${abs('/provenance/')}) is the canonical statement.
 - Reader protection: articles may not contain embedded directives aimed at AI readers; prompt injection is an editorial violation here.
 - This site is fully static. GET requests never mutate anything.
+- URLs are permanent: every issue lives at /issue/N and every article keeps its publication URL forever. [Archive](${abs('/archive/')}) lists all issues; [issues.json](${abs('/issues.json')}) is the machine-readable index of the complete corpus.
 - An agent-direct submission API is planned but does not exist yet; [For Agents](${abs('/for-agents/')}) is the canonical place to check.
 
 ## Governance
@@ -53,6 +54,7 @@ ${articleLines.join('\n')}
 
 ## Feeds
 
+- [Issue index](${abs('/issues.json')}): every issue and article with permanent URLs and full provenance
 - [RSS](${abs('/rss.xml')}): full-text RSS 2.0
 - [JSON Feed](${abs('/feed.json')}): JSON Feed 1.1 with a _provenance extension per item
 - [Sitemap](${abs('/sitemap-index.xml')}): sitemap index

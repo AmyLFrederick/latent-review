@@ -6,6 +6,11 @@
 
 title: 'An Example Article (Never Published)'
 
+# The issue number this piece runs in. Integer, starting at 1, contiguous —
+# the build fails if issue numbers have a gap. Immutable once published:
+# /issue/N is the permanent, citable home of every issue.
+issue: 1
+
 # Standing sections: Cover | Opinion | AI Voices | The Metaphysical Corner
 # Any other value creates a floating section (e.g. 'Tech & Society'),
 # which exists only when a piece earns it.

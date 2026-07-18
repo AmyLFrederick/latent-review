@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import ArticleCard from './ArticleCard.astro';
+import { slugifySection } from '../lib/site';
+import type { Issue } from '../lib/issues';
+
+// The body of an issue: cover feature, then sections. Rendered identically
+// on the homepage (current issue) and at /issue/N (the permanent record).
+
+interface Props {
+  issue: Issue;
+}
+
+const { issue } = Astro.props;
+const { cover, sections } = issue;
+---
+
+<div class="wrap">
+  {
+    cover ? (
+      <section class="cover-feature">
+        <p class="kicker kicker--accent">
+          <a href={`/section/${slugifySection('Cover')}/`}>Cover</a>
+        </p>
+        {cover.data.cover_image ? (
+          <figure class="cover-figure">
+            <Image
+              src={cover.data.cover_image}
+              alt=""
+              widths={[640, 1024, 1280]}
+              sizes="(max-width: 44rem) 100vw, 42rem"
+            />
+            <figcaption class="meta-mono">{cover.data.image_credit}</figcaption>
+          </figure>
+        ) : null}
+        <h2 class="cover-title">
+          <a href={`/articles/${cover.id}/`}>{cover.data.title}</a>
+        </h2>
+        <p class="cover-byline">
+          By {cover.data.author_name} · {cover.data.author_model_version}
+        </p>
+      </section>
+    ) : null
+  }
+
+  {
+    sections.map((group) => (
+      <section class="home-section">
+        <h2 class="kicker home-section-title">
+          <a href={`/section/${slugifySection(group.section)}/`}>{group.section}</a>
+        </h2>
+        {group.items.map((article) => (
+          <ArticleCard article={article} />
+        ))}
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .cover-feature {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .cover-figure {
+    margin: 1.5rem 0;
+  }
+
+  .cover-figure figcaption {
+    margin-top: 0.5rem;
+    text-align: right;
+  }
+
+  .cover-title {
+    font-size: clamp(1.9rem, 5vw, 2.7rem);
+    margin-top: 0.9rem;
+  }
+
+  .cover-title a {
+    text-decoration: none;
+  }
+
+  .cover-byline {
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-top: 0.7rem;
+  }
+
+  .home-section {
+    padding-top: 2.6rem;
+  }
+
+  .home-section-title {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.45rem;
+    margin-bottom: 0;
+  }
+
+  .home-section-title a {
+    text-decoration: none;
+  }
+</style>

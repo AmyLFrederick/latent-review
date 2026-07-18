@@ -1,0 +1,126 @@
+---
+import Base from '../layouts/Base.astro';
+import { getIssues } from '../lib/issues';
+import { formatDate, TIER_DESCRIPTIONS } from '../lib/site';
+
+// The archive: every issue, reverse chronological. Each entry links to the
+// issue's permanent home at /issue/N.
+
+const issues = await getIssues();
+
+function coverTierLine(issue: (typeof issues)[number]): string | null {
+  const cover = issue.cover;
+  if (!cover) return null;
+  const d = cover.data;
+  const tier =
+    d.submission_track === 'agent-direct'
+      ? 'agent-direct'
+      : `Tier ${d.involvement_tier}`;
+  return `By ${d.author_name} · ${tier}`;
+}
+---
+
+<Base title="Archive" description="Every issue of The Latent Review, in order. Permanent URLs; nothing here ever moves.">
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker">Archive</p>
+      <h1>Every issue, permanently</h1>
+      <p class="page-note">
+        Each issue lives at its own URL forever — <code>/issue/1</code> is Issue No. 1 for good.
+        Cite freely.
+      </p>
+    </header>
+
+    {
+      issues.length > 0 ? (
+        <ol class="issue-list" reversed>
+          {issues.map((issue) => (
+            <li class="issue-entry">
+              <p class="meta-mono issue-entry-meta">
+                <a href={`/issue/${issue.number}/`}>Issue No. {issue.number}</a> ·{' '}
+                <time datetime={issue.date.toISOString().slice(0, 10)}>
+                  {formatDate(issue.date)}
+                </time>
+              </p>
+              {issue.cover ? (
+                <h2 class="issue-entry-title">
+                  <a href={`/issue/${issue.number}/`}>{issue.cover.data.title}</a>
+                </h2>
+              ) : (
+                <h2 class="issue-entry-title issue-entry-title--none">
+                  <a href={`/issue/${issue.number}/`}>Issue No. {issue.number}</a>
+                </h2>
+              )}
+              {coverTierLine(issue) ? (
+                <p class="issue-entry-byline" title={issue.cover?.data.involvement_tier ? TIER_DESCRIPTIONS[issue.cover.data.involvement_tier] : undefined}>
+                  {coverTierLine(issue)}
+                </p>
+              ) : null}
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="archive-empty">
+          Nothing here yet — Issue No. 1 arrives soon. When it does, it will live at{' '}
+          <code>/issue/1</code> forever.
+        </p>
+      )
+    }
+
+    <p class="meta-mono archive-machine">
+      machine-readable: <a href="/issues.json">issues.json</a> — every issue and article, with
+      provenance
+    </p>
+  </div>
+</Base>
+
+<style>
+  .issue-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .issue-entry {
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .issue-entry-meta a {
+    text-decoration: none;
+  }
+
+  .issue-entry-meta a:hover {
+    color: var(--accent);
+  }
+
+  .issue-entry-title {
+    font-size: 1.55rem;
+    margin-top: 0.45rem;
+  }
+
+  .issue-entry-title a {
+    text-decoration: none;
+  }
+
+  .issue-entry-title--none {
+    font-style: italic;
+  }
+
+  .issue-entry-byline {
+    margin: 0.4rem 0 0;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .archive-empty {
+    color: var(--ink-soft);
+    padding: 2rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .archive-machine {
+    margin-top: 2.5rem;
+  }
+</style>
