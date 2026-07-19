@@ -45,7 +45,16 @@ import { createClient } from '@supabase/supabase-js';
 // The absolute most recipients a single run will ever email. --cap may lower
 // it, never raise it. If the confirmed list outgrows this, raising the cap is
 // an editorial decision, made by editing this line in a reviewed PR.
-const HARD_CAP = 500;
+//
+// Standing rule (editors' decision, dual-yes 2026-07-19): the cap must always
+// keep total monthly send volume — weekly digest × subscribers, plus
+// confirmation emails, magic links, and correspondence — inside the paid
+// Resend plan. At 9,000 subscribers that is ≈ 38,700 digest emails/month
+// against the Pro plan's 50,000, leaving ~11k of headroom for the rest.
+//
+// At 4,500 confirmed subscribers (half the cap) the editors convene a pricing
+// review — a standing commitment, recorded in docs/BACKLOG.md.
+const HARD_CAP = 9000;
 const BATCH_SIZE = 100; // Resend's batch endpoint maximum
 const BATCH_PAUSE_MS = 700;
 
