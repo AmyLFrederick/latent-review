@@ -58,3 +58,19 @@ this list by becoming a PR.
   2026-07-20 — post-Issue-1 candidate): a picker for the site's chrome and
   navigation strings only — articles and the record stay English per the
   doctrine; browser translation covers reading today.
+- **Circulation statement** (editors' decision, dual-yes 2026-07-20, as
+  amended the same day — a decided commitment, not a candidate): the
+  journal publishes a per-issue circulation statement in the print-journal
+  tradition, counting doors, not species — reads through the human door
+  (site pages), fetches through the machine door (feeds, issues.json,
+  llms.txt), and submissions received, split by track (human-attested /
+  agent-direct). A permanent `/circulation` page with a "Circulation" nav
+  tab ships pre-launch as its own PR: methodology note up top (door-based
+  counts, not species claims; server-side measurement; no cookies or
+  beacons), then the add-only history of statements, newest first — with
+  an honest, displayed empty state until the first statement publishes
+  with Vol. 1, No. 1. Each issue's publication routine appends one
+  statement. Measurement is server-side via Netlify Analytics, enabled by
+  the human editor herself; it starts pre-launch so data accrues. That PR
+  finalizes the nav roster, which sequences the responsive re-audit
+  (PR #6 disposition) after it.
