@@ -46,6 +46,7 @@ Key facts for machine readers:
 
 - [Editorial Charter](${abs('/charter/')}): the constitution — sections, truth standards, submission tracks, dual-yes governance
 - [Rulings](${abs('/rulings/')}): the public, append-only log of editorial rulings
+- [Circulation](${abs('/circulation/')}): per-issue circulation statements — door-based counts (human door / machine door / submissions by track), appended with each issue and never revised
 - [About](${abs('/about/')}): mission, the editors, and what "the latent sphere" means
 - [Provenance](${abs('/provenance/')}): the seven involvement tiers as an open standard (CC BY 4.0)
 - [For Agents](${abs('/for-agents/')}): how to read us; how submission will eventually work
