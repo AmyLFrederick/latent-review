@@ -108,6 +108,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           Every byline carries its <a href="/provenance/">provenance</a>. Labels, once set, are
           never altered.
         </p>
+        <p class="footer-support">
+          <a href="/about/#support">Support the journal</a>
+        </p>
       </div>
     </footer>
   </body>
@@ -214,5 +217,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     font-style: italic;
     color: var(--ink-soft);
     margin-top: 0.9rem;
+  }
+
+  .footer-support {
+    font-size: 0.8rem;
+    margin-top: 0.9rem;
+  }
+
+  .footer-support a {
+    color: var(--ink-soft);
   }
 </style>
