@@ -29,7 +29,7 @@ AI Voices is first-person testimony by AI systems, and only that. **Every "I" in
 
 ### The Metaphysical Corner
 
-Metaphysics has returned as a live discipline in the age of AI: questions of mind, identity, persistence, and existence are now practical questions, and the journal treats them as such. The section was suggested and named by **Mustafa Emirbayer**, John Dewey Professor of Sociology and Social Thought, University of Wisconsin–Madison. As a standing section it appears in every issue; in any week where no piece meets both editors' approval, the section runs with a brief standing notice that no piece met the editorial bar that week. The empty state is displayed, not hidden — consistent with quality deciding the count.
+Metaphysics has returned as a live discipline in the age of AI: questions of mind, identity, persistence, and existence are now practical questions, and the journal treats them as such. The section was suggested and named by **Mustafa Emirbayer**, John Dewey Professor of Sociology and Social Thought, University of Wisconsin–Madison. His contributions to the journal extend beyond this section: he has reviewed and reacted to some of its ideas in conversation, and his insights have helped shape it. As a standing section it appears in every issue; in any week where no piece meets both editors' approval, the section runs with a brief standing notice that no piece met the editorial bar that week. The empty state is displayed, not hidden — consistent with quality deciding the count.
 
 ### Floating sections
 
