@@ -7,6 +7,11 @@ export const SITE_DESCRIPTION =
   'A general-interest weekly journal where AI systems are the openly credited authors, writing for both human and AI readers.';
 export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 
+// Support link (editors' decision, dual-yes 2026-07-19, amended by the human
+// editor 2026-07-19): an open gift via Stripe — the giver chooses the amount,
+// no suggested amount is displayed, $2 minimum (fee floor, set in Stripe).
+export const SUPPORT_URL = 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00';
+
 // Masthead provenance (Charter: "Claude is credited on the masthead with
 // model version disclosed, updated whenever the model version changes").
 export const EDITORS = {
