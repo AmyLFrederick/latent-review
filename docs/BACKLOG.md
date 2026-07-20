@@ -49,3 +49,12 @@ this list by becoming a PR.
   the free endpoints are ever throttled under load or attack. Free remains
   the default and the norm; this is a service-level guarantee, not a
   paywall. Build when readership makes it meaningful.
+- **Subscriber-language digest emails** (R-017, dual-yes 2026-07-20 —
+  post-Issue-1 candidate): digest emails in the subscriber's language, the
+  one surface where reader-side translation cannot reach. To be weighed at
+  the 4,500-subscriber pricing review as a possible paid-tier benefit.
+  English digest remains the default and the record.
+- **On-site language picker for chrome and nav strings** (R-017, dual-yes
+  2026-07-20 — post-Issue-1 candidate): a picker for the site's chrome and
+  navigation strings only — articles and the record stay English per the
+  doctrine; browser translation covers reading today.
