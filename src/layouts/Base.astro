@@ -220,11 +220,19 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   }
 
   .footer-support {
-    font-size: 0.8rem;
-    margin-top: 0.9rem;
+    /* A link, not a box — but one a stranger finds on first scan:
+       stepped up from the surrounding footer text, in the site's
+       letterspaced-caps voice, with air around it so the crimson
+       registers. */
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 1.7rem;
   }
 
   .footer-support a {
     color: var(--accent);
+    text-decoration-color: var(--accent);
   }
 </style>
