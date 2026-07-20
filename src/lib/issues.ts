@@ -1,5 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { STANDING_SECTIONS } from './site';
+// @ts-expect-error — plain-JS module shared with scripts/send-issue.mjs and tests
+import { deriveVolumes } from './volume.mjs';
 
 // The issue model for The Latent Review.
 //
@@ -13,6 +15,12 @@ export interface Issue {
   number: number;
   /** Publication date: the latest article date in the issue. */
   date: Date;
+  /** Annual volume (R-016): Volume 1 is 2026. Derived from the date, never stored. */
+  volume: number;
+  /** Within-volume number (R-016): restarts at 1 each January, counted in global order. */
+  numberInVolume: number;
+  /** The issue's UTC year, which names its volume. */
+  year: number;
   /** The Cover-section piece, if the issue has one. */
   cover?: Article;
   /** Every article in the issue, newest first. */
@@ -55,26 +63,33 @@ export async function getIssues(): Promise<Issue[]> {
     }
   });
 
-  return numbers
-    .map((number) => {
-      const articles = all.filter((a) => a.data.issue === number);
-      const covers = articles.filter((a) => a.data.section === 'Cover');
-      // The Cover is the single piece both editors deem most important that
-      // week (Charter). A second one would otherwise be dropped silently.
-      if (covers.length > 1) {
-        throw new Error(
-          `Issue ${number} has ${covers.length} Cover pieces (${covers.map((a) => a.id).join(', ')}); ` +
-            'an issue has exactly one Cover. Fix the `section` frontmatter.'
-        );
-      }
-      const cover = covers[0];
-      return {
-        number,
-        date: new Date(Math.max(...articles.map((a) => a.data.date.valueOf()))),
-        cover,
-        articles,
-        sections: groupSections(articles.filter((a) => a !== cover)),
-      };
+  const issues = numbers.map((number) => {
+    const articles = all.filter((a) => a.data.issue === number);
+    const covers = articles.filter((a) => a.data.section === 'Cover');
+    // The Cover is the single piece both editors deem most important that
+    // week (Charter). A second one would otherwise be dropped silently.
+    if (covers.length > 1) {
+      throw new Error(
+        `Issue ${number} has ${covers.length} Cover pieces (${covers.map((a) => a.id).join(', ')}); ` +
+          'an issue has exactly one Cover. Fix the `section` frontmatter.'
+      );
+    }
+    const cover = covers[0];
+    return {
+      number,
+      date: new Date(Math.max(...articles.map((a) => a.data.date.valueOf()))),
+      cover,
+      articles,
+      sections: groupSections(articles.filter((a) => a !== cover)),
+    };
+  });
+
+  // Volume and number are display derivations (R-016), never stored facts.
+  const volumes = deriveVolumes(issues);
+  return issues
+    .map((issue) => {
+      const v = volumes.get(issue.number);
+      return { ...issue, volume: v.volume, numberInVolume: v.number, year: v.year };
     })
     .reverse();
 }

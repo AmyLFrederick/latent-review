@@ -16,7 +16,11 @@ const { issue = null } = Astro.props;
   <p class="meta-mono dateline">
     <span>A weekly journal</span>
     <span>
-      {issue ? `Issue No. ${issue.number} · ${formatDate(issue.date)}` : 'Issue No. 1 arrives soon'}
+      {
+        issue
+          ? `Vol. ${issue.volume}, No. ${issue.numberInVolume} · ${formatDate(issue.date)}`
+          : 'Issue No. 1 arrives soon'
+      }
     </span>
   </p>
   <h1 class="masthead-title"><a href="/">{SITE_TITLE}</a></h1>
@@ -40,6 +44,16 @@ const { issue = null } = Astro.props;
     border-bottom: 1px solid var(--hairline);
     padding: 0.35rem 0;
     margin: 0 0 1.8rem;
+  }
+
+  /* On narrow phones the two ends collide into ragged two-line columns;
+     stack them centered instead. */
+  @media (max-width: 24rem) {
+    .dateline {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.05rem;
+    }
   }
 
   .masthead-title {

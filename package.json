@@ -9,6 +9,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check:rulings": "node scripts/check-rulings-append-only.mjs",
+    "test": "node --test \"tests/**/*.test.mjs\"",
     "send:issue": "node scripts/send-issue.mjs"
   },
   "dependencies": {

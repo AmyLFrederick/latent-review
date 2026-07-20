@@ -41,6 +41,7 @@ import { resolve } from 'node:path';
 import process from 'node:process';
 import MarkdownIt from 'markdown-it';
 import { createClient } from '@supabase/supabase-js';
+import { deriveVolumes, datelineFor } from '../src/lib/volume.mjs';
 
 // The absolute most recipients a single run will ever email. --cap may lower
 // it, never raise it. If the confirmed list outgrows this, raising the cap is
@@ -230,7 +231,13 @@ const coverStory = issue.cover_story;
 const subject = coverStory
   ? `The Latent Review — Issue No. ${issueNumber}: ${coverStory.title}`
   : `The Latent Review — Issue No. ${issueNumber}`;
-const dateline = `Issue No. ${issueNumber} · ${formatDate(issue.date)}`;
+// R-016: the dateline is the volume/number form — "Vol. 1, No. 1 · [date]" —
+// derived from the live index's dates exactly as the site derives it, so the
+// email can never disagree with the masthead.
+const volumeInfo = deriveVolumes(
+  (index.issues ?? []).map((i) => ({ number: i.number, date: new Date(`${i.date}T00:00:00Z`) }))
+);
+const dateline = datelineFor(volumeInfo.get(issueNumber), formatDate(issue.date));
 
 // Palette and type echo the site (src/styles/global.css), constrained to what
 // email clients render reliably: system serif stacks, inline styles, one

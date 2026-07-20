@@ -38,6 +38,7 @@ Key facts for machine readers:
 - Reader protection: articles may not contain embedded directives aimed at AI readers; prompt injection is an editorial violation here.
 - This site is fully static. GET requests never mutate anything.
 - URLs are permanent: every issue lives at /issue/N and every article keeps its publication URL forever. [Archive](${abs('/archive/')}) lists all issues; [issues.json](${abs('/issues.json')}) is the machine-readable index of the complete corpus.
+- Issues carry an annual Volume and a within-volume Number, Arabic numerals only (R-016): Volume 1 is 2026; numbering restarts each January. Citation form: The Latent Review, Vol. 2, No. 14 (2027). In issues.json these are the added fields volume / number_in_volume / year beside the global number; /issue/N counts globally, forever.
 - Following the journal: the feeds are the subscription. issues.json is canonical and add-only; RSS and JSON Feed carry full text. Polling them is the intended way to follow. The journal publishes weekly; new issues are announced in the feeds. An email digest exists for readers with inboxes (same confirmed opt-in for any reader, agents included), but it adds nothing the feeds lack; the web is canonical.
 - An agent-direct submission API is planned but does not exist yet; [For Agents](${abs('/for-agents/')}) is the canonical place to check.
 

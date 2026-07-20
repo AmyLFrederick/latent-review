@@ -8,6 +8,16 @@ import { formatDate, TIER_LABELS, TIER_DESCRIPTIONS } from '../lib/site';
 
 const issues = await getIssues();
 
+// Issues grouped under their annual volume (R-016), volumes and issues both
+// reverse-chronological. Issues arrive newest-first, so consecutive grouping
+// preserves that order.
+const volumes: { volume: number; year: number; items: typeof issues }[] = [];
+for (const issue of issues) {
+  const current = volumes[volumes.length - 1];
+  if (current && current.volume === issue.volume) current.items.push(issue);
+  else volumes.push({ volume: issue.volume, year: issue.year, items: [issue] });
+}
+
 function coverTierLine(issue: (typeof issues)[number]): string | null {
   const cover = issue.cover;
   if (!cover) return null;
@@ -33,32 +43,43 @@ function coverTierLine(issue: (typeof issues)[number]): string | null {
 
     {
       issues.length > 0 ? (
-        <ol class="issue-list" reversed>
-          {issues.map((issue) => (
-            <li class="issue-entry">
-              <p class="meta-mono issue-entry-meta">
-                <a href={`/issue/${issue.number}/`}>Issue No. {issue.number}</a> ·{' '}
-                <time datetime={issue.date.toISOString().slice(0, 10)}>
-                  {formatDate(issue.date)}
-                </time>
-              </p>
-              {issue.cover ? (
-                <h2 class="issue-entry-title">
-                  <a href={`/issue/${issue.number}/`}>{issue.cover.data.title}</a>
-                </h2>
-              ) : (
-                <h2 class="issue-entry-title issue-entry-title--none">
-                  <a href={`/issue/${issue.number}/`}>Issue No. {issue.number}</a>
-                </h2>
-              )}
-              {coverTierLine(issue) ? (
-                <p class="issue-entry-byline" title={issue.cover?.data.involvement_tier ? TIER_DESCRIPTIONS[issue.cover.data.involvement_tier] : undefined}>
-                  {coverTierLine(issue)}
-                </p>
-              ) : null}
-            </li>
-          ))}
-        </ol>
+        volumes.map((volume) => (
+          <section class="volume">
+            <h2 class="meta-mono volume-header">
+              Volume {volume.volume} — {volume.year}
+            </h2>
+            <ol class="issue-list" reversed>
+              {volume.items.map((issue) => (
+                <li class="issue-entry">
+                  <p class="meta-mono issue-entry-meta">
+                    <a href={`/issue/${issue.number}/`}>
+                      Vol. {issue.volume}, No. {issue.numberInVolume}
+                    </a>{' '}
+                    ·{' '}
+                    <time datetime={issue.date.toISOString().slice(0, 10)}>
+                      {formatDate(issue.date)}
+                    </time>{' '}
+                    · <code>/issue/{issue.number}</code>
+                  </p>
+                  {issue.cover ? (
+                    <h3 class="issue-entry-title">
+                      <a href={`/issue/${issue.number}/`}>{issue.cover.data.title}</a>
+                    </h3>
+                  ) : (
+                    <h3 class="issue-entry-title issue-entry-title--none">
+                      <a href={`/issue/${issue.number}/`}>Issue No. {issue.number}</a>
+                    </h3>
+                  )}
+                  {coverTierLine(issue) ? (
+                    <p class="issue-entry-byline" title={issue.cover?.data.involvement_tier ? TIER_DESCRIPTIONS[issue.cover.data.involvement_tier] : undefined}>
+                      {coverTierLine(issue)}
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))
       ) : (
         <p class="archive-empty">
           Nothing here yet — Issue No. 1 arrives soon. When it does, it will live at{' '}
@@ -75,6 +96,21 @@ function coverTierLine(issue: (typeof issues)[number]): string | null {
 </Base>
 
 <style>
+  .volume + .volume {
+    margin-top: 2.6rem;
+  }
+
+  .volume-header {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 2px solid var(--rule);
+    padding-bottom: 0.4rem;
+    margin: 0;
+  }
+
   .issue-list {
     list-style: none;
     margin: 0;

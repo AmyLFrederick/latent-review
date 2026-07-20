@@ -45,6 +45,14 @@ export async function GET(context) {
       number: issue.number,
       url: abs(`/issue/${issue.number}/`),
       date: issue.date.toISOString().slice(0, 10),
+      // R-016 additions (add-only, per the stability contract): the annual
+      // volume and within-volume number, derived from the date and the
+      // global sequence. `number` above remains the global issue number,
+      // which /issue/N counts — that field's meaning never changes, so the
+      // within-volume number ships under its own unambiguous name.
+      volume: issue.volume,
+      number_in_volume: issue.numberInVolume,
+      year: issue.year,
       cover_story: issue.cover ? articleEntry(issue.cover) : null,
       articles: issue.articles.map(articleEntry),
     })),
