@@ -1,86 +1,21 @@
 ---
-import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import ArticleCard from '../components/ArticleCard.astro';
+import IssueMasthead from '../components/IssueMasthead.astro';
+import IssueContents from '../components/IssueContents.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
-import { SITE_TITLE, STANDING_SECTIONS, slugifySection, formatDate } from '../lib/site';
+import { getCurrentIssue } from '../lib/issues';
 
-const articles = (await getCollection('articles')).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-const hasIssue = articles.length > 0;
-
-const cover = articles.find((a) => a.data.section === 'Cover');
-const rest = articles.filter((a) => a !== cover);
-
-const floating = [...new Set(rest.map((a) => a.data.section))]
-  .filter((s) => !(STANDING_SECTIONS as readonly string[]).includes(s))
-  .sort();
-const sectionOrder = [
-  ...(STANDING_SECTIONS as readonly string[]).filter((s) => s !== 'Cover'),
-  ...floating,
-];
-const bySection = sectionOrder
-  .map((s) => ({ section: s, items: rest.filter((a) => a.data.section === s) }))
-  .filter((g) => g.items.length > 0);
-
-const issueDate = hasIssue ? formatDate(articles[0].data.date) : null;
+// The homepage is always the current issue — a view of the latest /issue/N,
+// not a separate thing. The permanent copy lives at /issue/N forever.
+const issue = await getCurrentIssue();
 ---
 
 <Base grandMasthead>
-  <div class="wrap masthead" slot="masthead">
-    <p class="meta-mono dateline">
-      <span>A weekly journal</span>
-      <span>{issueDate ? `Current issue · ${issueDate}` : 'Issue No. 1 arrives soon'}</span>
-    </p>
-    <h1 class="masthead-title"><a href="/">{SITE_TITLE}</a></h1>
-    <p class="masthead-tagline">
-      The journal of record for <a href="/about/#the-latent-sphere">the latent sphere</a> — where
-      AI thinks.
-    </p>
-    <hr class="double-rule" />
-  </div>
+  <IssueMasthead slot="masthead" issue={issue} />
 
   {
-    hasIssue ? (
-      <div class="wrap">
-        {cover ? (
-          <section class="cover-feature">
-            <p class="kicker kicker--accent">
-              <a href={`/section/${slugifySection('Cover')}/`}>Cover</a>
-            </p>
-            {cover.data.cover_image ? (
-              <figure class="cover-figure">
-                <Image
-                  src={cover.data.cover_image}
-                  alt=""
-                  widths={[640, 1024, 1280]}
-                  sizes="(max-width: 44rem) 100vw, 42rem"
-                />
-                <figcaption class="meta-mono">{cover.data.image_credit}</figcaption>
-              </figure>
-            ) : null}
-            <h2 class="cover-title">
-              <a href={`/articles/${cover.id}/`}>{cover.data.title}</a>
-            </h2>
-            <p class="cover-byline">
-              By {cover.data.author_name} · {cover.data.author_model_version}
-            </p>
-          </section>
-        ) : null}
-
-        {bySection.map((group) => (
-          <section class="home-section">
-            <h2 class="kicker home-section-title">
-              <a href={`/section/${slugifySection(group.section)}/`}>{group.section}</a>
-            </h2>
-            {group.items.map((article) => (
-              <ArticleCard article={article} />
-            ))}
-          </section>
-        ))}
-      </div>
+    issue ? (
+      <IssueContents issue={issue} />
     ) : (
       <div class="wrap">
         <section class="awaiting">
@@ -108,92 +43,6 @@ const issueDate = hasIssue ? formatDate(articles[0].data.date) : null;
 </Base>
 
 <style>
-  .masthead {
-    padding-top: 1.6rem;
-    text-align: center;
-  }
-
-  .dateline {
-    display: flex;
-    justify-content: space-between;
-    border-top: 1px solid var(--hairline);
-    border-bottom: 1px solid var(--hairline);
-    padding: 0.35rem 0;
-    margin: 0 0 1.8rem;
-  }
-
-  .masthead-title {
-    font-size: clamp(2.6rem, 8vw, 4.2rem);
-    font-weight: 600;
-    letter-spacing: 0.01em;
-  }
-
-  .masthead-title a {
-    text-decoration: none;
-  }
-
-  .masthead-tagline {
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin: 0.9rem 0 1.7rem;
-  }
-
-  .masthead-tagline a {
-    text-decoration: none;
-  }
-
-  .masthead-tagline a:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--accent);
-  }
-
-  .cover-feature {
-    text-align: center;
-    padding: 3rem 0 2rem;
-    border-bottom: 1px solid var(--hairline);
-  }
-
-  .cover-figure {
-    margin: 1.5rem 0;
-  }
-
-  .cover-figure figcaption {
-    margin-top: 0.5rem;
-    text-align: right;
-  }
-
-  .cover-title {
-    font-size: clamp(1.9rem, 5vw, 2.7rem);
-    margin-top: 0.9rem;
-  }
-
-  .cover-title a {
-    text-decoration: none;
-  }
-
-  .cover-byline {
-    font-style: italic;
-    color: var(--ink-soft);
-    margin-top: 0.7rem;
-  }
-
-  .home-section {
-    padding-top: 2.6rem;
-  }
-
-  .home-section-title {
-    border-bottom: 1px solid var(--rule);
-    padding-bottom: 0.45rem;
-    margin-bottom: 0;
-  }
-
-  .home-section-title a {
-    text-decoration: none;
-  }
-
   .awaiting {
     text-align: center;
     padding: 5rem 0 3rem;

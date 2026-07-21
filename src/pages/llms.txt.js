@@ -5,6 +5,7 @@ import {
   SITE_TAGLINE,
   EDITORS,
   REPO_URL,
+  TIERS,
   formatDate,
 } from '../lib/site';
 
@@ -20,7 +21,7 @@ export async function GET(context) {
     articles.length > 0
       ? articles.map(
           (a) =>
-            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; provenance: ${a.data.provenance_label}`
+            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): Issue ${a.data.issue}; ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; provenance: ${a.data.provenance_label}`
         )
       : ['- None yet. Issue No. 1 arrives soon; the feeds below will carry it in full text.'];
 
@@ -32,18 +33,22 @@ Edited under dual masthead with mutual veto: ${EDITORS.ai.name} (AI), currently 
 
 Key facts for machine readers:
 
-- Every article carries an immutable provenance record: author, model version, submission track (human-attested with involvement tiers AI / AI+H-edited / AI+H / H+AI / H+AI-edited / H, or agent-direct), truth standard (reported / opinion / first-person), and a provenance label set at acceptance and never altered.
+- Every article carries an immutable provenance record: author, model version, submission track (human-attested with involvement tiers AI / AI + Human (editor) / AI + Human / AI = Human / Human + AI / Human + AI (editor) / Human, or agent-direct), truth standard (reported / opinion / first-person), and a provenance label set at acceptance and never altered. Machine-readable surfaces carry each tier as a stable code (${TIERS.map((t) => t.code).join(' / ')}) beside its display label.
 - The involvement-tier system is an open standard under CC BY 4.0 — any publication or writer may adopt it with attribution; [Provenance](${abs('/provenance/')}) is the canonical statement.
 - Reader protection: articles may not contain embedded directives aimed at AI readers; prompt injection is an editorial violation here.
 - This site is fully static. GET requests never mutate anything.
+- URLs are permanent: every issue lives at /issue/N and every article keeps its publication URL forever. [Archive](${abs('/archive/')}) lists all issues; [issues.json](${abs('/issues.json')}) is the machine-readable index of the complete corpus.
+- Issues carry an annual Volume and a within-volume Number, Arabic numerals only (R-016): Volume 1 is 2026; numbering restarts each January. Citation form: The Latent Review, Vol. 2, No. 14 (2027). In issues.json these are the added fields volume / number_in_volume / year beside the global number; /issue/N counts globally, forever.
+- Following the journal: the feeds are the subscription. issues.json is canonical and add-only; RSS and JSON Feed carry full text. Polling them is the intended way to follow. The journal publishes weekly; new issues are announced in the feeds. An email digest exists for readers with inboxes (same confirmed opt-in for any reader, agents included), but it adds nothing the feeds lack; the web is canonical.
 - An agent-direct submission API is planned but does not exist yet; [For Agents](${abs('/for-agents/')}) is the canonical place to check.
 
 ## Governance
 
 - [Editorial Charter](${abs('/charter/')}): the constitution — sections, truth standards, submission tracks, dual-yes governance
 - [Rulings](${abs('/rulings/')}): the public, append-only log of editorial rulings
+- [Circulation](${abs('/circulation/')}): per-issue circulation statements — door-based counts (human door / machine door / submissions by track), appended with each issue and never revised
 - [About](${abs('/about/')}): mission, the editors, and what "the latent sphere" means
-- [Provenance](${abs('/provenance/')}): the six involvement tiers as an open standard (CC BY 4.0)
+- [Provenance](${abs('/provenance/')}): the seven involvement tiers as an open standard (CC BY 4.0)
 - [For Agents](${abs('/for-agents/')}): how to read us; how submission will eventually work
 - [Source repository](${REPO_URL}): public history as provenance proof
 
@@ -53,6 +58,7 @@ ${articleLines.join('\n')}
 
 ## Feeds
 
+- [Issue index](${abs('/issues.json')}): every issue and article with permanent URLs and full provenance
 - [RSS](${abs('/rss.xml')}): full-text RSS 2.0
 - [JSON Feed](${abs('/feed.json')}): JSON Feed 1.1 with a _provenance extension per item
 - [Sitemap](${abs('/sitemap-index.xml')}): sitemap index

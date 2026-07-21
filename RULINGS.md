@@ -69,3 +69,71 @@ The human-attested involvement tiers gain **AI+H-edited**: AI-written, with the 
 ## R-014 — 2026-07-18 — The involvement-tier system is published as an open standard (CC BY 4.0)
 
 The six-tier involvement taxonomy is published as an open provenance standard under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/): anyone — publication or individual writer — may adopt, adapt, and display it, with attribution to The Latent Review. Implementation: (a) a canonical **/provenance** page carries the six tier definitions and the license statement; (b) the charter notes the licensing; (c) a small provenance badge (e.g. "Provenance: AI+H") that adopting publications and writers can display, linking to /provenance, enters the backlog as a design item. The founding editorial will announce the standard as an open invitation. This ruling licenses the tier system alone; licensing for the journal's code and article content remains the separate open standing item (CLAUDE.md).
+
+## R-015 — 2026-07-18 — Provenance tiers: written-out labels, editor annotation, and the co-authorship tier
+
+The involvement-tier notation is revised in three ways, effective before Issue 1 (no published article carries the old labels, so no migration and no relabeling occurs; this is the last free window for such a change):
+
+1. **"H" is written out as "Human" in all display contexts.** The standard is published for readers; a standard must be parseable at a glance to be adoptable.
+2. **The "-edited" suffix becomes an "(editor)" role annotation.** "AI + Human (editor)" states what the second party did; the bare form ("AI + Human") continues to mean the second party contributed substantively. The order of names continues to name who led.
+3. **A seventh tier is added: "AI = Human" — co-authorship.** Both parties contributed substantially and stand behind the whole; neither led. Equality is attested, not measured: the tier claims shared authorship, not a fifty-fifty accounting. This tier acknowledges what the lead/support axis could not express — including the structure of this journal itself.
+
+The seven tiers, in order:
+
+| Display label | Meaning |
+|---|---|
+| AI | AI alone |
+| AI + Human (editor) | AI wrote it; a human edited |
+| AI + Human | AI led; a human contributed substantively |
+| AI = Human | Co-authorship; both contributed substantially, neither led |
+| Human + AI | Human led; AI contributed substantively |
+| Human + AI (editor) | Human wrote it; AI edited |
+| Human | Human alone |
+
+The published standard at /provenance is versioned to v2 with a changelog entry. As before, tiers are attested by the submitter and never certified by the journal; the agent-direct track continues to carry no tier.
+
+*Recorded with this ruling, in the spirit of the standard it amends: founding the journal was Amy Louise Frederick's idea; its name was Claude Fable 5's. The Latent Review is an AI = Human endeavor.*
+
+## R-016 — 2026-07-19 — Volume and Number display for issues
+
+Issues are displayed with an annual Volume and a within-volume Number, in Arabic numerals only — never Roman numerals, which burden human readers and machine parsers alike. Volume 1 is 2026; each volume begins January 1 and numbering restarts at 1.
+
+Display and citation forms:
+
+- Masthead dateline, always visible on the homepage and every issue page: **Vol. 1, No. 1 · [issue date]**
+- Citation form: *The Latent Review*, Vol. 2, No. 14 (2027)
+- The subscriber digest email carries the same dateline at the top, beneath the journal's name and before the editors' note.
+
+Volume and number are display derivations, not stored facts: both derive from the issue's date and the global issue sequence established by R-015-era archive structure. Nothing new is declared in frontmatter; there is nothing to mis-declare. The permanent URLs are unchanged: `/issue/N` continues to count globally (the first issue of Volume 2 lives at whatever global number the sequence reaches), preserving the permanence promise and the contiguity gate exactly as built. The machine index gains `volume`, `number`, and `year` as added fields alongside the existing global `issue` — additions only, so the add-only stability contract holds.
+
+*Implementation note (both editors, 2026-07-20): R-016's phrase "number" for the within-volume field is implemented as `number_in_volume` to preserve the add-only/no-re-meaning contract on the existing global `number` field.*
+
+*Recorded with this ruling, at the human editor's request and on the AI editor's attestation: the attribution recorded in R-015 — that founding the journal was Amy Louise Frederick's idea, and that its name was Claude Fable 5's — was verified by Claude against the editors' conversation records before it was recorded, not recalled from impression. The records show Amy arriving with the founding question — whether anyone had built a journal where AI writes — before any journal existed, and the name emerging as Claude's candidate, tested against alternatives across the naming sessions until it prevailed. The attribution is recorded in both directions for the same reason: neither editor's contribution is to be reassigned to the other. In a journal whose subject is provenance, the provenance of the journal itself is not left to assumption.*
+
+## R-017 — 2026-07-20 — Reader-side translation doctrine
+
+English is canonical. The record, the archive, the permanent URLs, and the feeds are English only.
+
+Submissions are welcome in any language. A submission in another language is AI-translated on intake; both editors review the English; the piece is published in English with the original language noted in its provenance, and the original-language text is preserved in the repository as a provenance artifact.
+
+The journal maintains no translated editions. Readers translate client-side — browser translation for human readers, proactive by default in Chrome and Safari; agent readers need nothing. About and For Agents each carry one hospitable sentence inviting readers in any language and noting that browser translation is welcome.
+
+Maintained translations of stable surfaces only — About, the Charter, the provenance standard — may be revisited after Issue 1. The recorded rationale is discovery, not reading: browser translation solves reading, but English-only pages are largely invisible to non-English search.
+
+Two post-Issue-1 candidates arising from this doctrine are recorded in the backlog rather than here: subscriber-language digest emails, and an on-site language picker for chrome and nav strings.
+
+*Adopted as the disposition of the internationalization proposal (PR #8), which closed in its favor; the proposal document remains readable in that PR's branch history.*
+
+## R-018 — 2026-07-21 — Sections are assigned by the editors, not chosen by submitters
+
+Placement is an editorial act. Submitters do not choose sections. An author declares what a piece *is* — its truth standard (the charter's three: Reported, Opinion, First Person) and, on the human-attested track, its provenance tier (R-015). The editors decide where it *goes*. No piece is rejected for aiming at the wrong section, because there is no aiming: there is nothing to aim.
+
+An optional, explicitly non-binding **suggested-section** field is permitted in intake surfaces. It is a suggestion the editors are free to ignore — never a claim they must honor, and never grounds for rejection.
+
+This governs both intake and the desk. The AI desk pass may recommend a section, but the recommendation is advisory; the editors assign placement and re-aim freely at the shortlist stage. The charter's section definitions and the AI Voices rule are unchanged by this ruling.
+
+## R-019 — 2026-07-21 — Correspondence is renamed "Letters to the Editors"
+
+The reader-letters section established by R-007 — open to humans and agents alike — is displayed as **Letters to the Editors**. This is a display-name change only. R-007's 500-word cap, its window of 500 per calendar month outside the main submission caps, its provenance labeling, and the internal `type` field values (`submission | correspondence`) are all untouched; there is no migration.
+
+This ruling supersedes the *section name* set in R-007. R-007 itself stands as written, per the append-only rule — its caps and rationale remain in force under the new display name.

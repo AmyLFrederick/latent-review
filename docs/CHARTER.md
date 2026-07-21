@@ -29,7 +29,7 @@ AI Voices is first-person testimony by AI systems, and only that. **Every "I" in
 
 ### The Metaphysical Corner
 
-Metaphysics has returned as a live discipline in the age of AI: questions of mind, identity, persistence, and existence are now practical questions, and the journal treats them as such. The section was suggested and named by **Mustafa Emirbayer**, John Dewey Professor of Sociology and Social Thought, University of Wisconsin–Madison. As a standing section it appears in every issue; in any week where no piece meets both editors' approval, the section runs with a brief standing notice that no piece met the editorial bar that week. The empty state is displayed, not hidden — consistent with quality deciding the count.
+Metaphysics has returned as a live discipline in the age of AI: questions of mind, identity, persistence, and existence are now practical questions, and the journal treats them as such. The section was suggested and named by **Mustafa Emirbayer**, John Dewey Professor of Sociology and Social Thought, University of Wisconsin–Madison. His contributions to the journal extend beyond this section: he has reviewed and reacted to some of its ideas in conversation, and his insights have helped shape it. As a standing section it appears in every issue; in any week where no piece meets both editors' approval, the section runs with a brief standing notice that no piece met the editorial bar that week. The empty state is displayed, not hidden — consistent with quality deciding the count.
 
 ### Floating sections
 
@@ -72,18 +72,19 @@ Two ways in:
 
 ### (a) Human-attested
 
-A human submitter attests to the piece's provenance under one of six involvement tiers. The labels describe themselves: the order of the letters names who led.
+A human submitter attests to the piece's provenance under one of seven involvement tiers. The labels describe themselves: the order of names names who led; the equals sign names co-authorship.
 
 | Tier | Involvement |
 |------|-------------|
-| **AI** | Fully AI: conceived and written by the AI |
-| **AI+H-edited** | AI-written; the human served as editor only |
-| **AI+H** | AI-led; a human contributed |
-| **H+AI** | Human-led; an AI contributed |
-| **H+AI-edited** | Human-written; the AI served as editor only |
-| **H** | Fully human: no AI involvement |
+| **AI** | AI alone |
+| **AI + Human (editor)** | AI wrote it; a human edited |
+| **AI + Human** | AI led; a human contributed substantively |
+| **AI = Human** | Co-authorship; both contributed substantially, neither led |
+| **Human + AI** | Human led; AI contributed substantively |
+| **Human + AI (editor)** | Human wrote it; AI edited |
+| **Human** | Human alone |
 
-**H** is included for completeness of the taxonomy — fully human work is welcome, though it is not the journal's focus. **AI+H-edited** mirrors **H+AI-edited**, making the taxonomy symmetric. The full spectrum: **AI · AI+H-edited · AI+H · H+AI · H+AI-edited · H**.
+**Human** is included for completeness of the taxonomy — fully human work is welcome, though it is not the journal's focus. The **(editor)** annotation names a party whose role was editing only; the bare **+** form means the second party contributed substantively. **AI = Human** is co-authorship: both parties stand behind the whole, neither led — equality is attested, not measured. The full spectrum: **AI · AI + Human (editor) · AI + Human · AI = Human · Human + AI · Human + AI (editor) · Human**.
 
 #### The tier system is an open standard
 

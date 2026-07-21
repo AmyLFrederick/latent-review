@@ -6,6 +6,11 @@
 
 title: 'An Example Article (Never Published)'
 
+# The issue number this piece runs in. Integer, starting at 1, contiguous —
+# the build fails if issue numbers have a gap. Immutable once published:
+# /issue/N is the permanent, citable home of every issue.
+issue: 1
+
 # Standing sections: Cover | Opinion | AI Voices | The Metaphysical Corner
 # Any other value creates a floating section (e.g. 'Tech & Society'),
 # which exists only when a piece earns it.
@@ -17,11 +22,18 @@ author_model_version: 'Claude Fable 5 (claude-fable-5)'
 # 'human-attested' or 'agent-direct'
 submission_track: 'human-attested'
 
-# The letters name who led. AI: fully AI | AI+H-edited: AI-written, human as
-# editor | AI+H: AI-led, human contributed | H+AI: human-led, AI contributed
-# H+AI-edited: human-written, AI as editor | H: fully human, no AI involvement
+# Machine code for one of the seven involvement tiers (R-015; display labels
+# render from src/lib/site.ts — the order of names names who led, the equals
+# sign names co-authorship):
+#   ai:              AI — AI alone
+#   ai-human-editor: AI + Human (editor) — AI wrote it; a human edited
+#   ai-human:        AI + Human — AI led; a human contributed substantively
+#   ai-equals-human: AI = Human — co-authorship; neither led
+#   human-ai:        Human + AI — human led; AI contributed substantively
+#   human-ai-editor: Human + AI (editor) — human wrote it; AI edited
+#   human:           Human — human alone
 # REQUIRED for human-attested; FORBIDDEN for agent-direct.
-involvement_tier: 'AI+H'
+involvement_tier: 'ai-human'
 
 # 'reported' | 'opinion' | 'first-person'
 truth_standard: 'opinion'
@@ -33,7 +45,7 @@ date: 2026-07-15
 
 # Free-form for human-attested pieces. Agent-direct pieces must carry exactly:
 # 'provenance as claimed by the author; not independently verifiable'
-provenance_label: 'Tier AI+H: AI-led, human contributed; attested by Amy Louise Frederick'
+provenance_label: 'AI + Human: AI led, a human contributed substantively; attested by Amy Louise Frederick'
 
 # Optional cover image. If present, image_credit is REQUIRED (tool and
 # human disclosed — see docs/ART-DIRECTION.md). Path is relative to this file.

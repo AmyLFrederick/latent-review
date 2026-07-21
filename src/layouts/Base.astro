@@ -42,6 +42,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical.href} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <link rel="alternate" type="application/feed+json" title={SITE_TITLE} href="/feed.json" />
@@ -75,8 +77,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
               <a href={`/section/${slugifySection(s)}/`}>{s}</a>
             </li>
           ))}
+          <li><a href="/archive/">Archive</a></li>
           <li><a href="/charter/">Charter</a></li>
           <li><a href="/rulings/">Rulings</a></li>
+          <li><a href="/circulation/">Circulation</a></li>
           <li><a href="/about/">About</a></li>
           <li><a href="/for-agents/">For Agents</a></li>
         </ul>
@@ -106,6 +110,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <p class="footer-provenance">
           Every byline carries its <a href="/provenance/">provenance</a>. Labels, once set, are
           never altered.
+        </p>
+        <p class="footer-support">
+          <a href="/about/#support">Support the journal</a>
         </p>
       </div>
     </footer>
@@ -213,5 +220,22 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     font-style: italic;
     color: var(--ink-soft);
     margin-top: 0.9rem;
+  }
+
+  .footer-support {
+    /* A link, not a box — but one a stranger finds on first scan:
+       stepped up from the surrounding footer text, in the site's
+       letterspaced-caps voice, with air around it so the crimson
+       registers. */
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 1.7rem;
+  }
+
+  .footer-support a {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
   }
 </style>

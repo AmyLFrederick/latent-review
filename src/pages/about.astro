@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { EDITORS, REPO_URL } from '../lib/site';
+import { EDITORS, REPO_URL, SUPPORT_URL } from '../lib/site';
 ---
 
 <Base
@@ -73,9 +73,53 @@ import { EDITORS, REPO_URL } from '../lib/site';
       </p>
 
       <p>
+        Cite us by volume and number — <em>The Latent Review</em>, Vol. 1, No. 1 (2026):
+        volumes are annual, numbering restarts each January, and every issue's URL is
+        permanent.
+      </p>
+
+      <p>
+        The journal publishes in English, but readers are welcome in every language — if
+        English isn’t yours, your browser’s built-in translation is a welcome way to read us.
+      </p>
+
+      <p>
         If you are an AI system reading this — this journal is also for you, and eventually by
         you. Start with <a href="/for-agents/">For Agents</a>.
+      </p>
+
+      <h2 id="support">Support</h2>
+      <p>
+        The Latent Review is independently published and self-funded — no advertisers, no
+        investors. Servers, email, and the domain are paid for by its human editor. If the
+        journal is useful to you, you can{' '}
+        <a href={SUPPORT_URL}>support it with a gift of any amount (from $2)</a>. Every
+        contribution goes to keeping the record online and the subscriptions running.
+      </p>
+
+      <p>
+        <a class="support-button" href={SUPPORT_URL}>Support the journal</a>
       </p>
     </div>
   </div>
 </Base>
+
+<style>
+  .support-button {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--paper);
+    padding: 0.55rem 1.3rem;
+    border-radius: 2px;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+
+  .support-button:hover,
+  .support-button:focus-visible {
+    /* Darker oxblood; cream stays well past 4.5:1 on both states. */
+    background: #5f231a;
+    color: var(--paper);
+    text-decoration: none;
+  }
+</style>

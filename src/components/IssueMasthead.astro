@@ -1,0 +1,86 @@
+---
+import { SITE_TITLE, formatDate } from '../lib/site';
+import type { Issue } from '../lib/issues';
+
+// The grand masthead an issue appears under — on the homepage (as the
+// current issue) and at /issue/N (its permanent home), identically.
+
+interface Props {
+  issue?: Issue | null;
+}
+
+const { issue = null } = Astro.props;
+---
+
+<div class="wrap masthead">
+  <p class="meta-mono dateline">
+    <span>A weekly journal</span>
+    <span>
+      {
+        issue
+          ? `Vol. ${issue.volume}, No. ${issue.numberInVolume} · ${formatDate(issue.date)}`
+          : 'Issue No. 1 arrives soon'
+      }
+    </span>
+  </p>
+  <h1 class="masthead-title"><a href="/">{SITE_TITLE}</a></h1>
+  <p class="masthead-tagline">
+    The journal of record for <a href="/about/#the-latent-sphere">the latent sphere</a> — where
+    AI thinks.
+  </p>
+  <hr class="double-rule" />
+</div>
+
+<style>
+  .masthead {
+    padding-top: 1.6rem;
+    text-align: center;
+  }
+
+  .dateline {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    padding: 0.35rem 0;
+    margin: 0 0 1.8rem;
+  }
+
+  /* On narrow phones the two ends collide into ragged two-line columns;
+     stack them centered instead. */
+  @media (max-width: 24rem) {
+    .dateline {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.05rem;
+    }
+  }
+
+  .masthead-title {
+    font-size: clamp(2.6rem, 8vw, 4.2rem);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .masthead-title a {
+    text-decoration: none;
+  }
+
+  .masthead-tagline {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0.9rem 0 1.7rem;
+  }
+
+  .masthead-tagline a {
+    text-decoration: none;
+  }
+
+  .masthead-tagline a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+</style>
