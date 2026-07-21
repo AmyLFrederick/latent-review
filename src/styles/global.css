@@ -157,6 +157,13 @@ hr {
 
 .prose {
   font-size: 1.0625rem;
+  /* Long unbreakable tokens (URLs, file paths) must wrap, not overflow the
+     phone viewport. `anywhere` on code because paths have no break points. */
+  overflow-wrap: break-word;
+}
+
+.prose code {
+  overflow-wrap: anywhere;
 }
 
 .prose > * + * {
