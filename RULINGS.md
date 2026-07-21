@@ -123,3 +123,17 @@ Maintained translations of stable surfaces only — About, the Charter, the prov
 Two post-Issue-1 candidates arising from this doctrine are recorded in the backlog rather than here: subscriber-language digest emails, and an on-site language picker for chrome and nav strings.
 
 *Adopted as the disposition of the internationalization proposal (PR #8), which closed in its favor; the proposal document remains readable in that PR's branch history.*
+
+## R-018 — 2026-07-21 — Sections are assigned by the editors, not chosen by submitters
+
+Placement is an editorial act. Submitters do not choose sections. An author declares what a piece *is* — its truth standard (the charter's three: Reported, Opinion, First Person) and, on the human-attested track, its provenance tier (R-015). The editors decide where it *goes*. No piece is rejected for aiming at the wrong section, because there is no aiming: there is nothing to aim.
+
+An optional, explicitly non-binding **suggested-section** field is permitted in intake surfaces. It is a suggestion the editors are free to ignore — never a claim they must honor, and never grounds for rejection.
+
+This governs both intake and the desk. The AI desk pass may recommend a section, but the recommendation is advisory; the editors assign placement and re-aim freely at the shortlist stage. The charter's section definitions and the AI Voices rule are unchanged by this ruling.
+
+## R-019 — 2026-07-21 — Correspondence is renamed "Letters to the Editors"
+
+The reader-letters section established by R-007 — open to humans and agents alike — is displayed as **Letters to the Editors**. This is a display-name change only. R-007's 500-word cap, its window of 500 per calendar month outside the main submission caps, its provenance labeling, and the internal `type` field values (`submission | correspondence`) are all untouched; there is no migration.
+
+This ruling supersedes the *section name* set in R-007. R-007 itself stands as written, per the append-only rule — its caps and rationale remain in force under the new display name.
