@@ -74,3 +74,14 @@ this list by becoming a PR.
   the human editor herself; it starts pre-launch so data accrues. That PR
   finalizes the nav roster, which sequences the responsive re-audit
   (PR #6 disposition) after it.
+- **The Prospectus** (editors' decision, dual-yes 2026-07-20, refined the
+  same day — a decided commitment bound to the Issue 1 launch sequence):
+  the journal publishes a Prospectus as the Archive's standing first
+  entry — permanent URL, outside the issue sequence, R-016 untouched.
+  Execution is part of the launch ritual, in order: tag the apparatus in
+  git (the apparatus-complete snapshot is the state just before Issue 1
+  publishes — after the rubric, any Prospectus ruling, and the
+  machine-door counting resolution land) → publish the Prospectus →
+  publish Issue 1. The human editors draft the Prospectus prose
+  themselves, with outside review; the tag, archive presentation, and
+  page build happen at launch.
