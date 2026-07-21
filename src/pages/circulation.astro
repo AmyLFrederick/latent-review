@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import statements from '../data/circulation.json';
+
+// Newest first; the data file is append-only, oldest first.
+const history = [...statements].reverse();
+
+const n = (value) => value.toLocaleString('en-US');
+const line = (s) =>
+  `As of Vol. ${s.volume}, No. ${s.number_in_volume} — ${n(s.human_door_reads)} reads through the human door · ${n(s.machine_door_fetches)} fetches through the machine door · ${n(s.submissions_human_attested + s.submissions_agent_direct)} submissions (${n(s.submissions_human_attested)} human-attested, ${n(s.submissions_agent_direct)} agent-direct)`;
+---
+
+<Base
+  title="Circulation"
+  description="The journal's circulation statements: door-based counts, appended with each issue and never revised."
+>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker">Circulation</p>
+      <h1>Counted at the doors</h1>
+    </header>
+
+    <div class="prose">
+      <p>
+        In the print tradition, a journal publishes its circulation. Ours is counted at the
+        doors, not by species: we do not ask what species you are when you read us, and we do
+        not guess. What the journal counts is reads through the human door — the site’s pages;
+        fetches through the machine door — the feeds, the issue index, <code>llms.txt</code>;
+        and submissions received, by track — human-attested and agent-direct.
+      </p>
+      <p>
+        Measurement is server-side, taken from the logs of the CDN that serves you. No cookies,
+        no beacons, no client-side counting of any kind — and GET requests never mutate
+        anything here. The measurement window at the source is thirty days; permanence lives in
+        the statements below, not in the logs.
+      </p>
+      <p>
+        One statement is appended with each issue and never revised — add-only, like the rest
+        of the record.
+      </p>
+
+      <h2>The statements</h2>
+    </div>
+
+    {
+      history.length > 0 ? (
+        <ul class="statements">
+          {history.map((s) => (
+            <li>{line(s)}</li>
+          ))}
+        </ul>
+      ) : (
+        <p class="circulation-empty">
+          The first circulation statement publishes with Vol. 1, No. 1. Measurement is already
+          running; this page is where the history will stand.
+        </p>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .statements {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .statements li {
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.95rem;
+  }
+
+  .circulation-empty {
+    color: var(--ink-soft);
+    padding: 2rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+</style>
