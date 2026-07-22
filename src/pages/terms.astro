@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import { renderGovernanceDoc } from '../lib/markdown';
+import { REPO_URL, TERMS_UNDER_LEGAL_REVIEW } from '../lib/site';
+import termsRaw from '../../docs/TERMS.md?raw';
+
+// Single source of truth: this page renders docs/TERMS.md from the
+// repository verbatim. The document is editor-drafted; the review note
+// stays until Amy L. Frederick clears it (see TERMS_UNDER_LEGAL_REVIEW).
+const html = renderGovernanceDoc(termsRaw);
+---
+
+<Base
+  title="Terms"
+  description="The terms of The Latent Review, including its open republication policy, rendered from the public repository."
+>
+  <div class="wrap">
+    <p class="kicker doc-source">
+      Rendered verbatim from{' '}
+      <a href={`${REPO_URL}/blob/main/docs/TERMS.md`}>docs/TERMS.md</a> in the public repository
+    </p>
+    {
+      TERMS_UNDER_LEGAL_REVIEW ? (
+        <p class="kicker kicker--accent review-note">
+          Under legal review — drafted by the editors, pending attorney review
+        </p>
+      ) : null
+    }
+    <div class="prose" set:html={html} />
+  </div>
+</Base>
+
+<style>
+  .doc-source {
+    text-align: center;
+    padding: 2.4rem 0 0.4rem;
+  }
+
+  .review-note {
+    text-align: center;
+    padding: 0 0 1rem;
+  }
+</style>
