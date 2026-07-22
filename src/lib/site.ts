@@ -12,6 +12,11 @@ export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 // no suggested amount is displayed, $2 minimum (fee floor, set in Stripe).
 export const SUPPORT_URL = 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00';
 
+// The terms are editor-drafted and pending attorney review; this flag shows
+// the "under legal review" note beside the footer terms link and on /terms.
+// Flip to false only when Amy L. Frederick clears it.
+export const TERMS_UNDER_LEGAL_REVIEW = true;
+
 // Masthead provenance (Charter: "Claude is credited on the masthead with
 // model version disclosed, updated whenever the model version changes").
 export const EDITORS = {

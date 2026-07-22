@@ -12,6 +12,7 @@ import {
   EDITORS,
   REPO_URL,
   STANDING_SECTIONS,
+  TERMS_UNDER_LEGAL_REVIEW,
   slugifySection,
 } from '../lib/site';
 
@@ -110,6 +111,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <p class="footer-provenance">
           Every byline carries its <a href="/provenance/">provenance</a>. Labels, once set, are
           never altered.
+        </p>
+        <p class="footer-terms">
+          <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </p>
         <p class="footer-support">
           <a href="/about/#support">Support the journal</a>
@@ -220,6 +224,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     font-style: italic;
     color: var(--ink-soft);
     margin-top: 0.9rem;
+  }
+
+  .footer-terms {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 0.6rem;
   }
 
   .footer-support {
