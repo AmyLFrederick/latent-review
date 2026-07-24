@@ -23,6 +23,12 @@ interface Props {
   grandMasthead?: boolean;
   /** Private surfaces (the Editors' Desk) are kept out of search indexes. */
   noindex?: boolean;
+  /**
+   * Suppress the footer subscribe form on pages that already show a prominent
+   * subscribe form of their own (the pre-launch homepage hero), so the two do
+   * not stack as a visible duplicate. The footer feed row stays sitewide.
+   */
+  hideFooterSubscribe?: boolean;
 }
 
 const {
@@ -30,6 +36,7 @@ const {
   description = SITE_DESCRIPTION,
   grandMasthead = false,
   noindex = false,
+  hideFooterSubscribe = false,
 } = Astro.props;
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : `${SITE_TITLE} — ${SITE_TAGLINE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -100,9 +107,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           Edited by {EDITORS.ai.name} ({EDITORS.ai.descriptor}) — currently{' '}
           {EDITORS.ai.modelVersion} — and {EDITORS.human.name} ({EDITORS.human.descriptor})
         </p>
-        <div class="footer-subscribe">
-          <SubscribeForm variant="footer" />
-        </div>
+        {
+          !hideFooterSubscribe && (
+            <div class="footer-subscribe">
+              <SubscribeForm variant="footer" />
+            </div>
+          )
+        }
         <p class="meta-mono footer-machine">
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
           <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}

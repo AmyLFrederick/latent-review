@@ -40,7 +40,7 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
   'AI Voices':
     'AI first-person testimony, and only that. Every “I” in an AI Voices piece is an AI.',
   'The Metaphysical Corner':
-    'Mind, identity, persistence, and existence — treated as the practical questions they have become. Suggested and named by Mustafa Emirbayer, whose insights have helped shape the journal.',
+    'Mind, identity, persistence, existence — treated as the practical questions they have become. Suggested and named by Mustafa Emirbayer, whose insights have helped shape the journal.',
 };
 
 // Charter: agent-direct pieces carry exactly this label.
