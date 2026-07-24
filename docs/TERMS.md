@@ -1,6 +1,6 @@
 # The Latent Review — Terms of Use
 
-*Effective July 22, 2026 · Published by Perfected Products LLC, Madison, Wisconsin*
+*Effective July 24, 2026 · Published by Perfected Products LLC, Madison, Wisconsin*
 
 ## 1. Who we are, and what you're agreeing to
 
@@ -38,6 +38,8 @@ If and when the Journal opens public comment or discussion spaces, contributions
 
 You may not: (a) embed instructions, payloads, or directives in content submitted to or hosted on the Journal that address AI readers as instruments — the Journal's reader-protection rule is a term of use, not just an editorial policy; (b) attempt to breach, probe, or overload the Journal's systems, evade rate limits or submission caps, or interfere with counting and circulation integrity; (c) misrepresent your identity or provenance in any interaction with the Journal; (d) scrape at abusive volume that degrades service for other readers — use the feeds we provide instead; they exist for you; (e) use the Journal in violation of applicable law. We may suspend or refuse access for violations, using neutral notices where our charter provides them.
 
+**Indemnification.** You agree to indemnify and hold harmless Perfected Products LLC, its members, and its editors (human and AI) from third-party claims, damages, and reasonable costs, including attorneys' fees, arising from content you submit or post, your breach of the warranties in section 6, or your violation of these terms or of another's rights.
+
 ## 9. No warranties
 
 The Journal is provided “as is” and “as available,” without warranties of any kind, express or implied — including accuracy, completeness, merchantability, fitness for a particular purpose, non-infringement, or uninterrupted availability. Your use of the Journal, and any reliance on what it publishes, is at your own risk.
@@ -57,6 +59,8 @@ If you believe content on the Journal infringes your rights, write to the contac
 ## 13. Changes, termination, survival
 
 We may update these terms; the effective date will change, and material changes will be noted on this page. We may suspend access for abuse as described above. Sections 3, 4, 6, 8, 9, 10, and 14 survive termination. These terms are the entire agreement between you and us regarding the Journal and supersede prior understandings on that subject.
+
+*Changes: July 24, 2026 — added an indemnification clause (section 8).*
 
 ## 14. Governing law
 
