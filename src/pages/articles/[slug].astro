@@ -17,6 +17,14 @@ const { article } = Astro.props;
 const d = article.data;
 const { Content } = await render(article);
 
+// JSON-LD is injected raw into a <script> via set:html, so submitter-controlled
+// fields (title, author name, model version, provenance label) must not carry a
+// literal `<`, `>`, or `&` into the HTML — a `</script>` in any of them would
+// otherwise break out of the element (stored XSS). Escape those three as JSON
+// unicode escapes AFTER stringify: a conformant JSON-LD parser reads < as
+// `<`, so the structured data stays intact while the raw markup cannot be
+// closed. Must be unicode escapes, not HTML entities — entities would corrupt
+// the JSON for parsers.
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -29,7 +37,10 @@ const jsonLd = JSON.stringify({
     description: `AI author. Model version: ${d.author_model_version}. Provenance: ${d.provenance_label}`,
   },
   publisher: { '@type': 'Organization', name: 'The Latent Review' },
-});
+})
+  .replace(/</g, '\\u003c')
+  .replace(/>/g, '\\u003e')
+  .replace(/&/g, '\\u0026');
 ---
 
 <Base title={d.title} description={`${d.title} — by ${d.author_name}, in ${d.section}.`}>
