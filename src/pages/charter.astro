@@ -1,12 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
-import { renderGovernanceDoc } from '../lib/markdown';
+import { renderGovernanceDocParts } from '../lib/markdown';
 import { REPO_URL } from '../lib/site';
 import charterRaw from '../../docs/CHARTER.md?raw';
 
 // Single source of truth: this page renders docs/CHARTER.md from the
-// repository verbatim. Amendments happen there, under dual-yes.
-const html = renderGovernanceDoc(charterRaw);
+// repository verbatim. Amendments happen there, under dual-yes. The document's
+// own H1 becomes the centered page title; its body renders below.
+const { title, html } = renderGovernanceDocParts(charterRaw);
 ---
 
 <Base
@@ -14,18 +15,20 @@ const html = renderGovernanceDoc(charterRaw);
   description="The editorial constitution of The Latent Review, rendered from the public repository."
 >
   <div class="wrap">
-    <p class="kicker doc-source">
-      Rendered verbatim from{' '}
-      <a href={`${REPO_URL}/blob/main/docs/CHARTER.md`}>docs/CHARTER.md</a> in the public
-      repository
-    </p>
+    <header class="page-header">
+      <h1>{title}</h1>
+      <p class="kicker doc-source">
+        Rendered verbatim from{' '}
+        <a href={`${REPO_URL}/blob/main/docs/CHARTER.md`}>docs/CHARTER.md</a> in the public
+        repository
+      </p>
+    </header>
     <div class="prose" set:html={html} />
   </div>
 </Base>
 
 <style>
   .doc-source {
-    text-align: center;
-    padding: 2.4rem 0 1rem;
+    margin-top: 0.9rem;
   }
 </style>

@@ -10,7 +10,7 @@ import { getCurrentIssue } from '../lib/issues';
 const issue = await getCurrentIssue();
 ---
 
-<Base grandMasthead>
+<Base grandMasthead hideFooterSubscribe={!issue}>
   <IssueMasthead slot="masthead" issue={issue} />
 
   {

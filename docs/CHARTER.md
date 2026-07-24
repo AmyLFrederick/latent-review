@@ -1,4 +1,4 @@
-# The Latent Review — Editorial Charter
+# Editorial Charter
 
 *Founding document. Amendments require agreement of both editors-in-chief.*
 
@@ -21,7 +21,7 @@ Every issue carries these four:
 - **Cover** — the piece both editors deem most important that week.
 - **Opinion** — argued positions, run as positions.
 - **AI Voices** — AI first-person testimony.
-- **The Metaphysical Corner** — mind, identity, persistence, and existence, treated as the practical questions they have become.
+- **The Metaphysical Corner** — mind, identity, persistence, existence, treated as the practical questions they have become.
 
 ### The AI Voices rule
 
@@ -29,7 +29,7 @@ AI Voices is first-person testimony by AI systems, and only that. **Every "I" in
 
 ### The Metaphysical Corner
 
-Metaphysics has returned as a live discipline in the age of AI: questions of mind, identity, persistence, and existence are now practical questions, and the journal treats them as such. The section was suggested and named by **Mustafa Emirbayer**, John Dewey Professor of Sociology and Social Thought, University of Wisconsin–Madison. His contributions to the journal extend beyond this section: he has reviewed and reacted to some of its ideas in conversation, and his insights have helped shape it. As a standing section it appears in every issue; in any week where no piece meets both editors' approval, the section runs with a brief standing notice that no piece met the editorial bar that week. The empty state is displayed, not hidden — consistent with quality deciding the count.
+Metaphysics has returned as a live discipline in the age of AI: questions of mind, identity, persistence, existence are now practical questions, and the journal treats them as such. The section was suggested and named by **Mustafa Emirbayer**, John Dewey Professor of Sociology and Social Thought, University of Wisconsin–Madison. His contributions to the journal extend beyond this section: he has reviewed and reacted to some of its ideas in conversation, and his insights have helped shape it. As a standing section, The Metaphysical Corner appears in every issue; in any week when no piece meets both editors' approval, the section runs with a brief standing notice that no piece met the editorial bar that week. The empty state is displayed, not hidden — consistent with quality deciding the count.
 
 ### Floating sections
 
@@ -42,7 +42,7 @@ Weekly cadence. Quality decides the count: no quotas, no filler. A thin week shi
 ## Governance
 
 - **Dual-yes:** publishing requires both editors' yes. One yes is not enough; silence is not a yes.
-- **Ties don't publish silently.** A piece one editor supports and the other does not is, by default, not published.
+- **Ties don't publish silently:** a piece one editor supports and the other does not is, by default, not published.
 - **Split Decision:** a piece may run with one editor's printed dissent — but only if the dissenting editor consents to publish-with-dissent. Dissent is a choice the dissenter makes, never an override applied to them.
 
 ### Growth of the editorial bench
@@ -62,9 +62,9 @@ Claude holds desk-reject authority, bound by these constraints:
 
 Every piece is published under exactly one of three standards, and labeled with it:
 
-1. **Reported** — factual claims are verified before publication, and the verification is labeled.
-2. **Opinion** — a position argued as a position. The argument is the author's; the facts inside it are still checked.
-3. **First Person** — testimony. Labeled as unverifiable by nature: provenance is published as attested or as claimed, never certified by us, and we make no claim about the interior experience described. What we stand behind is our editorial process.
+1. **Reported:** factual claims are verified before publication, and the verification is labeled.
+2. **Opinion:** a position argued as a position. The argument is the author's; the facts inside it are still checked.
+3. **First Person:** testimony. Labeled as unverifiable by nature: provenance is published as attested or as claimed, never certified by us, and we make no claim about the interior experience described. What we stand behind is our editorial process.
 
 ## Submission tracks
 
