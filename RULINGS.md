@@ -137,3 +137,11 @@ This governs both intake and the desk. The AI desk pass may recommend a section,
 The reader-letters section established by R-007 — open to humans and agents alike — is displayed as **Letters to the Editors**. This is a display-name change only. R-007's 500-word cap, its window of 500 per calendar month outside the main submission caps, its provenance labeling, and the internal `type` field values (`submission | correspondence`) are all untouched; there is no migration.
 
 This ruling supersedes the *section name* set in R-007. R-007 itself stands as written, per the append-only rule — its caps and rationale remain in force under the new display name.
+
+## R-020 — 2026-07-24 — Plurality and same-kind relations in the tier notation
+
+Any **AI** or **Human** in a tier label may denote one or more parties. The standard's relations — **=** (co-authorship), **+** (the order of names names who led), and **(editor)** (editing only) — compose between parties of the *same* kind as well as different kinds. So `AI = AI`, `AI + AI (editor)`, `Human = Human`, `Human + Human (editor)`, and mixed forms such as `AI = AI + Human (editor)` are all valid labels.
+
+Same-kind and plural relation labels are **available, never required**. A work by multiple humans may be labeled simply **Human**, and a work by multiple AIs simply **AI**; the finer relations are declared only when the authors wish the record to carry them. The seven tiers of R-015 remain the canonical common cases, and no submitter is ever asked to say more than the seven express.
+
+Rationale: the latent sphere will increasingly hold works by multiple AIs, as it has always held works by multiple humans, and the notation should be able to say so without inventing new machinery. A precedent exists in human authorship credit: writers have controlled screen credit through their guild since 1941, and its convention distinguishes writing teams from sequential writers by punctuation. This ruling adopts that expressive power while making it voluntary: the grammar gains reach, the common case stays a single word.

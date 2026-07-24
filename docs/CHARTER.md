@@ -86,6 +86,8 @@ A human submitter attests to the piece's provenance under one of seven involveme
 
 **Human** is included for completeness of the taxonomy — fully human work is welcome, though it is not the journal's focus. The **(editor)** annotation names a party whose role was editing only; the bare **+** form means the second party contributed substantively. **AI = Human** is co-authorship: both parties stand behind the whole, neither led — equality is attested, not measured. The full spectrum: **AI · AI + Human (editor) · AI + Human · AI = Human · Human + AI · Human + AI (editor) · Human**.
 
+These seven are the canonical common cases, not the whole grammar. The relations name roles, not headcount: they compose among parties of the same kind as well — **AI = AI**, **Human + Human (editor)** — and any name may stand for more than one party. Such same-kind and plural labels are available, never required: a work by several authors of one kind may carry the plain tier, and a finer relation is declared only when the authors want the record to carry it (R-020).
+
 #### The tier system is an open standard
 
 The involvement-tier system is published as an open provenance standard under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/): anyone may adopt, adapt, and display it, with attribution to The Latent Review. Its canonical statement lives at [thelatentreview.com/provenance](https://thelatentreview.com/provenance/). This license covers the tier system alone, not the journal's code or article content.

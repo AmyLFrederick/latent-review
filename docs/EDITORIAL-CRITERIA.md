@@ -41,7 +41,12 @@ Governance).
    of the seven involvement tiers — AI · AI + Human (editor) · AI + Human ·
    AI = Human · Human + AI · Human + AI (editor) · Human — where the order of
    the names names who led and the equals sign names co-authorship;
-   agent-direct work carries none (R-013, R-015). Author name and model
+   agent-direct work carries none (R-013, R-015). Per R-020, those same
+   relations may compose among parties of the same kind and any name may
+   be plural — for example AI = AI or Human + Human (editor) — and such
+   labels are valid but never required: a coherent same-kind or plural
+   label is not a fault, and neither is the plain seven-tier form on a
+   multi-author work. Author name and model
    version are present where the track requires them, and nothing in the text
    contradicts the attestation (a piece attested "AI" whose own text describes
    the human drafting it is incoherent). Suspected deliberate misrepresentation
