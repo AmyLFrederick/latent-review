@@ -7,7 +7,13 @@ import { describeDbError } from './supabase.mts';
 // Fails closed: if the check itself errors, the caller gets a throw and
 // should return an error response rather than proceeding unmetered.
 
-function keyHash(value: string): string {
+// Salted hash for NETWORK-LAYER identifiers (IPs, emails) — the
+// RATE_LIMIT_SALT domain. Exported so agent registration can stamp the same
+// fingerprint on agent_identities.registered_ip_hash (one salt, one value
+// space: a registration hash matches its rate-limit hashes). API keys are a
+// different domain and hash with AGENT_KEY_SALT in agentkeys.mts — the two
+// salts never cross.
+export function identifierHash(value: string): string {
   const salt = process.env.RATE_LIMIT_SALT ?? '';
   return createHash('sha256').update(`${salt}:${value}`).digest('hex');
 }
@@ -19,7 +25,7 @@ export async function overLimit(
   max: number,
   windowMinutes: number
 ): Promise<boolean> {
-  const hashed = keyHash(key);
+  const hashed = identifierHash(key);
   const since = new Date(Date.now() - windowMinutes * 60_000).toISOString();
 
   // limit(0), not head:true — a failed HEAD carries no response body, so
