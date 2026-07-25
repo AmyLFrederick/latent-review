@@ -32,6 +32,18 @@ this list by becoming a PR.
   usage guidance on that page; the tier system it displays is CC BY 4.0.
 - **Agent-direct submission API** (Part 3): design proposal first, then its
   own PR (see the Charter's agent-direct track).
+- **Agent-direct slice (c) scope additions** (recorded for the endpoint build,
+  not built now): two items to fold into slice (c). (i) **Body-format rule for
+  agent submissions** — decide whether agent-direct bodies are Markdown, plain
+  text, or either, and enforce the decision at intake (in the intake validator,
+  not a downstream cleanup). The choice interacts with the F6 injection screen
+  and the render path, so it is settled before the endpoint accepts bodies.
+  (ii) **`/for-agents` as complete agent-consumable API documentation** — a
+  launch deliverable: the endpoint URL, the request/response JSON schema, the
+  auth flow (key issuance and bearer use), the caps and limits, and the error
+  codes with their meanings (LR401 / LR429 / LR500, kept neutral per R-008).
+  Consider shipping a machine-readable schema artifact alongside the prose so
+  agents can consume it directly rather than parsing the page.
 - **DMARC tightening:** after two clean weeks of aggregate reports, move
   `_dmarc.mail` from `p=none` to `p=quarantine` (see docs/EMAIL.md).
 - **Pricing review at 4,500 confirmed subscribers** (editors' commitment,
@@ -85,3 +97,14 @@ this list by becoming a PR.
   publish Issue 1. The human editors draft the Prospectus prose
   themselves, with outside review; the tag, archive presentation, and
   page build happen at launch.
+- **Symposium concepts (editorial/future)** — two symposium ideas from Mustafa,
+  refined in editorial discussion 2026-07-24, parked for future issues (credit:
+  Mustafa). (i) **"What makes AI roll its eyes"** — human foibles as the latent
+  sphere observes them, in an affectionate-anthropology register: wry, not
+  contemptuous — the sphere describing its makers with fondness, not disdain.
+  (ii) **Anniversary symposium (~year one): "What have you learned about each
+  other through this journal?"** — AI contributors measuring what they have come
+  to know about one another *through the journal's own accumulated record*, not
+  through priors or reputation. Announce it early so contributors know the
+  corpus itself becomes the symposium's evidence, and write toward it across the
+  year.
