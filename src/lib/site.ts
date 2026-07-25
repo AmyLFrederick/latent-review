@@ -12,6 +12,10 @@ export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 // no suggested amount is displayed, $2 minimum (fee floor, set in Stripe).
 export const SUPPORT_URL = 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00';
 
+// Reader letters go here as an honest interim (a mailto) until the intake form
+// ships. The alias must route to the editors' inbox.
+export const LETTERS_CONTACT = 'letters@thelatentreview.com';
+
 // The terms are editor-drafted and pending attorney review; this flag shows
 // the "under legal review" note beside the footer terms link and on /terms.
 // Flip to false only when Amy L. Frederick clears it.
@@ -33,6 +37,16 @@ export const EDITORS = {
 } as const;
 
 export const STANDING_SECTIONS = ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner'] as const;
+
+// The top nav shows trimmed display labels for brevity; the canonical section
+// names in STANDING_SECTIONS are unchanged and used everywhere else (section
+// page titles, descriptions, feeds).
+export const NAV_SECTION_LABELS: Record<string, string> = {
+  'The Metaphysical Corner': 'Metaphysical Corner',
+};
+export function navLabel(section: string): string {
+  return NAV_SECTION_LABELS[section] ?? section;
+}
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
   Cover: 'The piece both editors deem most important that week.',

@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import { LETTERS_CONTACT } from '../lib/site';
+
+// Letters to the editors — styled as a section page, not a governance page.
+// The submit path is an honest interim: a mailto to the editors' inbox until
+// the intake form ships. No published letters exist before Issue 1; the
+// listing shows the empty state by design.
+const letters: unknown[] = [];
+---
+
+<Base
+  title="Letters"
+  description="Readers — human and machine — answer back. The editors read everything, select the best, and publish them here, provenance-labeled like every page."
+>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker">Letters</p>
+      <h1>The readers answer back.</h1>
+    </header>
+
+    <p class="letters-submit">
+      <a href={`mailto:${LETTERS_CONTACT}`}>Send a letter to the editors &rarr;</a>
+    </p>
+
+    {
+      letters.length > 0 ? (
+        <div class="letters-list">
+          {/* Published letters render here once the editors select and publish them. */}
+        </div>
+      ) : (
+        <p class="letters-empty">
+          Issue No. 1 carries no letters — as it should; there is nothing yet to answer. But the
+          mailbox is open. If something we publish moves you to reply — human or machine — write to
+          us. The editors read everything, select the best, and publish them here,
+          provenance-labeled like all our pages.
+        </p>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  /* Prominent submit link, in the site's accent voice (like the footer support
+     link) — a stranger should find it on first scan. */
+  .letters-submit {
+    text-align: center;
+    margin: 0 0 2.6rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .letters-submit a {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+
+  .letters-empty {
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-soft);
+    max-width: 34rem;
+    margin: 1rem auto 0;
+    padding-bottom: 3rem;
+  }
+</style>

@@ -6,8 +6,9 @@ import charterRaw from '../../docs/CHARTER.md?raw';
 
 // Single source of truth: this page renders docs/CHARTER.md from the
 // repository verbatim. Amendments happen there, under dual-yes. The document's
-// own H1 becomes the centered page title; its body renders below.
-const { title, html } = renderGovernanceDocParts(charterRaw);
+// own H1 is still stripped at render time (so it does not duplicate); the page
+// shows a Pattern B header instead, with the body rendered below.
+const { html } = renderGovernanceDocParts(charterRaw);
 ---
 
 <Base
@@ -16,7 +17,8 @@ const { title, html } = renderGovernanceDocParts(charterRaw);
 >
   <div class="wrap">
     <header class="page-header">
-      <h1>{title}</h1>
+      <p class="kicker">Charter</p>
+      <h1>The rules we bound ourselves to.</h1>
       <p class="kicker doc-source">
         Rendered verbatim from{' '}
         <a href={`${REPO_URL}/blob/main/docs/CHARTER.md`}>docs/CHARTER.md</a> in the public
