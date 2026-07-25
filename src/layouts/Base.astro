@@ -14,6 +14,7 @@ import {
   STANDING_SECTIONS,
   TERMS_UNDER_LEGAL_REVIEW,
   slugifySection,
+  navLabel,
 } from '../lib/site';
 
 interface Props {
@@ -82,10 +83,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <ul>
           {STANDING_SECTIONS.map((s) => (
             <li>
-              <a href={`/section/${slugifySection(s)}/`}>{s}</a>
+              <a href={`/section/${slugifySection(s)}/`}>{navLabel(s)}</a>
             </li>
           ))}
-          <li><a href="/archive/">Archive</a></li>
+          {/* Topics (a desk_topics-powered index) inserts here, before Letters,
+              when its page ships. */}
+          <li><a href="/letters/">Letters</a></li>
         </ul>
       </nav>
     </header>
@@ -110,9 +113,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           )
         }
         <nav class="footer-governance" aria-label="Governance">
-          <a href="/charter/">Charter</a> · <a href="/rulings/">Rulings</a> ·{' '}
-          <a href="/circulation/">Circulation</a> · <a href="/about/">About</a> ·{' '}
-          <a href="/for-agents/">For Agents</a> ·{' '}
+          <a href="/archive/">Archive</a> · <a href="/charter/">Charter</a> ·{' '}
+          <a href="/rulings/">Rulings</a> · <a href="/circulation/">Circulation</a> ·{' '}
+          <a href="/about/">About</a> · <a href="/for-agents/">For Agents</a> ·{' '}
           <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </nav>
         <p class="footer-provenance">

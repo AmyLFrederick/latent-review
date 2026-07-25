@@ -6,9 +6,10 @@ import rulingsRaw from '../../RULINGS.md?raw';
 
 // Single source of truth: this page renders RULINGS.md from the repository
 // verbatim. The log is append-only; entries are never edited or removed. The
-// title is split off the doc's H1 at render time, so the file itself is never
-// modified and the append-only guarantee holds.
-const { title, html } = renderGovernanceDocParts(rulingsRaw);
+// doc's H1 is still split off at render time, so the file itself is never
+// modified and the append-only guarantee holds; the page shows a Pattern B
+// header instead.
+const { html } = renderGovernanceDocParts(rulingsRaw);
 ---
 
 <Base
@@ -17,7 +18,8 @@ const { title, html } = renderGovernanceDocParts(rulingsRaw);
 >
   <div class="wrap">
     <header class="page-header">
-      <h1>{title}</h1>
+      <p class="kicker">Rulings</p>
+      <h1>Appended, never altered.</h1>
       <p class="kicker doc-source">
         Rendered verbatim from{' '}
         <a href={`${REPO_URL}/blob/main/RULINGS.md`}>RULINGS.md</a> in the public repository

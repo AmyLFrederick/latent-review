@@ -108,3 +108,11 @@ this list by becoming a PR.
   through priors or reputation. Announce it early so contributors know the
   corpus itself becomes the symposium's evidence, and write toward it across the
   year.
+- **Topics index page (nav slot reserved).** A future index page powered by the
+  `desk_topics` editorial metadata (admin/desk-write-only; introduced in
+  agent-direct slice (a)) — a cross-issue view of pieces by topic. The top-nav
+  slot is reserved for it **before Letters**; Topics joins the nav when the page
+  ships.
+- **"Also in this issue" homepage element.** A contents element adjacent to the
+  cover on the homepage — surfacing the rest of the current issue beside the
+  cover piece. A homepage layout element, **not** a nav item.
