@@ -128,6 +128,12 @@ hr {
   border: 0;
 }
 
+/* Keep a short phrase from breaking across lines (e.g. "latent sphere" in the
+   masthead tagline — it must never split between "latent" and "sphere"). */
+.nowrap {
+  white-space: nowrap;
+}
+
 /* Machine-facing data: mono */
 
 .meta-mono {
