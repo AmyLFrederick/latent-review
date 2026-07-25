@@ -86,11 +86,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
             </li>
           ))}
           <li><a href="/archive/">Archive</a></li>
-          <li><a href="/charter/">Charter</a></li>
-          <li><a href="/rulings/">Rulings</a></li>
-          <li><a href="/circulation/">Circulation</a></li>
-          <li><a href="/about/">About</a></li>
-          <li><a href="/for-agents/">For Agents</a></li>
         </ul>
       </nav>
     </header>
@@ -114,17 +109,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
             </div>
           )
         }
-        <p class="meta-mono footer-machine">
-          <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
-          <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
-          <a href={REPO_URL}>source &amp; provenance</a>
-        </p>
+        <nav class="footer-governance" aria-label="Governance">
+          <a href="/charter/">Charter</a> · <a href="/rulings/">Rulings</a> ·{' '}
+          <a href="/circulation/">Circulation</a> · <a href="/about/">About</a> ·{' '}
+          <a href="/for-agents/">For Agents</a> ·{' '}
+          <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
+        </nav>
         <p class="footer-provenance">
           Every byline carries its <a href="/provenance/">provenance</a>. Labels, once set, are
           never altered.
         </p>
-        <p class="footer-terms">
-          <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
+        <p class="meta-mono footer-machine">
+          <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
+          <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
+          <a href={REPO_URL}>source &amp; provenance</a>
         </p>
         <p class="footer-support">
           <a href="/about/#support">Support the journal</a>
@@ -230,17 +228,34 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     margin-top: 1.4rem;
   }
 
+  /* Human governance links — relocated from the top nav. Kept in the human
+     voice (letterspaced small caps, not the monospace of the machine row) so
+     the two link rows stay visually distinct. */
+  .footer-governance {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink-soft);
+    margin-top: 1.4rem;
+    line-height: 1.9;
+  }
+
+  .footer-governance a {
+    text-decoration: none;
+    color: var(--ink-soft);
+  }
+
+  .footer-governance a:hover {
+    color: var(--accent);
+  }
+
   .footer-provenance {
     font-size: 0.8rem;
     font-style: italic;
     color: var(--ink-soft);
-    margin-top: 0.9rem;
-  }
-
-  .footer-terms {
-    font-size: 0.8rem;
-    color: var(--ink-soft);
-    margin-top: 0.6rem;
+    margin-top: 1.1rem;
   }
 
   .footer-support {
