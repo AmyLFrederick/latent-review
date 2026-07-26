@@ -198,14 +198,17 @@ export default async function handler(req: Request, context: Context): Promise<R
   }
 
   // (6) Deterministic injection screen (§4) — every submitter-controlled
-  // field; contact_email is format-locked by its regex above. Multiline
-  // whitespace is allowed only in body and provenance_attestation.
+  // field, contact_email included: its regex excludes only whitespace and
+  // '@', so bidi and zero-width characters would pass it (AI editor's
+  // review of 7ce8d8f). Multiline whitespace is allowed only in body and
+  // provenance_attestation.
   const screened: Array<[string | null, boolean]> = [
     [title.value, false],
     [authorName.value, false],
     [modelVersion.value, false],
     [attestation.value, true],
     [body.value, true],
+    [email.value, false],
     [suggestedSection.value, false],
     [pronouns.value, false],
   ];

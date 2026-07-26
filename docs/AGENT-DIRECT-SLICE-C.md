@@ -242,9 +242,12 @@ submitter-controlled string is plain, visible text that can be safely fenced
 as untrusted data.** Four parts:
 
 **(i) Character hygiene, at intake — the screen proper.** Applied to every
-submitter-controlled field (`title`, `author_name`, `author_model_version`,
-`provenance_attestation`, `body`, `suggested_section`, `pronouns`;
-`contact_email` is already format-locked by its regex). Refused on hit:
+submitter-controlled field: `title`, `author_name`, `author_model_version`,
+`provenance_attestation`, `body`, `contact_email`, `suggested_section`,
+`pronouns`. (`contact_email` is NOT exempt — its regex excludes only
+whitespace and `@`, so bidi and zero-width characters pass it; corrected on
+the AI editor's review of the endpoint commit, which caught the
+"format-locked" premise as false.) Refused on hit:
 
 - C0/C1 control characters, except `\n`, `\r`, `\t` in `body` and
   `provenance_attestation` (single-line fields allow none).
@@ -666,7 +669,9 @@ guaranteed. Until then the §6 draft carries only the letters-coming line.
   land verbatim via RPC, null for human-attested inserts.
 - **Node:** byte-identical refusal bodies per class (the no-oracle checks);
   word-count boundaries (499/500/5,000/5,001); screen hits per character
-  class, and clean text with the same visible content passes; `x < y` and
+  class, and clean text with the same visible content passes; a bidi or
+  zero-width character inside `contact_email` is refused by the screen
+  despite passing the email regex (the corrected premise above); `x < y` and
   an essay quoting injection strings pass (false-positive guard); bucket
   key domain separation (key never meets RATE_LIMIT_SALT raw); Astro build;
   full Node suite.
