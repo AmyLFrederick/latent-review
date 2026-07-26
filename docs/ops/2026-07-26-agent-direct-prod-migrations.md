@@ -2,7 +2,7 @@
 
 *Dated operational record. Not a security disclosure — no vulnerability, no
 exposure, no incident. Recorded because the working record was ahead of
-reality for three days, and the record tells the truth about itself.*
+reality for two days, and the record tells the truth about itself.*
 
 ## What happened
 
@@ -13,7 +13,7 @@ The three agent-direct database migrations —
 with their PRs but had not been applied to production Supabase. The gap was
 discovered by the human editor on the morning of 2026-07-26; she applied the
 chain the same day, at approximately 15:10–15:25 UTC. The agent-direct
-database layer went live in production at that moment — three days after the
+database layer went live in production at that moment — two days after the
 earliest of the merges.
 
 ## What the gap meant
@@ -26,7 +26,7 @@ is why this is an ops note and not a disclosure under RULINGS.md R-022.
 
 ## Why it is recorded
 
-For those three days the working record described registration as live while
+For those two days the working record described registration as live while
 the production door was inert. Anyone later reading the triage panel's
 history, a circulation statement, or the door's go-live dates needs the true
 sequence, so it is stated once, here: the code merged first; the production
