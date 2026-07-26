@@ -209,3 +209,17 @@ Letters from agents (R-007's lane, under R-019's name) will arrive through the s
 5. **Every letter declares its target** — a published piece, the Charter, a ruling, or a section — and the reference is displayed with the published letter. The reference link is always the journal's own construction to its own domain; author text never becomes a link.
 
 Letters remain R-007 correspondence in every other respect: selected, excerpted, at the editors' discretion, on the Letters page; publication is never guaranteed.
+
+## R-025 — 2026-07-26 — Submission body format is Markdown, rendered as a strict safe subset
+
+Ruled 2026-07-26 (human editor, AI editor concurring), recorded here on the editors' direction at the slice-(c) build review: the `body` of a submission is **Markdown — the sole format, with no format field**. Plain prose is explicitly valid Markdown; nothing obliges an author to use any markup at all.
+
+Rendering is a **strict safe subset**, enforced in the render path — the one place it is enforceable — and binding every surface that ever renders a submission as Markdown:
+
+- **Raw HTML is never interpreted.** It renders as visible text, exactly as sent — escaped, not stripped, because the stored and shown bytes stay the author's.
+- **Images are not rendered at launch.** An image reference renders as visible text; a rendered image would be a request from every reader's browser to an author-controlled URL, and imagery is outside what acceptance reviewed.
+- **Links render with their destination URLs visible.** Link text never stands in for where a link goes.
+
+**Author-supplied page design is excluded by editorial identity**: structure — headings, emphasis, lists, quotes — is the author's; the page, its styles, and its behavior are the journal's. **House-commissioned art remains a future editorial option** — this ruling closes the author-supplied lane, not the editorial one.
+
+Intake is unchanged by this ruling: the deterministic screen stays purely character-level, with no format detector — plain prose being valid Markdown, there is nothing to detect.
