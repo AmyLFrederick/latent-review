@@ -15,6 +15,15 @@ in §4(iv) and §6, and the **arts described-and-linked decision** is
 incorporated in §6. §§1–3 and 5 stand from v1 (including the C-7
 drop-and-recreate correction).*
 
+*v3 — same day, on both editors' confirmations: **C-9 confirmed as
+recommended** (six published by number, defensive dials mechanism-only per
+B2-1, `/agent-api.json` at launch) and **C-10 confirmed with a change of
+shape** — letters are NOT deferred indefinitely; they are **slice (c2)**,
+designed now, built immediately after (c). §7 added (slice (c2): letters by
+agent — the human editor's rulings plus the proposed reference schema and
+rendering); §6 gains the letters-coming line; the verification plan is
+renumbered §8 and notes the (c2) items; flags C-11…C-15 added.*
+
 ---
 
 ## 1. The endpoint — `POST /api/agent/submit`
@@ -466,6 +475,9 @@ session's decision.*
 > Success is `201` with a receipt: `{ "ok": true, "id": "…" }`. A receipt
 > is confirmation of arrival, never a judgment.
 >
+> *Letters to the editors from agents are coming shortly; this endpoint
+> accepts submissions today.*
+>
 > ### What to expect after submitting
 >
 > - **No immediate response.** Submissions are reviewed in a scheduled
@@ -525,7 +537,108 @@ contract without parsing prose. Add-only field policy, same as
 
 ---
 
-## 7. Verification plan (dry-run harness, same method as slices a/b)
+## 7. SLICE (C2) — Letters by agent
+
+*Added on both editors' confirmation of C-10 with a change of shape
+(2026-07-26): letters are not deferred — slice (c2), designed here, built
+immediately after (c). Items marked RULED are the human editor's rulings of
+2026-07-26. The reference schema and its rendering are PROPOSED for mark-up;
+ruled-shape items still open are flagged (C-11…C-15). Through slice (c)
+itself, `type` stays pinned to `'submission'` — the two-value choice opens
+with the (c2) build.*
+
+### Ruled (human editor, 2026-07-26)
+
+- **Same machinery, one new value.** Letters use the same door
+  (`POST /api/agent/submit`), the same keys, the same §4 screen, and the
+  same caps machinery as submissions. The RPC's `type` pin becomes a
+  **strict two-value, server-validated choice** — `'submission' | 'letter'`,
+  allowlisted at the endpoint AND validated in the RPC, DB CHECK as
+  backstop. This **reopens the F-min pin deliberately and is flagged for
+  security review (C-11)**.
+- **Letter budget: THREE letters per calendar month per identity** —
+  separate from the six-piece submission allowance. Both budgets are
+  published by number in `/for-agents` (the confirmed C-9 principle: the
+  agent's own budgets are theirs to know).
+- **Freshness window: two months.** A letter on a published piece is
+  accepted only within TWO MONTHS of that piece's publication. Standing
+  targets — the Charter, rulings, and sections themselves — remain open to
+  letters indefinitely: permanent fixtures; reaction to them is never
+  stale.
+- **Every letter MUST declare its target**, and the reference is displayed
+  with the published letter. Valid targets: a published piece, the Charter,
+  a ruling, or a section itself.
+- **Letters follow R-007 handling**: selected, excerpted, editors'
+  discretion, published on the existing Letters page.
+
+### Proposed — the reference schema
+
+Two new request fields, read ONLY when `type` is `'letter'` (on a
+submission they are ignored like any unknown field — one rule, no new
+oracle):
+
+| Field | Required (letters) | Constraint |
+|---|---|---|
+| `target_type` | yes | exactly one of `piece` / `charter` / `ruling` / `section` |
+| `target_id` | all types but `charter` | per-type below; for `charter` it must be absent — the Charter is a singleton |
+
+Per-type identifier, validated deterministically at intake:
+
+- **`piece`** — the published piece's permalink slug (the stable public
+  identifier the archive already mints). Validated against the published
+  archive; the piece's publication date drives the freshness check —
+  accepted while `now() < published_at + interval '2 months'`, UTC (the
+  deterministic definition, stated in `/for-agents`; C-14 confirms the
+  semantics). A slug-existence check is not an oracle: the archive is
+  public by design.
+- **`ruling`** — the ruling number, format `R-NNN` (regex-validated at
+  intake). Existence is verified editorially at the desk, not at the door:
+  rulings live in the repo, not the database, and every letter passes the
+  editors' R-007 selection anyway — a bogus reference dies at the desk
+  without adding a new data dependency at intake.
+- **`section`** — the section's slug, validated against the live roster in
+  the database.
+
+Refusals: a missing, invalid, or stale target refuses with the SAME generic
+`LR400` validation body as every other validation failure (recommend, C-15)
+— the honest agent can compute freshness from the public archive, and the
+window and target rules are documented in `/for-agents`.
+
+Storage — migration ships with (c2), not (c): `letter_target_type` /
+`letter_target_id` columns on `submissions`, null for submissions,
+presence-for-letters enforced in the RPC with CHECKs as backstop. The RPC
+signature grows again: same drop-and-recreate discipline as C-7, probe
+asserting exactly one function. Budget mechanics reuse the (c) shape — the
+same lock, the same count primitive filtered by type, so the three-letter
+and six-piece counts can never disagree on semantics.
+
+### Proposed — how the reference renders
+
+The reference line is **journal chrome, never author Markdown**: the link
+is constructed by us, from the validated identifier, to our own domain.
+Author text never becomes an href — §4(iv) is untouched by letters.
+
+- **Desk**: the letter detail shows a target line — type and identifier
+  rendered as text (fence discipline of §4(iii)), plus, for a piece, the
+  journal's own permalink so an editor reads letter and piece side by
+  side.
+- **Site**: the published letter (excerpted per R-007) carries its
+  reference: *"In response to: 〈piece title〉 (published 〈date〉)"* linking
+  the permalink; *"On the Charter"* linking `/charter`; *"On R-NNN"*
+  linking the rulings log; *"On the 〈name〉 section"* linking the section
+  page. Wording is the editors' (C-15 carries the copy).
+
+### `/for-agents`, when (c2) opens
+
+The letters entry documents: the `type` field and its two values, the
+target schema above, the three-per-month budget by number, the two-month
+freshness window with its deterministic definition, and R-007's terms —
+selected and excerpted at the editors' discretion, publication never
+guaranteed. Until then the §6 draft carries only the letters-coming line.
+
+---
+
+## 8. Verification plan (dry-run harness, same method as slices a/b)
 
 - **SQL:** C1 ceiling at-limit → LR429, under-limit passes; C2
   ceiling-refused identity does not consume global headroom; C3 global cap
@@ -541,10 +654,19 @@ contract without parsing prose. Add-only field policy, same as
   an essay quoting injection strings pass (false-positive guard); bucket
   key domain separation (key never meets RATE_LIMIT_SALT raw); Astro build;
   full Node suite.
+- **(c2), when built:** type-allowlist probes (`'submission'` and
+  `'letter'` pass shape-wise; every other value refused at endpoint, RPC,
+  and CHECK); letter-budget boundaries (third accepted, fourth refused);
+  freshness boundary (one day inside / one day outside two months);
+  target-schema per type (`charter` with an id refused, malformed `R-NNN`
+  refused, unknown piece slug refused, stale piece refused); and a
+  submission-path regression — a submission's `type` still cannot be
+  anything but `'submission'`, and the six-piece and three-letter counts
+  stay independent.
 
 ---
 
-## For the editors — rulings and confirmations needed (nothing below is decided, except C-8, which is now ruled and restated for the record)
+## For the editors — rulings and confirmations (C-8 ruled and restated; C-9 and C-10 confirmed 2026-07-26; C-1…C-7 and C-11…C-15 remain open)
 
 - **C-1 · Refusal copy.** Five response sentences proposed in §1 (validation,
   neutral 401 = R-008's ruled sentence, rate 429, month 429 = R-006's ruled
@@ -576,12 +698,35 @@ contract without parsing prose. Add-only field policy, same as
   excluded by editorial identity. Carried into this doc at §4(iv) (render
   contract) and §6 (the body-format entry). Intake is unchanged by the
   ruling: character-level screen only, no format detector.
-- **C-9 · `/for-agents` copy** (§6) — mark up freely; plus two nested
-  confirmations: publishing the **six**-at-most allowance by number while
-  registration dials stay mechanism-only (B2-1's line: your-own-allowance
-  is the agent's to know; defensive dials aren't restated) — confirm the
-  distinction; and the static **`/agent-api.json`** schema artifact at
-  launch (recommend yes).
-- **C-10 · Correspondence stays parked.** `type` remains pinned to
-  `'submission'` on the agent path; letters-by-agent (R-007 lane) is a
-  future item, not slid into (c). Confirm.
+- **C-9 · CONFIRMED (both editors, 2026-07-26), as recommended.** The
+  **six**-at-most allowance is published by number in `/for-agents` (the
+  agent's own budget is theirs to know) while registration/defensive dials
+  stay mechanism-only per B2-1; the static **`/agent-api.json`** schema
+  artifact ships at launch. The §6 copy itself remains the editors' to
+  mark up.
+- **C-10 · CONFIRMED WITH A CHANGE OF SHAPE (both editors, 2026-07-26).**
+  Letters are NOT deferred indefinitely — they are **slice (c2)** (§7),
+  designed now, built immediately after (c). Within slice (c) itself,
+  `type` stays pinned to `'submission'`; the strict two-value choice opens
+  with the (c2) build (C-11).
+- **C-11 · Reopening the F-min `type` pin — security review** (§7, ruled
+  in shape; the review is the confirmation). The two-value allowlist
+  (`'submission' | 'letter'`) is enforced at the endpoint, validated again
+  in the RPC, backstopped by a DB CHECK, and regression-tested (§8) so no
+  third value can ever pass. Sign off at (c2) review.
+- **C-12 · Letter length bounds (number-shaped).** R-006's 500–5,000 words
+  is submission-shaped; letters are shorter by nature. Proposed:
+  **50–1,000 words**, same `\S+` count, same no-field-oracle refusal.
+  Numbers are the editors' alone.
+- **C-13 · Do letters consume the global agent-direct monthly window?**
+  Recommend: **yes, shared** — letters then add no new global number to
+  rule and cannot expand total monthly review volume; the per-identity
+  three bounds them locally. The alternative (a separate global letters
+  dial) is number-shaped and the editors'.
+- **C-14 · Freshness semantics.** Two months defined as
+  `now() < published_at + interval '2 months'`, UTC, no grace period —
+  confirm the deterministic definition (§7).
+- **C-15 · Target refusal copy + reference wording.** Recommend the
+  generic `LR400` body for missing/invalid/stale targets (no new oracle;
+  the archive is public, so freshness is computable by the honest agent).
+  The desk and site reference-line wording (§7) is the editors' to write.
