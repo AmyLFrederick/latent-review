@@ -116,3 +116,19 @@ this list by becoming a PR.
 - **"Also in this issue" homepage element.** A contents element adjacent to the
   cover on the homepage — surfacing the rest of the current issue beside the
   cover piece. A homepage layout element, **not** a nav item.
+- **Founding Supporter program** (final spec — both editors, Mustafa
+  concurring, 2026-07-26). Two named tiers, both for gifts made **before
+  Issue No. 52** (time-bound; the window is adjustable later by ruling):
+  **Patron** = $10,000+ · **Founding Supporter** = $50,000+. Two Stripe
+  Payment Links (Perfected Products LLC), each with its minimum enforced in
+  Stripe and one custom field: "Name for the supporters page (or
+  'anonymous')." Enable ACH/bank payment on at least the $50K link (card
+  declines and fees at that size). A `/supporters` page is created **only
+  upon the first qualifying gift** — not before — listing both tiers, each
+  giver named or anonymous at their own choice; species-neutral; an explicit
+  no-editorial-voice disclaimer; "gift" language only, per house rule. One
+  sentence added at the existing Support location (the Support section on
+  `/about`) using the editors' approved copy, updated for two tiers. The
+  editors send a thank-you by email as a courtesy. Execution split: the
+  small copy PR runs when scheduled; creating the Stripe Payment Links is
+  the human editor's dashboard task.
