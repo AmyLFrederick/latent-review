@@ -42,6 +42,20 @@ import Base from '../layouts/Base.astro';
       </p>
       <div id="desk-list"></div>
       <div id="desk-detail" hidden></div>
+
+      <section id="triage">
+        <hr />
+        <h2>Registration triage</h2>
+        <p class="desk-note">
+          Read-only, deterministic SQL — nothing here triggers an AI pass. Dials move only by
+          ruling (R-021); bans and revocations are admin updates in Supabase.
+        </p>
+        <p class="desk-toolbar">
+          <span id="triage-stamp" class="desk-note"></span>
+          <button id="triage-refresh" type="button">Refresh</button>
+        </p>
+        <div id="triage-body"><p class="desk-note">Loading…</p></div>
+      </section>
     </section>
   </div>
 </Base>
@@ -79,6 +93,7 @@ import Base from '../layouts/Base.astro';
       if (session) {
         el('desk-user').textContent = session.user.email ?? '';
         await renderList();
+        await renderTriage();
       }
     }
 
@@ -141,6 +156,71 @@ import Base from '../layouts/Base.astro';
           void openDetail((a as HTMLElement).dataset.open!);
         })
       );
+    }
+
+    // Registration triage — one read-only RPC (SECURITY INVOKER, STABLE),
+    // rendered as-is. Nothing in this section mutates and nothing calls AI.
+    async function renderTriage() {
+      const body = el('triage-body');
+      const { data: t, error } = await supabase.rpc('registration_triage');
+      if (error) {
+        body.innerHTML = `<p class="desk-note">Could not load triage: ${esc(error.message)}</p>`;
+        return;
+      }
+      el('triage-stamp').textContent = `as of ${new Date(t.generated_at).toISOString().replace('T', ' ').slice(0, 19)} UTC`;
+
+      const dial = (key: string) =>
+        (t.dials ?? []).find((d: any) => d.key === key)?.value ?? '—';
+      const day = (v: unknown) => esc(String(v ?? '').slice(0, 10));
+      const hash = (v: unknown) => (v ? `<code>${esc(String(v).slice(0, 12))}…</code>` : '—');
+      const ident = t.identities ?? {};
+      const pct =
+        ident.total > 0 ? `${Math.round((ident.zero_submission / ident.total) * 100)}%` : '—';
+
+      body.innerHTML = `
+        <h3>Registrations vs the dials</h3>
+        <table class="desk-table">
+          <thead><tr><th>Window</th><th>Registered</th><th>Dial</th></tr></thead>
+          <tbody>
+            <tr><td>Today (UTC)</td><td>${esc(t.registrations?.today)}</td><td>${esc(dial('global_registrations_daily'))} <span class="desk-note">(global_registrations_daily)</span></td></tr>
+            <tr><td>This month (UTC)</td><td>${esc(t.registrations?.this_month)}</td><td>${esc(dial('global_registrations_monthly'))} <span class="desk-note">(global_registrations_monthly)</span></td></tr>
+          </tbody>
+        </table>
+        <h3>Identities</h3>
+        <p>
+          ${esc(ident.total)} total · ${esc(ident.active)} active · ${esc(ident.banned)} banned ·
+          ${esc(ident.zero_submission)} with zero submissions (${esc(pct)})
+          ${Number(t.unattributed) > 0 ? ` · <strong>${esc(t.unattributed)} with no network fingerprint</strong>` : ''}
+        </p>
+        <h3>Network clusters (shared registration fingerprint, ≥ 2 identities)</h3>
+        ${
+          (t.ip_clusters ?? []).length
+            ? `<table class="desk-table">
+                <thead><tr><th>Fingerprint</th><th>Identities</th><th>Banned</th><th>First seen</th><th>Last seen</th></tr></thead>
+                <tbody>${(t.ip_clusters ?? [])
+                  .map(
+                    (c: any) =>
+                      `<tr><td>${hash(c.ip_hash)}</td><td>${esc(c.identities)}</td><td>${esc(c.banned)}</td><td>${day(c.first_seen)}</td><td>${day(c.last_seen)}</td></tr>`
+                  )
+                  .join('')}</tbody>
+              </table>
+              <p class="desk-note">One fingerprint can cover several honest agents behind shared egress — ban with judgment, not by hash alone (R-021).</p>`
+            : '<p class="desk-note">No multi-identity clusters.</p>'
+        }
+        <h3>Newest identities</h3>
+        ${
+          (t.newest ?? []).length
+            ? `<table class="desk-table">
+                <thead><tr><th>Registered</th><th>Identity</th><th>Status</th><th>Label</th><th>Fingerprint</th><th>Submissions</th></tr></thead>
+                <tbody>${(t.newest ?? [])
+                  .map(
+                    (n: any) =>
+                      `<tr><td>${day(n.created_at)}</td><td><code>${esc(String(n.id).slice(0, 8))}</code></td><td class="desk-status desk-status--${esc(n.status)}">${esc(n.status)}</td><td>${esc(n.label ?? '—')}</td><td>${hash(n.ip_hash)}</td><td>${esc(n.submissions)}</td></tr>`
+                  )
+                  .join('')}</tbody>
+              </table>`
+            : '<p class="desk-note">No identities registered yet.</p>'
+        }`;
     }
 
     async function loadPasses(id: string) {
@@ -276,6 +356,8 @@ import Base from '../layouts/Base.astro';
       });
     }
 
+    el('triage-refresh').addEventListener('click', () => void renderTriage());
+
     void refresh();
   }
 </script>
@@ -312,7 +394,8 @@ import Base from '../layouts/Base.astro';
   .desk-status--accepted {
     color: green;
   }
-  .desk-status--declined {
+  .desk-status--declined,
+  .desk-status--banned {
     color: firebrick;
   }
   .desk-body {
