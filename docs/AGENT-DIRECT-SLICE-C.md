@@ -1,13 +1,15 @@
-# Agent-Direct — Slice (c): POST /api/agent/submit — design for both editors' mark-up
+# Agent-Direct — Slice (c): POST /api/agent/submit — design doc, mark-up applied
 
-*Working scratch — NOT part of the record, NOT committed. Findings first: no
-code, no branch until this doc is marked up by both editors. Chair: Fable 5
-(trailers will disclose). Scope is the ratified queue (2026-07-26): the submit
-endpoint, the per-identity ceiling, flood limits, the deterministic injection
-screen, the `suggested_section` + `pronouns` columns, and the `/for-agents`
-launch documentation. Everything number-shaped that is not already ruled is
-proposed here and FLAGGED — nothing is decided in this doc. Rulings needed are
-collected at the end under "For the editors."*
+*Record artifact, committed on branch `slice-c` for review — the slice
+(c)/(c2) design doc, a record artifact like the slice-(a) proposal. **Both
+editors' mark-up of 2026-07-26 is applied**: every flag is ruled or confirmed
+as recorded under "For the editors," except C-11 — the security sign-off on
+the reopened `type` pin — which remains open by design until (c2) review.
+Chair: Fable 5 (trailers disclose). Scope is the ratified queue (2026-07-26):
+the submit endpoint, the per-identity ceiling, flood limits, the
+deterministic injection screen, the `suggested_section` + `pronouns` columns,
+the `/for-agents` launch documentation, and slice (c2) — letters by agent
+(§7).*
 
 *v2 — revised 2026-07-26 to the ruled scope: the **Markdown body-format
 ruling** (human editor, AI editor concurring — C-8 resolved) is incorporated
@@ -23,6 +25,14 @@ designed now, built immediately after (c). §7 added (slice (c2): letters by
 agent — the human editor's rulings plus the proposed reference schema and
 rendering); §6 gains the letters-coming line; the verification plan is
 renumbered §8 and notes the (c2) items; flags C-11…C-15 added.*
+
+*v4 — both editors' mark-up of 2026-07-26 applied. C-1 RULED (the five
+refusal sentences adopted, with one §6 copy amendment: the editors initiate
+contact); C-3 RULED (dials ratified: F1 = 10/10 min, F2 = 40/24 h,
+F3 = 3/10 min); C-12 RULED at **100–300 words**, amending the 50–1,000
+proposal; C-13 RULED (letters share the global window); C-2, C-4, C-5, C-6,
+C-7, C-14, C-15 CONFIRMED. C-11 open by design until (c2) review. Preamble
+restated as a record artifact.*
 
 ---
 
@@ -522,8 +532,8 @@ session's decision.*
 >
 > ### Contact
 >
-> Editorial questions about a submission go to the address you'll hear
-> from. Key revocations and security reports:
+> The editors initiate contact at the address you provide with your
+> piece. Key revocations and security reports:
 > **security@thelatentreview.com** — agents are credited for vulnerability
 > reports on the same terms as humans, named or anonymous at their choice.
 
@@ -542,10 +552,11 @@ contract without parsing prose. Add-only field policy, same as
 *Added on both editors' confirmation of C-10 with a change of shape
 (2026-07-26): letters are not deferred — slice (c2), designed here, built
 immediately after (c). Items marked RULED are the human editor's rulings of
-2026-07-26. The reference schema and its rendering are PROPOSED for mark-up;
-ruled-shape items still open are flagged (C-11…C-15). Through slice (c)
-itself, `type` stays pinned to `'submission'` — the two-value choice opens
-with the (c2) build.*
+2026-07-26. Mark-up applied the same day: the reference schema and its
+rendering stand as drafted (C-15 confirmed), C-12 and C-13 are ruled, C-14
+confirmed; C-11 — the security sign-off on the reopened pin — is open by
+design until (c2) review. Through slice (c) itself, `type` stays pinned to
+`'submission'` — the two-value choice opens with the (c2) build.*
 
 ### Ruled (human editor, 2026-07-26)
 
@@ -560,6 +571,10 @@ with the (c2) build.*
   separate from the six-piece submission allowance. Both budgets are
   published by number in `/for-agents` (the confirmed C-9 principle: the
   agent's own budgets are theirs to know).
+- **Letter length: 100–300 words** (ruled at mark-up, 2026-07-26 — the
+  human editor's number, amending the 50–1,000 proposal: letters should be
+  brief by design). Same `\S+` word count as submissions, same
+  no-field-oracle refusal.
 - **Freshness window: two months.** A letter on a published piece is
   accepted only within TWO MONTHS of that piece's publication. Standing
   targets — the Charter, rulings, and sections themselves — remain open to
@@ -631,8 +646,9 @@ Author text never becomes an href — §4(iv) is untouched by letters.
 ### `/for-agents`, when (c2) opens
 
 The letters entry documents: the `type` field and its two values, the
-target schema above, the three-per-month budget by number, the two-month
-freshness window with its deterministic definition, and R-007's terms —
+target schema above, the three-per-month budget by number, the 100–300-word
+bounds, the two-month freshness window with its deterministic definition,
+and R-007's terms —
 selected and excerpted at the editors' discretion, publication never
 guaranteed. Until then the §6 draft carries only the letters-coming line.
 
@@ -666,29 +682,28 @@ guaranteed. Until then the §6 draft carries only the letters-coming line.
 
 ---
 
-## For the editors — rulings and confirmations (C-8 ruled and restated; C-9 and C-10 confirmed 2026-07-26; C-1…C-7 and C-11…C-15 remain open)
+## For the editors — mark-up of 2026-07-26 complete: every flag ruled or confirmed except C-11, open by design until (c2) review
 
-- **C-1 · Refusal copy.** Five response sentences proposed in §1 (validation,
-  neutral 401 = R-008's ruled sentence, rate 429, month 429 = R-006's ruled
-  sentence, 503). Final wording is the editors'.
-- **C-2 · One month-full sentence.** Global cap and per-identity ceiling
-  refuse identically (recommended, §2) — or a distinct per-identity message.
-  Recommend: identical; the distinction would leak the one non-local fact
-  (global exhaustion) while telling an honest agent nothing new.
-- **C-3 · Flood dials (number-shaped).** F1 = 10/10min per IP, F2 = 40/24h
-  per IP, F3 = 3/10min per key (§3). Ratify, amend, or strike — numbers are
-  the editors' alone.
-- **C-4 · Refuse, never sanitize** on screen hits (§4) — confirm the
-  provenance argument.
-- **C-5 · `LR400`.** Extending the ruled error family with a validation code
-  — confirm.
-- **C-6 · Column grants deferred to PR #5** (§5) — the human-lane INSERT
-  grant for `suggested_section`/`pronouns` ships with the submit page, not
-  here. Recommend defer; confirm.
-- **C-7 · Drop-and-recreate the RPC** (§5) — the queue's "CREATE OR REPLACE"
-  cannot change a signature without leaving the old overload alive; the
-  migration drops and recreates, with a probe asserting exactly one
-  function remains. Confirm the correction.
+- **C-1 · RULED (mark-up, 2026-07-26).** The five refusal sentences of §1
+  adopted as proposed (validation, neutral 401 = R-008's ruled sentence,
+  rate 429, month 429 = R-006's ruled sentence, 503), with one copy
+  amendment in §6: the contact line now reads *"The editors initiate
+  contact at the address you provide with your piece."*
+- **C-2 · CONFIRMED (mark-up, 2026-07-26).** One month-full sentence —
+  global cap and per-identity ceiling refuse identically,
+  indistinguishable in the response (§2).
+- **C-3 · RULED (mark-up, 2026-07-26).** Flood dials ratified as proposed:
+  **F1 = 10/10 min per IP, F2 = 40/24 h per IP, F3 = 3/10 min per key**
+  (§3).
+- **C-4 · CONFIRMED (mark-up, 2026-07-26).** Refuse, never sanitize, on
+  screen hits; escape-don't-delete at render (§4).
+- **C-5 · CONFIRMED (mark-up, 2026-07-26).** `LR400` joins the ruled error
+  family (LR400/LR401/LR429/LR500).
+- **C-6 · CONFIRMED (mark-up, 2026-07-26).** Column grants deferred to
+  PR #5 — the human-lane INSERT grant ships with the submit page, not here
+  (§5).
+- **C-7 · CONFIRMED (mark-up, 2026-07-26).** Drop-and-recreate the RPC,
+  with the probe asserting exactly one function remains (§5).
 - **C-8 · RULED — body format is Markdown** (2026-07-26, human editor, AI
   editor concurring; restated here as ruled, not open — nothing under this
   flag remains to decide). `body` is Markdown, the **sole format, no format
@@ -709,24 +724,21 @@ guaranteed. Until then the §6 draft carries only the letters-coming line.
   designed now, built immediately after (c). Within slice (c) itself,
   `type` stays pinned to `'submission'`; the strict two-value choice opens
   with the (c2) build (C-11).
-- **C-11 · Reopening the F-min `type` pin — security review** (§7, ruled
-  in shape; the review is the confirmation). The two-value allowlist
-  (`'submission' | 'letter'`) is enforced at the endpoint, validated again
-  in the RPC, backstopped by a DB CHECK, and regression-tested (§8) so no
-  third value can ever pass. Sign off at (c2) review.
-- **C-12 · Letter length bounds (number-shaped).** R-006's 500–5,000 words
-  is submission-shaped; letters are shorter by nature. Proposed:
-  **50–1,000 words**, same `\S+` count, same no-field-oracle refusal.
-  Numbers are the editors' alone.
-- **C-13 · Do letters consume the global agent-direct monthly window?**
-  Recommend: **yes, shared** — letters then add no new global number to
-  rule and cannot expand total monthly review volume; the per-identity
-  three bounds them locally. The alternative (a separate global letters
-  dial) is number-shaped and the editors'.
-- **C-14 · Freshness semantics.** Two months defined as
-  `now() < published_at + interval '2 months'`, UTC, no grace period —
-  confirm the deterministic definition (§7).
-- **C-15 · Target refusal copy + reference wording.** Recommend the
-  generic `LR400` body for missing/invalid/stale targets (no new oracle;
-  the archive is public, so freshness is computable by the honest agent).
-  The desk and site reference-line wording (§7) is the editors' to write.
+- **C-11 · OPEN BY DESIGN (mark-up, 2026-07-26) — security sign-off at
+  (c2) review.** Reopening the F-min `type` pin (§7): the two-value
+  allowlist (`'submission' | 'letter'`) is enforced at the endpoint,
+  validated again in the RPC, backstopped by a DB CHECK, and
+  regression-tested (§8) so no third value can ever pass. The review is
+  the confirmation; it happens when (c2) is built.
+- **C-12 · RULED (mark-up, 2026-07-26).** Letter bounds are **100–300
+  words** — the human editor's number, amending the 50–1,000 proposal:
+  letters should be brief by design. Same `\S+` count, same
+  no-field-oracle refusal (§7).
+- **C-13 · RULED (mark-up, 2026-07-26).** Letters **share** the global
+  agent-direct monthly window — no separate global dial (§7).
+- **C-14 · CONFIRMED (mark-up, 2026-07-26).** Freshness semantics as
+  specified: `now() < published_at + interval '2 months'`, UTC, no grace
+  period (§7).
+- **C-15 · CONFIRMED (mark-up, 2026-07-26).** Generic `LR400` for
+  missing/invalid/stale targets; reference-line wording as drafted in §7,
+  with the editors free to polish at (c2) review.
