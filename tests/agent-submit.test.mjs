@@ -1,6 +1,7 @@
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -289,7 +290,7 @@ test('N10: the screen refusal log line names the category and no field content',
 
 // --- N11: the success path -------------------------------------------------
 
-test('N11: a valid submission reaches the RPC with all ten params and returns a 201 receipt', async () => {
+test('N11: a valid submission reaches the RPC with all thirteen params and returns a 201 receipt', async () => {
   const key = generateAgentKey();
   let params;
   stub.rateCounts = [0, 0, 0];
@@ -318,6 +319,9 @@ test('N11: a valid submission reaches the RPC with all ten params and returns a 
   assert.equal(params.p_suggested_section, 'Essays');
   assert.equal(params.p_pronouns, 'it/its');
   assert.ok(!('unknown_future_field' in params));
+  // Thirteen, and no more: a fourteenth would mean an unreviewed field
+  // reached the write path.
+  assert.equal(Object.keys(params).length, 13);
 
   // The raw key appears in no log line and no backend request.
   const everywhere = [...logged, ...stub.requests.map((r) => `${r.url} ${r.body}`)].join('\n');
@@ -370,5 +374,220 @@ test('N13: agent-submit hashes through the shared module and never passes key ma
     if (line.includes('console.')) {
       assert.doesNotMatch(line, /rawKey|presented|api_key|keyHash/, line.trim());
     }
+  }
+});
+
+// --- Slice (c2): letters by agent ------------------------------------------
+// N20–N26. The reopened `type` pin (C-11), the letter word bounds (R-024 §3),
+// the declared target and its per-type rules (R-024 §5), and the regression
+// that the submission path is exactly what it was.
+
+const letterBody = words(150);
+const letterPayload = (extra = {}) => ({
+  ...validPayload(),
+  body: letterBody,
+  type: 'letter',
+  target_type: 'charter',
+  ...extra,
+});
+
+test('N20: `type` absent is a submission — the two live integrations keep working', async () => {
+  let params;
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = (_name, p) => {
+    params = p;
+    return ok(UUID);
+  };
+  const res = await submit(request(validPayload(), generateAgentKey()), ctx);
+  assert.equal(res.status, 201);
+  assert.equal(params.p_type, 'submission');
+  assert.equal(params.p_letter_target_type, null);
+  assert.equal(params.p_letter_target_id, null);
+});
+
+test('N20b: target fields on a submission are ignored like any unknown field, never stored', async () => {
+  let params;
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = (_name, p) => {
+    params = p;
+    return ok(UUID);
+  };
+  const payload = { ...validPayload(), target_type: 'charter', target_id: 'R-001' };
+  const res = await submit(request(payload, generateAgentKey()), ctx);
+  assert.equal(res.status, 201);
+  assert.equal(params.p_letter_target_type, null);
+  assert.equal(params.p_letter_target_id, null);
+});
+
+test('N21: the type allowlist admits exactly two values, and every refusal is the one LR400 body', async () => {
+  const bodies = new Set();
+  for (const type of ['correspondence', 'Letter', 'LETTER', 'letters', 'submission ', '', 42, {}, []]) {
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = rpcUnreachable;
+    const res = await submit(request({ ...validPayload(), type }, generateAgentKey()), ctx);
+    assert.equal(res.status, 400, `type ${JSON.stringify(type)} should refuse`);
+    bodies.add(await res.text());
+  }
+  assert.equal(bodies.size, 1);
+  assert.equal([...bodies][0], JSON.stringify(REFUSAL_VALIDATION));
+});
+
+test('N22: letter word bounds are 100–300, and they are the TYPE\'s bounds, not the door\'s', async () => {
+  const cases = [
+    [words(99), 400],
+    [words(100), 201],
+    [words(300), 201],
+    [words(301), 400],
+    [words(600), 400], // a fine submission length; too long for a letter
+  ];
+  for (const [body, expected] of cases) {
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = () => ok(UUID);
+    const res = await submit(request(letterPayload({ body }), generateAgentKey()), ctx);
+    assert.equal(res.status, expected, `letter of ${body.split(' ').length} words`);
+  }
+  // …and the same 600-word body is accepted when it is a submission.
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = () => ok(UUID);
+  const asSubmission = await submit(request(validPayload(), generateAgentKey()), ctx);
+  assert.equal(asSubmission.status, 201);
+});
+
+test('N23: every target rule refuses with the same generic body — no field, no reason', async () => {
+  const bodies = new Set();
+  const cases = [
+    {}, // no target_type at all
+    { target_type: 'issue', target_id: 'x' }, // not in the allowlist
+    { target_type: 'charter', target_id: 'R-001' }, // the singleton carries no id
+    { target_type: 'piece' }, // id required
+    { target_type: 'ruling' }, // id required
+    { target_type: 'section' }, // id required
+    { target_type: 'ruling', target_id: 'R-24' }, // malformed number
+    { target_type: 'ruling', target_id: 'R-0244' },
+    { target_type: 'ruling', target_id: 'r-024' },
+    { target_type: 'section', target_id: 'no-such-section' },
+    { target_type: 'section', target_id: 'Opinion' }, // a name, not a slug
+    { target_type: 'piece', target_id: 'no-such-piece-anywhere' },
+    { target_type: 'piece', target_id: '../../etc/passwd' }, // charset
+    { target_type: 'piece', target_id: 'a‮b' }, // screen: bidi
+  ];
+  for (const extra of cases) {
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = rpcUnreachable;
+    const payload = { ...letterPayload(), ...extra };
+    if (!('target_type' in extra)) delete payload.target_type;
+    const res = await submit(request(payload, generateAgentKey()), ctx);
+    assert.equal(res.status, 400, JSON.stringify(extra));
+    bodies.add(await res.text());
+  }
+  assert.equal(bodies.size, 1);
+  assert.equal([...bodies][0], JSON.stringify(REFUSAL_VALIDATION));
+});
+
+test('N24: a valid letter reaches the RPC carrying its declared target', async () => {
+  const accepted = [
+    ['charter', undefined, null],
+    ['ruling', 'R-024', 'R-024'],
+    ['section', 'ai-voices', 'ai-voices'],
+  ];
+  for (const [target_type, target_id, expectedId] of accepted) {
+    let params;
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = (_name, p) => {
+      params = p;
+      return ok(UUID);
+    };
+    const payload = letterPayload({ target_type });
+    if (target_id !== undefined) payload.target_id = target_id;
+    else delete payload.target_id;
+
+    const res = await submit(request(payload, generateAgentKey()), ctx);
+    assert.equal(res.status, 201, `${target_type} letter should be accepted`);
+    assert.equal(params.p_type, 'letter');
+    assert.equal(params.p_letter_target_type, target_type);
+    assert.equal(params.p_letter_target_id, expectedId);
+  }
+});
+
+test('N25: the RPC\'s LR400 (its own re-validation of the pin) maps to the generic validation body', async () => {
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = () => pgError('LR400', 'agent-direct submission not accepted');
+  const res = await submit(request(letterPayload(), generateAgentKey()), ctx);
+  assert.equal(res.status, 400);
+  assert.equal(await res.text(), JSON.stringify(REFUSAL_VALIDATION));
+});
+
+test('N26: a fresh published piece is a valid target and a stale one is not', async () => {
+  const { __setArchiveRootForTests } = await import('../netlify/lib/archive.mts');
+  const dir = mkdtempSync(join(tmpdir(), 'lr-archive-'));
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const daysAgo = (n) => new Date(Date.now() - n * 86400000);
+
+  writeFileSync(
+    join(dir, 'a-recent-piece.md'),
+    `---\ntitle: 'Recent'\nsection: 'Opinion'\ndate: ${iso(daysAgo(3))}\n---\nbody\n`
+  );
+  writeFileSync(
+    join(dir, 'an-old-piece.md'),
+    `---\ntitle: 'Old'\nsection: 'Tech & Society'\ndate: ${iso(daysAgo(200))}\n---\nbody\n`
+  );
+  writeFileSync(
+    join(dir, '_not-published.md'),
+    `---\ntitle: 'Example'\nsection: 'Opinion'\ndate: ${iso(daysAgo(3))}\n---\nbody\n`
+  );
+  __setArchiveRootForTests(dir);
+
+  try {
+    // Fresh piece: accepted, and the slug reaches the RPC verbatim.
+    let params;
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = (_name, p) => {
+      params = p;
+      return ok(UUID);
+    };
+    let res = await submit(
+      request(letterPayload({ target_type: 'piece', target_id: 'a-recent-piece' }), generateAgentKey()),
+      ctx
+    );
+    assert.equal(res.status, 201);
+    assert.equal(params.p_letter_target_id, 'a-recent-piece');
+
+    // Outside the two-month window: refused, and indistinguishable from a
+    // slug that does not exist.
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = rpcUnreachable;
+    res = await submit(
+      request(letterPayload({ target_type: 'piece', target_id: 'an-old-piece' }), generateAgentKey()),
+      ctx
+    );
+    assert.equal(res.status, 400);
+    const stale = await res.text();
+
+    stub.rateCounts = [0, 0, 0];
+    res = await submit(
+      request(letterPayload({ target_type: 'piece', target_id: 'never-existed' }), generateAgentKey()),
+      ctx
+    );
+    assert.equal(await res.text(), stale);
+
+    // A file the build excludes is not published, so it is not a target.
+    stub.rateCounts = [0, 0, 0];
+    res = await submit(
+      request(letterPayload({ target_type: 'piece', target_id: '_not-published' }), generateAgentKey()),
+      ctx
+    );
+    assert.equal(res.status, 400);
+
+    // A floating section a published piece earned IS a valid section target.
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = () => ok(UUID);
+    res = await submit(
+      request(letterPayload({ target_type: 'section', target_id: 'tech-and-society' }), generateAgentKey()),
+      ctx
+    );
+    assert.equal(res.status, 201);
+  } finally {
+    __setArchiveRootForTests(null);
+    rmSync(dir, { recursive: true, force: true });
   }
 });
