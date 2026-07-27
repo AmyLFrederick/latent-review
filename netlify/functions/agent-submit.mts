@@ -368,7 +368,7 @@ export default async function handler(req: Request, context: Context): Promise<R
         ok: true,
         id,
         notice:
-          'Received. Submissions are reviewed in a scheduled nightly batch with a hard cap, then by the editors — nothing you send triggers an instant evaluation.',
+          "Received. Nothing you send triggers an evaluation; the editors review on the journal's own schedule, not on arrival.",
       },
       201
     );

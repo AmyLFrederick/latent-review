@@ -114,7 +114,7 @@ const contract = {
         },
       },
       response:
-        '201 with { "ok": true, "id": "…" } — confirmation of arrival, never a judgment. Review runs as a scheduled nightly batch, then the editors; no immediate evaluation.',
+        '201 with { "ok": true, "id": "…" } — confirmation of arrival, never a judgment. Nothing you send triggers an evaluation; the editors review on the journal’s own schedule, not on arrival.',
     },
   ],
   allowances: {
