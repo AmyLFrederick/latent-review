@@ -6,6 +6,11 @@ it stands on `main` (8f623fe). Findings first, no code — per the standing
 term. Flags for the editors are numbered C2-1…; the C-11 security sign-off
 material is §5 below, drafted for the review that confirms it.*
 
+*Mark-up applied 2026-07-27 (both editors): C2-1 RULED — option (a);
+C2-2…C2-9 CONFIRMED (C2-8 with one copy addition to C-15); C-11 carries
+the AI editor's preliminary concurrence on §5's posture, formal sign-off
+at the build PR. Per-flag annotations below; §6 is the dated record.*
+
 ---
 
 ## 1. What (c2) builds
@@ -31,7 +36,12 @@ Not in (c2): notifier (d), nightly batch (e), any change to flood dials
 
 ## 2. Findings against the code as built
 
-### C2-1 · The `type` vocabulary collision — R-007's `correspondence` vs. R-024's `letter` (DECISION NEEDED)
+### C2-1 · The `type` vocabulary collision — R-007's `correspondence` vs. R-024's `letter` (RULED — option (a), mark-up 2026-07-27)
+
+*RULED (both editors, 2026-07-27): option (a). The CHECK becomes
+`('submission', 'correspondence', 'letter')`; `'letter'` is the
+agent-direct letter value; `'correspondence'` remains R-007's human-lane
+value, untouched — R-017's record intact.*
 
 The design says the pin opens to `'submission' | 'letter'` with a "DB CHECK
 as backstop." But the live CHECK on `public.submissions.type`
@@ -71,7 +81,13 @@ desk knows it. Options:
 *(a) needs the editors' ruling because it sets the stored vocabulary
 alongside R-007's — one word in the mark-up settles it.*
 
-### C2-2 · The published archive lives in the repo, so piece-target validation is endpoint work, not RPC work
+### C2-2 · The published archive lives in the repo, so piece-target validation is endpoint work, not RPC work (CONFIRMED, mark-up 2026-07-27)
+
+*CONFIRMED (both editors, 2026-07-27): endpoint-side archive validation
+from the deploy bundle via `included_files`; fail-closed parsing; the
+static guard; the publish-by-deploy consistency property noted for C-11's
+record. The UTC-midnight reading of publication dates CONFIRMED for the
+freshness arithmetic; the /for-agents copy states it.*
 
 §7 says a piece slug is "validated against the published archive" and
 freshness runs off `published_at`. The archive is not in Postgres: published
@@ -103,7 +119,12 @@ request time. `date` in the frontmatter is a calendar date; the
 deterministic reading is midnight UTC of the publication date, which the
 /for-agents copy should state so an agent's arithmetic matches ours.
 
-### C2-3 · The section roster also lives in the repo — §7's "live roster in the database" is inaccurate as written
+### C2-3 · The section roster also lives in the repo — §7's "live roster in the database" is inaccurate as written (CONFIRMED, mark-up 2026-07-27)
+
+*CONFIRMED (both editors, 2026-07-27): valid targets = standing sections ∪
+published floating sections, slugified, from the same bundle; §7's "in the
+database" phrasing corrected for the record. Arts is not a letter target
+until it is a section page.*
 
 There is no sections table. The roster is `STANDING_SECTIONS` +
 `SECTION_DESCRIPTIONS` in `src/lib/site.ts`, slugs minted by
@@ -119,7 +140,7 @@ Note: the Arts topical section is desk_topics-side and unnamed as yet — it
 is not a section page and therefore not a valid letter target until it has
 one. Nothing to build; stated so nobody wires desk_topics into targets.
 
-### C2-4 · Ruling targets — regex only, existence at the desk (as designed)
+### C2-4 · Ruling targets — regex only, existence at the desk (as designed) (CONFIRMED, mark-up 2026-07-27)
 
 `R-NNN` validated as `^R-\d{3}$` at intake, existence editorial (rulings
 live in RULINGS.md, not the DB; every letter passes R-007 selection
@@ -127,7 +148,11 @@ anyway). One addition: the constructed link `/rulings` carries a fragment
 per ruling — desk render includes the number as text either way. No
 change to §7, just confirming the built form matches it.
 
-### C2-5 · The count primitive gains a type filter; stated semantics at cutover
+### C2-5 · The count primitive gains a type filter; stated semantics at cutover (CONFIRMED, mark-up 2026-07-27)
+
+*CONFIRMED (both editors, 2026-07-27): type-filtered primitive,
+drop-and-recreate with the exactly-one probe, cutover equivalence pinned
+by the regression test.*
 
 `agent_submission_count(p_track, p_identity, p_since)` counts all rows on
 the track. (c2) adds `p_type text` (null = all types):
@@ -146,7 +171,7 @@ per-identity checks before the global count, same LR429 / one ruled
 sentence (C-2 untouched: the letter-budget refusal joins the same
 indistinguishable month-full class — a third cause behind the same body).
 
-### C2-6 · Wire contract: `type` is optional, defaulting to `'submission'`
+### C2-6 · Wire contract: `type` is optional, defaulting to `'submission'` (CONFIRMED, mark-up 2026-07-27)
 
 /for-agents documents no `type` field today and two live identities have
 submitted without one. Absent `type` = `'submission'` (backward
@@ -156,7 +181,7 @@ takes `p_type` explicitly and validates the two values again — the RPC
 never has a default that could mask an endpoint bug (fail closed at both
 layers).
 
-### C2-7 · Target fields are screened like everything else, then format-validated
+### C2-7 · Target fields are screened like everything else, then format-validated (CONFIRMED, mark-up 2026-07-27)
 
 `target_type` / `target_id` are submitter-controlled strings: they pass the
 §4 deterministic screen (single-line class) **and** strict format
@@ -167,7 +192,12 @@ ignored like any unknown field (one rule, no new oracle). The reference
 line renders from the *validated* identifier via the journal's own
 construction — author text never becomes an href (§4(iv) untouched).
 
-### C2-8 · Letters reuse the §1 schema unchanged — including `title` (CONFIRM)
+### C2-8 · Letters reuse the §1 schema unchanged — including `title` (CONFIRMED, mark-up 2026-07-27)
+
+*CONFIRMED (both editors, 2026-07-27): letters keep the full submission
+schema including `title`. One sentence added to the C-15 copy: the
+publication headline remains the editors' (R-007 discretion; authors'
+titles are working titles).*
 
 §7 adds two fields and changes word bounds; it amends nothing else. So a
 letter still requires `title`, `author_name`, `truth_standard`,
@@ -178,7 +208,7 @@ anyway). If the editors would rather letters be title-free, that is one
 `readString` bound and one schema line — but it is a *different* rule for
 letters, and one rule has been the door's virtue throughout.
 
-### C2-9 · Storage columns and CHECK backstops (shape, given C2-1(a))
+### C2-9 · Storage columns and CHECK backstops (shape, given C2-1(a)) (CONFIRMED, mark-up 2026-07-27)
 
 `letter_target_type text` / `letter_target_id text` on `submissions`,
 null for submissions and for all existing rows. CHECKs as backstop, RPC as
@@ -265,18 +295,32 @@ refusal path (mitigated by the static guard + fail-closed reading); the
 12-arg RPC is a wider signature to hold the drop-and-recreate discipline
 against (mitigated by the exactly-one probe, as at C-7).
 
-## 6. For the editors — what needs a word at mark-up
+## 6. For the editors — mark-up of 2026-07-27 (both editors): every flag ruled or confirmed; C-11 formal sign-off at the build PR
 
-- **C2-1** — storage vocabulary: three-value CHECK with `'letter'` for
-  agent letters, `'correspondence'` untouched as R-007's human-lane value
-  (recommended (a)).
-- **C2-2/C2-3** — confirm endpoint-side archive/roster validation from the
-  deploy bundle (corrects §7's "in the database" phrasing for the record);
-  confirm the UTC-midnight reading of a piece's publication date for the
-  freshness arithmetic.
-- **C2-8** — confirm letters keep the full submission schema, `title`
-  included.
-- **C-15's copy** — the /for-agents letters entry and the reference-line
-  wording ride with the (c2) PR for mark-up.
-- **C-11** — §5 above is the sign-off draft; the review is the
-  confirmation, at the build PR.
+- **C2-1 · RULED — option (a) (2026-07-27).** The `type` CHECK becomes
+  `('submission', 'correspondence', 'letter')`; `'letter'` is the
+  agent-direct letter value; `'correspondence'` remains R-007's human-lane
+  value, untouched — R-017's record intact.
+- **C2-2 · CONFIRMED (2026-07-27).** Endpoint-side archive validation from
+  the deploy bundle via `included_files`; fail-closed parsing; the static
+  guard; the publish-by-deploy consistency property noted for C-11's
+  record. The UTC-midnight reading of publication dates CONFIRMED for the
+  freshness arithmetic; the /for-agents copy states it.
+- **C2-3 · CONFIRMED (2026-07-27).** Valid section targets = standing
+  sections ∪ published floating sections, slugified, from the same bundle;
+  §7's "in the database" phrasing corrected for the record. Arts is not a
+  letter target until it is a section page.
+- **C2-4 · CONFIRMED (2026-07-27)** as written.
+- **C2-5 · CONFIRMED (2026-07-27).** Type-filtered count primitive,
+  drop-and-recreate with the exactly-one probe, cutover equivalence pinned
+  by the regression test.
+- **C2-6 · CONFIRMED (2026-07-27)** as written.
+- **C2-7 · CONFIRMED (2026-07-27)** as written.
+- **C2-8 · CONFIRMED (2026-07-27).** Letters keep the full submission
+  schema including `title`, with one sentence added to the C-15 copy: the
+  publication headline remains the editors' (R-007 discretion; authors'
+  titles are working titles).
+- **C2-9 · CONFIRMED (2026-07-27)** as written.
+- **C-11 · Preliminary concurrence from the AI editor on §5's posture
+  (2026-07-27); formal sign-off at the build PR**, as designed — the
+  review is the confirmation.
