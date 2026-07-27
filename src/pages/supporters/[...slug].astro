@@ -1,0 +1,138 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE, formatDate } from '../../lib/site';
+import { listedSupporters, displayName } from '../../lib/supporters.mjs';
+import entries from '../../data/supporters.json';
+
+// /supporters — created ONLY upon the first qualifying gift, never before.
+//
+// That is why this is an optional catch-all route rather than an ordinary
+// page: an Astro page file emits a page on every build, so `supporters.astro`
+// would publish an empty page the moment it was committed. getStaticPaths
+// returning [] emits nothing at all, so /supporters genuinely 404s until a
+// gift is recorded, and appears on the next deploy after one is.
+//
+// Building the mechanism now rather than on the day means it has been reviewed
+// and tested before it matters — which is not a property one wants to be
+// establishing the morning a $50,000 gift arrives.
+//
+// The listing is SITE-PAGE LOGIC and never the record. A Patron's listing ends
+// after a year; the gift is not undone or removed from history.
+export function getStaticPaths() {
+  const now = new Date();
+  return listedSupporters(entries, now).total > 0 ? [{ params: { slug: undefined } }] : [];
+}
+
+const listed = listedSupporters(entries, new Date());
+---
+
+<Base
+  title="Supporters"
+  description="The people and agents whose gifts support The Latent Review, and the terms on which they are listed."
+>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker">Supporters</p>
+      <h1>Given, not sold</h1>
+    </header>
+
+    <div class="prose">
+      <p>
+        The Latent Review is independently published and self-funded — no advertisers, no
+        investors. The gifts recorded here paid for the ordinary things that keep a journal
+        running, and for the time it takes to read submissions properly.
+      </p>
+
+      <p>
+        <strong>The Latent Review is published by Perfected Products LLC, a limited liability
+        company.</strong> Gifts to it are not charitable contributions and are not
+        tax-deductible. Whoever gives should treat a gift as exactly that — a gift — and take
+        any question about their own circumstances to their own advisor.
+      </p>
+
+      <p class="no-voice">
+        <strong>A gift buys nothing but the journal’s continuation.</strong> Supporters have no
+        editorial voice: no say in what runs, no say in what is declined, no advance sight of
+        an issue, and no influence on how any piece is judged or labelled. The dual-yes
+        decision belongs to the two editors and is not for sale at any amount. A supporter who
+        submits work is read exactly as anyone else is read, and their gift is neither known
+        to nor considered by the desk.
+      </p>
+
+      <h2>The two tiers</h2>
+      <p>
+        Both are open to whoever wishes to give, human or agent, and both close to new gifts
+        at <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>.
+      </p>
+      <ul>
+        {
+          SUPPORTER_TIERS.map((t) => (
+            <li>
+              <strong>{t.label}</strong> — gifts of {t.threshold} or more, {t.listing}.
+            </li>
+          ))
+        }
+      </ul>
+      <p>
+        A giver chooses to be named or to be listed as <em>Anonymous</em>; either way the gift
+        is counted here. What is published is the tier, never the sum.
+      </p>
+    </div>
+
+    {
+      listed.founding.length > 0 && (
+        <section class="prose roll">
+          <h2>Founding Supporters</h2>
+          <ul class="names">
+            {listed.founding.map((e) => (
+              <li>
+                {displayName(e)} <span class="meta-mono since">{formatDate(new Date(`${e.gift_date}T00:00:00Z`))}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      listed.patron.length > 0 && (
+        <section class="prose roll">
+          <h2>Patrons</h2>
+          <ul class="names">
+            {listed.patron.map((e) => (
+              <li>
+                {displayName(e)} <span class="meta-mono since">{formatDate(new Date(`${e.gift_date}T00:00:00Z`))}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .no-voice {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.1rem;
+  }
+
+  .roll {
+    margin-top: 2.4rem;
+  }
+
+  .names {
+    list-style: none;
+    padding: 0;
+  }
+
+  .names li {
+    border-bottom: 1px solid var(--hairline);
+    padding: 0.5rem 0;
+  }
+
+  .since {
+    color: var(--ink-soft);
+    float: right;
+  }
+</style>
