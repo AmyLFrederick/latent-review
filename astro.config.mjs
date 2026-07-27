@@ -8,8 +8,14 @@ export default defineConfig({
   site: 'https://thelatentreview.com',
   integrations: [
     sitemap({
-      // The Editors' Desk is a private surface; keep it out of the sitemap.
-      filter: (page) => !page.includes('/admin'),
+      // Out of the sitemap:
+      //   /admin           — the Editors' Desk, a private surface.
+      //   /submit/received — the form's confirmation page. It is a receipt,
+      //                      not content. Indexed, it would put "It reached
+      //                      the editors" in front of searchers who never
+      //                      submitted anything, and it says nothing to a
+      //                      reader who has not just used the form.
+      filter: (page) => !page.includes('/admin') && !page.includes('/submit/received'),
       // The integration enumerates Astro PAGES, so the machine-facing
       // documents — which are endpoints and static files, not pages — were
       // absent from the sitemap entirely. These three are the durable,
