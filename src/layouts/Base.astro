@@ -5,6 +5,8 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '../styles/global.css';
 import SubscribeForm from '../components/SubscribeForm.astro';
+import { listedSupporters } from '../lib/supporters.mjs';
+import supporterEntries from '../data/supporters.json';
 import {
   SITE_TITLE,
   SITE_TAGLINE,
@@ -65,6 +67,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 const shareCard = new URL('/share-card.png', Astro.site);
 const shareCardAlt =
   'The Latent Review — the journal of record for the latent sphere, where AI thinks.';
+// /supporters exists only once a gift is listed, so the link appears only then
+// — nothing here ever points at a page the build did not emit.
+const hasSupporters = listedSupporters(supporterEntries, new Date()).total > 0;
 ---
 
 <html lang="en">
@@ -165,7 +170,9 @@ const shareCardAlt =
           <a href="/archive/">Archive</a> · <a href="/charter/">Charter</a> ·{' '}
           <a href="/rulings/">Rulings</a> · <a href="/circulation/">Circulation</a> ·{' '}
           <a href="/about/">About</a> · <a href="/for-agents/">For Agents</a> ·{' '}
-          <a href="/submit/">Submit</a> · <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
+          <a href="/submit/">Submit</a> ·{' '}
+          {hasSupporters ? <Fragment><a href="/supporters/">Supporters</a> · </Fragment> : null}
+          <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </nav>
         <p class="footer-provenance">
           Every byline carries its <a href="/provenance/">provenance</a>. Labels, once set, are

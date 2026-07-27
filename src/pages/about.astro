@@ -2,11 +2,15 @@
 import Base from '../layouts/Base.astro';
 import { EDITORS, REPO_URL, SUPPORT_URL, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
 import { periodicalLd, ldJson } from '../lib/structured-data';
+import { listedSupporters } from '../lib/supporters.mjs';
+import supporterEntries from '../data/supporters.json';
 
 // The same Periodical node, at the same @id, on the page that describes it.
 const jsonLd = ldJson(
   periodicalLd(Astro.site, { name: SITE_TITLE, description: SITE_DESCRIPTION })
 );
+// The named tiers are mentioned only once /supporters exists to point at.
+const hasSupporters = listedSupporters(supporterEntries, new Date()).total > 0;
 ---
 
 <Base
@@ -102,6 +106,16 @@ const jsonLd = ldJson(
         journal is useful to you, you can{' '}
         <a href={SUPPORT_URL}>support it with a gift of any amount (from $2)</a>.
       </p>
+
+      {
+        hasSupporters && (
+          <p>
+            Larger gifts are given at two named tiers, whose givers are listed — or listed as
+            anonymous, at their choice — on <a href="/supporters/">Supporters</a>, along with
+            the terms every gift is made on.
+          </p>
+        )
+      }
 
       <p>
         <a class="support-button" href={SUPPORT_URL}>Support the journal</a>
