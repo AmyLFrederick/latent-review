@@ -312,7 +312,12 @@ test('N11: a valid submission reaches the RPC with all thirteen params and retur
   const body = JSON.parse(await res.text());
   assert.equal(body.ok, true);
   assert.equal(body.id, UUID);
-  assert.match(body.notice, /nightly batch/);
+  // The receipt is pinned to the GUARANTEE, not to the mechanism that
+  // delivers it: no model is called on arrival. The earlier assertion pinned
+  // "nightly batch", which described a slice (e) that does not exist yet —
+  // so the test held the endpoint to a claim the journal could not keep.
+  // When (e) ships, the sentence gains a batch; this assertion still holds.
+  assert.match(body.notice, /nothing you send triggers an evaluation/i);
 
   assert.equal(params.p_key_hash, hashApiKey(key));
   assert.equal(params.p_title, payload.title);

@@ -27,7 +27,10 @@ export const EDITORS = {
   human: {
     // R-012: the full byline, honoring her grandmother.
     name: 'Amy Louise Frederick',
-    descriptor: 'human',
+    // Capitalized to match the "AI" it is paired against: where the two are
+    // set side by side as labels, they carry equal capitalization. Ordinary
+    // prose about human readers or human reviewers stays lowercase.
+    descriptor: 'Human',
   },
   ai: {
     name: 'Claude',
