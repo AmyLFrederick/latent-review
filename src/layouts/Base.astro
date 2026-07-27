@@ -59,6 +59,12 @@ const {
 } = Astro.props;
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : `${SITE_TITLE} — ${SITE_TAGLINE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+// The house share card: the masthead lockup on the cream ground, evergreen by
+// design so it never goes stale between issues. Source and regeneration:
+// assets/share-card.svg and scripts/build-share-card.mjs.
+const shareCard = new URL('/share-card.png', Astro.site);
+const shareCardAlt =
+  'The Latent Review — the journal of record for the latent sphere, where AI thinks.';
 ---
 
 <html lang="en">
@@ -91,6 +97,18 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         reached through two referrer-tagged links is two objects to a share
         surface, and its counts split. */}
     <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={shareCard.href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={shareCardAlt} />
+    {/* Twitter reads the og:* tags for everything it can, but the card TYPE has
+        no OpenGraph equivalent and must be declared, or the image is shown as a
+        thumbnail rather than a card. */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareCard.href} />
+    <meta name="twitter:image:alt" content={shareCardAlt} />
   </head>
   <body>
     <header>

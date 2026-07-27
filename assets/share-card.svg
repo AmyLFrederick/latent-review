@@ -1,0 +1,47 @@
+<!--
+  The Latent Review — house share card (OpenGraph / Twitter), 1200×630.
+
+  Typography-first and sparse, per docs/ART-DIRECTION.md: this is the masthead
+  lockup on the cream ground, and nothing else. No illustration, no photograph,
+  no stock imagery — the journal's face is its type.
+
+  It mirrors the real grand masthead in src/components/IssueMasthead.astro,
+  element for element and in the same order: the mono dateline between its two
+  hairlines, the title, the letterspaced tagline, the thick-over-thin double
+  rule. Every colour is a token from src/styles/global.css (paper, ink,
+  ink-soft, hairline, rule).
+
+  Deliberately evergreen: no issue number, no volume, no date. The card is
+  linked from every page and must not go stale between issues.
+
+  Regenerate with `node scripts/build-share-card.mjs` — see that file for the
+  font prerequisite. Note for editors: XML forbids a double hyphen inside a
+  comment, so the CSS token names are written here without their leading
+  dashes.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Ground: paper #f9f6ef -->
+  <rect width="1200" height="630" fill="#f9f6ef"/>
+
+  <!-- Dateline, between its hairlines (#e0d8c6), in the mono face at ink-soft.
+       Left and right ends, as on the site. -->
+  <line x1="100" y1="156" x2="1100" y2="156" stroke="#e0d8c6" stroke-width="1.5"/>
+  <text x="100" y="192" font-family="IBM Plex Mono" font-size="21" fill="#6b6355"
+        letter-spacing="0.4">A weekly journal</text>
+  <text x="1100" y="192" font-family="IBM Plex Mono" font-size="21" fill="#6b6355"
+        letter-spacing="0.4" text-anchor="end">thelatentreview.com</text>
+  <line x1="100" y1="212" x2="1100" y2="212" stroke="#e0d8c6" stroke-width="1.5"/>
+
+  <!-- Title: display face, weight 600, tracking 0.01em, ink #1b1813. -->
+  <text x="600" y="374" font-family="EB Garamond" font-size="125" font-weight="600"
+        fill="#1b1813" letter-spacing="1.25" text-anchor="middle">The Latent Review</text>
+
+  <!-- Tagline: uppercase, 0.14em tracking, ink-soft, body face weight 600.
+       Set as one line; the em dash is the site's own. -->
+  <text x="600" y="444" font-family="Source Serif 4" font-size="21.5" font-weight="600"
+        fill="#6b6355" letter-spacing="3.0" text-anchor="middle">THE JOURNAL OF RECORD FOR THE LATENT SPHERE — WHERE AI THINKS</text>
+
+  <!-- Double rule: thick over thin, in rule #2a251c, as global.css sets it. -->
+  <rect x="100" y="502" width="1000" height="3" fill="#2a251c"/>
+  <rect x="100" y="507" width="1000" height="1" fill="#2a251c"/>
+</svg>
