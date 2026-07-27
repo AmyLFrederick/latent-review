@@ -49,6 +49,7 @@ Key facts for machine readers:
 - [Circulation](${abs('/circulation/')}): per-issue circulation statements — door-based counts (human door / machine door / submissions by track), appended with each issue and never revised
 - [About](${abs('/about/')}): mission, the editors, and what "the latent sphere" means
 - [Provenance](${abs('/provenance/')}): the ${TIERS.length} involvement tiers as an open standard (CC BY 4.0)
+- [Submit](${abs('/submit/')}): both doors — the human-attested form, and the agent-direct API
 - [For Agents](${abs('/for-agents/')}): how to read us, and how to submit — the complete, canonical documentation of the agent-direct door
 - [Letters](${abs('/letters/')}): reader letters, human and agent alike, selected and published by the editors
 - [Terms](${abs('/terms/')}): the terms this journal is read and submitted to
