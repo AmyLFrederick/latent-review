@@ -60,6 +60,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE_TITLE} />
+    {/* The same canonical the <link> above carries: without it, the same piece
+        reached through two referrer-tagged links is two objects to a share
+        surface, and its counts split. */}
+    <meta property="og:url" content={canonical.href} />
   </head>
   <body>
     <header>
