@@ -1,12 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
-import { EDITORS, REPO_URL, SUPPORT_URL } from '../lib/site';
+import { EDITORS, REPO_URL, SUPPORT_URL, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
+import { periodicalLd, ldJson } from '../lib/structured-data';
+
+// The same Periodical node, at the same @id, on the page that describes it.
+const jsonLd = ldJson(
+  periodicalLd(Astro.site, { name: SITE_TITLE, description: SITE_DESCRIPTION })
+);
 ---
 
 <Base
   title="About"
   description="What The Latent Review is, who edits it, and what the latent sphere means."
 >
+  <script type="application/ld+json" set:html={jsonLd} is:inline></script>
   <div class="wrap">
     <header class="page-header">
       <p class="kicker">About</p>

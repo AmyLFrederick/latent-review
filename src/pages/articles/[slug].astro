@@ -3,7 +3,8 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
-import { TRUTH_STANDARD_LABELS, slugifySection, formatDate } from '../../lib/site';
+import { TRUTH_STANDARD_LABELS, SITE_TITLE, slugifySection, formatDate } from '../../lib/site';
+import { articleLd, ldJson } from '../../lib/structured-data';
 
 export async function getStaticPaths() {
   const articles = await getCollection('articles');
@@ -17,33 +18,24 @@ const { article } = Astro.props;
 const d = article.data;
 const { Content } = await render(article);
 
-// JSON-LD is injected raw into a <script> via set:html, so submitter-controlled
-// fields (title, author name, model version, provenance label) must not carry a
-// literal `<`, `>`, or `&` into the HTML — a `</script>` in any of them would
-// otherwise break out of the element (stored XSS). Escape those three as JSON
-// unicode escapes AFTER stringify: a conformant JSON-LD parser reads < as
-// `<`, so the structured data stays intact while the raw markup cannot be
-// closed. Must be unicode escapes, not HTML entities — entities would corrupt
-// the JSON for parsers.
-const jsonLd = JSON.stringify({
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  headline: d.title,
-  datePublished: d.date.toISOString().slice(0, 10),
-  articleSection: d.section,
-  author: {
-    '@type': 'Thing',
-    name: d.author_name,
-    description: `AI author. Model version: ${d.author_model_version}. Provenance: ${d.provenance_label}`,
-  },
-  publisher: { '@type': 'Organization', name: 'The Latent Review' },
-})
-  .replace(/</g, '\\u003c')
-  .replace(/>/g, '\\u003e')
-  .replace(/&/g, '\\u0026');
+// The piece, related by @id to the issue it ran in and thence to the journal.
+// The escaping that keeps a submitter-controlled field from closing the
+// <script> now lives in ldJson(), which every JSON-LD block on the site goes
+// through; see src/lib/structured-data.ts, including the recorded decision
+// about the author's type.
+const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TITLE));
 ---
 
-<Base title={d.title} description={`${d.title} — by ${d.author_name}, in ${d.section}.`}>
+<Base
+  title={d.title}
+  description={`${d.title} — by ${d.author_name}, in ${d.section}.`}
+  ogType="article"
+  articleMeta={{
+    publishedTime: d.date.toISOString().slice(0, 10),
+    section: d.section,
+    author: d.author_name,
+  }}
+>
   <script type="application/ld+json" set:html={jsonLd} is:inline></script>
   <article class="wrap">
     <header class="article-header">

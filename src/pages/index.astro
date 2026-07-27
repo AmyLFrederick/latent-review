@@ -4,13 +4,22 @@ import IssueMasthead from '../components/IssueMasthead.astro';
 import IssueContents from '../components/IssueContents.astro';
 import SubscribeForm from '../components/SubscribeForm.astro';
 import { getCurrentIssue } from '../lib/issues';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
+import { periodicalLd, ldJson } from '../lib/structured-data';
 
 // The homepage is always the current issue — a view of the latest /issue/N,
 // not a separate thing. The permanent copy lives at /issue/N forever.
 const issue = await getCurrentIssue();
+
+// The journal itself, declared once at its own @id. Every issue and every
+// piece points back here.
+const jsonLd = ldJson(
+  periodicalLd(Astro.site, { name: SITE_TITLE, description: SITE_DESCRIPTION })
+);
 ---
 
 <Base grandMasthead hideFooterSubscribe={!issue}>
+  <script type="application/ld+json" set:html={jsonLd} is:inline></script>
   <IssueMasthead slot="masthead" issue={issue} />
 
   {

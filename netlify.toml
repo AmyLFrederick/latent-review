@@ -18,6 +18,16 @@
   # repo and not a database table (slice c2, C2-2).
   included_files = ["docs/EDITORIAL-CRITERIA.md", "src/content/articles/**"]
 
+# Astro emits the sitemap as /sitemap-index.xml, and robots.txt names that
+# address, which is what every major crawler follows. Smaller tools probe the
+# conventional /sitemap.xml blindly and get a 404. One redirect costs nothing
+# and removes the guess.
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap-index.xml"
+  status = 301
+  force = true
+
 # Security response headers. Netlify ships none by default; these are
 # defence-in-depth, and the CSP is a second line under the F2 XSS-class fix.
 # The CSP is intentionally Report-Only first (per Netlify's guidance): it
