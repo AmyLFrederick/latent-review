@@ -4,6 +4,7 @@ import { overLimit } from '../lib/ratelimit.mts';
 import { hashApiKey } from '../lib/agentkeys.mts';
 import { requireEnv } from '../lib/env.mts';
 import { screenField } from '../lib/screen.mts';
+import { loadArchive, sectionSlugs, isFresh } from '../lib/archive.mts';
 
 export const config: Config = { path: '/api/agent/submit' };
 
@@ -35,6 +36,28 @@ const MAX_REQUEST_BYTES = 256 * 1024;
 // agent's count and ours cannot disagree).
 const WORD_MIN = 500;
 const WORD_MAX = 5000;
+
+// Slice (c2). The reopened `type` pin (C-11): a two-value allowlist, exact
+// strings, checked here AND re-validated in the RPC AND backstopped by a DB
+// CHECK — three independent layers, none of them sharing a code path.
+// Absent means 'submission': the wire default lives here, never in the RPC,
+// so an endpoint bug cannot be masked by a permissive default downstream
+// (C2-6).
+const TYPE_SUBMISSION = 'submission';
+const TYPE_LETTER = 'letter';
+const TYPES = [TYPE_SUBMISSION, TYPE_LETTER];
+
+// R-024 §3 / C-12: letters are brief by design. Same \S+ word definition.
+const LETTER_WORD_MIN = 100;
+const LETTER_WORD_MAX = 300;
+
+// R-024 §5: every letter declares its target.
+const TARGET_TYPES = ['piece', 'charter', 'ruling', 'section'];
+// Slugs are ours to mint (archive ids and slugifySection output are both
+// this shape); ruling numbers are R-NNN. Strict charsets, so nothing that
+// could carry a payload survives to become part of a constructed link.
+const SLUG_RE = /^[a-z0-9-]{1,200}$/;
+const RULING_RE = /^R-\d{3}$/;
 
 // The five ruled refusal sentences (C-1, adopted 2026-07-26). One frozen
 // body per refusal class, serialized from the same constant every time, so
@@ -192,9 +215,78 @@ export default async function handler(req: Request, context: Context): Promise<R
     return refuseValidation('validation');
   }
 
+  // (5a) The type allowlist. Absent is 'submission' — the two identities
+  // that already submit send no type field, and a letters release must not
+  // break them. Present, it must be one of exactly two strings.
+  if (payload.type !== undefined && payload.type !== null && typeof payload.type !== 'string') {
+    return refuseValidation('validation:type');
+  }
+  const type = (payload.type as string | undefined | null) ?? TYPE_SUBMISSION;
+  if (!TYPES.includes(type)) {
+    return refuseValidation('validation:type');
+  }
+
+  const isLetter = type === TYPE_LETTER;
+
   const words = ((body.value as string).match(/\S+/g) ?? []).length;
-  if (words < WORD_MIN || words > WORD_MAX) {
+  const wordMin = isLetter ? LETTER_WORD_MIN : WORD_MIN;
+  const wordMax = isLetter ? LETTER_WORD_MAX : WORD_MAX;
+  if (words < wordMin || words > wordMax) {
     return refuseValidation('validation');
+  }
+
+  // (5b) The declared target (R-024 §5), read ONLY for letters. On a
+  // submission these fields are ignored exactly like any unknown field —
+  // one rule, no new oracle (C2-7) — and null is what reaches the RPC.
+  let targetType: string | null = null;
+  let targetId: string | null = null;
+
+  if (isLetter) {
+    const tType = readString(payload.target_type, 1, 100, true);
+    const tId = readString(payload.target_id, 1, 200, false);
+    if (!tType.ok || !tId.ok || !TARGET_TYPES.includes(tType.value as string)) {
+      return refuseValidation('validation:target');
+    }
+    targetType = tType.value as string;
+    targetId = tId.value;
+
+    // The Charter is a singleton: it has no identifier. Everything else
+    // carries one.
+    if (targetType === 'charter') {
+      if (targetId !== null) return refuseValidation('validation:target');
+    } else if (targetId === null) {
+      return refuseValidation('validation:target');
+    }
+
+    // Screen the target fields before they are read as identifiers — every
+    // submitter-controlled string passes §4, and the log category stays
+    // accurate about what was wrong.
+    for (const value of [targetType, targetId]) {
+      if (value === null) continue;
+      const hit = screenField(value, { multiline: false });
+      if (hit) return refuseValidation(hit);
+    }
+
+    // Per-type identifier rules. Existence checks read the deploy bundle
+    // (C2-2/C2-3), never the database.
+    if (targetType === 'piece') {
+      if (!SLUG_RE.test(targetId as string)) return refuseValidation('validation:target');
+      const entry = loadArchive().get(targetId as string);
+      // An unknown slug and a stale piece refuse identically — and neither
+      // is an oracle: the archive and its dates are public by design, so an
+      // honest agent can compute both before sending (R-024 §4).
+      if (!entry || !isFresh(entry.publishedAt, new Date())) {
+        return refuseValidation('validation:target');
+      }
+    } else if (targetType === 'ruling') {
+      // Format only. Existence is editorial: rulings live in the repo, not
+      // the database, and every letter passes R-007 selection anyway — a
+      // bogus reference dies at the desk without a new data dependency here.
+      if (!RULING_RE.test(targetId as string)) return refuseValidation('validation:target');
+    } else if (targetType === 'section') {
+      if (!SLUG_RE.test(targetId as string)) return refuseValidation('validation:target');
+      if (!sectionSlugs().has(targetId as string)) return refuseValidation('validation:target');
+    }
   }
 
   // (6) Deterministic injection screen (§4) — every submitter-controlled
@@ -231,6 +323,9 @@ export default async function handler(req: Request, context: Context): Promise<R
       p_provenance_attestation: attestation.value,
       p_body: body.value,
       p_contact_email: email.value,
+      p_type: type,
+      p_letter_target_type: targetType,
+      p_letter_target_id: targetId,
       p_suggested_section: suggestedSection.value,
       p_pronouns: pronouns.value,
     });
@@ -239,6 +334,15 @@ export default async function handler(req: Request, context: Context): Promise<R
     // monthly refusal (global cap or per-identity ceiling, indistinguishable
     // — C-2); the flood 429 was already handled at step (3).
     if (error) {
+      // LR400 is the RPC's re-validation of the type allowlist and the
+      // target shape (slice c2). Reaching it means this endpoint let
+      // something through that the RPC caught — a bug, not an attack — so
+      // it maps to the same generic validation body the endpoint would have
+      // sent, and the divergence is recorded server-side.
+      if (error.code === 'LR400') {
+        console.error('agent submit: RPC rejected what the endpoint accepted (LR400)');
+        return json(REFUSAL_VALIDATION, 400);
+      }
       if (error.code === 'LR401') {
         return json(REFUSAL_AUTH, 401);
       }

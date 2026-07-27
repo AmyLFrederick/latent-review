@@ -12,7 +12,11 @@
   directory = "netlify/functions"
   # The AI review desk reads the editors' written criteria at runtime so the
   # criteria stay versioned in the repo (see docs/EDITORS-DESK.md).
-  included_files = ["docs/EDITORIAL-CRITERIA.md"]
+  # The published archive ships too: the agent-direct door validates a
+  # letter's declared piece target — existence and the two-month freshness
+  # window — against these files, because the archive is markdown in the
+  # repo and not a database table (slice c2, C2-2).
+  included_files = ["docs/EDITORIAL-CRITERIA.md", "src/content/articles/**"]
 
 # Security response headers. Netlify ships none by default; these are
 # defence-in-depth, and the CSP is a second line under the F2 XSS-class fix.
