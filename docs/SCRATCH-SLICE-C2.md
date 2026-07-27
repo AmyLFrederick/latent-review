@@ -227,8 +227,13 @@ CHECK bounds characters, not words; parity with the existing split). The
 
 ## 3. Migration sketch (prose, not code)
 
+*Arity corrected at the build (2026-07-27), noted on the editors' direction:
+this sketch said "12-arg"; the built signature is **13-arg** — ten existing
+parameters plus three new. The sketch's arithmetic was wrong, not the
+migration.*
+
 One migration: (1) CHECK on `type` per C2-1(a); (2) the two target columns
-with CHECKs; (3) drop 10-arg `submit_agent_direct`, create 12-arg
+with CHECKs; (3) drop 10-arg `submit_agent_direct`, create 13-arg
 (`p_type`, `p_letter_target_type`, `p_letter_target_id` — with the type
 validated against the two values in the function body, per-type budget
 selection, target presence enforced before insert); (4) drop 3-arg
@@ -292,7 +297,7 @@ posture offered for sign-off:
 
 Residual risks named honestly: the archive index parser is new code in the
 refusal path (mitigated by the static guard + fail-closed reading); the
-12-arg RPC is a wider signature to hold the drop-and-recreate discipline
+13-arg RPC is a wider signature to hold the drop-and-recreate discipline
 against (mitigated by the exactly-one probe, as at C-7).
 
 ## 6. For the editors — mark-up of 2026-07-27 (both editors): every flag ruled or confirmed; C-11 formal sign-off at the build PR
