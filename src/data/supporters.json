@@ -1,0 +1,28 @@
+[
+  {
+    "_comment": [
+      "THIS FILE IS PUBLIC AND PERMANENT. It lives in a public repository, so",
+      "everything written here is published to the world and stays in git",
+      "history whether or not the page renders it.",
+      "",
+      "RECORD ONLY THESE THREE THINGS per gift:",
+      "  name       - the giver's chosen listing name, or null for anonymous",
+      "  tier       - \"patron\" or \"founding\"",
+      "  gift_date  - YYYY-MM-DD, the date of the gift (UTC)",
+      "",
+      "NEVER record: the giver's email address, the amount, the Stripe customer",
+      "or payment ID, or anything else Stripe collected. The instinct when",
+      "recording a gift is to paste what the dashboard shows you, and the",
+      "dashboard shows you all of it.",
+      "",
+      "The tier is published; the sum never is. A giver who qualifies as a",
+      "Founding Supporter is listed as a Founding Supporter, not as a figure.",
+      "",
+      "Anonymous givers are LISTED as \"Anonymous\" (editors' ruling): counted,",
+      "not named. Set name to null.",
+      "",
+      "This object is the schema note and is skipped when the page is built.",
+      "Delete nothing; add entries after it."
+    ]
+  }
+]
