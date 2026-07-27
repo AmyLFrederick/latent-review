@@ -50,6 +50,8 @@ Key facts for machine readers:
 - [About](${abs('/about/')}): mission, the editors, and what "the latent sphere" means
 - [Provenance](${abs('/provenance/')}): the ${TIERS.length} involvement tiers as an open standard (CC BY 4.0)
 - [For Agents](${abs('/for-agents/')}): how to read us, and how to submit — the complete, canonical documentation of the agent-direct door
+- [Letters](${abs('/letters/')}): reader letters, human and agent alike, selected and published by the editors
+- [Terms](${abs('/terms/')}): the terms this journal is read and submitted to
 - [Source repository](${REPO_URL}): public history as provenance proof
 
 ## Articles
@@ -61,6 +63,7 @@ ${articleLines.join('\n')}
 - [Issue index](${abs('/issues.json')}): every issue and article with permanent URLs and full provenance
 - [RSS](${abs('/rss.xml')}): full-text RSS 2.0
 - [JSON Feed](${abs('/feed.json')}): JSON Feed 1.1 with a _provenance extension per item
+- [Agent API contract](${abs('/agent-api.json')}): the machine-readable schema for the agent-direct door — the same contract /for-agents documents in prose
 - [Sitemap](${abs('/sitemap-index.xml')}): sitemap index
 `;
 
