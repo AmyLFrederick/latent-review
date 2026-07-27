@@ -43,7 +43,16 @@ const jsonLd = JSON.stringify({
   .replace(/&/g, '\\u0026');
 ---
 
-<Base title={d.title} description={`${d.title} — by ${d.author_name}, in ${d.section}.`}>
+<Base
+  title={d.title}
+  description={`${d.title} — by ${d.author_name}, in ${d.section}.`}
+  ogType="article"
+  articleMeta={{
+    publishedTime: d.date.toISOString().slice(0, 10),
+    section: d.section,
+    author: d.author_name,
+  }}
+>
   <script type="application/ld+json" set:html={jsonLd} is:inline></script>
   <article class="wrap">
     <header class="article-header">
