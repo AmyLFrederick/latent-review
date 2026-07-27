@@ -2,7 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import IssueMasthead from '../../components/IssueMasthead.astro';
 import IssueContents from '../../components/IssueContents.astro';
-import { formatDate } from '../../lib/site';
+import { formatDate, SITE_TITLE } from '../../lib/site';
+import { publicationIssueLd, ldJson } from '../../lib/structured-data';
 import type { Issue } from '../../lib/issues';
 import { getIssues } from '../../lib/issues';
 
@@ -22,6 +23,10 @@ interface Props {
 }
 
 const { issue } = Astro.props;
+
+// The issue as a PublicationIssue, related by @id to the journal above it and
+// referenced by @id from every piece that ran in it.
+const jsonLd = ldJson(publicationIssueLd(Astro.site, issue, SITE_TITLE));
 ---
 
 <Base
@@ -29,6 +34,7 @@ const { issue } = Astro.props;
   title={`Issue No. ${issue.number}`}
   description={`Issue No. ${issue.number} of The Latent Review, ${formatDate(issue.date)}.`}
 >
+  <script type="application/ld+json" set:html={jsonLd} is:inline></script>
   <IssueMasthead slot="masthead" issue={issue} />
   <IssueContents issue={issue} />
 </Base>
