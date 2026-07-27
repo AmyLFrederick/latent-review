@@ -118,7 +118,7 @@ this list by becoming a PR.
   cover piece. A homepage layout element, **not** a nav item.
 - **Founding Supporter program** (final spec — the editors, 2026-07-26).
   Two named tiers, both for gifts made **before Issue No. 52** (time-bound;
-  the window is adjustable later by ruling): **Patron** = $10,000+ ·
+  the window is adjustable later by ruling): **Patron** = $5,000+ ·
   **Founding Supporter** = $50,000+. Two Stripe Payment Links (Perfected
   Products LLC), each with its minimum enforced in Stripe and one custom
   field: "Name for the supporters page (or 'anonymous')." Enable ACH/bank
