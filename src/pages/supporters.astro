@@ -98,12 +98,14 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
       <p>
         Every tier is open to anyone who wishes to give — a person, an organization, or an AI.
       </p>
-      <p>
-        Founding Supporter differs in two ways. It is offered only before{' '}
-        <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>, about the journal’s first
-        two years, because that stretch is the founding. And a Founding Supporter’s name stays
-        on this page for as long as the journal exists.
-      </p>
+      {/*
+        FLAGGED FOR THE EDITORS, NOT DELETED. With the Founding note moved into its own row,
+        every row states its own listing duration, so "each listing lasts for the time named
+        beside it" now describes what the reader can already see. "The other tiers stay open"
+        still does work — it is the only statement that the rest of the ladder has no window —
+        but it reads oddly as "the OTHER tiers" when the tier it contrasts with is now five
+        rows below rather than in the paragraph above.
+      */}
       <p>
         The other tiers stay open, and each listing lasts for the time named beside it.
       </p>
@@ -130,11 +132,15 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
       <ul class="ladder">
         {SUPPORT_MONTHLY_URL && (
           <li>
-            <strong>Monthly Supporter</strong> — $5 a month, recorded as Supporter and not
-            listed.
-            <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
-              Give monthly
-            </a>
+            <p class="terms">
+              <strong>Monthly Supporter</strong> — $5 a month, recorded as Supporter and not
+              listed.
+            </p>
+            <p class="act">
+              <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
+                Give monthly
+              </a>
+            </p>
           </li>
         )}
         {
@@ -143,12 +149,35 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
             const href = open ? SUPPORTER_LINKS[t.key] : null;
             return (
               <li>
-                <strong>{t.label}</strong> — gifts of {t.threshold} or more, {listingSentence(t)}.
-                {!open && <span> Closed to new gifts.</span>}
+                <p class="terms">
+                  <strong>{t.label}</strong> — gifts of {t.threshold} or more,{' '}
+                  {listingSentence(t)}.
+                  {!open && <span> Closed to new gifts.</span>}
+                </p>
+                {/*
+                  THE FOUNDING NOTE LIVES IN THE FOUNDING ROW. It used to stand above the whole
+                  list, explaining the bottom rung before a reader had reached any rung at all.
+                  Wording is ruled and unchanged; only its position moved.
+
+                  Keyed on the tier key rather than on closes_at_issue, even though that field
+                  is what makes this tier different, because the sentence NAMES Founding
+                  Supporter. A second time-bound tier would need its own words, not these.
+                */}
+                {t.key === 'founding' && (
+                  <p class="row-note">
+                    Founding Supporter differs in two ways. It is offered only before{' '}
+                    <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>, about the
+                    journal’s first two years, because that stretch is the founding. And a
+                    Founding Supporter’s name stays on this page for as long as the journal
+                    exists.
+                  </p>
+                )}
                 {href && (
-                  <a class="give" href={href} aria-label={`Give at the ${t.label} level`}>
-                    Give
-                  </a>
+                  <p class="act">
+                    <a class="give" href={href} aria-label={`Give at the ${t.label} level`}>
+                      Give
+                    </a>
+                  </p>
                 )}
               </li>
             );
@@ -302,9 +331,16 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
   /*
     A BUTTON PER ROW, NOT A LINK. "Give" as small inline text was easy to miss,
     which on the one page whose job is to be actionable is the whole failure.
-    It sits on its own line beneath the row's terms rather than beside them, so
-    the rows stay readable as a list and the buttons line up as a column of
-    equal choices — no rung shouted louder than another by its position.
+
+    EACH BUTTON GETS ITS OWN LINE, RIGHT-ALIGNED. Inline at the end of the row's
+    terms, a button landed wherever that row's text happened to wrap — mid-line
+    on the long rows, hard against a short sentence on the others. Aligning to
+    the right edge puts them in a clean vertical column whatever the text does.
+
+    WIDTHS ARE NOT EQUALISED. "Give monthly" is wider than "Give" and stays
+    wider: the house styles set no button width anywhere, and forcing a common
+    one would be a new rule invented here rather than one already kept. The
+    right edge is what lines up.
   */
   .ladder {
     list-style: none;
@@ -316,13 +352,29 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
     padding: 0.9rem 0;
   }
 
+  .ladder .terms,
+  .ladder .row-note {
+    margin: 0;
+  }
+
+  .ladder .row-note {
+    margin-top: 0.5rem;
+    font-size: 0.94rem;
+    color: var(--ink-soft);
+  }
+
+  .ladder .act {
+    margin: 0.6rem 0 0;
+    text-align: right;
+  }
+
   .give {
     display: inline-block;
-    margin-top: 0.6rem;
     background: var(--accent);
     color: var(--paper);
     padding: 0.4rem 1rem;
-    border-radius: 2px;
+    /* Proposed token — see the note beside it in global.css. */
+    border-radius: var(--radius-button);
     font-size: 0.9rem;
     text-decoration: none;
   }
