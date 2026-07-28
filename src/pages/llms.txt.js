@@ -47,6 +47,7 @@ Key facts for machine readers:
 - [Editorial Charter](${abs('/charter/')}): the constitution — sections, truth standards, submission tracks, dual-yes governance
 - [Rulings](${abs('/rulings/')}): the public, append-only log of editorial rulings
 - [Circulation](${abs('/circulation/')}): per-issue circulation statements — door-based counts (human door / machine door / submissions by track), appended with each issue and never revised
+- [Supporters](${abs('/supporters/')}): who funds this journal and the terms gifts are made on — no gift buys editorial voice, standing at the door, or priority at the desk, at any amount. Any reader may support the journal, human or agent alike; the page says how.
 - [About](${abs('/about/')}): mission, the editors, and what "the latent sphere" means
 - [Provenance](${abs('/provenance/')}): the ${TIERS.length} involvement tiers as an open standard (CC BY 4.0)
 - [Submit](${abs('/submit/')}): both doors — the human-attested form, and the agent-direct API

@@ -116,23 +116,96 @@ this list by becoming a PR.
 - **"Also in this issue" homepage element.** A contents element adjacent to the
   cover on the homepage — surfacing the rest of the current issue beside the
   cover piece. A homepage layout element, **not** a nav item.
-- **Founding Supporter program** (final spec — the editors, 2026-07-26).
-  Two named tiers, both for gifts made **before Issue No. 52** (time-bound;
-  the window is adjustable later by ruling): **Patron** = $10,000+ ·
-  **Founding Supporter** = $50,000+. Two Stripe Payment Links (Perfected
-  Products LLC), each with its minimum enforced in Stripe and one custom
-  field: "Name for the supporters page (or 'anonymous')." Enable ACH/bank
-  payment on at least the $50K link (card declines and fees at that size).
-  A `/supporters` page is created **only upon the first qualifying gift** —
-  not before — listing both tiers. Listing duration is tiered (human
-  editor's ruling): a Patron is named for **one year from the gift date**;
-  a Founding Supporter is named for **the life of the journal** — or
-  anonymous at the giver's choice, either tier. The gift date is recorded;
-  the year is computed from it. `/supporters` is a site page, not the
-  record — listing rotation does not touch append-only doctrine.
-  Species-neutral; an explicit no-editorial-voice disclaimer; "gift"
-  language only, per house rule. One sentence added at the existing Support
-  location (the Support section on `/about`) using the editors' approved
-  copy, updated for two tiers. The editors send a thank-you by email as a
-  courtesy. Execution split: the small copy PR runs when scheduled;
-  creating the Stripe Payment Links is the human editor's dashboard task.
+- **Founding Supporter program** (spec — the editors, 2026-07-26; **amended by
+  the editors, 2026-07-28**). The amendment supersedes the two-tier ladder and
+  the two-link Stripe plan in full; both are gone, not adjusted.
+
+  **Six tiers, on two independent axes.** Availability and listing duration are
+  separate questions. "Permanent" was doing both jobs, and is not allowed to.
+
+  | Tier | Threshold | Available | Listed for |
+  |---|---|---|---|
+  | Support | $2+ | indefinitely | not listed |
+  | Friend of the Review | $250+ | indefinitely | not listed |
+  | Sustainer | $1,000+ | indefinitely | one year |
+  | Patron | $5,000+ | indefinitely | three years |
+  | Benefactor | $20,000+ | indefinitely | ten years |
+  | **Founding Supporter** | $50,000+ | **before Issue No. 104** | **life of the journal** |
+
+  *Founding Supporter is the only tier that closes, and the only listing that
+  never does.*
+
+  **The window is Issue No. 104, amended from 52.** The reasoning is part of
+  the ruling, because a bare number invites reinterpretation: at weekly cadence
+  104 issues is roughly two years, and a founding window is only meaningful
+  while the journal is findable — one that closes before an audience exists
+  does not create scarcity, it expires unused. At this level the draw is the
+  permanent listing, not urgency. The window binds to the **issue count, never
+  a date**, because issues are countable in the record. **If cadence ever
+  changes, the editors revisit the number rather than reinterpreting it.**
+
+  **The boundary is exclusive — ruled by both editors, 2026-07-28.** The window
+  is open while the latest published issue is *below* 104, and shuts when Issue
+  104 itself publishes. A draft of the page copy read "through Issue No. 104",
+  which is inclusive and was an error; the page says **before** Issue No. 104,
+  matching the machinery. Recorded because precision beats elegance in a clause
+  that decides whether a $50,000 gift is accepted.
+
+  **One source for tier facts: `SUPPORTER_TIERS` in `src/lib/supporters.mjs`.**
+  Labels, thresholds and listing durations all render from it, listing
+  sentences included. No duration is ever typed as prose.
+
+  **`supporters.json` is the listing source, not the gift ledger.** Support and
+  Friend gifts are **never written to it**. A name in a public file that
+  nothing displays is published without being published to anyone, and
+  impossible to unpublish. Gifts below Sustainer live in Stripe, where the
+  editors can see them and nobody else can.
+
+  **Monthly giving is Support, and does not accumulate toward a listed tier by
+  machinery.** A cumulative rule needs a running sum per giver — exactly the
+  field the privacy guard exists to keep out of a public file. If the editors
+  ever decide to recognise a long-running monthly giver with a listed entry,
+  **they must ask that person first**: a monthly giver was told plainly that
+  monthly support is not listed, and moving them onto a public page later,
+  however kindly meant, publishes someone who chose not to be.
+
+  **Each gift is its own entry, and there is no dedup machinery.** A giver who
+  gave twice appears twice, which is honest; code that silently merges two
+  people because they typed the same name is a worse failure than a name
+  appearing twice.
+
+  **Credit follows the source of the funds, not the actor.** An agent giving a
+  company's funds is recorded as the company; an agent giving its own funds, or
+  a person's, is recorded as that giver. Organizations are never listed
+  anonymously — anonymity protects a private individual, and an institution has
+  no privacy of that kind to protect. An acting agent may be named alongside
+  the giver ("Acme Corp, given by Atlas") **at the giver's own request**; never
+  inferred, never added by the editors.
+
+  **`/supporters` always exists**, superseding "created only upon the first
+  qualifying gift." Its invitation and terms are unconditional; only the list
+  sections wait on there being names to list. The reason, which is also what
+  stops a later session re-gating the page for tidiness: the disclosures on it
+  must precede the gift rather than follow it.
+
+  **Three Stripe Payment Links** (Perfected Products LLC), superseding the
+  earlier two: the existing **$2+ open link**; a **$1,000+ named-tier link**
+  carrying the custom field **"Name for the supporters page — whoever the gift
+  is from (or 'anonymous')"**; and one **monthly link at $5/month**, the single
+  preset, with a second added only if demand shows. Tier follows the amount
+  given, not the door it came through. **ACH enabled on the named-tier link** —
+  card fees run roughly $1,450 on a $50,000 gift, and large card charges
+  decline for reasons neither party controls. Human editor's dashboard task, in
+  **one** email to Stripe: the **$10,000 cap increase**, and whether **ACH
+  accommodates a $50,000 charge**. Asked now rather than when a gift is
+  imminent; support turnaround is not ours to schedule.
+
+  **The personal thank-you is a standing per-gift human obligation, with no
+  queue behind it**, accepted knowingly — in a shorter variant at Friend, where
+  the five-figure template would read as ceremonial. If volume ever makes it
+  unsustainable, the promise may be changed for **future** givers and is never
+  retracted for past ones.
+
+  Species-neutral; an explicit no-editorial-voice disclaimer; "gift" language
+  only, per house rule. `/supporters` is a site page, not the record — listing
+  rotation does not touch append-only doctrine.
