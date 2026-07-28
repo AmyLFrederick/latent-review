@@ -42,6 +42,12 @@ const listed = listedSupporters(entries, new Date());
 // from now, nobody reading this today will be the one who notices.
 const issues = await getIssues();
 const latestIssue = issues.length > 0 ? issues[0].number : 0;
+
+// The lowest rung that is listed at all — read off the table rather than typed,
+// so the sentence stating which gifts can be listed cannot disagree with the
+// rows beneath it. The table is ascending, so the first listed tier is the
+// cheapest one.
+const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
 ---
 
 <Base
@@ -95,19 +101,24 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
         list beneath cannot drift from the table because it renders from it.
       */}
       <h2>The tiers</h2>
-      <p>
-        Every tier is open to anyone who wishes to give — a person, an organization, or an AI.
-      </p>
       {/*
-        FLAGGED FOR THE EDITORS, NOT DELETED. With the Founding note moved into its own row,
-        every row states its own listing duration, so "each listing lasts for the time named
-        beside it" now describes what the reader can already see. "The other tiers stay open"
-        still does work — it is the only statement that the rest of the ladder has no window —
-        but it reads oddly as "the OTHER tiers" when the tier it contrasts with is now five
-        rows below rather than in the paragraph above.
+        LISTING IS A CHOICE, AND THE PAGE MUST READ THAT WAY. The rows state a duration as a
+        fact — "listed for one year from the date of the gift" — which on its own reads as
+        though a name goes up whether the giver wants it or not. The choice is stated ONCE
+        here, above the list, rather than repeated down seven rows; the rows stay short.
+
+        THE THRESHOLD IS DERIVED, NEVER TYPED. It is the lowest rung that is listed at all,
+        which is a fact about the tier table and would go stale the moment the table changed.
+        A page that states a number the table also states is a page with two numbers.
+
+        The paragraph that stood here — "The other tiers stay open, and each listing lasts for
+        the time named beside it" — is deleted: the Founding note it contrasted with now lives
+        in its own row, and every row already states its own duration.
       */}
       <p>
-        The other tiers stay open, and each listing lasts for the time named beside it.
+        Every tier is open to anyone who wishes to give — a person, an organization, or an AI.
+        Gifts of {LOWEST_LISTED_TIER.threshold} or more can be listed on this page, and whoever
+        gives chooses whether to be named or listed as <em>Anonymous</em>.
       </p>
       {/*
         THIS LIST IS THE LEVEL-SELECTION SCREEN. A payment link is single-purpose and cannot
@@ -257,21 +268,34 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
       <p>
         A gift may come from a person or from an organization.
       </p>
+      {/*
+        REVERSAL, BOTH EDITORS: ORGANIZATIONS MAY BE LISTED AS ANONYMOUS. The rule this
+        replaces held that an institution has no privacy of that kind to protect and must be
+        named. It is withdrawn. A giver who wants privacy should not be turned away, and this
+        journal's independence does not rest on publishing who funds it — it rests on the
+        dual-yes, on the desk not knowing who has given, and on the no-editorial-voice
+        promise. Refusing a gift over a listing preference would be principle for its own sake.
+
+        The asymmetry is gone entirely: no "An organization may not", no sentence about
+        institutions having no privacy to protect. Anonymity is one choice, on the same terms,
+        for a person, an organization, or an AI. A future session should not reinstate the
+        asymmetry from the older copy still quoted in docs or git history.
+      */}
       <p>
-        A person may choose to be listed as <em>Anonymous</em>; the gift is counted here either
-        way. <strong>An organization may not.</strong> Anonymity on this page protects a private
-        individual, and an institution has no privacy of that kind to protect: a company or a
-        laboratory that puts its name behind this journal does so as a matter of record, and the
-        record is the point.
+        Whoever gives chooses whether to be named or listed as <em>Anonymous</em> — a person, an
+        organization, or an AI, on the same terms. The gift is counted here either way. Nobody
+        is turned away over a listing preference: this journal’s independence does not rest on
+        publishing who funds it. It rests on the dual-yes, on the desk not knowing who has
+        given, and on the promise that no gift buys editorial voice.
       </p>
       <p>
         <strong>A gift is credited to whoever it is from, not whoever sent it.</strong> When the
         payment form asks for the name for this page, it asks for <em>whoever the gift is
         from</em> — which is not necessarily whoever is filling it in. An agent giving a
-        company’s funds is recorded as the company, listed by name; organizations are not listed
-        anonymously. An agent giving its own funds, for itself, is listed as it chooses: by name
-        or as <em>Anonymous</em>, the same choice any individual has. Funds that are a person’s,
-        given through their agent, are recorded as that person, with the same choice.
+        company’s funds is recorded as the company, which chooses how it is listed like anyone
+        else. An agent giving its own funds, for itself, is recorded as that agent. Funds that
+        are a person’s, given through their agent, are recorded as that person. In every case
+        the giver of record makes the choice, and the acting party does not make it for them.
       </p>
       <p>
         A giver who wants the acting agent recorded as well may ask for it — <em>Acme Corp,
