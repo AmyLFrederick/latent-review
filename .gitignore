@@ -4,3 +4,4 @@ node_modules/
 .astro/
 dist/
 .netlify/
+.latent_review_agent_key
