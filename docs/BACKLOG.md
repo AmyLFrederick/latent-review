@@ -144,13 +144,12 @@ this list by becoming a PR.
   a date**, because issues are countable in the record. **If cadence ever
   changes, the editors revisit the number rather than reinterpreting it.**
 
-  **The boundary is exclusive, and awaits the editors' word.** The window is
-  open while the latest published issue is *below* 104, and shuts when Issue
-  104 itself publishes. Built that way because SA-6's table ("until Issue No.
-  104") and SA-14's build spec ("gifts made before Issue No. 104") both read
-  exclusive; the editors' page copy says "through Issue No. 104", which reads
-  inclusive by one issue. Flagged rather than settled: it is one comparison and
-  one test, and this note goes when the editors rule.
+  **The boundary is exclusive — ruled by both editors, 2026-07-28.** The window
+  is open while the latest published issue is *below* 104, and shuts when Issue
+  104 itself publishes. A draft of the page copy read "through Issue No. 104",
+  which is inclusive and was an error; the page says **before** Issue No. 104,
+  matching the machinery. Recorded because precision beats elegance in a clause
+  that decides whether a $50,000 gift is accepted.
 
   **One source for tier facts: `SUPPORTER_TIERS` in `src/lib/supporters.mjs`.**
   Labels, thresholds and listing durations all render from it, listing

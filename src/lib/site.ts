@@ -16,6 +16,11 @@ export const SUPPORT_URL = 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00';
 // ships. The alias must route to the editors' inbox.
 export const LETTERS_CONTACT = 'letters@thelatentreview.com';
 
+// Gift conversations, not reader letters. Its own alias deliberately: a gift at
+// the top of the ladder is arranged with the editors, and routing that into the
+// letters queue would bury it among submissions for publication.
+export const SUPPORTERS_CONTACT = 'supporters@thelatentreview.com';
+
 // The terms are editor-drafted and pending attorney review; this flag shows
 // the "under legal review" note beside the footer terms link and on /terms.
 // Flip to false only when Amy L. Frederick clears it.

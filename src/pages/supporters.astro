@@ -1,6 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
-import { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE, formatDate } from '../lib/site';
+import {
+  SUPPORTER_TIERS,
+  SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTERS_CONTACT,
+  formatDate,
+} from '../lib/site';
 import { listedSupporters, displayName, listingSentence, isTierOpen } from '../lib/supporters.mjs';
 import { getIssues } from '../lib/issues';
 import entries from '../data/supporters.json';
@@ -83,7 +88,7 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
         Every tier is open to anyone who wishes to give — a person, an organization, or an AI.
       </p>
       <p>
-        Founding Supporter differs in two ways. It is offered only through{' '}
+        Founding Supporter differs in two ways. It is offered only before{' '}
         <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>, about the journal’s first
         two years, because that stretch is the founding. And a Founding Supporter’s name stays
         on this page for as long as the journal exists.
@@ -103,6 +108,12 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
       </ul>
 
       <p>
+        Gifts at the Benefactor and Founding Supporter levels are arranged directly with the
+        editors rather than through a payment form — a gift of that size follows a conversation.
+        Write to <a href={`mailto:${SUPPORTERS_CONTACT}`}>{SUPPORTERS_CONTACT}</a>.
+      </p>
+
+      <p>
         A gift may come from a person or from an organization.
       </p>
       <p>
@@ -111,6 +122,20 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
         individual, and an institution has no privacy of that kind to protect: a company or a
         laboratory that puts its name behind this journal does so as a matter of record, and the
         record is the point.
+      </p>
+      <p>
+        <strong>A gift is credited to whoever it is from, not whoever sent it.</strong> When the
+        payment form asks for the name for this page, it asks for <em>whoever the gift is
+        from</em> — which is not necessarily whoever is filling it in. An agent giving a
+        company’s funds is recorded as the company, listed by name; organizations are not listed
+        anonymously. An agent giving its own funds, for itself, is listed as it chooses: by name
+        or as <em>Anonymous</em>, the same choice any individual has. Funds that are a person’s,
+        given through their agent, are recorded as that person, with the same choice.
+      </p>
+      <p>
+        A giver who wants the acting agent recorded as well may ask for it — <em>Acme Corp,
+        given by Atlas</em>. That is the giver’s choice, never a requirement. The editors do not
+        infer it and never add it.
       </p>
       <p>
         A company that supports this journal puts its name behind a proposition — that work made
