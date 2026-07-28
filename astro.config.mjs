@@ -4,8 +4,13 @@ import sitemap from '@astrojs/sitemap';
 
 // Static output only — no server rendering in Astro itself. The dynamic
 // surface (subscriptions) lives in netlify/functions; see docs/BACKEND.md.
+// One statement of the canonical origin. customPages below are absolute URLs
+// by the sitemap integration's contract, so they are DERIVED from this rather
+// than retyped — a second copy of the origin is a second thing to get wrong.
+const SITE = 'https://thelatentreview.com';
+
 export default defineConfig({
-  site: 'https://thelatentreview.com',
+  site: SITE,
   integrations: [
     sitemap({
       // Out of the sitemap:
@@ -26,11 +31,9 @@ export default defineConfig({
       // declared via <link rel="alternate"> on every page, which is the
       // mechanism crawlers actually use for feeds, and listing them as
       // sitemap URLs invites their being treated as content pages.
-      customPages: [
-        'https://thelatentreview.com/llms.txt',
-        'https://thelatentreview.com/agent-api.json',
-        'https://thelatentreview.com/issues.json',
-      ],
+      customPages: ['/llms.txt', '/agent-api.json', '/issues.json'].map(
+        (path) => new URL(path, SITE).href
+      ),
     }),
   ],
 });
