@@ -34,8 +34,19 @@ export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 104;
 // Two sentinel strings rather than null/Infinity because both must survive
 // JSON-free reasoning and read correctly in a failing test message.
 //
-// Ladder order — highest first. The page's sections render in this order, so
-// adding a tier one day is an edit to this table and to nothing else.
+// ASCENDING ORDER — CHEAPEST FIRST, FOUNDING SUPPORTER LAST — AND THE TABLE'S
+// ORDER IS THE DISPLAY ORDER BY DESIGN. The invitation list on /supporters
+// renders straight from this array, so a reader meets the tiers at the rung
+// most of them will actually use and climbs from there. Adding a tier one day
+// is an edit to this table and to nothing else; putting one in the wrong place
+// here puts it in the wrong place on the page.
+//
+// THE ROLL OF NAMES RUNS THE OTHER WAY, HIGHEST FIRST, DELIBERATELY. See
+// listedSupporters() below: a list of people who have given is conventionally
+// led by the largest gifts, and that convention is not the same question as
+// which rung an undecided reader should meet first. The two orders are opposite
+// on purpose. If they are ever made to agree, that should be a decision someone
+// takes, not a side effect of editing this line.
 //
 // AVAILABILITY AND LISTING DURATION ARE TWO SEPARATE AXES, and conflating them
 // is the defect the amendment exists to prevent: `listing` is how long a gift
@@ -47,33 +58,15 @@ export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 104;
 // time-bound, that is the moment to promote it to a real column.
 export const SUPPORTER_TIERS = [
   {
-    key: 'founding',
-    label: 'Founding Supporter',
-    plural: 'Founding Supporters',
-    threshold: '$50,000',
-    listing: 'permanent',
-    closes_at_issue: SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
-  },
-  {
-    key: 'benefactor',
-    label: 'Benefactor',
-    plural: 'Benefactors',
-    threshold: '$20,000',
-    listing: 10,
-  },
-  {
-    key: 'patron',
-    label: 'Patron',
-    plural: 'Patrons',
-    threshold: '$5,000',
-    listing: 3,
-  },
-  {
-    key: 'sustainer',
-    label: 'Sustainer',
-    plural: 'Sustainers',
-    threshold: '$1,000',
-    listing: 1,
+    // Relabelled from "Support" to "Supporter": every other rung names a
+    // person, not an act, and a row reading "Support — gifts of $2 or more"
+    // named the act. THE KEY STAYS 'support' — it is what supporters.json
+    // records and what every guard checks, and a label is not an identifier.
+    key: 'support',
+    label: 'Supporter',
+    plural: 'Supporters',
+    threshold: '$2',
+    listing: 'none',
   },
   {
     key: 'friend',
@@ -83,11 +76,33 @@ export const SUPPORTER_TIERS = [
     listing: 'none',
   },
   {
-    key: 'support',
-    label: 'Support',
-    plural: 'Supporters',
-    threshold: '$2',
-    listing: 'none',
+    key: 'sustainer',
+    label: 'Sustainer',
+    plural: 'Sustainers',
+    threshold: '$1,000',
+    listing: 1,
+  },
+  {
+    key: 'patron',
+    label: 'Patron',
+    plural: 'Patrons',
+    threshold: '$5,000',
+    listing: 3,
+  },
+  {
+    key: 'benefactor',
+    label: 'Benefactor',
+    plural: 'Benefactors',
+    threshold: '$20,000',
+    listing: 10,
+  },
+  {
+    key: 'founding',
+    label: 'Founding Supporter',
+    plural: 'Founding Supporters',
+    threshold: '$50,000',
+    listing: 'permanent',
+    closes_at_issue: SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
   },
 ];
 
@@ -132,14 +147,17 @@ export const SUPPORTER_TIER_KEYS = SUPPORTER_TIERS.map((t) => t.key);
 // amended by the human editor the same day: the giver chooses the amount, no
 // suggested amount is displayed, $2 minimum — a fee floor, set in Stripe.)
 //
-// Ladder order, matching SUPPORTER_TIERS.
+// Ascending, matching SUPPORTER_TIERS. Key order here has no effect on
+// anything rendered — the page looks these up by tier key — but a map that
+// reads in a different order from the table it mirrors is a map someone will
+// eventually misread.
 export const SUPPORTER_LINKS = {
-  founding: null,
-  benefactor: null,
-  patron: 'https://buy.stripe.com/7sYdRbgkidexaTFc8g4Vy03',
-  sustainer: 'https://buy.stripe.com/00wcN76JI3DXe5R7S04Vy02',
-  friend: 'https://buy.stripe.com/8x214p8RQ4I1gdZ4FO4Vy01',
   support: 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00',
+  friend: 'https://buy.stripe.com/8x214p8RQ4I1gdZ4FO4Vy01',
+  sustainer: 'https://buy.stripe.com/00wcN76JI3DXe5R7S04Vy02',
+  patron: 'https://buy.stripe.com/7sYdRbgkidexaTFc8g4Vy03',
+  benefactor: null,
+  founding: null,
 };
 
 // Monthly giving, $5 a month. Its own link because Stripe's customer-chooses
@@ -267,9 +285,19 @@ export function isListed(entry, now) {
 }
 
 /**
- * The supporters to display: one group per listed tier, in ladder order,
- * newest gift first within each. Groups with nobody in them are dropped, so
- * the page renders only sections that have names.
+ * The supporters to display: one group per listed tier, HIGHEST FIRST, newest
+ * gift first within each. Groups with nobody in them are dropped, so the page
+ * renders only sections that have names.
+ *
+ * THE ROLL RUNS OPPOSITE TO THE INVITATION LIST, AND THAT IS DELIBERATE. The
+ * tier table is ascending — cheapest first — because an undecided reader should
+ * meet the rung most people use before the rung almost nobody does. A roll of
+ * names is a different act: it records what was given, and a list of givers is
+ * conventionally led by the largest gifts. The reverse below is the whole of
+ * that decision, so it is stated once, here, rather than assumed.
+ *
+ * If the editors ever rule that the two should agree, delete the reverse — do
+ * not reorder the table, which would drag the invitation list with it.
  *
  * Generated from the tier table rather than hardcoded, so a seventh tier one
  * day touches the table and nothing else.
@@ -281,7 +309,9 @@ export function isListed(entry, now) {
 export function listedSupporters(entries, now) {
   const listed = entries.filter((e) => isListed(e, now));
   const byDateDesc = (a, b) => (a.gift_date < b.gift_date ? 1 : a.gift_date > b.gift_date ? -1 : 0);
-  const groups = SUPPORTER_TIERS.filter((t) => t.listing !== 'none')
+  const groups = [...SUPPORTER_TIERS]
+    .reverse()
+    .filter((t) => t.listing !== 'none')
     .map((tier) => ({ tier, entries: listed.filter((e) => e.tier === tier.key).sort(byDateDesc) }))
     .filter((g) => g.entries.length > 0);
   return { groups, total: listed.length };

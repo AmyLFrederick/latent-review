@@ -63,15 +63,20 @@ test('every recorded gift in supporters.json carries a tier we know', () => {
 test('the ladder is the six ruled tiers, in order, at the ruled durations', () => {
   // The commercial commitment itself. If this fails, someone changed what the
   // journal promised people who gave it money.
+  //
+  // THE ORDER IS ASCENDING AND IS ALSO THE DISPLAY ORDER — /supporters renders
+  // the invitation list straight from this array, cheapest rung first. The roll
+  // of names runs the other way; that is asserted separately, and the two being
+  // opposite is deliberate.
   assert.deepEqual(
     SUPPORTER_TIERS.map((t) => [t.key, t.threshold, t.listing]),
     [
-      ['founding', '$50,000', 'permanent'],
-      ['benefactor', '$20,000', 10],
-      ['patron', '$5,000', 3],
-      ['sustainer', '$1,000', 1],
-      ['friend', '$250', 'none'],
       ['support', '$2', 'none'],
+      ['friend', '$250', 'none'],
+      ['sustainer', '$1,000', 1],
+      ['patron', '$5,000', 3],
+      ['benefactor', '$20,000', 10],
+      ['founding', '$50,000', 'permanent'],
     ]
   );
 });
@@ -103,7 +108,7 @@ test('the tiers with no link are exactly Benefactor and Founding Supporter', () 
   const withoutLink = SUPPORTER_TIERS.filter((t) => !SUPPORTER_LINKS[t.key]).map((t) => t.key);
   assert.deepEqual(
     withoutLink,
-    ['founding', 'benefactor'],
+    ['benefactor', 'founding'],
     'a tier with no link is a tier a giver cannot give at — if that is now ' +
       'intended for a different set of tiers, update this list and say why'
   );

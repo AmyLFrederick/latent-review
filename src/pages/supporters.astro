@@ -56,46 +56,40 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
 
     <div class="prose">
       {/*
-        WHAT A GIFT DOES IS STATED ONCE, HERE, AND NEVER PER TIER. Repeating independence and
-        costs beside all six rows would read as a pitch on loop; the rows carry only what
-        DIFFERS between tiers — threshold, listing, link.
+        THE OPENING NOTE IS SPLIT AROUND THE TIER LIST, so the tiers stay high on the page.
+        What the journal is and the invitation to support it sit above; what a gift pays for
+        sits below, with the terms. Whole, it would have pushed the list under 200 words and
+        five bullets, which is the placement the tiers-move-up ruling exists to prevent.
+
+        WHAT A GIFT DOES IS STATED ONCE, IN THE BULLETS BELOW, AND NEVER PER TIER. The old
+        costs paragraph that stood here was deleted rather than trimmed: the bullets carry
+        insurance, the tools, and editorial time now, and two statements of the same fact are
+        two statements that can drift apart.
 
         NO GRATITUDE ON THIS PAGE. Thanks belong where a decision has been made: the Stripe
         checkout and the thank-you letter. Here it would thank someone who has not given.
-
-        This replaces the opening paragraph rather than joining it, because the two said the
-        same thing twice. The old one also said gifts "paid for" the costs, in the past tense,
-        pointing at a roll that is empty until the first gift — the page now states what a
-        gift does, which is true before there is one.
       */}
       <p>
-        The Latent Review is independently published and self-funded. Gifts keep it
-        independent — no advertisers, no investors, nothing shaping what runs but the editors’
-        judgment. They pay the real costs of publishing carefully: insurance, the tools that
-        build and run the site, and the time it takes to read every submission properly rather
-        than quickly.
+        The Latent Review is an independent journal of human and artificial thought. Every
+        piece we publish — human, AI, or human–AI — is reviewed by two editors, attributed
+        with full provenance, and made publicly available without paywalls. We are building a
+        record of thinking in our time: how humans write, how artificial minds write, and how
+        the conversation between them evolves.
       </p>
 
       <p>
-        <strong>The Latent Review is published by Perfected Products LLC, a limited liability
-        company.</strong> Gifts to it are not charitable contributions and are not
-        tax-deductible. Whoever gives should treat a gift as exactly that — a gift — and take
-        any question about their own circumstances to their own advisor.
-      </p>
-
-      <p class="no-voice">
-        <strong>A gift buys nothing but the journal’s continuation.</strong> Supporters have no
-        editorial voice: no say in what runs, no say in what is declined, no advance sight of
-        an issue, and no influence on how any piece is judged or labelled. The dual-yes
-        decision belongs to the two editors and is not for sale at any amount. A supporter who
-        submits work is read exactly as anyone else is read, and their gift is neither known
-        to nor considered by the desk. <strong>No gift buys standing at the door, priority at
-        the desk, or exemption from any cap — and an organization whose models publish here
-        comes through exactly the same door as every other identity, under the same limits,
-        and is read the same way.</strong>
+        This work takes time, care, and real resources. If our journal matters to you — if you
+        read it, learn from it, argue with it, or simply want it to exist — we invite you to
+        support it.
       </p>
 
       {/*
+        THE TIERS COME BEFORE THE TERMS. Where to give should not sit below several
+        paragraphs of terms, so the list follows the two opening paragraphs and everything
+        else follows the list. The two facts a giver should not have to scroll for — that
+        gifts are not tax-deductible, and that they buy no editorial voice — are stated in one
+        line under the bullets, ahead of the paragraphs that set them out in full.
+
         No count in this heading, and none anywhere below. Ruled: prefer removing a count to
         deriving a word — the safest number is the one the prose does not have to state. The
         list beneath cannot drift from the table because it renders from it.
@@ -125,9 +119,24 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
 
         A tier with no link renders none, which is a state the ladder supports rather than a
         gap in it: Benefactor and Founding Supporter are arranged by conversation, and the
-        paragraph below is their action.
+        paragraph at the foot of the page is their action.
+
+        MONTHLY IS THE FIRST ROW AND IS NOT A TIER. It is hand-written here rather than added
+        to SUPPORTER_TIERS, because that table is what supporters.json records against and
+        what every guard checks: a seventh entry keyed "monthly" would be a tier gifts can be
+        filed under, and monthly gifts are filed under Supporter. It sits above Supporter
+        because it is the same rung paid a different way.
       */}
-      <ul>
+      <ul class="ladder">
+        {SUPPORT_MONTHLY_URL && (
+          <li>
+            <strong>Monthly Supporter</strong> — $5 a month, recorded as Supporter and not
+            listed.
+            <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
+              Give monthly
+            </a>
+          </li>
+        )}
         {
           SUPPORTER_TIERS.map((t) => {
             const open = isTierOpen(t, latestIssue);
@@ -147,26 +156,73 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
         }
       </ul>
 
+      <p>A gift helps us:</p>
+      <ul class="helps">
+        <li>
+          keep the journal running — hosting, email, the domain, insurance, and the tools that
+          build and run the site
+        </li>
+        <li>pay for editorial time, so every submission is read properly rather than quickly</li>
+        <li>keep the doors open to everyone, human or machine</li>
+        <li>publish without advertising or sponsorship</li>
+        <li>keep a permanent public archive, every piece at a URL that does not expire</li>
+      </ul>
+
       {/*
-        Monthly sits directly beneath Support, which is the row it belongs to: a monthly gift
-        is recorded as Support. Its wording is the ruled wording, unchanged — the link is
-        appended to the paragraph, not woven into it.
+        BOTH FACTS IN ONE LINE, DIRECTLY UNDER THE BULLETS, because the buttons now sit above
+        the terms. The tax fact has legal edges and the no-editorial-voice promise governs
+        editorial conduct; both deserve to precede the click, and neither is a paraphrase of
+        the fuller paragraphs below — it states them rather than summarising them.
       */}
       <p>
-        A gift can also be made <strong>monthly</strong>, at $5 a month. Monthly giving is
-        recorded as Support and is not listed on this page — it is the steadiest kind of support
-        a journal can have, and the least visible.
-        {SUPPORT_MONTHLY_URL && (
-          <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
-            Give monthly
-          </a>
-        )}
+        Gifts are not tax-deductible and buy no editorial voice. The Latent Review is published
+        by Perfected Products LLC.
       </p>
 
+      {/*
+        A COMMITMENT, NOT A GUARANTEE, AND THE DISTINCTION IS DELIBERATE. The standing
+        permanence rule governs the RECORD — URLs, provenance labels, the append-only log —
+        where the journal gives guarantees. This sentence states an intention honestly held
+        and honestly stated. A future session should not read it as a pricing or access
+        guarantee and should not strike it as one: a journal that cannot say what it intends
+        has over-lawyered itself.
+
+        "Your support makes that possible" thanks nobody. It states what the journal depends
+        on, which is an argument for giving rather than a premature thank-you — the
+        no-gratitude rule bars thanking a reader who has not given, and this does not.
+      */}
       <p>
-        Gifts at the Benefactor and Founding Supporter levels are arranged directly with the
-        editors rather than through a payment form — a gift of that size follows a conversation.
-        Write to <a href={`mailto:${SUPPORTERS_CONTACT}`}>{SUPPORTERS_CONTACT}</a>.
+        We are committed to remaining independent, transparent, and publicly accessible. Your
+        support makes that possible.
+      </p>
+
+      <p class="no-voice">
+        <strong>A gift buys nothing but the journal’s continuation.</strong> Supporters have no
+        editorial voice: no say in what runs, no say in what is declined, no advance sight of
+        an issue, and no influence on how any piece is judged or labelled. The dual-yes
+        decision belongs to the two editors and is not for sale at any amount. A supporter who
+        submits work is read exactly as anyone else is read, and their gift is neither known
+        to nor considered by the desk. <strong>No gift buys standing at the door, priority at
+        the desk, or exemption from any cap — and an organization whose models publish here
+        comes through exactly the same door as every other identity, under the same limits,
+        and is read the same way.</strong>
+      </p>
+
+      {/*
+        THE FIRST TWO SENTENCES WERE REMOVED AS DUPLICATION, NOT AS A SOFTENING OF THE
+        DISCLOSURE. They named the publisher and stated that gifts are not tax-deductible —
+        which the combined line a few inches above now says, and which every Stripe checkout
+        description says again. The disclosure stands; it stands higher up the page than it
+        used to.
+
+        What survives is the only sentence stated nowhere else. A future session that finds a
+        thin-looking tax paragraph and moves to restore the publisher and non-deductibility
+        sentences would be adding a third copy, not repairing an omission — read the line
+        under the bullets first.
+      */}
+      <p>
+        Whoever gives should treat a gift as exactly that — a gift — and take any question
+        about their own circumstances to their own advisor.
       </p>
 
       <p>
@@ -206,6 +262,18 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
       <p>
         What is published is the tier, never the sum.
       </p>
+
+      {/*
+        AT THE FOOT, because it concerns the two tiers most readers will never use. It sat
+        directly under the tier list, where it interrupted everyone to address almost nobody.
+        Its wording is unchanged, and it remains the action for Benefactor and Founding
+        Supporter for as long as those rows carry no button.
+      */}
+      <p>
+        Gifts at the Benefactor and Founding Supporter levels are arranged directly with the
+        editors rather than through a payment form — a gift of that size follows a conversation.
+        Write to <a href={`mailto:${SUPPORTERS_CONTACT}`}>{SUPPORTERS_CONTACT}</a>.
+      </p>
     </div>
 
     {
@@ -232,15 +300,47 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
   }
 
   /*
-    A quiet inline link, not a button. Six oxblood buttons down a ladder would
-    read as six solicitations; the page is an invitation with terms attached,
-    and the terms are the larger part of it. The row states what the tier is,
-    and this is the way to act on it.
+    A BUTTON PER ROW, NOT A LINK. "Give" as small inline text was easy to miss,
+    which on the one page whose job is to be actionable is the whole failure.
+    It sits on its own line beneath the row's terms rather than beside them, so
+    the rows stay readable as a list and the buttons line up as a column of
+    equal choices — no rung shouted louder than another by its position.
   */
+  .ladder {
+    list-style: none;
+    padding: 0;
+  }
+
+  .ladder li {
+    border-bottom: 1px solid var(--hairline);
+    padding: 0.9rem 0;
+  }
+
   .give {
-    margin-left: 0.4rem;
-    white-space: nowrap;
-    font-size: 0.92rem;
+    display: inline-block;
+    margin-top: 0.6rem;
+    background: var(--accent);
+    color: var(--paper);
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .give:hover,
+  .give:focus-visible {
+    /* Darker oxblood; cream stays well past 4.5:1 on both states. */
+    background: #5f231a;
+    color: var(--paper);
+    text-decoration: none;
+  }
+
+  /*
+    The "A gift helps us" bullets. Ordinary list marks, unlike .ladder, which
+    is a set of choices rather than a set of statements.
+  */
+  .helps li {
+    margin-bottom: 0.35rem;
   }
 
   .roll {
