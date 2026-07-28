@@ -10,7 +10,51 @@ export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 // Support link (editors' decision, dual-yes 2026-07-19, amended by the human
 // editor 2026-07-19): an open gift via Stripe — the giver chooses the amount,
 // no suggested amount is displayed, $2 minimum (fee floor, set in Stripe).
+//
+// THE donate.stripe.com HOST IS CORRECT AND IS NOT A LEFTOVER. This link's call
+// to action was changed from "Donate" to "Pay" on 2026-07-28 and the URL did not
+// move — verified against the live checkout, which renders a Pay button on this
+// host. The host follows the LINK TYPE, not the call to action, so this stays
+// the odd one among the five while the other four sit on buy.stripe.com. A
+// future session should not "correct" it to buy.stripe.com; that URL is not this
+// link.
 export const SUPPORT_URL = 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00';
+
+// Monthly giving, $5 a month. Its own link because Stripe's
+// customer-chooses-amount links do not support recurring payments, so a
+// recurring gift is a fixed preset on a separate link. Recorded as Support and
+// not listed — the page says so before the giver acts.
+export const SUPPORT_MONTHLY_URL: string | null =
+  'https://buy.stripe.com/3cIbJ36JIdexaTFego4Vy04';
+
+// ONE PAYMENT LINK PER TIER, BECAUSE /supporters IS THE LEVEL-SELECTION SCREEN.
+// A Stripe payment link is single-purpose and cannot present a ladder, so the
+// page that lists the tiers is the page where a giver chooses one, and each
+// tier row carries its own way to give: a reader who has decided they are a
+// Patron should not have to work out which link that is.
+//
+// Sustainer and Patron collect the listing name; Support and Friend do not,
+// because neither is listed and a name field with nothing to list is a
+// question asked for no reason.
+//
+// BENEFACTOR AND FOUNDING SUPPORTER ARE null FOR ONE REASON: a $20,000 minimum
+// cannot exist under Stripe's $10,000 maximum on customer-chooses links. The
+// human editor has asked Stripe to raise the cap. WHEN IT IS RAISED, ADDING
+// THEM IS FILLING IN THESE TWO VALUES AND NOTHING ELSE — the page renders a
+// link for any tier that has one, renders none for any tier that does not, and
+// the sentence pointing at supporters@ stands either way. A future session that
+// finds itself restructuring the page to add a link has misread this.
+//
+// Ladder order, matching SUPPORTER_TIERS. A tier with no entry here is a tier
+// with no link, which is a supported state rather than a defect.
+export const SUPPORTER_LINKS: Record<string, string | null> = {
+  founding: null,
+  benefactor: null,
+  patron: 'https://buy.stripe.com/7sYdRbgkidexaTFc8g4Vy03',
+  sustainer: 'https://buy.stripe.com/00wcN76JI3DXe5R7S04Vy02',
+  friend: 'https://buy.stripe.com/8x214p8RQ4I1gdZ4FO4Vy01',
+  support: SUPPORT_URL,
+};
 
 // Reader letters go here as an honest interim (a mailto) until the intake form
 // ships. The alias must route to the editors' inbox.

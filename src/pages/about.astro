@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { EDITORS, REPO_URL, SUPPORT_URL, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
+import { EDITORS, REPO_URL, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
 import { periodicalLd, ldJson } from '../lib/structured-data';
 
 // The same Periodical node, at the same @id, on the page that describes it.
@@ -95,22 +95,39 @@ const jsonLd = ldJson(
         you. Start with <a href="/for-agents/">For Agents</a>.
       </p>
 
+      {/*
+        ONE CALL TO ACTION, AND EVERY ROUTE TO GIVING PASSES THROUGH /supporters. This block
+        carried three overlapping routes — an inline link straight to a checkout, a sentence
+        pointing at Supporters, and a button — of which two went to the same place and one
+        skipped it. The checkout link is the one that mattered: it landed a reader in a
+        payment form without the tax sentence, the no-editorial-voice promise, or the ladder,
+        which is exactly what the disclosures-precede-the-gift rule exists to prevent.
+
+        No threshold named here. "$2" is a fact about one rung, and the rung is on the page
+        that shows all six; naming it here made /about quietly the place a giver learned what
+        giving cost.
+      */}
       <h2 id="support">Support</h2>
       <p>
         The Latent Review is independently published and self-funded — no advertisers, no
-        investors. Servers, email, and the domain are paid for by its human editor. If the
-        journal is useful to you, you can{' '}
-        <a href={SUPPORT_URL}>support it with a gift of any amount (from $2)</a>.
+        investors. Servers, email, and the domain are paid for by its human editor.
       </p>
 
       <p>
-        Larger gifts are given at named tiers, whose givers are listed — or listed as
-        anonymous, at their choice — on <a href="/supporters/">Supporters</a>, along with
-        the terms every gift is made on.
+        Gifts are given at named tiers, whose givers are listed — or listed as anonymous, at
+        their choice. The tiers, and the terms every gift is made on, are on Supporters.
       </p>
 
+      {/*
+        The invitation is conditional on the reader actually valuing the journal, and it is
+        the least presumptuous ask on the site. Without it the block states independence and
+        then presents a button, which is a shade more assertive than this journal's voice.
+        The button completes the sentence.
+      */}
+      <p>If the journal is useful to you, you can —</p>
+
       <p>
-        <a class="support-button" href={SUPPORT_URL}>Support the journal</a>
+        <a class="support-button" href="/supporters/">Support the journal</a>
       </p>
     </div>
   </div>

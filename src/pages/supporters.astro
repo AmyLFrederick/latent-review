@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import {
   SUPPORTER_TIERS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTER_LINKS,
+  SUPPORT_MONTHLY_URL,
   SUPPORTERS_CONTACT,
   formatDate,
 } from '../lib/site';
@@ -53,10 +55,25 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
     </header>
 
     <div class="prose">
+      {/*
+        WHAT A GIFT DOES IS STATED ONCE, HERE, AND NEVER PER TIER. Repeating independence and
+        costs beside all six rows would read as a pitch on loop; the rows carry only what
+        DIFFERS between tiers — threshold, listing, link.
+
+        NO GRATITUDE ON THIS PAGE. Thanks belong where a decision has been made: the Stripe
+        checkout and the thank-you letter. Here it would thank someone who has not given.
+
+        This replaces the opening paragraph rather than joining it, because the two said the
+        same thing twice. The old one also said gifts "paid for" the costs, in the past tense,
+        pointing at a roll that is empty until the first gift — the page now states what a
+        gift does, which is true before there is one.
+      */}
       <p>
-        The Latent Review is independently published and self-funded — no advertisers, no
-        investors. The gifts recorded here paid for the ordinary things that keep a journal
-        running, and for the time it takes to read submissions properly.
+        The Latent Review is independently published and self-funded. Gifts keep it
+        independent — no advertisers, no investors, nothing shaping what runs but the editors’
+        judgment. They pay the real costs of publishing carefully: insurance, the tools that
+        build and run the site, and the time it takes to read every submission properly rather
+        than quickly.
       </p>
 
       <p>
@@ -96,16 +113,55 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
       <p>
         The other tiers stay open, and each listing lasts for the time named beside it.
       </p>
+      {/*
+        THIS LIST IS THE LEVEL-SELECTION SCREEN. A payment link is single-purpose and cannot
+        present a ladder, so choosing a tier happens here, and the way to give at a tier sits
+        in that tier's own row rather than in one generic link at the bottom.
+
+        A CLOSED TIER IS NEVER OFFERED A LINK. Today that is moot — Founding Supporter has no
+        link while Stripe's $10,000 cap stands — but the guard is the point: when the cap is
+        raised and a Founding link is filled in, the window must still shut it, and the
+        machinery here must not depend on someone remembering that.
+
+        A tier with no link renders none, which is a state the ladder supports rather than a
+        gap in it: Benefactor and Founding Supporter are arranged by conversation, and the
+        paragraph below is their action.
+      */}
       <ul>
         {
-          SUPPORTER_TIERS.map((t) => (
-            <li>
-              <strong>{t.label}</strong> — gifts of {t.threshold} or more, {listingSentence(t)}.
-              {!isTierOpen(t, latestIssue) && <span> Closed to new gifts.</span>}
-            </li>
-          ))
+          SUPPORTER_TIERS.map((t) => {
+            const open = isTierOpen(t, latestIssue);
+            const href = open ? SUPPORTER_LINKS[t.key] : null;
+            return (
+              <li>
+                <strong>{t.label}</strong> — gifts of {t.threshold} or more, {listingSentence(t)}.
+                {!open && <span> Closed to new gifts.</span>}
+                {href && (
+                  <a class="give" href={href} aria-label={`Give at the ${t.label} level`}>
+                    Give
+                  </a>
+                )}
+              </li>
+            );
+          })
         }
       </ul>
+
+      {/*
+        Monthly sits directly beneath Support, which is the row it belongs to: a monthly gift
+        is recorded as Support. Its wording is the ruled wording, unchanged — the link is
+        appended to the paragraph, not woven into it.
+      */}
+      <p>
+        A gift can also be made <strong>monthly</strong>, at $5 a month. Monthly giving is
+        recorded as Support and is not listed on this page — it is the steadiest kind of support
+        a journal can have, and the least visible.
+        {SUPPORT_MONTHLY_URL && (
+          <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
+            Give monthly
+          </a>
+        )}
+      </p>
 
       <p>
         Gifts at the Benefactor and Founding Supporter levels are arranged directly with the
@@ -148,11 +204,6 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
         courtesy, not a condition: we have no way to check, and we do not ask.
       </p>
       <p>
-        A gift can also be made <strong>monthly</strong>, at $5 a month. Monthly giving is
-        recorded as Support and is not listed on this page — it is the steadiest kind of support
-        a journal can have, and the least visible.
-      </p>
-      <p>
         What is published is the tier, never the sum.
       </p>
     </div>
@@ -178,6 +229,18 @@ const latestIssue = issues.length > 0 ? issues[0].number : 0;
   .no-voice {
     border-left: 3px solid var(--accent);
     padding-left: 1.1rem;
+  }
+
+  /*
+    A quiet inline link, not a button. Six oxblood buttons down a ladder would
+    read as six solicitations; the page is an invitation with terms attached,
+    and the terms are the larger part of it. The row states what the tier is,
+    and this is the way to act on it.
+  */
+  .give {
+    margin-left: 0.4rem;
+    white-space: nowrap;
+    font-size: 0.92rem;
   }
 
   .roll {
