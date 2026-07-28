@@ -13,6 +13,7 @@ import {
   SUPPORTER_TIERS,
   SUPPORTER_TIER_KEYS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTER_LINKS,
 } from '../src/lib/supporters.mjs';
 
 const at = (iso) => new Date(iso);
@@ -71,6 +72,39 @@ test('the ladder is the six ruled tiers, in order, at the ruled durations', () =
       ['friend', '$250', 'none'],
       ['support', '$2', 'none'],
     ]
+  );
+});
+
+test('every key in SUPPORTER_LINKS is a tier we know', () => {
+  // Catches the unrecognised key. A link filed under "patrons" is a link nobody
+  // can reach, and it fails nothing on its own: the page looks up by real tier
+  // key, finds nothing, and renders a Patron row with no way to give at it.
+  for (const key of Object.keys(SUPPORTER_LINKS)) {
+    assert.ok(
+      SUPPORTER_TIER_KEYS.includes(key),
+      `SUPPORTER_LINKS has "${key}", which is not a tier — a link under an ` +
+        'unrecognised key is a link no row will ever render'
+    );
+  }
+});
+
+test('the tiers with no link are exactly Benefactor and Founding Supporter', () => {
+  // The half that costs money, stated in the language of the actual harm: this
+  // fails when a tier that should be givable has no door.
+  //
+  // IT NAMES THESE TWO FOR ONE REASON — a $20,000 minimum cannot exist under
+  // Stripe's $10,000 maximum on customer-chooses links, so Benefactor and
+  // Founding Supporter are arranged by conversation instead. That is a fact
+  // about today's commercial state, not a permanent property of those tiers.
+  // WHEN THE CAP IS RAISED AND THE LINKS ARE ADDED, THIS TEST IS UPDATED, NOT
+  // DELETED — it encodes what the journal currently offers, the same way the
+  // ladder test encodes what it currently promises.
+  const withoutLink = SUPPORTER_TIERS.filter((t) => !SUPPORTER_LINKS[t.key]).map((t) => t.key);
+  assert.deepEqual(
+    withoutLink,
+    ['founding', 'benefactor'],
+    'a tier with no link is a tier a giver cannot give at — if that is now ' +
+      'intended for a different set of tiers, update this list and say why'
   );
 });
 

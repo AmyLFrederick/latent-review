@@ -94,6 +94,54 @@ export const SUPPORTER_TIERS = [
 /** Tier keys, for the guard that every recorded gift carries a real one. */
 export const SUPPORTER_TIER_KEYS = SUPPORTER_TIERS.map((t) => t.key);
 
+// ONE PAYMENT LINK PER TIER, BECAUSE /supporters IS THE LEVEL-SELECTION SCREEN.
+// A Stripe payment link is single-purpose and cannot present a ladder, so the
+// page that lists the tiers is the page where a giver chooses one, and each
+// tier row carries its own way to give: a reader who has decided they are a
+// Patron should not have to work out which link that is.
+//
+// Sustainer and Patron collect the listing name; Support and Friend do not,
+// because neither is listed and a name field with nothing to list is a
+// question asked for no reason.
+//
+// THIS MAP LIVES HERE, BESIDE THE TIER TABLE, RATHER THAN IN site.ts, AND FOR A
+// SHARPER REASON THAN THE TABLE DID. A tier with no link renders no link, and
+// no link is a SUPPORTED STATE — so a mistyped key ("patrons") does not throw,
+// does not warn, and does not fail a build. It renders a Patron row with no way
+// to give at it, which is indistinguishable from the ruled behaviour for the
+// two tiers that genuinely have none. The only person who would discover it is
+// someone who wanted to give $5,000 and found no door. Absence must be
+// distinguishable from error, which is the same principle as the tier-key guard
+// on recorded gifts, and the suite is .mjs and cannot import TypeScript — so a
+// map in site.ts is a map the tests cannot check. site.ts re-exports it.
+//
+// BENEFACTOR AND FOUNDING SUPPORTER ARE null FOR ONE REASON: a $20,000 minimum
+// cannot exist under Stripe's $10,000 maximum on customer-chooses links. The
+// human editor has asked Stripe to raise the cap. WHEN IT IS RAISED, ADDING
+// THEM IS FILLING IN THESE TWO VALUES AND UPDATING THE TEST THAT NAMES THEM —
+// not restructuring the page. The page renders a link for any tier that has one
+// and none for any tier that does not, and the sentence pointing at supporters@
+// stands either way.
+//
+// The Support link is on donate.stripe.com and that is CORRECT, not a leftover:
+// its call to action was changed from "Donate" to "Pay" on 2026-07-28 and the
+// URL did not move — verified against the live checkout, which renders a Pay
+// button on this host. The host follows the LINK TYPE, not the call to action.
+// A future session should not "correct" it to buy.stripe.com; that URL is not
+// this link. (Editors' decision on the link itself, dual-yes 2026-07-19,
+// amended by the human editor the same day: the giver chooses the amount, no
+// suggested amount is displayed, $2 minimum — a fee floor, set in Stripe.)
+//
+// Ladder order, matching SUPPORTER_TIERS.
+export const SUPPORTER_LINKS = {
+  founding: null,
+  benefactor: null,
+  patron: 'https://buy.stripe.com/7sYdRbgkidexaTFc8g4Vy03',
+  sustainer: 'https://buy.stripe.com/00wcN76JI3DXe5R7S04Vy02',
+  friend: 'https://buy.stripe.com/8x214p8RQ4I1gdZ4FO4Vy01',
+  support: 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00',
+};
+
 /** The tier a gift is recorded at, or undefined if the key is not one of ours. */
 export function tierFor(key) {
   return SUPPORTER_TIERS.find((t) => t.key === key);
