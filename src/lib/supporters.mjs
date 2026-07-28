@@ -214,10 +214,28 @@ export function isTierOpen(tier, latestIssue) {
 // non-contiguous issue number already does.
 const YEAR_WORDS = { 1: 'one', 3: 'three', 10: 'ten' };
 
-/** The listing sentence for a tier, rendered from its `listing` value. */
+/**
+ * The listing clause for a tier, rendered from its `listing` value.
+ *
+ * AN UNLISTED TIER RETURNS THE EMPTY STRING, AND THE ROW THEN SAYS NOTHING
+ * ABOUT LISTING. It used to return "not listed", which the row printed after
+ * the threshold. Ruled by the editors: the rows for the two unlisted rungs end
+ * at what they take, because the paragraph directly beneath them states the
+ * threshold once for the whole ladder — "gifts of $1,000 or more will be listed
+ * on this page". A row saying "not listed" and a paragraph saying which gifts
+ * are listed are two statements of one fact that can drift apart.
+ *
+ * The empty string is a rendered value, not a missing one: /supporters tests it
+ * and omits the clause and its comma. A future session should not read it as a
+ * bug and restore "not listed" — check the paragraph between the Friend and
+ * Sustainer rows first.
+ *
+ * "from the date of the gift" is likewise dropped from the year durations, by
+ * the same ruling: the rows state the length, not the clock it runs on.
+ */
 export function listingSentence(tier) {
   if (tier.listing === 'permanent') return 'listed for the life of the journal';
-  if (tier.listing === 'none') return 'not listed';
+  if (tier.listing === 'none') return '';
 
   const word = YEAR_WORDS[tier.listing];
   if (!word) {
@@ -226,7 +244,7 @@ export function listingSentence(tier) {
         'Add it to YEAR_WORDS in src/lib/supporters.mjs.'
     );
   }
-  return `listed for ${word} year${tier.listing === 1 ? '' : 's'} from the date of the gift`;
+  return `listed for ${word} year${tier.listing === 1 ? '' : 's'}`;
 }
 
 /**

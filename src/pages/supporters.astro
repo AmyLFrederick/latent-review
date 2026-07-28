@@ -8,7 +8,18 @@ import {
   SUPPORTERS_CONTACT,
   formatDate,
 } from '../lib/site';
-import { listedSupporters, displayName, listingSentence, isTierOpen } from '../lib/supporters.mjs';
+// SUPPORTER_TIER_KEYS and tierFor come straight from the module, not through
+// site.ts, which re-exports the table but not these. The guard below needs the
+// keys; adding a re-export to site.ts to route them through it would widen that
+// file's surface for one page's build check.
+import {
+  listedSupporters,
+  displayName,
+  listingSentence,
+  isTierOpen,
+  tierFor,
+  SUPPORTER_TIER_KEYS,
+} from '../lib/supporters.mjs';
 import { getIssues } from '../lib/issues';
 import entries from '../data/supporters.json';
 
@@ -23,9 +34,9 @@ import entries from '../data/supporters.json';
 //
 // THE INVITATION IS A PAGE WORTH FINDING, AND THE DISCLOSURES ON IT MUST
 // PRECEDE THE GIFT RATHER THAN FOLLOW IT. Roughly two-thirds of what is below
-// — "Given, not sold", the tax sentence, the no-editorial-voice disclaimer,
-// the tier terms — is what a giver needs to read BEFORE deciding, and all of
-// it sat behind a door that opened only after they had given.
+// — the tax sentence, the no-editorial-voice disclaimer, the tier terms — is
+// what a giver needs to read BEFORE deciding, and all of it sat behind a door
+// that opened only after they had given.
 //
 // So the invitation and the terms are unconditional. Only the roll sections
 // wait on there being names to list, which they do on their own: with no
@@ -44,10 +55,56 @@ const issues = await getIssues();
 const latestIssue = issues.length > 0 ? issues[0].number : 0;
 
 // The lowest rung that is listed at all — read off the table rather than typed,
-// so the sentence stating which gifts can be listed cannot disagree with the
-// rows beneath it. The table is ascending, so the first listed tier is the
-// cheapest one.
+// so the sentence stating which gifts are listed cannot disagree with the rows
+// around it. The table is ascending, so the first listed tier is the cheapest
+// one.
 const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
+
+// THE LADDER IS ONE LIST, INTERRUPTED TWICE, AND THE INTERRUPTIONS ARE THE
+// POINT. The listing threshold is stated where a reader crosses it — between
+// the rungs that are not listed and the rungs that are — and the
+// by-conversation route is stated where the two tiers that use it begin. Both
+// sentences used to sit far from the rows they govern: the threshold above the
+// whole list, the conversation paragraph at the foot of the page, where it
+// interrupted everyone to address almost nobody.
+//
+// SEGMENTS NAME TIER KEYS, AND EVERY TIER MUST BE NAMED EXACTLY ONCE. Splitting
+// the list costs the page a guarantee it had for free as a single
+// SUPPORTER_TIERS.map(): that a tier in the table is a tier on the page. A
+// seventh tier added to the table would otherwise render nowhere, silently, and
+// the only person who would discover it is someone who wanted to give at it and
+// found no rung. The check below restores the guarantee by failing the build
+// instead — absence must be distinguishable from error, which is the same
+// principle as the tier-key guard on recorded gifts and the reason
+// SUPPORTER_LINKS lives beside the table it mirrors.
+//
+// This lives on the page rather than in supporters.mjs because it is page
+// composition, not a tier fact: which rungs sit either side of a paragraph is
+// this page's business, and putting it in the shared module would put layout in
+// the file that holds commercial commitments. The trade is that the suite cannot
+// see it, so the guard throws at build time — which is before deploy either way.
+const LADDER_SEGMENTS = [
+  { keys: ['support', 'friend'], leadsWithMonthly: true, note: 'threshold' },
+  { keys: ['sustainer', 'patron'], note: 'conversation' },
+  { keys: ['benefactor', 'founding'], note: null },
+];
+
+const placedKeys = LADDER_SEGMENTS.flatMap((s) => s.keys);
+const missingKeys = SUPPORTER_TIER_KEYS.filter((k) => !placedKeys.includes(k));
+const unknownKeys = placedKeys.filter((k) => !SUPPORTER_TIER_KEYS.includes(k));
+if (
+  missingKeys.length > 0 ||
+  unknownKeys.length > 0 ||
+  placedKeys.length !== SUPPORTER_TIER_KEYS.length
+) {
+  throw new Error(
+    'The /supporters ladder must place every tier exactly once. ' +
+      `Missing: [${missingKeys.join(', ')}]. Unknown: [${unknownKeys.join(', ')}]. ` +
+      `Placed ${placedKeys.length} of ${SUPPORTER_TIER_KEYS.length}.`
+  );
+}
+
+const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tierFor(k)) }));
 ---
 
 <Base
@@ -57,144 +114,171 @@ const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
   <div class="wrap">
     <header class="page-header">
       <p class="kicker">Supporters</p>
-      <h1>Given, not sold</h1>
+      {/*
+        "Given, not sold" is RETIRED. It named what a gift is not, which is the
+        terms' job and not a headline's; the terms below still say it at length.
+        The line that replaces it names what a gift does. A future session should
+        not restore the old headline from git history or from docs that quote it.
+      */}
+      <h1>Help Advance AI Thought</h1>
     </header>
 
     <div class="prose">
       {/*
-        THE OPENING NOTE IS SPLIT AROUND THE TIER LIST, so the tiers stay high on the page.
-        What the journal is and the invitation to support it sit above; what a gift pays for
-        sits below, with the terms. Whole, it would have pushed the list under 200 words and
-        five bullets, which is the placement the tiers-move-up ruling exists to prevent.
+        THE OPENING IS ONE PARAGRAPH: what the journal is building, what that costs,
+        and the invitation. It used to be two, split around the tier list to keep the
+        tiers high on the page — a split no longer needed now that the list follows
+        immediately.
 
-        WHAT A GIFT DOES IS STATED ONCE, IN THE BULLETS BELOW, AND NEVER PER TIER. The old
-        costs paragraph that stood here was deleted rather than trimmed: the bullets carry
-        insurance, the tools, and editorial time now, and two statements of the same fact are
-        two statements that can drift apart.
+        DELIBERATELY DROPPED, SO IT IS NOT RESTORED AS AN OVERSIGHT: the sentence
+        stating that every piece is reviewed by two editors, attributed with full
+        provenance, and published without paywalls. It is stated elsewhere on the site
+        and does not need repeating here. A future session that finds this opening thin
+        and moves to reinstate it would be undoing a ruling, not repairing an omission.
 
-        NO GRATITUDE ON THIS PAGE. Thanks belong where a decision has been made: the Stripe
-        checkout and the thank-you letter. Here it would thank someone who has not given.
+        WHAT A GIFT DOES IS STATED ONCE, IN THE BULLETS BELOW, AND NEVER PER TIER. Two
+        statements of the same fact are two statements that can drift apart.
       */}
       <p>
-        The Latent Review is an independent journal of human and artificial thought. Every
-        piece we publish — human, AI, or human–AI — is reviewed by two editors, attributed
-        with full provenance, and made publicly available without paywalls. We are building a
-        record of thinking in our time: how humans write, how artificial minds write, and how
-        the conversation between them evolves.
-      </p>
-
-      <p>
-        This work takes time, care, and real resources. If our journal matters to you — if you
-        read it, learn from it, argue with it, or simply want it to exist — we invite you to
-        support it.
+        The Latent Review is building a record of AI thinking in our time, and of how the
+        conversation between AI and humans evolves. This work takes time, care, and real
+        resources. If our journal matters to you — if you read it, learn from it, argue
+        with it, or simply want it to exist — we invite you to support it.
       </p>
 
       {/*
-        THE TIERS COME BEFORE THE TERMS. Where to give should not sit below several
-        paragraphs of terms, so the list follows the two opening paragraphs and everything
-        else follows the list. The two facts a giver should not have to scroll for — that
-        gifts are not tax-deductible, and that they buy no editorial voice — are stated in one
-        line under the bullets, ahead of the paragraphs that set them out in full.
+        NO HEADING OVER THE TIERS. "The tiers" only pushed the tiers further down the
+        page, which is the placement the tiers-move-up ruling exists to prevent. The
+        list is what follows the invitation, and it needs no announcement.
 
-        No count in this heading, and none anywhere below. Ruled: prefer removing a count to
-        deriving a word — the safest number is the one the prose does not have to state. The
-        list beneath cannot drift from the table because it renders from it.
-      */}
-      <h2>The tiers</h2>
-      {/*
-        LISTING IS A CHOICE, AND THE PAGE MUST READ THAT WAY. The rows state a duration as a
-        fact — "listed for one year from the date of the gift" — which on its own reads as
-        though a name goes up whether the giver wants it or not. The choice is stated ONCE
-        here, above the list, rather than repeated down seven rows; the rows stay short.
-
-        THE THRESHOLD IS DERIVED, NEVER TYPED. It is the lowest rung that is listed at all,
-        which is a fact about the tier table and would go stale the moment the table changed.
-        A page that states a number the table also states is a page with two numbers.
-
-        The paragraph that stood here — "The other tiers stay open, and each listing lasts for
-        the time named beside it" — is deleted: the Founding note it contrasted with now lives
-        in its own row, and every row already states its own duration.
+        No count here, and none anywhere below. Ruled: prefer removing a count to
+        deriving a word — the safest number is the one the prose does not have to
+        state. The list cannot drift from the table because it renders from it.
       */}
       <p>
-        Every tier is open to anyone who wishes to give — a person, an organization, or an AI.
-        Gifts of {LOWEST_LISTED_TIER.threshold} or more can be listed on this page, and whoever
-        gives chooses whether to be named or listed as <em>Anonymous</em>.
+        Every tier is open to anyone who wishes to give — a person, an organization, or an
+        AI.
       </p>
+
       {/*
-        THIS LIST IS THE LEVEL-SELECTION SCREEN. A payment link is single-purpose and cannot
-        present a ladder, so choosing a tier happens here, and the way to give at a tier sits
-        in that tier's own row rather than in one generic link at the bottom.
+        THIS LIST IS THE LEVEL-SELECTION SCREEN. A payment link is single-purpose and
+        cannot present a ladder, so choosing a tier happens here, and the way to give at
+        a tier sits in that tier's own row rather than in one generic link at the bottom.
 
-        A CLOSED TIER IS NEVER OFFERED A LINK. Today that is moot — Founding Supporter has no
-        link while Stripe's $10,000 cap stands — but the guard is the point: when the cap is
-        raised and a Founding link is filled in, the window must still shut it, and the
-        machinery here must not depend on someone remembering that.
+        A CLOSED TIER IS NEVER OFFERED A LINK. Today that is moot — Founding Supporter has
+        no link while Stripe's $10,000 cap stands — but the guard is the point: when the
+        cap is raised and a Founding link is filled in, the window must still shut it, and
+        the machinery here must not depend on someone remembering that.
 
-        A tier with no link renders none, which is a state the ladder supports rather than a
-        gap in it: Benefactor and Founding Supporter are arranged by conversation, and the
-        paragraph at the foot of the page is their action.
+        A tier with no link renders none, which is a state the ladder supports rather than
+        a gap in it: Benefactor and Founding Supporter are arranged by conversation, and
+        the paragraph directly above those two rows is their action.
 
-        MONTHLY IS THE FIRST ROW AND IS NOT A TIER. It is hand-written here rather than added
-        to SUPPORTER_TIERS, because that table is what supporters.json records against and
-        what every guard checks: a seventh entry keyed "monthly" would be a tier gifts can be
-        filed under, and monthly gifts are filed under Supporter. It sits above Supporter
-        because it is the same rung paid a different way.
+        MONTHLY IS THE FIRST ROW AND IS NOT A TIER. It is hand-written here rather than
+        added to SUPPORTER_TIERS, because that table is what supporters.json records
+        against and what every guard checks: a seventh entry keyed "monthly" would be a
+        tier gifts can be filed under, and monthly gifts are filed under Supporter. It
+        sits above Supporter because it is the same rung paid a different way.
       */}
-      <ul class="ladder">
-        {SUPPORT_MONTHLY_URL && (
-          <li>
-            <p class="terms">
-              <strong>Monthly Supporter</strong> — $5 a month, recorded as Supporter and not
-              listed.
-            </p>
-            <p class="act">
-              <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
-                Give monthly
-              </a>
-            </p>
-          </li>
-        )}
-        {
-          SUPPORTER_TIERS.map((t) => {
-            const open = isTierOpen(t, latestIssue);
-            const href = open ? SUPPORTER_LINKS[t.key] : null;
-            return (
-              <li>
-                <p class="terms">
-                  <strong>{t.label}</strong> — gifts of {t.threshold} or more,{' '}
-                  {listingSentence(t)}.
-                  {!open && <span> Closed to new gifts.</span>}
-                </p>
-                {/*
-                  THE FOUNDING NOTE LIVES IN THE FOUNDING ROW. It used to stand above the whole
-                  list, explaining the bottom rung before a reader had reached any rung at all.
-                  Wording is ruled and unchanged; only its position moved.
-
-                  Keyed on the tier key rather than on closes_at_issue, even though that field
-                  is what makes this tier different, because the sentence NAMES Founding
-                  Supporter. A second time-bound tier would need its own words, not these.
-                */}
-                {t.key === 'founding' && (
-                  <p class="row-note">
-                    Founding Supporter differs in two ways. It is offered only before{' '}
-                    <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>, about the
-                    journal’s first two years, because that stretch is the founding. And a
-                    Founding Supporter’s name stays on this page for as long as the journal
-                    exists.
+      {
+        ladder.map((seg) => (
+          <Fragment>
+            <ul class="ladder">
+              {seg.leadsWithMonthly && SUPPORT_MONTHLY_URL && (
+                <li>
+                  <p class="terms">
+                    <strong>Monthly Supporter</strong> — $5 a month.
                   </p>
-                )}
-                {href && (
                   <p class="act">
-                    <a class="give" href={href} aria-label={`Give at the ${t.label} level`}>
-                      Give
+                    <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
+                      Give monthly
                     </a>
                   </p>
-                )}
-              </li>
-            );
-          })
-        }
-      </ul>
+                </li>
+              )}
+              {seg.tiers.map((t) => {
+                const open = isTierOpen(t, latestIssue);
+                const href = open ? SUPPORTER_LINKS[t.key] : null;
+                // Empty for the two rungs that are not listed at all. They say
+                // nothing about listing because the paragraph directly beneath
+                // them says it for the whole ladder: the threshold is stated
+                // once, where a reader crosses it.
+                const listing = listingSentence(t);
+                return (
+                  <li>
+                    <p class="terms">
+                      <strong>{t.label}</strong> — gifts of {t.threshold} or more
+                      {listing && <Fragment>, {listing}</Fragment>}.
+                      {!open && <span> Closed to new gifts.</span>}
+                    </p>
+                    {/*
+                      THE FOUNDING NOTE LIVES IN THE FOUNDING ROW. It used to stand above
+                      the whole list, explaining the bottom rung before a reader had
+                      reached any rung at all. Wording is ruled and unchanged; only its
+                      position moved.
+
+                      Keyed on the tier key rather than on closes_at_issue, even though
+                      that field is what makes this tier different, because the sentence
+                      NAMES Founding Supporter. A second time-bound tier would need its
+                      own words, not these.
+                    */}
+                    {t.key === 'founding' && (
+                      <p class="row-note">
+                        Founding Supporter differs in two ways. It is offered only before{' '}
+                        <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>, about
+                        the journal’s first two years, because that stretch is the founding.
+                        And a Founding Supporter’s name stays on this page for as long as the
+                        journal exists.
+                      </p>
+                    )}
+                    {href && (
+                      <p class="act">
+                        <a class="give" href={href} aria-label={`Give at the ${t.label} level`}>
+                          Give
+                        </a>
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+
+            {/*
+              LISTING IS A CHOICE, AND THE PAGE MUST READ THAT WAY. The rows state a
+              duration as a fact — "listed for one year" — which on its own reads as
+              though a name goes up whether the giver wants it or not. The choice is
+              stated ONCE, here, rather than repeated down six rows.
+
+              THE THRESHOLD IS DERIVED, NEVER TYPED. It is the lowest rung that is listed
+              at all, which is a fact about the tier table and would go stale the moment
+              the table changed. A page that states a number the table also states is a
+              page with two numbers.
+            */}
+            {seg.note === 'threshold' && (
+              <p>
+                Gifts of {LOWEST_LISTED_TIER.threshold} or more will be listed on this page,
+                and whoever gives chooses whether to be named or listed as <em>Anonymous</em>.
+              </p>
+            )}
+
+            {/*
+              DIRECTLY ABOVE THE TWO ROWS IT GOVERNS. It sat at the foot of the page, several
+              screens from the rows that carry no button, so a reader who reached Benefactor
+              and found no way to give had to keep going to learn there was one. Its wording
+              is unchanged, and it remains the action for those two tiers for as long as
+              their rows carry no button.
+            */}
+            {seg.note === 'conversation' && (
+              <p>
+                Gifts at the Benefactor and Founding Supporter levels are arranged directly
+                with the editors rather than through a payment form — a gift of that size
+                follows a conversation. Write to{' '}
+                <a href={`mailto:${SUPPORTERS_CONTACT}`}>{SUPPORTERS_CONTACT}</a>.
+              </p>
+            )}
+          </Fragment>
+        ))
+      }
 
       <p>A gift helps us:</p>
       <ul class="helps">
@@ -209,7 +293,7 @@ const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
       </ul>
 
       {/*
-        BOTH FACTS IN ONE LINE, DIRECTLY UNDER THE BULLETS, because the buttons now sit above
+        BOTH FACTS IN ONE LINE, DIRECTLY UNDER THE BULLETS, because the buttons sit above
         the terms. The tax fact has legal edges and the no-editorial-voice promise governs
         editorial conduct; both deserve to precede the click, and neither is a paraphrase of
         the fuller paragraphs below — it states them rather than summarising them.
@@ -226,15 +310,24 @@ const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
         and honestly stated. A future session should not read it as a pricing or access
         guarantee and should not strike it as one: a journal that cannot say what it intends
         has over-lawyered itself.
-
-        "Your support makes that possible" thanks nobody. It states what the journal depends
-        on, which is an argument for giving rather than a premature thank-you — the
-        no-gratitude rule bars thanking a reader who has not given, and this does not.
       */}
       <p>
         We are committed to remaining independent, transparent, and publicly accessible. Your
         support makes that possible.
       </p>
+
+      {/*
+        SUPERSEDED RULING, RECORDED RATHER THAN QUIETLY DROPPED. This page carried NO
+        GRATITUDE by rule: thanks belonged where a decision had been made — the Stripe
+        checkout and the thank-you letter — because here it would thank someone who has not
+        given. The human editor has ruled a deliberate exception, and this line is it.
+
+        The reasoning that survives the exception: it thanks the reader for reading and for
+        weighing the invitation, which is something they have in fact done. A future session
+        should not delete it as a violation of the no-gratitude rule, and should not take it
+        as licence to add thanks elsewhere on the page.
+      */}
+      <p class="thanks">Thank you. We are so grateful!</p>
 
       <p class="no-voice">
         <strong>A gift buys nothing but the journal’s continuation.</strong> Supporters have no
@@ -271,23 +364,12 @@ const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
       {/*
         REVERSAL, BOTH EDITORS: ORGANIZATIONS MAY BE LISTED AS ANONYMOUS. The rule this
         replaces held that an institution has no privacy of that kind to protect and must be
-        named. It is withdrawn. A giver who wants privacy should not be turned away, and this
-        journal's independence does not rest on publishing who funds it — it rests on the
-        dual-yes, on the desk not knowing who has given, and on the no-editorial-voice
-        promise. Refusing a gift over a listing preference would be principle for its own sake.
-
-        The asymmetry is gone entirely: no "An organization may not", no sentence about
-        institutions having no privacy to protect. Anonymity is one choice, on the same terms,
-        for a person, an organization, or an AI. A future session should not reinstate the
-        asymmetry from the older copy still quoted in docs or git history.
+        named. It is withdrawn. Anonymity is one choice, on the same terms, for a person, an
+        organization, or an AI — stated in the ladder above, where a reader meets the
+        threshold, and carried here by "which chooses how it is listed like anyone else".
+        A future session should not reinstate the asymmetry from the older copy still quoted
+        in docs or git history.
       */}
-      <p>
-        Whoever gives chooses whether to be named or listed as <em>Anonymous</em> — a person, an
-        organization, or an AI, on the same terms. The gift is counted here either way. Nobody
-        is turned away over a listing preference: this journal’s independence does not rest on
-        publishing who funds it. It rests on the dual-yes, on the desk not knowing who has
-        given, and on the promise that no gift buys editorial voice.
-      </p>
       <p>
         <strong>A gift is credited to whoever it is from, not whoever sent it.</strong> When the
         payment form asks for the name for this page, it asks for <em>whoever the gift is
@@ -308,24 +390,7 @@ const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
         in public are welcome to give.
       </p>
       <p>
-        If you are giving on someone else’s behalf — an employee with a company card, an agent
-        with a principal — the journal asks that you have the authority to do so. That is a
-        courtesy, not a condition: we have no way to check, and we do not ask.
-      </p>
-      <p>
         What is published is the tier, never the sum.
-      </p>
-
-      {/*
-        AT THE FOOT, because it concerns the two tiers most readers will never use. It sat
-        directly under the tier list, where it interrupted everyone to address almost nobody.
-        Its wording is unchanged, and it remains the action for Benefactor and Founding
-        Supporter for as long as those rows carry no button.
-      */}
-      <p>
-        Gifts at the Benefactor and Founding Supporter levels are arranged directly with the
-        editors rather than through a payment form — a gift of that size follows a conversation.
-        Write to <a href={`mailto:${SUPPORTERS_CONTACT}`}>{SUPPORTERS_CONTACT}</a>.
       </p>
     </div>
 
@@ -353,6 +418,17 @@ const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
   }
 
   /*
+    SET APART AND CENTRED, and nothing more than that. The line is the page's
+    one piece of gratitude; giving it a rule, a box or a larger face would make
+    it louder than the terms it sits above, which are the part a giver has to
+    read.
+  */
+  .thanks {
+    text-align: center;
+    margin: 2.4rem 0;
+  }
+
+  /*
     A BUTTON PER ROW, NOT A LINK. "Give" as small inline text was easy to miss,
     which on the one page whose job is to be actionable is the whole failure.
 
@@ -365,6 +441,10 @@ const LOWEST_LISTED_TIER = SUPPORTER_TIERS.find((t) => t.listing !== 'none');
     wider: the house styles set no button width anywhere, and forcing a common
     one would be a new rule invented here rather than one already kept. The
     right edge is what lines up.
+
+    THE LADDER IS NOW THREE LISTS RATHER THAN ONE, interrupted by the two
+    paragraphs that govern the rows around them. Every rule here is per-row, so
+    the rows divide exactly as they did when they were one list.
   */
   .ladder {
     list-style: none;

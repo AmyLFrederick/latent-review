@@ -187,12 +187,20 @@ test('a leap-day gift rolls forward at every duration, never back', () => {
 
 test('a listing sentence is rendered from the duration, never typed', () => {
   assert.equal(listingSentence(tierFor('founding')), 'listed for the life of the journal');
-  assert.equal(listingSentence(tierFor('benefactor')), 'listed for ten years from the date of the gift');
-  assert.equal(listingSentence(tierFor('patron')), 'listed for three years from the date of the gift');
+  assert.equal(listingSentence(tierFor('benefactor')), 'listed for ten years');
+  assert.equal(listingSentence(tierFor('patron')), 'listed for three years');
   // Singular, not "one years".
-  assert.equal(listingSentence(tierFor('sustainer')), 'listed for one year from the date of the gift');
-  assert.equal(listingSentence(tierFor('friend')), 'not listed');
-  assert.equal(listingSentence(tierFor('support')), 'not listed');
+  assert.equal(listingSentence(tierFor('sustainer')), 'listed for one year');
+});
+
+test('the two unlisted rungs render no listing clause at all', () => {
+  // Ruled: their rows end at what the tier takes, because the paragraph beneath
+  // them states the threshold once for the whole ladder. The empty string is
+  // the rendered value — /supporters omits the clause and its comma on it — and
+  // is asserted here so a future session cannot restore "not listed" to one
+  // place and leave the threshold paragraph standing in the other.
+  assert.equal(listingSentence(tierFor('support')), '');
+  assert.equal(listingSentence(tierFor('friend')), '');
 });
 
 test('a duration with no number word fails loudly rather than rendering nonsense', () => {
