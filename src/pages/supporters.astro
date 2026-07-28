@@ -1,29 +1,32 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE, formatDate } from '../../lib/site';
-import { listedSupporters, displayName, listingSentence, isTierOpen } from '../../lib/supporters.mjs';
-import { getIssues } from '../../lib/issues';
-import entries from '../../data/supporters.json';
+import Base from '../layouts/Base.astro';
+import { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE, formatDate } from '../lib/site';
+import { listedSupporters, displayName, listingSentence, isTierOpen } from '../lib/supporters.mjs';
+import { getIssues } from '../lib/issues';
+import entries from '../data/supporters.json';
 
-// /supporters — created ONLY upon the first qualifying gift, never before.
+// /supporters — THIS PAGE ALWAYS EXISTS.
 //
-// That is why this is an optional catch-all route rather than an ordinary
-// page: an Astro page file emits a page on every build, so `supporters.astro`
-// would publish an empty page the moment it was committed. getStaticPaths
-// returning [] emits nothing at all, so /supporters genuinely 404s until a
-// gift is recorded, and appears on the next deploy after one is.
+// It used to be an optional catch-all route whose getStaticPaths returned []
+// until a gift was recorded, so the page genuinely 404'd. That mechanism is
+// retired along with the rule that motivated it, because the rule could not
+// bootstrap: nothing on the site named the tiers before the first gift, so
+// nobody could learn they existed, so nobody gave at those levels, so the page
+// never appeared.
 //
-// Building the mechanism now rather than on the day means it has been reviewed
-// and tested before it matters — which is not a property one wants to be
-// establishing the morning a $50,000 gift arrives.
+// THE INVITATION IS A PAGE WORTH FINDING, AND THE DISCLOSURES ON IT MUST
+// PRECEDE THE GIFT RATHER THAN FOLLOW IT. Roughly two-thirds of what is below
+// — "Given, not sold", the tax sentence, the no-editorial-voice disclaimer,
+// the tier terms — is what a giver needs to read BEFORE deciding, and all of
+// it sat behind a door that opened only after they had given.
+//
+// So the invitation and the terms are unconditional. Only the roll sections
+// wait on there being names to list, which they do on their own: with no
+// gifts, listedSupporters returns no groups and nothing renders. A future
+// session should not re-gate this page for tidiness.
 //
 // The listing is SITE-PAGE LOGIC and never the record. A Patron's listing ends
-// after a year; the gift is not undone or removed from history.
-export function getStaticPaths() {
-  const now = new Date();
-  return listedSupporters(entries, now).total > 0 ? [{ params: { slug: undefined } }] : [];
-}
-
+// after three years; the gift is not undone or removed from history.
 const listed = listedSupporters(entries, new Date());
 
 // The founding window closes on the ISSUE COUNT, not a date, and the archive
