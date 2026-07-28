@@ -9,8 +9,10 @@ import {
   listingSentence,
   listingExpiry,
   tierFor,
+  isTierOpen,
   SUPPORTER_TIERS,
   SUPPORTER_TIER_KEYS,
+  SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
 } from '../src/lib/supporters.mjs';
 
 const at = (iso) => new Date(iso);
@@ -193,6 +195,37 @@ test('one giver who gave twice appears in both sections, by design', () => {
   );
   assert.deepEqual(listed.groups.map((g) => g.tier.key), ['patron', 'sustainer']);
   assert.equal(listed.total, 2, 'two gifts, counted twice — the file is gifts, not givers');
+});
+
+test('the founding window closes at Issue No. 104, and only that tier closes', () => {
+  // A commercial commitment with a date on it, so the number is asserted
+  // rather than trusted. Amended from 52 by the editors, 2026-07-28.
+  assert.equal(SUPPORTER_WINDOW_CLOSES_AT_ISSUE, 104);
+  assert.equal(tierFor('founding').closes_at_issue, 104);
+
+  // Five of six carry no closing issue at all — availability and listing
+  // duration are separate axes, and only one tier is time-bound.
+  const timeBound = SUPPORTER_TIERS.filter((t) => typeof t.closes_at_issue === 'number');
+  assert.deepEqual(timeBound.map((t) => t.key), ['founding']);
+});
+
+test('the window boundary is exclusive, named at 103 / 104 / 105', () => {
+  // "Open to gifts made before Issue No. 104": a gift made while 103 is the
+  // newest issue is before 104; one made once 104 is out is not. The boundary
+  // is spelled out here because an off-by-one in a $50,000 commitment is worth
+  // asserting rather than inferring from a comparison operator.
+  const founding = tierFor('founding');
+  assert.equal(isTierOpen(founding, 0), true, 'open before any issue exists');
+  assert.equal(isTierOpen(founding, 103), true, 'open while 103 is the newest issue');
+  assert.equal(isTierOpen(founding, 104), false, 'closed once Issue 104 publishes');
+  assert.equal(isTierOpen(founding, 105), false, 'and stays closed');
+});
+
+test('the tiers with no closing issue are open indefinitely', () => {
+  for (const key of ['benefactor', 'patron', 'sustainer', 'friend', 'support']) {
+    assert.equal(isTierOpen(tierFor(key), 0), true, `${key} open at issue 0`);
+    assert.equal(isTierOpen(tierFor(key), 10_000), true, `${key} still open at issue 10,000`);
+  }
 });
 
 test('an unrecognised tier is not listed', () => {

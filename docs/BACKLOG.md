@@ -130,7 +130,7 @@ this list by becoming a PR.
   | Sustainer | $1,000+ | indefinitely | one year |
   | Patron | $5,000+ | indefinitely | three years |
   | Benefactor | $20,000+ | indefinitely | ten years |
-  | **Founding Supporter** | $50,000+ | **through Issue No. 104** | **life of the journal** |
+  | **Founding Supporter** | $50,000+ | **before Issue No. 104** | **life of the journal** |
 
   *Founding Supporter is the only tier that closes, and the only listing that
   never does.*
@@ -143,6 +143,14 @@ this list by becoming a PR.
   permanent listing, not urgency. The window binds to the **issue count, never
   a date**, because issues are countable in the record. **If cadence ever
   changes, the editors revisit the number rather than reinterpreting it.**
+
+  **The boundary is exclusive, and awaits the editors' word.** The window is
+  open while the latest published issue is *below* 104, and shuts when Issue
+  104 itself publishes. Built that way because SA-6's table ("until Issue No.
+  104") and SA-14's build spec ("gifts made before Issue No. 104") both read
+  exclusive; the editors' page copy says "through Issue No. 104", which reads
+  inclusive by one issue. Flagged rather than settled: it is one comparison and
+  one test, and this note goes when the editors rule.
 
   **One source for tier facts: `SUPPORTER_TIERS` in `src/lib/supporters.mjs`.**
   Labels, thresholds and listing durations all render from it, listing

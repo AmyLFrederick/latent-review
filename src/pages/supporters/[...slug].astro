@@ -1,7 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE, formatDate } from '../../lib/site';
-import { listedSupporters, displayName, listingSentence } from '../../lib/supporters.mjs';
+import { listedSupporters, displayName, listingSentence, isTierOpen } from '../../lib/supporters.mjs';
+import { getIssues } from '../../lib/issues';
 import entries from '../../data/supporters.json';
 
 // /supporters — created ONLY upon the first qualifying gift, never before.
@@ -24,6 +25,13 @@ export function getStaticPaths() {
 }
 
 const listed = listedSupporters(entries, new Date());
+
+// The founding window closes on the ISSUE COUNT, not a date, and the archive
+// is where that count lives. Deriving it here means the tier stops being
+// offered on its own, rather than depending on someone remembering — two years
+// from now, nobody reading this today will be the one who notices.
+const issues = await getIssues();
+const latestIssue = issues.length > 0 ? issues[0].number : 0;
 ---
 
 <Base
@@ -69,6 +77,7 @@ const listed = listedSupporters(entries, new Date());
           SUPPORTER_TIERS.map((t) => (
             <li>
               <strong>{t.label}</strong> — gifts of {t.threshold} or more, {listingSentence(t)}.
+              {!isTierOpen(t, latestIssue) && <span> Closed to new gifts.</span>}
             </li>
           ))
         }
