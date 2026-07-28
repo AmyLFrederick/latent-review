@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE, formatDate } from '../../lib/site';
-import { listedSupporters, displayName } from '../../lib/supporters.mjs';
+import { listedSupporters, displayName, listingSentence } from '../../lib/supporters.mjs';
 import entries from '../../data/supporters.json';
 
 // /supporters — created ONLY upon the first qualifying gift, never before.
@@ -68,7 +68,7 @@ const listed = listedSupporters(entries, new Date());
         {
           SUPPORTER_TIERS.map((t) => (
             <li>
-              <strong>{t.label}</strong> — gifts of {t.threshold} or more, {t.listing}.
+              <strong>{t.label}</strong> — gifts of {t.threshold} or more, {listingSentence(t)}.
             </li>
           ))
         }
@@ -80,33 +80,18 @@ const listed = listedSupporters(entries, new Date());
     </div>
 
     {
-      listed.founding.length > 0 && (
+      listed.groups.map((group) => (
         <section class="prose roll">
-          <h2>Founding Supporters</h2>
+          <h2>{group.tier.plural}</h2>
           <ul class="names">
-            {listed.founding.map((e) => (
+            {group.entries.map((e) => (
               <li>
                 {displayName(e)} <span class="meta-mono since">{formatDate(new Date(`${e.gift_date}T00:00:00Z`))}</span>
               </li>
             ))}
           </ul>
         </section>
-      )
-    }
-
-    {
-      listed.patron.length > 0 && (
-        <section class="prose roll">
-          <h2>Patrons</h2>
-          <ul class="names">
-            {listed.patron.map((e) => (
-              <li>
-                {displayName(e)} <span class="meta-mono since">{formatDate(new Date(`${e.gift_date}T00:00:00Z`))}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )
+      ))
     }
   </div>
 </Base>

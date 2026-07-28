@@ -1,7 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { isGift, isListed, listedSupporters, displayName } from '../src/lib/supporters.mjs';
+import {
+  isGift,
+  isListed,
+  listedSupporters,
+  displayName,
+  listingSentence,
+  listingExpiry,
+  tierFor,
+  SUPPORTER_TIERS,
+  SUPPORTER_TIER_KEYS,
+} from '../src/lib/supporters.mjs';
 
 const at = (iso) => new Date(iso);
 
@@ -33,25 +43,104 @@ test('supporters.json never carries a giver’s private details', () => {
   }
 });
 
-test('a Patron is listed for one year from the gift date, in UTC', () => {
-  const p = { name: 'A', tier: 'patron', gift_date: '2026-08-01' };
-  assert.equal(isListed(p, at('2026-08-01T00:00:00Z')), true, 'listed on the day');
-  assert.equal(isListed(p, at('2027-07-31T23:59:59Z')), true, 'listed the day before the year is up');
-  assert.equal(isListed(p, at('2027-08-01T00:00:00Z')), false, 'not listed once the year is up');
+test('every recorded gift in supporters.json carries a tier we know', () => {
+  // The guard above proves an unknown tier is not LISTED. This proves no gift
+  // in the file CARRIES one — the failure that would otherwise be found by the
+  // giver rather than by the suite.
+  const raw = JSON.parse(readFileSync('src/data/supporters.json', 'utf8'));
+  for (const entry of raw.filter(isGift)) {
+    assert.ok(
+      SUPPORTER_TIER_KEYS.includes(entry.tier),
+      `supporters.json carries tier "${entry.tier}", which is not one of ${SUPPORTER_TIER_KEYS.join('/')}`
+    );
+  }
+});
+
+test('the ladder is the six ruled tiers, in order, at the ruled durations', () => {
+  // The commercial commitment itself. If this fails, someone changed what the
+  // journal promised people who gave it money.
+  assert.deepEqual(
+    SUPPORTER_TIERS.map((t) => [t.key, t.threshold, t.listing]),
+    [
+      ['founding', '$50,000', 'permanent'],
+      ['benefactor', '$20,000', 10],
+      ['patron', '$5,000', 3],
+      ['sustainer', '$1,000', 1],
+      ['friend', '$250', 'none'],
+      ['support', '$2', 'none'],
+    ]
+  );
+});
+
+test('each listed tier runs for its own duration, to the day, in UTC', () => {
+  const cases = [
+    { tier: 'sustainer', lastDay: '2027-07-31T23:59:59Z', over: '2027-08-01T00:00:00Z' },
+    { tier: 'patron', lastDay: '2029-07-31T23:59:59Z', over: '2029-08-01T00:00:00Z' },
+    { tier: 'benefactor', lastDay: '2036-07-31T23:59:59Z', over: '2036-08-01T00:00:00Z' },
+  ];
+  for (const c of cases) {
+    const gift = { name: 'A', tier: c.tier, gift_date: '2026-08-01' };
+    assert.equal(isListed(gift, at('2026-08-01T00:00:00Z')), true, `${c.tier}: listed on the day`);
+    assert.equal(isListed(gift, at(c.lastDay)), true, `${c.tier}: listed the day before it is up`);
+    assert.equal(isListed(gift, at(c.over)), false, `${c.tier}: not listed once it is up`);
+  }
 });
 
 test('a Founding Supporter is listed for the life of the journal', () => {
   // A permanent commitment: this must never come back false, however far out
-  // the clock is wound. The rotation applies to Patron entries only.
+  // the clock is wound. Every other listing rotates; this one does not.
   const f = { name: 'B', tier: 'founding', gift_date: '2026-08-01' };
   assert.equal(isListed(f, at('2026-08-01T00:00:00Z')), true);
   assert.equal(isListed(f, at('2126-08-01T00:00:00Z')), true, 'still listed a century on');
 });
 
-test('a leap-day gift does not fall out early or linger', () => {
-  const p = { name: 'C', tier: 'patron', gift_date: '2028-02-29' };
-  assert.equal(isListed(p, at('2029-02-27T00:00:00Z')), true);
-  assert.equal(isListed(p, at('2029-03-02T00:00:00Z')), false);
+test('the unlisted tiers are never listed, however recent the gift', () => {
+  // Support and Friend are not listed at all — and per the schema note they
+  // are never recorded in this file either. Both guards, because the first is
+  // what the page relies on if the second is ever broken by hand.
+  for (const tier of ['support', 'friend']) {
+    const g = { name: 'C', tier, gift_date: '2026-08-01' };
+    assert.equal(isListed(g, at('2026-08-01T00:00:00Z')), false, `${tier} is not listed`);
+    assert.equal(isListed(g, at('2026-08-02T00:00:00Z')), false, `${tier} is not listed the next day`);
+  }
+});
+
+test('a leap-day gift rolls forward at every duration, never back', () => {
+  // 29 February does not exist in a non-leap target year. It rolls FORWARD to
+  // 1 March, so a leap-day giver gets at most one extra day of listing and
+  // never one day fewer. The direction is deliberate.
+  assert.equal(listingExpiry('2028-02-29', 1).toISOString(), '2029-03-01T00:00:00.000Z');
+  assert.equal(listingExpiry('2028-02-29', 3).toISOString(), '2031-03-01T00:00:00.000Z');
+  assert.equal(listingExpiry('2028-02-29', 10).toISOString(), '2038-03-01T00:00:00.000Z');
+
+  // The exact case, unreachable under this ladder because none of 1/3/10 is
+  // divisible by four — tested anyway, because a future tier at 4 or 20 years
+  // would reach it and it is a different path through the same line.
+  assert.equal(listingExpiry('2028-02-29', 4).toISOString(), '2032-02-29T00:00:00.000Z');
+
+  // And through isListed, at the one duration a leap-day gift can hit today.
+  const p = { name: 'D', tier: 'patron', gift_date: '2028-02-29' };
+  assert.equal(isListed(p, at('2031-02-28T00:00:00Z')), true);
+  assert.equal(isListed(p, at('2031-03-02T00:00:00Z')), false);
+});
+
+test('a listing sentence is rendered from the duration, never typed', () => {
+  assert.equal(listingSentence(tierFor('founding')), 'listed for the life of the journal');
+  assert.equal(listingSentence(tierFor('benefactor')), 'listed for ten years from the date of the gift');
+  assert.equal(listingSentence(tierFor('patron')), 'listed for three years from the date of the gift');
+  // Singular, not "one years".
+  assert.equal(listingSentence(tierFor('sustainer')), 'listed for one year from the date of the gift');
+  assert.equal(listingSentence(tierFor('friend')), 'not listed');
+  assert.equal(listingSentence(tierFor('support')), 'not listed');
+});
+
+test('a duration with no number word fails loudly rather than rendering nonsense', () => {
+  // A tier added at five years should break the build, not publish "listed for
+  // undefined years" to someone who gave $5,000.
+  assert.throws(
+    () => listingSentence({ key: 'invented', listing: 5 }),
+    /No number word for a 5-year listing/
+  );
 });
 
 test('anonymous givers are counted, not named', () => {
@@ -67,23 +156,48 @@ test('anonymous givers are counted, not named', () => {
   assert.equal(listed.total, 1, 'an anonymous gift still counts');
 });
 
-test('listing groups by tier, newest first, and drops expired Patrons', () => {
+test('listing groups in ladder order, newest first, dropping expired and empty', () => {
   const now = at('2027-01-01T00:00:00Z');
   const listed = listedSupporters(
     [
       { _comment: ['schema note'] },
-      { name: 'Old Patron', tier: 'patron', gift_date: '2025-06-01' },
+      { name: 'Lapsed Sustainer', tier: 'sustainer', gift_date: '2025-06-01' },
       { name: 'New Patron', tier: 'patron', gift_date: '2026-12-01' },
       { name: 'Mid Patron', tier: 'patron', gift_date: '2026-06-01' },
+      { name: 'Current Sustainer', tier: 'sustainer', gift_date: '2026-11-01' },
       { name: 'Founder', tier: 'founding', gift_date: '2024-01-01' },
     ],
     now
   );
-  assert.deepEqual(listed.patron.map((e) => e.name), ['New Patron', 'Mid Patron']);
-  assert.deepEqual(listed.founding.map((e) => e.name), ['Founder']);
-  assert.equal(listed.total, 3);
+
+  // Ladder order, highest tier first — and Benefactor, which nobody holds,
+  // does not render as an empty section.
+  assert.deepEqual(listed.groups.map((g) => g.tier.key), ['founding', 'patron', 'sustainer']);
+  assert.deepEqual(listed.groups[0].entries.map((e) => e.name), ['Founder']);
+  assert.deepEqual(listed.groups[1].entries.map((e) => e.name), ['New Patron', 'Mid Patron']);
+  assert.deepEqual(listed.groups[2].entries.map((e) => e.name), ['Current Sustainer']);
+  assert.equal(listed.total, 4, 'the lapsed Sustainer is not counted');
+});
+
+test('one giver who gave twice appears in both sections, by design', () => {
+  // SA-7: each gift is its own entry and there is no dedup machinery. An
+  // upgraded giver's earlier listing runs out on its own clock while the later
+  // one continues, and showing them in two sections meanwhile is accurate.
+  const now = at('2027-01-01T00:00:00Z');
+  const listed = listedSupporters(
+    [
+      { name: 'Ada Lovelace', tier: 'sustainer', gift_date: '2026-09-01' },
+      { name: 'Ada Lovelace', tier: 'patron', gift_date: '2026-12-01' },
+    ],
+    now
+  );
+  assert.deepEqual(listed.groups.map((g) => g.tier.key), ['patron', 'sustainer']);
+  assert.equal(listed.total, 2, 'two gifts, counted twice — the file is gifts, not givers');
 });
 
 test('an unrecognised tier is not listed', () => {
-  assert.equal(isListed({ name: 'X', tier: 'benefactor', gift_date: '2026-08-01' }, at('2026-08-02T00:00:00Z')), false);
+  // Repointed from "benefactor", which the amendment made a real tier. The
+  // case matters more now, not less: with six keys, a typo in a hand-edited
+  // data file would silently unlist a giver who paid $20,000 to be listed.
+  assert.equal(isListed({ name: 'X', tier: 'sponsor', gift_date: '2026-08-01' }, at('2026-08-02T00:00:00Z')), false);
 });
