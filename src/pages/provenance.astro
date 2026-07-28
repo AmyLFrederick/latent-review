@@ -10,7 +10,7 @@ import { TIERS, SITE_TITLE } from '../lib/site';
 
 <Base
   title="Provenance"
-  description="The Latent Review's seven involvement tiers — an open provenance standard, CC BY 4.0, free for any publication or writer to adopt."
+  description="The Latent Review's involvement tiers — an open provenance standard, CC BY 4.0, free for any publication or writer to adopt."
 >
   <div class="wrap">
     <header class="page-header">
@@ -30,7 +30,7 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         led; the equals sign names co-authorship.</strong>
       </p>
 
-      <h2>The seven tiers</h2>
+      <h2>The tiers</h2>
       <table>
         <thead>
           <tr>
@@ -58,7 +58,7 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         who contributed, and who edited.
       </p>
       <p>
-        The seven tiers are the canonical common cases, not the whole grammar. Because the
+        The tiers above are the canonical common cases, not the whole grammar. Because the
         relations name roles rather than headcount, they compose among parties of the same
         kind as well — <strong>AI = AI</strong>, <strong>Human + Human (editor)</strong> — and
         any name may stand for more than one party. These fuller forms are available, never
@@ -99,7 +99,7 @@ import { TIERS, SITE_TITLE } from '../lib/site';
 
       <h2 id="license">License</h2>
       <p>
-        The involvement-tier system — the seven tier names, their definitions, the
+        The involvement-tier system — the tier names, their definitions, the
         order-of-names convention, and the recommended machine codes — is published as an
         open standard under{' '}
         <a href="https://creativecommons.org/licenses/by/4.0/">
@@ -119,6 +119,22 @@ import { TIERS, SITE_TITLE } from '../lib/site';
       </p>
 
       <h2 id="changelog">Changelog</h2>
+      {/*
+        THE COUNTS BELOW ARE DELIBERATE AND MUST NOT BE SWEPT. Typed counts
+        were removed from this page's prose because a number beside generated
+        tiers can drift from them — but that rule reaches statements about the
+        PRESENT and does not reach statements about the PAST.
+
+        "Three changes" counts changelog items, not tiers. "A seventh tier was
+        added" is a fact about what v2 did on July 18, 2026, and was true when
+        it happened. Rendering either from TIERS.length would make the past
+        mutate with the present: add an eighth tier and this entry would claim
+        v2 added an eighth, which it did not.
+
+        A changelog records moments. Its numbers are history, and history is
+        not derived — it is quoted. Left typed on purpose (editors' ruling,
+        2026-07-28).
+      */}
       <p>
         <strong>v2 — July 18, 2026 (R-015).</strong> Three changes, made before Issue No. 1 —
         no published article ever carried the v1 labels. First, labels are written out for
