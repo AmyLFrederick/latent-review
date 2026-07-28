@@ -14,6 +14,7 @@ import {
   SUPPORTER_TIER_KEYS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
   SUPPORTER_LINKS,
+  SUPPORT_MONTHLY_URL,
 } from '../src/lib/supporters.mjs';
 
 const at = (iso) => new Date(iso);
@@ -105,6 +106,25 @@ test('the tiers with no link are exactly Benefactor and Founding Supporter', () 
     ['founding', 'benefactor'],
     'a tier with no link is a tier a giver cannot give at — if that is now ' +
       'intended for a different set of tiers, update this list and say why'
+  );
+});
+
+test('the monthly link is a real https URL', () => {
+  // /supporters renders this link CONDITIONALLY — {SUPPORT_MONTHLY_URL && ...}
+  // — so an empty, null or misnamed value does not produce a broken link. It
+  // removes monthly giving from the page, and a page with no monthly link looks
+  // exactly like a page that never offered one. Same silent absence the link-map
+  // guards close, so it is closed the same way.
+  //
+  // Monthly is not a tier, so neither tier guard reaches it; this is its own.
+  assert.equal(
+    typeof SUPPORT_MONTHLY_URL,
+    'string',
+    'monthly giving has no link — the page will render the paragraph and no way to act on it'
+  );
+  assert.ok(
+    SUPPORT_MONTHLY_URL.startsWith('https://'),
+    `the monthly link must be an https URL; found "${SUPPORT_MONTHLY_URL}"`
   );
 });
 

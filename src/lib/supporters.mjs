@@ -142,6 +142,19 @@ export const SUPPORTER_LINKS = {
   support: 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00',
 };
 
+// Monthly giving, $5 a month. Its own link because Stripe's customer-chooses
+// links do not support recurring payments, so a recurring gift is a fixed
+// preset on a separate link. Recorded as Support and not listed — the page says
+// so before the giver acts.
+//
+// It sits here rather than in site.ts for the same reason the map does, and it
+// is NOT exempt for not being a tier: /supporters renders this link
+// conditionally, so an empty or misnamed value does not break the page. It
+// removes monthly giving from it, silently, and a page with no monthly link
+// looks exactly like a page that never offered one. The suite asserts it is a
+// real https URL.
+export const SUPPORT_MONTHLY_URL = 'https://buy.stripe.com/3cIbJ36JIdexaTFego4Vy04';
+
 /** The tier a gift is recorded at, or undefined if the key is not one of ours. */
 export function tierFor(key) {
   return SUPPORTER_TIERS.find((t) => t.key === key);
