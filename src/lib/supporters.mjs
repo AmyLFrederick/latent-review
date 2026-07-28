@@ -10,6 +10,35 @@
 // here touches append-only doctrine, and a future session should not "fix" the
 // rotation by editing anything but this file.
 
+// THE TIER TABLE IS THE SINGLE SOURCE OF TIER FACTS — labels, thresholds and
+// listing durations alike. It lives here rather than in site.ts because the
+// tests are .mjs and cannot import TypeScript: a table in site.ts is a table
+// the suite cannot see. site.ts re-exports it, so the pages import it from
+// where they always have.
+//
+// Thresholds are display strings: the page states what a tier takes, and never
+// what any giver actually gave.
+//
+// The founding window closes at Issue No. 52 — an issue number, deliberately,
+// not a date. The number is knowable from the archive; a date would be a
+// prediction.
+export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 52;
+
+export const SUPPORTER_TIERS = [
+  {
+    key: 'founding',
+    label: 'Founding Supporter',
+    threshold: '$50,000',
+    listing: 'listed for the life of the journal',
+  },
+  {
+    key: 'patron',
+    label: 'Patron',
+    threshold: '$5,000',
+    listing: 'listed for one year from the date of the gift',
+  },
+];
+
 /** A Patron is listed for one year from the gift date. */
 export const PATRON_LISTING_YEARS = 1;
 

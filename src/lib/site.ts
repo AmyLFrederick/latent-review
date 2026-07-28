@@ -40,27 +40,12 @@ export const EDITORS = {
 } as const;
 
 // Founding Supporter program (editors' spec 2026-07-26, Patron repriced
-// 2026-07-27). Thresholds are display strings: the page states what a tier
-// takes, and never what any giver actually gave.
-//
-// The founding window closes at Issue No. 52 — an issue number, deliberately,
-// not a date. The number is knowable from the archive; a date would be a
-// prediction.
-export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 52;
-export const SUPPORTER_TIERS = [
-  {
-    key: 'founding',
-    label: 'Founding Supporter',
-    threshold: '$50,000',
-    listing: 'listed for the life of the journal',
-  },
-  {
-    key: 'patron',
-    label: 'Patron',
-    threshold: '$5,000',
-    listing: 'listed for one year from the date of the gift',
-  },
-] as const;
+// 2026-07-27). The tier table and the window constant are DEFINED IN
+// supporters.mjs and re-exported here, so the pages import them from where
+// they always have. They live there because the test suite is .mjs and cannot
+// import TypeScript — see the comment at their definition.
+// @ts-expect-error — plain-JS module shared with the tests, as volume.mjs is
+export { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE } from './supporters.mjs';
 
 export const STANDING_SECTIONS = ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner'] as const;
 
