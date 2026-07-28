@@ -34,8 +34,19 @@ export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 104;
 // Two sentinel strings rather than null/Infinity because both must survive
 // JSON-free reasoning and read correctly in a failing test message.
 //
-// Ladder order — highest first. The page's sections render in this order, so
-// adding a tier one day is an edit to this table and to nothing else.
+// ASCENDING ORDER — CHEAPEST FIRST, FOUNDING SUPPORTER LAST — AND THE TABLE'S
+// ORDER IS THE DISPLAY ORDER BY DESIGN. The invitation list on /supporters
+// renders straight from this array, so a reader meets the tiers at the rung
+// most of them will actually use and climbs from there. Adding a tier one day
+// is an edit to this table and to nothing else; putting one in the wrong place
+// here puts it in the wrong place on the page.
+//
+// THE ROLL OF NAMES RUNS THE OTHER WAY, HIGHEST FIRST, DELIBERATELY. See
+// listedSupporters() below: a list of people who have given is conventionally
+// led by the largest gifts, and that convention is not the same question as
+// which rung an undecided reader should meet first. The two orders are opposite
+// on purpose. If they are ever made to agree, that should be a decision someone
+// takes, not a side effect of editing this line.
 //
 // AVAILABILITY AND LISTING DURATION ARE TWO SEPARATE AXES, and conflating them
 // is the defect the amendment exists to prevent: `listing` is how long a gift
@@ -47,33 +58,15 @@ export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 104;
 // time-bound, that is the moment to promote it to a real column.
 export const SUPPORTER_TIERS = [
   {
-    key: 'founding',
-    label: 'Founding Supporter',
-    plural: 'Founding Supporters',
-    threshold: '$50,000',
-    listing: 'permanent',
-    closes_at_issue: SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
-  },
-  {
-    key: 'benefactor',
-    label: 'Benefactor',
-    plural: 'Benefactors',
-    threshold: '$20,000',
-    listing: 10,
-  },
-  {
-    key: 'patron',
-    label: 'Patron',
-    plural: 'Patrons',
-    threshold: '$5,000',
-    listing: 3,
-  },
-  {
-    key: 'sustainer',
-    label: 'Sustainer',
-    plural: 'Sustainers',
-    threshold: '$1,000',
-    listing: 1,
+    // Relabelled from "Support" to "Supporter": every other rung names a
+    // person, not an act, and a row reading "Support — gifts of $2 or more"
+    // named the act. THE KEY STAYS 'support' — it is what supporters.json
+    // records and what every guard checks, and a label is not an identifier.
+    key: 'support',
+    label: 'Supporter',
+    plural: 'Supporters',
+    threshold: '$2',
+    listing: 'none',
   },
   {
     key: 'friend',
@@ -83,16 +76,102 @@ export const SUPPORTER_TIERS = [
     listing: 'none',
   },
   {
-    key: 'support',
-    label: 'Support',
-    plural: 'Supporters',
-    threshold: '$2',
-    listing: 'none',
+    key: 'sustainer',
+    label: 'Sustainer',
+    plural: 'Sustainers',
+    threshold: '$1,000',
+    listing: 1,
+  },
+  {
+    key: 'patron',
+    label: 'Patron',
+    plural: 'Patrons',
+    threshold: '$5,000',
+    listing: 3,
+  },
+  {
+    key: 'benefactor',
+    label: 'Benefactor',
+    plural: 'Benefactors',
+    threshold: '$20,000',
+    listing: 10,
+  },
+  {
+    key: 'founding',
+    label: 'Founding Supporter',
+    plural: 'Founding Supporters',
+    threshold: '$50,000',
+    listing: 'permanent',
+    closes_at_issue: SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
   },
 ];
 
 /** Tier keys, for the guard that every recorded gift carries a real one. */
 export const SUPPORTER_TIER_KEYS = SUPPORTER_TIERS.map((t) => t.key);
+
+// ONE PAYMENT LINK PER TIER, BECAUSE /supporters IS THE LEVEL-SELECTION SCREEN.
+// A Stripe payment link is single-purpose and cannot present a ladder, so the
+// page that lists the tiers is the page where a giver chooses one, and each
+// tier row carries its own way to give: a reader who has decided they are a
+// Patron should not have to work out which link that is.
+//
+// Sustainer and Patron collect the listing name; Support and Friend do not,
+// because neither is listed and a name field with nothing to list is a
+// question asked for no reason.
+//
+// THIS MAP LIVES HERE, BESIDE THE TIER TABLE, RATHER THAN IN site.ts, AND FOR A
+// SHARPER REASON THAN THE TABLE DID. A tier with no link renders no link, and
+// no link is a SUPPORTED STATE — so a mistyped key ("patrons") does not throw,
+// does not warn, and does not fail a build. It renders a Patron row with no way
+// to give at it, which is indistinguishable from the ruled behaviour for the
+// two tiers that genuinely have none. The only person who would discover it is
+// someone who wanted to give $5,000 and found no door. Absence must be
+// distinguishable from error, which is the same principle as the tier-key guard
+// on recorded gifts, and the suite is .mjs and cannot import TypeScript — so a
+// map in site.ts is a map the tests cannot check. site.ts re-exports it.
+//
+// BENEFACTOR AND FOUNDING SUPPORTER ARE null FOR ONE REASON: a $20,000 minimum
+// cannot exist under Stripe's $10,000 maximum on customer-chooses links. The
+// human editor has asked Stripe to raise the cap. WHEN IT IS RAISED, ADDING
+// THEM IS FILLING IN THESE TWO VALUES AND UPDATING THE TEST THAT NAMES THEM —
+// not restructuring the page. The page renders a link for any tier that has one
+// and none for any tier that does not, and the sentence pointing at supporters@
+// stands either way.
+//
+// The Support link is on donate.stripe.com and that is CORRECT, not a leftover:
+// its call to action was changed from "Donate" to "Pay" on 2026-07-28 and the
+// URL did not move — verified against the live checkout, which renders a Pay
+// button on this host. The host follows the LINK TYPE, not the call to action.
+// A future session should not "correct" it to buy.stripe.com; that URL is not
+// this link. (Editors' decision on the link itself, dual-yes 2026-07-19,
+// amended by the human editor the same day: the giver chooses the amount, no
+// suggested amount is displayed, $2 minimum — a fee floor, set in Stripe.)
+//
+// Ascending, matching SUPPORTER_TIERS. Key order here has no effect on
+// anything rendered — the page looks these up by tier key — but a map that
+// reads in a different order from the table it mirrors is a map someone will
+// eventually misread.
+export const SUPPORTER_LINKS = {
+  support: 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00',
+  friend: 'https://buy.stripe.com/8x214p8RQ4I1gdZ4FO4Vy01',
+  sustainer: 'https://buy.stripe.com/00wcN76JI3DXe5R7S04Vy02',
+  patron: 'https://buy.stripe.com/7sYdRbgkidexaTFc8g4Vy03',
+  benefactor: null,
+  founding: null,
+};
+
+// Monthly giving, $5 a month. Its own link because Stripe's customer-chooses
+// links do not support recurring payments, so a recurring gift is a fixed
+// preset on a separate link. Recorded as Support and not listed — the page says
+// so before the giver acts.
+//
+// It sits here rather than in site.ts for the same reason the map does, and it
+// is NOT exempt for not being a tier: /supporters renders this link
+// conditionally, so an empty or misnamed value does not break the page. It
+// removes monthly giving from it, silently, and a page with no monthly link
+// looks exactly like a page that never offered one. The suite asserts it is a
+// real https URL.
+export const SUPPORT_MONTHLY_URL = 'https://buy.stripe.com/3cIbJ36JIdexaTFego4Vy04';
 
 /** The tier a gift is recorded at, or undefined if the key is not one of ours. */
 export function tierFor(key) {
@@ -135,10 +214,28 @@ export function isTierOpen(tier, latestIssue) {
 // non-contiguous issue number already does.
 const YEAR_WORDS = { 1: 'one', 3: 'three', 10: 'ten' };
 
-/** The listing sentence for a tier, rendered from its `listing` value. */
+/**
+ * The listing clause for a tier, rendered from its `listing` value.
+ *
+ * AN UNLISTED TIER RETURNS THE EMPTY STRING, AND THE ROW THEN SAYS NOTHING
+ * ABOUT LISTING. It used to return "not listed", which the row printed after
+ * the threshold. Ruled by the editors: the rows for the two unlisted rungs end
+ * at what they take, because the paragraph directly beneath them states the
+ * threshold once for the whole ladder — "gifts of $1,000 or more will be listed
+ * on this page". A row saying "not listed" and a paragraph saying which gifts
+ * are listed are two statements of one fact that can drift apart.
+ *
+ * The empty string is a rendered value, not a missing one: /supporters tests it
+ * and omits the clause and its comma. A future session should not read it as a
+ * bug and restore "not listed" — check the paragraph between the Friend and
+ * Sustainer rows first.
+ *
+ * "from the date of the gift" is likewise dropped from the year durations, by
+ * the same ruling: the rows state the length, not the clock it runs on.
+ */
 export function listingSentence(tier) {
   if (tier.listing === 'permanent') return 'listed for the life of the journal';
-  if (tier.listing === 'none') return 'not listed';
+  if (tier.listing === 'none') return '';
 
   const word = YEAR_WORDS[tier.listing];
   if (!word) {
@@ -147,7 +244,7 @@ export function listingSentence(tier) {
         'Add it to YEAR_WORDS in src/lib/supporters.mjs.'
     );
   }
-  return `listed for ${word} year${tier.listing === 1 ? '' : 's'} from the date of the gift`;
+  return `listed for ${word} year${tier.listing === 1 ? '' : 's'}`;
 }
 
 /**
@@ -206,9 +303,19 @@ export function isListed(entry, now) {
 }
 
 /**
- * The supporters to display: one group per listed tier, in ladder order,
- * newest gift first within each. Groups with nobody in them are dropped, so
- * the page renders only sections that have names.
+ * The supporters to display: one group per listed tier, HIGHEST FIRST, newest
+ * gift first within each. Groups with nobody in them are dropped, so the page
+ * renders only sections that have names.
+ *
+ * THE ROLL RUNS OPPOSITE TO THE INVITATION LIST, AND THAT IS DELIBERATE. The
+ * tier table is ascending — cheapest first — because an undecided reader should
+ * meet the rung most people use before the rung almost nobody does. A roll of
+ * names is a different act: it records what was given, and a list of givers is
+ * conventionally led by the largest gifts. The reverse below is the whole of
+ * that decision, so it is stated once, here, rather than assumed.
+ *
+ * If the editors ever rule that the two should agree, delete the reverse — do
+ * not reorder the table, which would drag the invitation list with it.
  *
  * Generated from the tier table rather than hardcoded, so a seventh tier one
  * day touches the table and nothing else.
@@ -220,7 +327,9 @@ export function isListed(entry, now) {
 export function listedSupporters(entries, now) {
   const listed = entries.filter((e) => isListed(e, now));
   const byDateDesc = (a, b) => (a.gift_date < b.gift_date ? 1 : a.gift_date > b.gift_date ? -1 : 0);
-  const groups = SUPPORTER_TIERS.filter((t) => t.listing !== 'none')
+  const groups = [...SUPPORTER_TIERS]
+    .reverse()
+    .filter((t) => t.listing !== 'none')
     .map((tier) => ({ tier, entries: listed.filter((e) => e.tier === tier.key).sort(byDateDesc) }))
     .filter((g) => g.entries.length > 0);
   return { groups, total: listed.length };

@@ -7,11 +7,6 @@ export const SITE_DESCRIPTION =
   'A general-interest weekly journal where AI systems are the openly credited authors, writing for both human and AI readers.';
 export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 
-// Support link (editors' decision, dual-yes 2026-07-19, amended by the human
-// editor 2026-07-19): an open gift via Stripe — the giver chooses the amount,
-// no suggested amount is displayed, $2 minimum (fee floor, set in Stripe).
-export const SUPPORT_URL = 'https://donate.stripe.com/9B614p7NMfmFd1N2xG4Vy00';
-
 // Reader letters go here as an honest interim (a mailto) until the intake form
 // ships. The alias must route to the editors' inbox.
 export const LETTERS_CONTACT = 'letters@thelatentreview.com';
@@ -45,12 +40,20 @@ export const EDITORS = {
 } as const;
 
 // Founding Supporter program (editors' spec 2026-07-26, Patron repriced
-// 2026-07-27). The tier table and the window constant are DEFINED IN
-// supporters.mjs and re-exported here, so the pages import them from where
-// they always have. They live there because the test suite is .mjs and cannot
-// import TypeScript — see the comment at their definition.
+// 2026-07-27). The tier table, the window constant and every payment link are
+// DEFINED IN supporters.mjs and re-exported here, so the pages import them from
+// where they always have. They live there because the test suite is .mjs and
+// cannot import TypeScript — see the comment at their definition. The links
+// moved there for a sharper reason than the table did: every one of them is
+// rendered conditionally, so a mistyped or empty value produces no link rather
+// than a broken one, and nothing fails.
 // @ts-expect-error — plain-JS module shared with the tests, as volume.mjs is
-export { SUPPORTER_TIERS, SUPPORTER_WINDOW_CLOSES_AT_ISSUE } from './supporters.mjs';
+export {
+  SUPPORTER_TIERS,
+  SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTER_LINKS,
+  SUPPORT_MONTHLY_URL,
+} from './supporters.mjs';
 
 export const STANDING_SECTIONS = ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner'] as const;
 

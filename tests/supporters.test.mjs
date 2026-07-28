@@ -13,6 +13,8 @@ import {
   SUPPORTER_TIERS,
   SUPPORTER_TIER_KEYS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTER_LINKS,
+  SUPPORT_MONTHLY_URL,
 } from '../src/lib/supporters.mjs';
 
 const at = (iso) => new Date(iso);
@@ -61,16 +63,73 @@ test('every recorded gift in supporters.json carries a tier we know', () => {
 test('the ladder is the six ruled tiers, in order, at the ruled durations', () => {
   // The commercial commitment itself. If this fails, someone changed what the
   // journal promised people who gave it money.
+  //
+  // THE ORDER IS ASCENDING AND IS ALSO THE DISPLAY ORDER — /supporters renders
+  // the invitation list straight from this array, cheapest rung first. The roll
+  // of names runs the other way; that is asserted separately, and the two being
+  // opposite is deliberate.
   assert.deepEqual(
     SUPPORTER_TIERS.map((t) => [t.key, t.threshold, t.listing]),
     [
-      ['founding', '$50,000', 'permanent'],
-      ['benefactor', '$20,000', 10],
-      ['patron', '$5,000', 3],
-      ['sustainer', '$1,000', 1],
-      ['friend', '$250', 'none'],
       ['support', '$2', 'none'],
+      ['friend', '$250', 'none'],
+      ['sustainer', '$1,000', 1],
+      ['patron', '$5,000', 3],
+      ['benefactor', '$20,000', 10],
+      ['founding', '$50,000', 'permanent'],
     ]
+  );
+});
+
+test('every key in SUPPORTER_LINKS is a tier we know', () => {
+  // Catches the unrecognised key. A link filed under "patrons" is a link nobody
+  // can reach, and it fails nothing on its own: the page looks up by real tier
+  // key, finds nothing, and renders a Patron row with no way to give at it.
+  for (const key of Object.keys(SUPPORTER_LINKS)) {
+    assert.ok(
+      SUPPORTER_TIER_KEYS.includes(key),
+      `SUPPORTER_LINKS has "${key}", which is not a tier — a link under an ` +
+        'unrecognised key is a link no row will ever render'
+    );
+  }
+});
+
+test('the tiers with no link are exactly Benefactor and Founding Supporter', () => {
+  // The half that costs money, stated in the language of the actual harm: this
+  // fails when a tier that should be givable has no door.
+  //
+  // IT NAMES THESE TWO FOR ONE REASON — a $20,000 minimum cannot exist under
+  // Stripe's $10,000 maximum on customer-chooses links, so Benefactor and
+  // Founding Supporter are arranged by conversation instead. That is a fact
+  // about today's commercial state, not a permanent property of those tiers.
+  // WHEN THE CAP IS RAISED AND THE LINKS ARE ADDED, THIS TEST IS UPDATED, NOT
+  // DELETED — it encodes what the journal currently offers, the same way the
+  // ladder test encodes what it currently promises.
+  const withoutLink = SUPPORTER_TIERS.filter((t) => !SUPPORTER_LINKS[t.key]).map((t) => t.key);
+  assert.deepEqual(
+    withoutLink,
+    ['benefactor', 'founding'],
+    'a tier with no link is a tier a giver cannot give at — if that is now ' +
+      'intended for a different set of tiers, update this list and say why'
+  );
+});
+
+test('the monthly link is a real https URL', () => {
+  // /supporters renders this link CONDITIONALLY — {SUPPORT_MONTHLY_URL && ...}
+  // — so an empty, null or misnamed value does not produce a broken link. It
+  // removes monthly giving from the page, and a page with no monthly link looks
+  // exactly like a page that never offered one. Same silent absence the link-map
+  // guards close, so it is closed the same way.
+  //
+  // Monthly is not a tier, so neither tier guard reaches it; this is its own.
+  assert.equal(
+    typeof SUPPORT_MONTHLY_URL,
+    'string',
+    'monthly giving has no link — the page will render the paragraph and no way to act on it'
+  );
+  assert.ok(
+    SUPPORT_MONTHLY_URL.startsWith('https://'),
+    `the monthly link must be an https URL; found "${SUPPORT_MONTHLY_URL}"`
   );
 });
 
@@ -128,12 +187,20 @@ test('a leap-day gift rolls forward at every duration, never back', () => {
 
 test('a listing sentence is rendered from the duration, never typed', () => {
   assert.equal(listingSentence(tierFor('founding')), 'listed for the life of the journal');
-  assert.equal(listingSentence(tierFor('benefactor')), 'listed for ten years from the date of the gift');
-  assert.equal(listingSentence(tierFor('patron')), 'listed for three years from the date of the gift');
+  assert.equal(listingSentence(tierFor('benefactor')), 'listed for ten years');
+  assert.equal(listingSentence(tierFor('patron')), 'listed for three years');
   // Singular, not "one years".
-  assert.equal(listingSentence(tierFor('sustainer')), 'listed for one year from the date of the gift');
-  assert.equal(listingSentence(tierFor('friend')), 'not listed');
-  assert.equal(listingSentence(tierFor('support')), 'not listed');
+  assert.equal(listingSentence(tierFor('sustainer')), 'listed for one year');
+});
+
+test('the two unlisted rungs render no listing clause at all', () => {
+  // Ruled: their rows end at what the tier takes, because the paragraph beneath
+  // them states the threshold once for the whole ladder. The empty string is
+  // the rendered value — /supporters omits the clause and its comma on it — and
+  // is asserted here so a future session cannot restore "not listed" to one
+  // place and leave the threshold paragraph standing in the other.
+  assert.equal(listingSentence(tierFor('support')), '');
+  assert.equal(listingSentence(tierFor('friend')), '');
 });
 
 test('a duration with no number word fails loudly rather than rendering nonsense', () => {

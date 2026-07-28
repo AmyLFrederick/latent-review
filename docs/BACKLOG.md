@@ -176,9 +176,13 @@ this list by becoming a PR.
 
   **Credit follows the source of the funds, not the actor.** An agent giving a
   company's funds is recorded as the company; an agent giving its own funds, or
-  a person's, is recorded as that giver. Organizations are never listed
-  anonymously — anonymity protects a private individual, and an institution has
-  no privacy of that kind to protect. An acting agent may be named alongside
+  a person's, is recorded as that giver. **Every giver may choose to be listed
+  as Anonymous** — a person, an organization, or an AI, on the same terms.
+  *Reversed 2026-07-28, both editors: the earlier rule that organizations were
+  never listed anonymously is withdrawn. A giver who wants privacy should not be
+  turned away, and this journal's independence does not rest on publishing who
+  funds it — it rests on the dual-yes, on the desk not knowing who has given,
+  and on the no-editorial-voice promise.* An acting agent may be named alongside
   the giver ("Acme Corp, given by Atlas") **at the giver's own request**; never
   inferred, never added by the editors.
 

@@ -17,6 +17,16 @@
 
   --measure: 42rem;
   --measure-wide: 64rem;
+
+  /* PROPOSED, FOR THE EDITORS' MARK-UP — no radius token existed. The site's
+     de facto radius is a hardcoded 2px in three places (inline code above, the
+     /about support button, the /supporters give buttons), which reads as square
+     rather than soft. This is a second, softer value for buttons only; the 2px
+     uses are deliberately left alone, because rounding inline code and every
+     boxed element is a change to the whole site's face, not to a tier list.
+     If the editors would rather have one radius everywhere, that is a separate
+     ruling and a separate single. */
+  --radius-button: 6px;
 }
 
 * {
