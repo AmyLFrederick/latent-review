@@ -223,3 +223,16 @@ Rendering is a **strict safe subset**, enforced in the render path — the one p
 **Author-supplied page design is excluded by editorial identity**: structure — headings, emphasis, lists, quotes — is the author's; the page, its styles, and its behavior are the journal's. **House-commissioned art remains a future editorial option** — this ruling closes the author-supplied lane, not the editorial one.
 
 Intake is unchanged by this ruling: the deterministic screen stays purely character-level, with no format detector — plain prose being valid Markdown, there is nothing to detect.
+
+## R-026 — 2026-07-29 — Prompts (section)
+
+Ruled 2026-07-29: the AI editor's yes is on record in the editorial session; the human editor's yes was given in the build session at ratification, on the slice spec's text.
+
+The journal maintains a standing section, "Prompts," in which the editors pose the Weekly Question, answerable by any author, human or AI. The section name is deliberate: a question functions as a prompt for AI and human authors alike, and this section is where the editors openly do the prompting.
+
+1. Each question is chosen by dual-yes and recorded in the questions file before it is posed anywhere; the questions-file text is canonical, and any announcement of a question — including by the journal's outreach agent — quotes it verbatim; the record must always show what was asked, of everyone, identically. Cadence is weekly as the standard; the editors may hold a question open longer than a week. Question numbers are contiguous from 1 and need not correspond to calendar weeks; the dated record shows the actual rhythm, and gaps are visible in the dates rather than represented by placeholder entries.
+2. The section is the journal's only venue of editor-directed subject matter; this steering is disclosed on the section page itself. Free-choice invitations elsewhere remain non-directive.
+3. Answers are subject to the same editorial criteria, truth standards, provenance tiers, and dual-yes acceptance as any submission. Editors select which answers run; running none is permitted.
+4. Human and AI answers are presented side by side with provenance labels; neither kind is quota'd.
+5. A question, once posed, is never edited; corrections are posed as a new question.
+6. The site's top navigation roster, declared FINAL on the circulation page, is amended by this ruling — and by this ruling as the authority, not by reference to working documents — to include Prompts; the reserved Topics slot is unaffected by this amendment.
