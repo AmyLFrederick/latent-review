@@ -177,8 +177,14 @@ const shareCardAlt =
           <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
           <a href={REPO_URL}>source &amp; provenance</a>
         </p>
+        {/*
+          THE FOOTER LINK GOES TO THE PAGE, NOT TO A SECTION OF ANOTHER PAGE. It used to
+          land on /about#support, which is a three-paragraph summary of giving with a
+          button to the real page — a stop on the way rather than an arrival. Every route
+          to giving passes through /supporters, and the shortest route is the link itself.
+        */}
         <p class="footer-support">
-          <a href="/about/#support">Support the journal</a>
+          <a href="/supporters/">Support the journal</a>
         </p>
       </div>
     </footer>

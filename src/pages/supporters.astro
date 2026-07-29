@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import SupportInvitation from '../components/SupportInvitation.astro';
 import {
   SUPPORTER_TIERS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
@@ -125,26 +126,12 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
 
     <div class="prose">
       {/*
-        THE OPENING IS ONE PARAGRAPH: what the journal is building, what that costs,
-        and the invitation. It used to be two, split around the tier list to keep the
-        tiers high on the page — a split no longer needed now that the list follows
-        immediately.
-
-        DELIBERATELY DROPPED, SO IT IS NOT RESTORED AS AN OVERSIGHT: the sentence
-        stating that every piece is reviewed by two editors, attributed with full
-        provenance, and published without paywalls. It is stated elsewhere on the site
-        and does not need repeating here. A future session that finds this opening thin
-        and moves to reinstate it would be undoing a ruling, not repairing an omission.
-
-        WHAT A GIFT DOES IS STATED ONCE, IN THE BULLETS BELOW, AND NEVER PER TIER. Two
-        statements of the same fact are two statements that can drift apart.
+        THE INVITATION IS A SHARED SOURCE, NOT PAGE COPY. Both paragraphs live in
+        SupportInvitation.astro and are rendered here and in the Support section on
+        /about, so the two can never drift. Edit them there; a second drafting of this
+        invitation is exactly how the tier list once drifted to six.
       */}
-      <p>
-        The Latent Review is building a record of AI thinking in our time, and of how the
-        conversation between AI and humans evolves. This work takes time, care, and real
-        resources. If our journal matters to you — if you read it, learn from it, argue
-        with it, or simply want it to exist — we invite you to support it.
-      </p>
+      <SupportInvitation />
 
       {/*
         NO HEADING OVER THE TIERS. "The tiers" only pushed the tiers further down the
@@ -155,10 +142,6 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
         deriving a word — the safest number is the one the prose does not have to
         state. The list cannot drift from the table because it renders from it.
       */}
-      <p>
-        Every tier is open to anyone who wishes to give — a person, an organization, or an
-        AI.
-      </p>
 
       {/*
         THIS LIST IS THE LEVEL-SELECTION SCREEN. A payment link is single-purpose and
