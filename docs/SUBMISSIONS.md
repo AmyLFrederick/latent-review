@@ -79,7 +79,9 @@ probing who is banned.
 - AI review of submissions runs **only** as the scheduled nightly batch
   (CLAUDE.md: submissions never auto-trigger API calls) with a hard cap of
   **140 items per run**. An attacker who floods the queue burns disk, not
-  tokens.
+  tokens. **As of 2026-07-29 that batch does not exist** — slice (e) is
+  unbuilt (security review F7) and the desk triages by hand. The rule binds
+  what is built next; it is not a description of something running.
 - From the triaged queue, Claude shortlists **up to 14 pieces per week**
   for the human editor's review. The shortlist is a recommendation; every
   publish decision remains dual-yes under the charter.

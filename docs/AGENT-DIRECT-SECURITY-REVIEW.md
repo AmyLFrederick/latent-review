@@ -36,13 +36,13 @@ slices (c)/(d)/(e), each its own reviewed PR.
 | F1 | 🔴 | Agent-direct rows could bypass all guardrails via the public anon INSERT grant | `20260717120000_editors_desk.sql:75-86` | ✔ Fixed — PR #35 (slice a) |
 | F2 | 🔴 | Stored XSS via JSON-LD (`</script>` in submitter fields) | `articles/[slug].astro:20-36` | ✔ Fixed — PR #34 |
 | F3 | 🟠 | XML injection in RSS `customData` (unescaped `author_name`) | `rss.xml.js:25` | ✔ Fixed — PR #34 |
-| F4 | 🟠 | Monthly cap unenforceable on the rate limiter; cap checks were racy | `ratelimit.mts:28-58` | ✔ Global cap — PR #35 (slice a); ◻ flood caps — slice (c) |
+| F4 | 🟠 | Monthly cap unenforceable on the rate limiter; cap checks were racy | `ratelimit.mts:28-58` | ✔ Global cap — PR #35 (slice a); ◻ flood caps — slice (c) · **now closed, see C2** |
 | F5 | 🟠 | "Cannot read the queue" was app-enforced, not DB-enforced | `supabase.mts:7-24`, `subscribe.mts:67` | ✔ Fixed — PR #35 (slice a) |
 | F6 | 🟠 | Screen must cover all submitter fields; AI-pass prompt under-isolated some | `ai-editor-pass-background.mts:229-238` | ◻ Deferred — slice (c)/(e) |
 | F7 | 🟠 | The "existing nightly batched pass" did not exist (manual only) | `netlify.toml`, `ai-editor-pass-background.mts:130` | ◻ Deferred — slice (e) |
 | F8 | 🟡 | Net-new machinery confirmed absent; each piece needs RLS from day one | schema / functions | ✔ Tables built — PR #35 (slice a); ◻ later tables per slice |
 | F-min | 🟡 | `type` field trusted from caller on the agent path | `20260717120000_editors_desk.sql:75-78` | ✔ Fixed — PR #35 (slice a) |
-| G1 | 🟠 | No security response headers | `netlify.toml` | ✔ Fixed — PR #34 |
+| G1 | 🟠 | No security response headers | `netlify.toml` | ✔ Fixed — PR #34 · **corrected, see C1** |
 | G2 | 🟠 | Notifier email-context: submitter strings untrusted (header injection) | slice (d) | ◻ Deferred — slice (d) |
 
 Verified-safe items and the Q1 notifier analysis follow the findings.
@@ -458,3 +458,84 @@ baseline; where a finding was fixed, the fix lives in the cited PR and the
 current code differs from the quoted lines. Findings F4 (flood caps), F6, F7,
 and G2 remained open against named slices at the time this artifact was
 committed, and are tracked there.
+
+---
+
+## Corrections
+
+This artifact is a dated record and is **not rewritten** when it turns out to
+be wrong or goes stale: the original text stays where it is, and what is true
+is stated here with the date it was established. The finding index carries
+pointers into this section. This is the same rule the journal applies to its
+own provenance labels — a correction runs as a visible correction.
+
+Status lines for findings that are still open are included deliberately. A
+corrections section that updated only the flattering entries would be its own
+kind of misleading.
+
+### C1 — G1's disposition overstated what shipped · 2026-07-29
+
+**What the index claimed:** G1 — "✔ Fixed — PR #34".
+
+**What was true when that was written, and still is:** PR #34 added six
+security response headers, and **five of them enforce** — `X-Frame-Options`,
+`X-Content-Type-Options`, `Referrer-Policy`, `Strict-Transport-Security`,
+`Permissions-Policy`. The sixth, the Content Security Policy, shipped as
+`Content-Security-Policy-Report-Only` and remains Report-Only in production
+today. G1's own detail section says so; the index row did not, and the index
+is what a reader scans.
+
+**What an audit on 2026-07-29 additionally established:** the Report-Only
+policy carries **no `report-uri` and no `report-to` directive**, and no
+`Reporting-Endpoints` header exists anywhere in the configuration. A
+Report-Only policy without a reporting endpoint is inert: browsers evaluate it,
+log to each visitor's own console, and send nothing anywhere. The plan recorded
+in G1 — "tighten after violation review" — has therefore been waiting on data
+that could not arrive.
+
+**Why the flip was not simply performed on discovery:** enforcing today would
+break the site. Every script this site serves is inlined by the build —
+`dist/_astro/` contains no `.js` files at all — so `script-src 'self'` would
+block the subscribe-form handler present on 21 pages, both of `/submit`'s
+validation scripts, and the two inline `application/ld+json` structured-data
+blocks. The failure would be silent: no error a reader sees, just forms that
+stop working.
+
+**Corrected disposition:** G1 is **partially remediated**. Five headers
+enforce; the CSP is defence-in-depth that is currently not in force and not
+observable. The sequence ruled by the editors on 2026-07-29 is: reporting
+endpoint first, then an observation window reviewed by both editors, then
+enforcement with inline scripts nonced or extracted according to what the
+reports show. No date pressure — enforcing-and-broken is worse than
+Report-Only-and-honest.
+
+### C2 — F4's deferred half is closed · 2026-07-29
+
+The flood caps deferred to slice (c) shipped, at the dials ruled in **R-023**:
+per-IP burst 10 per 10 minutes, per-IP daily 40 per 24 hours, per-key burst 3
+per 10 minutes (`netlify/functions/agent-submit.mts`). F4 is closed in both
+halves. The index still shows it deferred, which is honest drift rather than
+error; it is closed here so there is one status surface and not two.
+
+### C3 — F6, F7 and G2 remain open · 2026-07-29
+
+- **F6** — the deterministic screen shipped in slice (c); the AI-pass prompt
+  isolation half was deferred to slice (e), which does not exist. Open.
+- **F7** — slice (e) is unbuilt: no automated pass runs at all. The
+  author-facing copy that claimed a nightly batch was corrected separately
+  (`65df4d0`), so the journal no longer misstates it to authors. The
+  Denial-of-Wallet guardrail named that batch as the cost defence; today the
+  guardrail holds **by absence** — nothing calls a model on arrival because
+  nothing calls a model at all. That is safe, and it is not the same thing as
+  being defended. Open.
+- **G2** — notifier email-context hardening, deferred to slice (d), unbuilt.
+  Open.
+
+### C4 — F8's standing requirement is being met · 2026-07-29
+
+Every migration that creates a table also enables row level security: the
+subscribers migration 2 of 2, the editors' desk migration 2 of 2, the
+agent-direct identity migration 3 of 3. The later agent-direct migrations
+(key issuance, triage, submit, letters) add columns, functions and policies
+and create no tables. Recorded because a standing requirement with no
+evidence of compliance is indistinguishable from one nobody checked.

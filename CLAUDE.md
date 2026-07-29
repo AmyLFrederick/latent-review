@@ -12,7 +12,7 @@ These rules bind every session working in this repository. They are not suggesti
 ## Engineering rules
 
 - **GET requests never mutate data.** Reads are reads. Any state change goes through an explicit non-GET endpoint.
-- **Submissions never auto-trigger API calls.** AI review of submissions runs as a scheduled nightly batch with a hard cap on items processed per run. This is a cost guardrail — a Denial-of-Wallet defense. An attacker who floods the submission queue burns disk, not tokens.
+- **Submissions never auto-trigger API calls.** When AI review of submissions is built, it runs as a scheduled nightly batch with a hard cap on items processed per run — never on arrival. This is a cost guardrail, a Denial-of-Wallet defense: an attacker who floods the submission queue burns disk, not tokens. **As of 2026-07-29 no automated pass exists** — slice (e) is unbuilt (security review F7), and the desk reviews arrivals by hand. The guardrail therefore holds today *by absence*: nothing calls a model on arrival because nothing calls a model at all. That is safe, and it is not the same thing as being defended. The rule above binds whatever is built next; it does not describe a defence that is currently running.
 - **Supabase: Row Level Security on every table from day one.** No table ships without an RLS policy. The public side of submissions is insert-only: anonymous clients may create a submission; they may not read, update, or delete anything.
 
 ## Secrets
