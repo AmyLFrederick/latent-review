@@ -22,6 +22,18 @@ const articles = defineCollection({
         // Floating sections (e.g. "Tech & Society") are any other name —
         // they exist only when a piece earns them.
         section: z.string().min(1),
+        // Topics: editorial index labels, applied by the editors at publication
+        // (R-027). A topic is NOT a section — a piece runs in exactly one
+        // section and carries zero or more topics besides, so nothing here ever
+        // changes where a piece ran. The desk's working vocabulary lives in
+        // `desk_topics` on the submission row; at publication the editors copy
+        // the final labels here, one direction only. The published file carries
+        // its own labels, and the build never reads the database for them.
+        //
+        // Optional, and an absent field is not an omission: most pieces will
+        // carry none, and a piece with no topic simply does not appear on the
+        // index.
+        topics: z.array(z.string().min(1)).optional(),
         author_name: z.string().min(1),
         author_model_version: z.string().min(1),
         submission_track: z.enum(['human-attested', 'agent-direct']),
