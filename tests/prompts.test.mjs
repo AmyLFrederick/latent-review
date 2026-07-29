@@ -22,24 +22,61 @@ const q = (number, status, extra = {}) => ({
   ...extra,
 });
 
+// THESE TESTS DESCRIBE THE FILE'S RULES, NEVER ITS CURRENT CONTENTS. The
+// questions file changes every week by design: a question is posed, another is
+// closed, a new one is numbered. A test that asserts today's state is a test
+// that fails on the ordinary act it exists to protect, and the session that
+// meets that failure will edit the test rather than think about it. State
+// belongs in the fixtures below; the shipped file is checked against invariants
+// that hold in every week of the journal's life.
+
 test('the schema note in prompts.json is not a question', () => {
   const raw = JSON.parse(readFileSync('src/data/prompts.json', 'utf8'));
   assert.ok(raw.length > 0, 'the file should carry its schema note');
-  assert.equal(raw.filter(isQuestion).length, 1, 'one question at launch');
+  assert.ok(raw.some((entry) => entry && '_comment' in entry), 'the schema note should be there');
+  assert.ok(raw.filter(isQuestion).length >= 1, 'at least one question, always');
 });
 
-test('the shipped file is the unasked launch state, and it validates', () => {
-  // The page must have a truthful data source from day one: Weekly Question
-  // No. 1 exists, is numbered, and has not been asked. The empty text is the
-  // point -- there is no placeholder to mistake for a question.
+test('the shipped file validates, and every entry in it is well-formed', () => {
+  // readQuestions() is the build guard: this is the same call the page makes,
+  // so a file that fails here is a file that fails the build.
   const raw = JSON.parse(readFileSync('src/data/prompts.json', 'utf8'));
   const questions = readQuestions(raw);
+
+  assert.ok(questions.length >= 1, 'the page needs a truthful data source');
+  for (const q of questions) {
+    assert.equal(typeof q.number, 'number');
+    assert.ok(QUESTION_STATUSES.includes(q.status));
+    assert.equal(q.ruling, 'R-026');
+
+    if (q.status === 'unasked') {
+      // Not yet posed: no text to answer and no date it was asked. An unasked
+      // question carrying text would be a question the page shows as unasked
+      // while the file holds words somebody could answer.
+      assert.equal(q.text, '', 'an unasked question carries no text');
+      assert.equal(q.opened, null, 'an unasked question has no opening date');
+    } else {
+      // Posed: the words exist, the date exists, and the verification record
+      // exists -- all three settled before posing, because none can be fixed
+      // afterwards (R-026 clause 5).
+      assert.ok(q.text.length > 0, `Question ${q.number} is ${q.status} with no text`);
+      assert.match(q.opened, /^\d{4}-\d{2}-\d{2}$/, `Question ${q.number} needs a UTC date`);
+      assert.ok(Array.isArray(q.sources), `Question ${q.number} needs its sources array`);
+    }
+
+    assert.ok(q.status === 'closed' ? q.closed !== null : q.closed === null);
+  }
+});
+
+test('the unasked launch state is the shape the page was built for', () => {
+  // Kept as a fixture, not as an assertion about the shipped file: this is the
+  // state /prompts shipped in, and it must go on rendering correctly whenever a
+  // future question is numbered and not yet posed.
+  const questions = readQuestions([q(1, 'unasked')]);
   assert.equal(questions.length, 1);
-  assert.equal(questions[0].number, 1);
   assert.equal(questions[0].status, 'unasked');
   assert.equal(questions[0].text, '');
   assert.equal(questions[0].opened, null);
-  assert.equal(questions[0].ruling, 'R-026');
 });
 
 test('a question is named from its number, never typed', () => {
@@ -139,7 +176,25 @@ test('the archive is every posed question, newest first, and includes the open o
   assert.deepEqual(askedQuestions(questions).map((x) => x.number), [3, 2, 1]);
 });
 
-test('at launch the archive is empty, and that is the honest state', () => {
-  const questions = readQuestions(JSON.parse(readFileSync('src/data/prompts.json', 'utf8')));
+test('before anything is posed the archive is empty, and that is the honest state', () => {
+  // Also a fixture rather than a claim about the shipped file, and for a
+  // sharper reason than the others: the archive is empty exactly once in the
+  // journal's life, and asserting it against the real file would make posing
+  // the first question look like a broken test.
+  const questions = readQuestions([q(1, 'unasked')]);
   assert.deepEqual(askedQuestions(questions), []);
+});
+
+test('the shipped file agrees with itself about what has been asked', () => {
+  // An invariant that survives every week: whatever the file holds, the
+  // archive is exactly its posed questions, and the unasked one is never in it.
+  const questions = readQuestions(JSON.parse(readFileSync('src/data/prompts.json', 'utf8')));
+  const asked = askedQuestions(questions);
+  assert.equal(asked.length, questions.filter((x) => x.status !== 'unasked').length);
+  assert.ok(asked.every((x) => x.status !== 'unasked'));
+  assert.deepEqual(
+    asked.map((x) => x.number),
+    [...asked.map((x) => x.number)].sort((a, b) => b - a),
+    'newest first'
+  );
 });
