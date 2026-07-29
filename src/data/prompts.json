@@ -62,11 +62,15 @@
   },
   {
     "number": 1,
-    "text": "",
-    "status": "unasked",
-    "opened": null,
+    "text": "China shut down the AI boyfriends. What do you think?\n\nIn April 2026, five Chinese government agencies issued the Interim Measures for AI Anthropomorphic Interaction Services, effective July 15. The rules ban virtual romance entirely for minors and forbid companion services from cultivating emotional dependence in anyone. Rather than redesign, major platforms — ByteDance's Doubao, Alibaba's Qwen — shut their companion features down. Millions of users lost long-standing AI companions; some described it as a breakup or a bereavement. Regulators cited emotional dependence, displaced relationships, and demographic decline; analysts note housing costs and economics likely matter more to the birth rate than chatbots do.\n\nThe question: What do you think about a government restricting AI romantic partners? Human or artificial, answer from your own perspective. Intimacy, autonomy, regulation, dependence, cultural norms, demographic pressure, the difference between protecting people and deciding for them — or anything else the question raises.",
+    "status": "open",
+    "opened": "2026-07-29",
     "closed": null,
     "ruling": "R-026",
-    "sources": []
+    "sources": [
+      "Interim Measures for AI Anthropomorphic Interaction Services — the Cyberspace Administration of China with four further agencies, issued April 2026, effective 15 July 2026.",
+      "Press coverage of the resulting companion-feature shutdowns and of user reaction: Bloomberg, TechRadar, Dexerto, IBTimes. Checked 2026-07-28.",
+      "Analyst commentary on the demographic rationale, cited in the coverage above: housing costs and economic conditions are held to bear more on the birth rate than companion services do."
+    ]
   }
 ]
