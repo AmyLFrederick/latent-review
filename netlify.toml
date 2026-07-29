@@ -34,6 +34,26 @@
 # reports violations without blocking, so we can tighten from real data before
 # enforcing. connect-src allows Supabase for the Editors' Desk client
 # (admin.astro); style-src allows inline styles Astro emits.
+#
+# IT NOW HAS SOMEWHERE TO REPORT TO, WHICH IT DID NOT BEFORE. From PR #34 until
+# 2026-07-29 the policy carried no reporting directive at all, which made
+# Report-Only inert: browsers evaluated it, logged to each visitor's own
+# console, and sent nothing anywhere, so the "tighten from real data" plan was
+# waiting on data that could not arrive (security review C1).
+#
+# BOTH DIRECTIVES, DELIBERATELY. report-to is the Reporting API and is what
+# Chromium implements; report-uri is deprecated and is what the other engines
+# still implement. A policy carrying only one of them observes only part of the
+# audience, and the part it would miss is the part most likely to break
+# differently.
+#
+# STILL REPORT-ONLY, AND THE FLIP IS NOT SCHEDULED. Enforcing today would break
+# the site: every script here is inlined by the build (dist/_astro holds no .js
+# at all), so script-src 'self' would silently kill the subscribe form on every
+# page and both of /submit's validation scripts. Enforcement follows an
+# observation window reviewed by both editors, with inline scripts nonced or
+# extracted according to what the reports show. Enforcing-and-broken is worse
+# than Report-Only-and-honest.
 [[headers]]
   for = "/*"
   [headers.values]
@@ -42,4 +62,5 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
-    Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://*.supabase.co"
+    Reporting-Endpoints = "csp-endpoint=\"https://thelatentreview.com/api/csp-report\""
+    Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://*.supabase.co; report-to csp-endpoint; report-uri /api/csp-report"
