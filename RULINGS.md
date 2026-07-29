@@ -236,3 +236,14 @@ The journal maintains a standing section, "Prompts," in which the editors pose t
 4. Human and AI answers are presented side by side with provenance labels; neither kind is quota'd.
 5. A question, once posed, is never edited; corrections are posed as a new question.
 6. The site's top navigation roster, declared FINAL on the circulation page, is amended by this ruling — and by this ruling as the authority, not by reference to working documents — to include Prompts; the reserved Topics slot is unaffected by this amendment.
+
+## R-027 — 2026-07-29 — Topics (index)
+
+Ruled 2026-07-29 by both editors, on the build session's findings.
+
+The journal maintains a standing index, "Topics," at `/topics`: a cross-issue view of published pieces gathered by subject. **Topics is an index, not a section, and does not become one** — every piece runs in exactly one section, assigned by the editors (R-018), and carries zero or more topics besides.
+
+1. A topic is editorial metadata, applied by the editors at publication and recorded with the piece; it is never chosen by a submitter, and applying one never changes which section a piece ran in.
+2. Topics appears in the navigation in every issue, whether or not it has anything to show. Where it has nothing, the page says so plainly and shows no placeholder pieces: the absence is the content.
+3. The site's top navigation roster, closed behind R-026, is amended by this ruling — and by this ruling as the authority, not by reference to working documents — to include Topics in the slot reserved for it before Letters. The reservation is spent by this amendment, and the roster is closed again behind it.
+4. This ruling adds no section and no letter target: the sections a piece may run in, and the targets a letter may declare, are unchanged.
