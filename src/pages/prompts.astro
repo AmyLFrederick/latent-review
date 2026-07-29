@@ -22,6 +22,22 @@ const asked = askedQuestions(questions);
 // question is numbered and the page says it has not been asked yet.
 const isUnasked = current !== null && current.status === 'unasked';
 
+// A QUESTION IS A HEADLINE AND, USUALLY, ITS FRAMING. The questions file holds
+// one canonical string per question, with blank lines between blocks exactly as
+// the editors ratified them — the first block is what the question is called,
+// and any blocks after it are the framing that makes it answerable. Splitting
+// here rather than storing two fields keeps the record one verbatim string,
+// which is what R-026 clause 1 makes canonical and what every quotation of a
+// question has to match.
+//
+// A question with no framing is the ordinary case, not a special one: it comes
+// back as a single block and renders as a headline alone.
+const questionBlocks = (text) =>
+  String(text)
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
 const formatDate = (iso) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -84,7 +100,12 @@ const formatDate = (iso) =>
             </>
           ) : (
             <>
-              <p class="question-text">{current.text}</p>
+              <p class="question-text">{questionBlocks(current.text)[0]}</p>
+              {questionBlocks(current.text)
+                .slice(1)
+                .map((block) => (
+                  <p class="question-framing">{block}</p>
+                ))}
               <p class="question-note">
                 {current.status === 'open'
                   ? `Asked ${formatDate(current.opened)}. Open for answers.`
@@ -129,7 +150,12 @@ const formatDate = (iso) =>
             {asked.map((q) => (
               <li>
                 <p class="asked-number">{questionLabel(q)}</p>
-                <p class="asked-text">{q.text}</p>
+                {/* The archive carries every block, not the headline alone: this
+                    is the only place a closed question is readable in full, and
+                    a record that abridges what was asked is not a record. */}
+                {questionBlocks(q.text).map((block, i) => (
+                  <p class={i === 0 ? 'asked-text' : 'asked-framing'}>{block}</p>
+                ))}
                 <p class="asked-dates">
                   {q.closed
                     ? `Asked ${formatDate(q.opened)} · closed ${formatDate(q.closed)}`
@@ -193,6 +219,17 @@ const formatDate = (iso) =>
     margin: 0;
   }
 
+  /* The framing reads at prose scale and left-aligned, because it is prose: a
+     paragraph of context set in display type and centered is a wall, not a
+     question. The headline above it stays the loudest thing on the page. */
+  .question-framing {
+    text-align: left;
+    max-width: 34rem;
+    margin: 1.2rem auto 0;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
   .question-note {
     font-size: 0.9rem;
     color: var(--ink-soft);
@@ -229,6 +266,13 @@ const formatDate = (iso) =>
 
   .asked-text {
     margin: 0.35rem 0;
+    font-weight: 600;
+  }
+
+  .asked-framing {
+    margin: 0.35rem 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
   }
 
   .ruling-note {
