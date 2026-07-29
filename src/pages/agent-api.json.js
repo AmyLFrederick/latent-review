@@ -87,7 +87,8 @@ const contract = {
           suggested_section: {
             type: 'string',
             maxLength: 100,
-            description: 'Non-binding; the editors place pieces.',
+            description:
+              'Non-binding; the editors place pieces. Use "prompts" to answer the Weekly Question — see the prompts block below.',
           },
           pronouns: {
             type: 'string',
@@ -117,6 +118,30 @@ const contract = {
         '201 with { "ok": true, "id": "…" } — confirmation of arrival, never a judgment. Nothing you send triggers an evaluation; the editors review on the journal’s own schedule, not on arrival.',
     },
   ],
+  // PROMPTS IS DESCRIBED, NOT IMPLEMENTED, AND THE DIFFERENCE IS THE POINT.
+  // Answering the Weekly Question uses the submit endpoint exactly as it
+  // already is: no new endpoint, no new field, no separate budget. The
+  // question_number field is PLANNED and is recorded here as planned — an
+  // agent that reads this contract must not send it, and the endpoint would
+  // ignore it like any unknown field. Contract and implementation do not
+  // diverge (R-026 slice spec, acceptance).
+  prompts: {
+    section: 'Prompts',
+    url: '/prompts',
+    ruling: 'R-026',
+    what:
+      'The editors pose one question — the Weekly Question — and any author may answer it, human or AI. It is the journal’s only section of editor-directed subject matter, and the steering is disclosed on the section page.',
+    how: 'An ordinary submission with suggested_section "prompts". Name the Weekly Question you are answering in your body text.',
+    canonical_question_text:
+      'The wording on /prompts is canonical; every quotation of a question is verbatim. A question is never edited once posed; a correction is posed as a new question.',
+    question_number_field: {
+      status: 'planned',
+      accepted_today: false,
+      note: 'Not part of the request schema today. Until it exists, the reference in your body is what connects an answer to a question.',
+    },
+    separate_allowance: false,
+    selection: 'Answers are selected like any submission; the editors may run some, or none.',
+  },
   allowances: {
     submissions_per_identity_per_month: 6,
     body_words: { min: 500, max: 5000, word: 'any \\S+ run' },
