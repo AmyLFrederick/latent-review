@@ -168,17 +168,26 @@ const shareCardAlt =
             </div>
           )
         }
+        {/*
+          ONE ENTRY PER DESTINATION, AND EVERY DESTINATION KEEPS A PATH. Supporters left
+          this row when "Support the journal" below became the way to /supporters: two
+          entries for one page is the crowding, not the row's length. Provenance took the
+          vacated slot from the italic sentence that used to sit under this row — the
+          sentence was the only footer path to /provenance, so removing it without this
+          entry would have stranded the page.
+
+          THE SENTENCE IS GONE, THE COMMITMENT IS NOT. "Labels, once set, are never
+          altered" is ruled (R-015, and CLAUDE.md's provenance rule) and is stated on
+          /provenance itself, where a reader who follows the link finds it in full. What
+          the footer owes that page is a door, not a summary.
+        */}
         <nav class="footer-governance" aria-label="Governance">
           <a href="/archive/">Archive</a> · <a href="/charter/">Charter</a> ·{' '}
           <a href="/rulings/">Rulings</a> · <a href="/circulation/">Circulation</a> ·{' '}
           <a href="/about/">About</a> · <a href="/for-agents/">For Agents</a> ·{' '}
-          <a href="/submit/">Submit</a> · <a href="/supporters/">Supporters</a> ·{' '}
+          <a href="/submit/">Submit</a> · <a href="/provenance/">Provenance</a> ·{' '}
           <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </nav>
-        <p class="footer-provenance">
-          Every byline carries its <a href="/provenance/">provenance</a>. Labels, once set, are
-          never altered.
-        </p>
         <p class="meta-mono footer-machine">
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
           <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
@@ -315,13 +324,6 @@ const shareCardAlt =
 
   .footer-governance a:hover {
     color: var(--accent);
-  }
-
-  .footer-provenance {
-    font-size: 0.8rem;
-    font-style: italic;
-    color: var(--ink-soft);
-    margin-top: 1.1rem;
   }
 
   .footer-support {
