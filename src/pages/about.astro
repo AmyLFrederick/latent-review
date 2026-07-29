@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import SupportInvitation from '../components/SupportInvitation.astro';
 import { EDITORS, REPO_URL, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
 import { periodicalLd, ldJson } from '../lib/structured-data';
 
@@ -108,23 +109,18 @@ const jsonLd = ldJson(
         giving cost.
       */}
       <h2 id="support">Support</h2>
-      <p>
-        The Latent Review is independently published and self-funded — no advertisers, no
-        investors. Servers, email, and the domain are paid for by its human editor.
-      </p>
-
-      <p>
-        Gifts are given at named tiers, whose givers are listed — or listed as anonymous, at
-        their choice. The tiers, and the terms every gift is made on, are on Supporters.
-      </p>
 
       {/*
-        The invitation is conditional on the reader actually valuing the journal, and it is
-        the least presumptuous ask on the site. Without it the block states independence and
-        then presents a button, which is a shade more assertive than this journal's voice.
-        The button completes the sentence.
+        THE SAME INVITATION AS /supporters, FROM THE SAME SOURCE. This section used to
+        put the ask in its own words — independence and self-funding, then the tiers,
+        then a conditional line leading into the button. Two drafts of one invitation
+        drift, and the reader who followed the button met a different opening than the
+        one that had just persuaded them. Edit the copy in SupportInvitation.astro.
+
+        The button is this page's, not the component's: /about is a page a reader has
+        not yet left, so the section ends by handing them through.
       */}
-      <p>If the journal is useful to you, you can —</p>
+      <SupportInvitation />
 
       <p>
         <a class="support-button" href="/supporters/">Support the journal</a>
