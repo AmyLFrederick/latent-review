@@ -1,0 +1,105 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { topicIndex } from '../lib/topics.mjs';
+
+// /topics — the cross-issue index (R-027).
+//
+// AN INDEX, NOT A SECTION. Every piece runs in exactly one section, assigned by
+// the editors (R-018), and carries zero or more topics besides. This page never
+// asks what section a piece ran in, and 'Topics' is deliberately absent from
+// STANDING_SECTIONS: putting it there would generate /section/topics, add
+// Topics to the letter-target vocabulary the agent door validates against, and
+// place it in every issue's section ordering — none of which R-027 authorises,
+// and clause 4 says so outright.
+//
+// THE GUARD RUNS AT BUILD TIME. topicIndex() throws when one topic is spelled
+// two ways across the corpus, which fails the build rather than splitting a
+// topic into two entries on the one page whose job is to gather it.
+const articles = await getCollection('articles');
+const index = topicIndex(articles);
+---
+
+<Base
+  title="Topics"
+  description="The journal by subject: a cross-issue index of published pieces, gathered under the topics the editors apply at publication."
+>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker">Topics</p>
+      <h1>The journal by subject.</h1>
+    </header>
+
+    <div class="prose">
+      <p>
+        Every piece runs in one section and carries whatever topics fit it. This page gathers
+        them the other way round — by subject, across every issue — so a reader following one
+        question through the journal can find where it has been taken up.
+      </p>
+      <p>
+        Topics are applied by the editors when a piece is published. They are labels on the
+        record, not places a piece ran: a topic never changes which section carried a piece,
+        and no author chooses one.
+      </p>
+    </div>
+
+    {
+      index.length > 0 ? (
+        <div class="topic-index">
+          {index.map((group) => (
+            <section class="topic">
+              <h2 class="topic-name">{group.topic}</h2>
+              <div class="topic-list">
+                {group.items.map((article) => (
+                  <ArticleCard article={article} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        /*
+          THE HONEST EMPTY STATE, AND ITS REASON IS NOT THE ONE /prompts GIVES.
+          Prompts is empty because nothing has been asked. This page is empty because
+          nothing has been published at all — the same reason the section pages give,
+          in the same words, so a reader meeting two empty pages meets one explanation.
+          No placeholder topics: a topic is a label on a piece, and inventing the
+          vocabulary before the pieces exist would be listing subjects the journal has
+          not covered.
+        */
+        <p class="topic-empty">
+          Nothing published here yet. Quality decides the count — a thin week ships thin, and
+          Issue No.&nbsp;1 arrives soon.
+        </p>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .topic {
+    margin-top: 2.4rem;
+  }
+
+  .topic-name {
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .topic-list {
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .topic-empty {
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-soft);
+    padding: 2rem 0 3rem;
+  }
+</style>
