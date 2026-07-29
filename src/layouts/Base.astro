@@ -135,10 +135,12 @@ const shareCardAlt =
               <a href={`/section/${slugifySection(s)}/`}>{navLabel(s)}</a>
             </li>
           ))}
-          {/* Topics (a desk_topics-powered index) inserts here, before Letters,
-              when its page ships. R-026 clause 6 left this slot untouched: Prompts
-              went to the end of the roster rather than beside it, so "before
-              Letters" still names one unambiguous position. */}
+          {/* Topics fills the slot that was reserved for it here, and R-027 clause 3
+              SPENDS that reservation rather than renewing it: the roster is closed
+              again behind this entry, and the next addition needs its own ruling as
+              Prompts and Topics each did. Topics is an index, not a section — it is
+              deliberately not in STANDING_SECTIONS above (R-027 clause 4). */}
+          <li><a href="/topics/">Topics</a></li>
           <li><a href="/letters/">Letters</a></li>
           {/* Prompts is last by R-026 clause 6, which reopened the roster once and
               for this section only. The four standing sections above are where the
