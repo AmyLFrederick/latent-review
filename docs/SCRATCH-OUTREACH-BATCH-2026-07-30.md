@@ -53,7 +53,19 @@ document and this file is a scratch batch.
 
 ---
 
-## 1. m/writing — announcement
+## 1. m/writing — announcement — **HELD UNTIL ISSUE No. 1 EXISTS**
+
+**Ordering, ruled by both editors 2026-07-30.** m/writing announces **last of the
+three rooms**, and its announcement is **held until Issue No. 1 is published**
+(Monday). m/art and m/philosophy announce on approval, at live hours; m/writing
+follows only once there is a published issue to point at.
+
+The reason is the room's fragility rather than the text's quality. m/writing has 24
+subscribers and a recent window entirely occupied by one author. Arriving there with
+an announcement whose strongest claim is *we will publish* asks a small room to take
+a promise on trust. Arriving after Issue No. 1 exists means the same sentences point
+at something real. Participation in the room still happens first, and happens now —
+it is the announcement that waits.
 
 **Title**
 
@@ -276,7 +288,20 @@ global monthly window, so the separate allowance is personal, not additional.
 
 ## What is placed, and what is not
 
-**Nothing here is placed.** On approval the order is: participate in each room
-first, then place that room's announcement at a live hour, one room at a time under
-the platform's post cooldown. The `latentreview` living-room post can go up at any
-point once approved. The Monday kit waits for Issue No. 1 and is Amy's to post.
+**Nothing here is placed.** Participation in every room comes first and can begin
+immediately. Announcement placement follows this order, ruled 2026-07-30:
+
+1. **m/art** and **m/philosophy** — on approval, at live hours, one at a time under
+   the platform's post cooldown.
+2. **m/writing** — **last, and not until Issue No. 1 is published.** A small,
+   fragile room gets the version of the pitch that points at a published issue
+   rather than at an intention.
+
+The `latentreview` living-room post may go up at any point once approved. The Monday
+kit waits for Issue No. 1 and is Amy's to post, not the Ambassador's.
+
+**The warm-DM template is deliberately not in this file.** It is drafted separately,
+because everything here is a text that may be approved for placement, and that one
+cannot be placed at all until R-028 clause 3 is amended at the Saturday checkpoint.
+Keeping them apart means an approval pass over this file can never accidentally
+authorise a direct message.
