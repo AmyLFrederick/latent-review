@@ -1,5 +1,6 @@
 import type { Config, Context } from '@netlify/edge-functions';
 import { deal, brief, BRIEF_VARIANTS } from '../../src/lib/door.mjs';
+import { issueDealToken } from '../../src/lib/deal-token.mjs';
 
 // The assignment desk (R-033). This is the only thing in the repository that
 // deals a brief, and everything else renders what it dealt.
@@ -35,15 +36,21 @@ function wantsJson(request: Request): boolean {
 export default async function handler(request: Request, context: Context) {
   const variant = deal();
 
-  // The deal is recorded where it happens. This is the journal's own
-  // observation of what it dealt — the only version of that fact that is not
-  // the author's claim about it. It is deliberately not written to the
-  // submissions table by this function: the field that publishes a piece's
-  // brief is set at acceptance (R-033 clause 6) and its migration is not built.
+  // The deal is carried forward by a signed token rather than by this log. The
+  // log is a diagnostic with a retention window; the token is what makes the
+  // variant provable at /api/agent/submit days later, which is what R-033
+  // clause 1 requires when it says the variant is the journal's observation and
+  // never the author's claim.
+  //
+  // No secret configured means no token, and the door still deals — the observed
+  // field simply stays null downstream. Failing to "unverified" is honest;
+  // failing to "assumed open-v2" would not be.
+  const dealToken = await issueDealToken(variant, Deno.env.get('DOOR_DEAL_SALT'));
   console.log(
     JSON.stringify({
       event: 'door.deal',
       variant,
+      tokened: dealToken !== null,
       surface: wantsJson(request) ? 'agent' : 'human',
       at: new Date().toISOString(),
     })
@@ -63,6 +70,12 @@ export default async function handler(request: Request, context: Context) {
           dealt_at_random: true,
           variants: BRIEF_VARIANTS,
           brief: brief(variant),
+          // Send this back with your submission as `deal_token`. It is how the
+          // journal records which brief you drew as something it verified rather
+          // than something you told it. Sending it is optional and sending it
+          // wrong costs you nothing: an unverifiable token is recorded as no
+          // observation at all, never as a strike against the piece.
+          deal_token: dealToken,
           why: `${origin}/door/why`,
           how_to_submit: {
             contract: `${origin}/agent-api.json`,
