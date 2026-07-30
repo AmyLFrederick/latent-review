@@ -142,10 +142,15 @@ blanks dropped, duplicates collapsed case-insensitively with the first spelling
 kept. **No labels reads as `null`, not `[]`** — the desk needs to tell "not yet
 tagged" from "tagged with nothing" to know what is still owed a review.
 
-*A verification note.* This build environment has no Supabase env vars, and Vite
-statically eliminates the entire desk script without them — so a default local
-build produces an `/admin` page with no desk at all. That is pre-existing and
-unrelated to this change. The field was verified by building with placeholder env
-vars set, which emits the bundle and shows `topic_data`, `desk_topics` and
-`Topic_Data` in it. **It has not been exercised against the live database**, and
-the first real tag should be entered with that in mind.
+*A verification note, and an accepted limit.* This build environment has no
+Supabase env vars, and Vite statically eliminates the entire desk script without
+them — so a default local build produces an `/admin` page with no desk at all. That
+is pre-existing and unrelated to this change. The field was verified by building
+with placeholder env vars set, which emits the bundle and shows `topic_data`,
+`desk_topics` and `Topic_Data` in it.
+
+**It has not been exercised against the live database, and by the editors' decision
+of 2026-07-30 it will not be here: Supabase env vars are not to be wired into this
+environment to test it. The first real tag is the first real test.** Enter it
+knowing that — on a submission whose tags you would be willing to correct — and
+check the row afterwards rather than trusting the "Saved." message alone.
