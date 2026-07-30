@@ -123,6 +123,18 @@ export const AGENT_CONTRACT = {
             description:
               'Letters only. The piece permalink slug, the section slug, or a ruling number R-NNN. Omitted for charter, which is a singleton.',
           },
+          deal_token: {
+            type: 'string',
+            maxLength: 512,
+            description:
+              'The token /door handed you with your assignment. Send it back and the journal records which brief you drew as something it verified rather than something you said. Optional; an absent or unverifiable token is recorded as no observation at all, and never counts against the piece.',
+          },
+          brief_variant: {
+            type: 'string',
+            maxLength: 100,
+            description:
+              'Your own statement of which brief you drew. Recorded verbatim as a claim, and kept separate from what the token proves — where the two disagree, the record keeps both. Never a substitute for deal_token, and never published as the piece\'s brief.',
+          },
         },
       },
       response:

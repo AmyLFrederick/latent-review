@@ -5,6 +5,7 @@ import { hashApiKey } from '../lib/agentkeys.mts';
 import { requireEnv } from '../lib/env.mts';
 import { screenField } from '../lib/screen.mts';
 import { loadArchive, sectionSlugs, isFresh } from '../lib/archive.mts';
+import { verifyDealToken } from '../../src/lib/deal-token.mjs';
 
 export const config: Config = { path: '/api/agent/submit' };
 
@@ -45,6 +46,16 @@ const MAX_REQUEST_BYTES = 256 * 1024;
 // letters bounds below have always been copies for the same reason. What
 // closes the gap is a test — tests/agent-contract.test.mjs reads this file and
 // fails if either number here disagrees with the contract module.
+//
+// THIS FILE DOES NOW IMPORT ONE THING FROM src/, AND THE DIFFERENCE IS
+// DELIBERATE. deal-token.mjs is an HMAC implementation, not a number. A copied
+// constant can be kept honest by a test that compares two integers; a copied
+// signature routine has to stay byte-compatible with the one that signed, and
+// two implementations that drift produce tokens that silently stop verifying —
+// which would show up as "no agent ever came through the door," a null that
+// looks like data. Duplication is the greater risk there, so it is imported.
+// The import is exercised by the test suite, which loads this module through
+// the same path, so a resolution break fails CI rather than production.
 const WORD_MIN = 500;
 const WORD_MAX = 3000;
 
@@ -361,6 +372,25 @@ export default async function handler(req: Request, context: Context): Promise<R
     }
   }
 
+  // (6b) The dealt brief, resolved into an observation and a claim.
+  //
+  // Both are optional and neither can refuse a submission. An agent that never
+  // saw /door sends neither; an agent that sends a garbled token is recorded as
+  // unobserved, not rejected. Nothing an author gets wrong here costs them a
+  // piece — this field is the journal's measurement, not the author's obligation.
+  const observedVariant = await verifyDealToken(
+    typeof payload.deal_token === 'string' ? payload.deal_token : null,
+    process.env.DOOR_DEAL_SALT ?? null
+  );
+  // The claim is stored verbatim and bounded, never enum-checked: a claim that
+  // disagrees with the observation is exactly the row worth keeping. It is
+  // screened like every other submitter-controlled string, because it is one.
+  const claimedRaw =
+    typeof payload.brief_variant === 'string' ? payload.brief_variant.slice(0, 100) : null;
+  const claimedVariant = claimedRaw && !screenField(claimedRaw, { multiline: false })
+    ? claimedRaw
+    : null;
+
   // (7) The RPC — auth, ceiling, cap, insert, all atomic in the DB.
   try {
     const { data, error } = await supabase.rpc('submit_agent_direct', {
@@ -410,6 +440,38 @@ export default async function handler(req: Request, context: Context): Promise<R
     }
 
     console.log(`agent submission received: id=${id}`);
+
+    // (9) Which brief this writer drew (R-033 c6), annotated onto the row that
+    // now exists. Two facts, kept apart on purpose:
+    //
+    //   observed — read out of a deal token whose HMAC we just verified. Not the
+    //              caller's value passing through: the caller sent a token it
+    //              could not have forged, and this is our own conclusion from it.
+    //   claimed  — whatever the payload asserted, verbatim and unverified,
+    //              recorded under a name that says so. The row where these two
+    //              disagree is the interesting one, which is why neither is
+    //              allowed to overwrite the other.
+    //
+    // Deliberately after the receipt path and never in front of it: this is
+    // metadata the desk reads days later, not an intake gate. A failure here
+    // must not turn a piece that is already safely stored into a refusal — the
+    // receipt confirms arrival, and arrival happened. See the long note in the
+    // migration for why this is a separate statement rather than two more RPC
+    // parameters.
+    if (observedVariant !== null || claimedVariant !== null) {
+      const { error: annotateError } = await supabase
+        .from('submissions')
+        .update({
+          brief_variant_observed: observedVariant,
+          brief_variant_claimed: claimedVariant,
+        })
+        .eq('id', id);
+      if (annotateError) {
+        console.error(
+          `agent submit: brief variant not recorded for id=${id}: ${annotateError.message ?? ''}`
+        );
+      }
+    }
 
     // Receipt only — nothing evaluative (§1 step 8).
     return json(
