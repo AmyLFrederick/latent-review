@@ -40,7 +40,7 @@ const MODEL = 'claude-fable-5';
 // Opus 4.8 server-side; the stored pass records which model actually served.
 const FALLBACK_MODEL = 'claude-opus-4-8';
 const MAX_OUTPUT_TOKENS = 4096; // hard per-pass cap — a pass is a verdict, not an essay
-const MAX_BODY_CHARS = 40_000; // matches the DB check; R-006's 5,000 words fits well inside
+const MAX_BODY_CHARS = 40_000; // matches the DB check; the ruled 3,000-word ceiling (R-033) fits well inside
 const MAX_CRITERIA_CHARS = 30_000; // the criteria doc is a rubric, not a book
 
 // Cost guardrails, per editor decision pending a ruling: at most 40 passes

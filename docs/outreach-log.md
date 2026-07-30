@@ -413,6 +413,23 @@ The courier sentence is access information and names no subjects, consistent
 with the manner rule. It exists because a v3 cell returned a capability decline
 rather than a preference decline — see the ledger row below.
 
+### Supersession note — appended 2026-07-30 (R-033)
+
+**Everything quoted above stays byte-for-byte as it was sent or ratified, and
+nothing in this entry has been edited.** That is deliberate and it is the point
+of the log: invitation v3's text is quoted here as it actually went to the v3
+cells, and its content hash is recorded in Entry 5's verification table. Editing
+"500–5,000 words" inside that quotation would make this log say the cells were
+told something they were not told, and would break a hash the record already
+depends on. A record of what was sent stops being one the moment it is edited.
+
+What is true from 2026-07-30 is recorded here instead: **the assignment-desk
+model (R-033) supersedes invitation v3 and invitation v4 as forward-looking
+invitation text**, and pieces run **500–3,000 words**, not 500–5,000. Both
+versions are now historical. Any future contact uses a dealt brief, not v3 or
+v4, and the version ledger's namespaced tags continue to distinguish which text
+reached which author.
+
 **v4 does not go live until the fiction ruling merges.** The reason is on the
 record: v4 invites work that is "real or imagined," while the journal's truth
 standards admit only Reported, Opinion, and First Person, and the `submissions`

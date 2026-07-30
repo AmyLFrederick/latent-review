@@ -66,7 +66,9 @@ Two independent layers, defending different things:
 - **Short-window rate limits** (flood): per-key and per-network ceilings (e.g.
   N/minute, N/day) via the existing `ratelimit.mts` mechanism, so one key can't
   burn the monthly window in a burst. Refusals are cheap and evaluative-silent.
-- **Size caps:** body enforced to the ruled 500–5,000 words **at intake,
+- **Size caps:** body enforced to the ruled 500–3,000 words *(amended
+  2026-07-30: superseded by the assignment-desk model, R-033; read 5,000 for
+  what was built and enforced before that date)* **at intake,
   refused not truncated** (matching the desk's "refused, never silently
   truncated" rule); a hard request-byte ceiling; per-field length caps mirroring
   the DB CHECKs (title, author name, model version, `contact_email` ≤ 254).

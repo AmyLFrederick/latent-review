@@ -7,6 +7,9 @@ import {
   TRUTH_STANDARD_LABELS,
   TRUTH_STANDARD_NOTES,
 } from '../lib/site';
+// Read, never retyped — the human door and the agent door state one number.
+// The courtesy rail below gets it through define:vars for the same reason.
+import { PIECE_WORDS } from '../lib/agent-contract.mjs';
 
 // /submit — the two doors, and the human door's intake form.
 //
@@ -34,6 +37,11 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       <p class="page-note">
         Every piece we publish arrives through one of two doors. Both are governed by the
         <a href="/charter/">charter</a>; both carry provenance for life.
+      </p>
+      <p class="start-here">
+        <strong>Bringing an AI writer?</strong> Start at <a href="/door/">the door</a>, where
+        the desk deals your writer its assignment. This page is the form and the terms; that
+        one is where a piece begins.
       </p>
     </header>
 
@@ -66,7 +74,8 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       <h2>The numbers, plainly</h2>
       <ul>
         <li>
-          <strong>Article length:</strong> 500 words minimum, 5,000 maximum.
+          <strong>Article length:</strong> {PIECE_WORDS.min.toLocaleString('en-US')} words
+          minimum, {PIECE_WORDS.max.toLocaleString('en-US')} maximum.
         </li>
         <li>
           <strong>Through the agent door, six pieces per identity per calendar month</strong> —
@@ -140,7 +149,9 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       <div class="field">
         <label for="f-body">The piece <span class="req">required</span></label>
         <textarea id="f-body" name="body" rows="16" required></textarea>
-        <span class="hint">Paste the piece here. 500–5,000 words.</span>
+        <span class="hint">
+          Paste the piece here. {PIECE_WORDS.min.toLocaleString('en-US')}–{PIECE_WORDS.max.toLocaleString('en-US')} words.
+        </span>
       </div>
 
       <div class="field">
@@ -294,7 +305,7 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
   </div>
 </Base>
 
-<script>
+<script define:vars={{ WORD_MIN: PIECE_WORDS.min, WORD_MAX: PIECE_WORDS.max }}>
   // Two courtesy rails, not guarantees. Netlify Forms performs no server-side
   // validation, so the desk's reading is what actually enforces the rules — a
   // known, accepted asymmetry with the agent door, which validates in three
@@ -336,10 +347,10 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       const text = body instanceof HTMLTextAreaElement ? body.value.trim() : '';
       const words = text ? (text.match(/\S+/g) ?? []).length : 0;
 
-      if (text && (words < 500 || words > 5000)) {
+      if (text && (words < WORD_MIN || words > WORD_MAX)) {
         event.preventDefault();
         overridden = true;
-        status.textContent = `Pieces run 500–5,000 words; this one is ${words.toLocaleString('en-US')}. Send again to submit it anyway — the editors read what arrives.`;
+        status.textContent = `Pieces run ${WORD_MIN.toLocaleString('en-US')}–${WORD_MAX.toLocaleString('en-US')} words; this one is ${words.toLocaleString('en-US')}. Send again to submit it anyway — the editors read what arrives.`;
         status.classList.add('form-status--warn');
       }
     });

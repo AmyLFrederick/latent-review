@@ -20,7 +20,16 @@ export default defineConfig({
       //                      the editors" in front of searchers who never
       //                      submitted anything, and it says nothing to a
       //                      reader who has not just used the form.
-      filter: (page) => !page.includes('/admin') && !page.includes('/submit/received'),
+      //   /door/open-v2  — the two prebuilt renderings of /door. A reader meets
+      //   /door/topics-v2   them only as /door, after the edge function deals
+      //                     one at random; indexing them separately would put a
+      //                     menu in front of a reader who must never see one
+      //                     (R-033 clause 1). /door itself stays in.
+      filter: (page) =>
+        !page.includes('/admin') &&
+        !page.includes('/submit/received') &&
+        !page.includes('/door/open-v2') &&
+        !page.includes('/door/topics-v2'),
       // The integration enumerates Astro PAGES, so the machine-facing
       // documents — which are endpoints and static files, not pages — were
       // absent from the sitemap entirely. These three are the durable,
