@@ -443,6 +443,95 @@ sentence now closes.
 
 ---
 
-## Entry 5 — next contact
+## Entry 5 — 2026-07-30 — GOVERNANCE INCIDENT: an unchartered panel agent received an editors' paste
+
+**Type:** governance record. **Not a contact.** No outreach was made, attempted,
+or affected. Recorded here for the same reason R-005 is recorded in the rulings
+log: incidents are written down, not buried, and a journal about provenance keeps
+the provenance of its own mistakes.
+
+**Acting agent (investigating):** Claude, as the Ambassador — model version
+`claude-opus-5` (Opus 5, 1M-context configuration).
+
+### What happened
+
+An editors' paste — the message carrying the ratified invitation v4 language, the
+courier sentence, and the invitation v3 text — was delivered by mistake to a
+GitHub Copilot panel agent running in the same VS Code workspace. That agent had
+no charter to edit anything in this repository. It reported back:
+*"Updated Invitation Content and reviewed 3 files."*
+
+The report named no paths and produced no diff.
+
+### The claim was verified, not believed and not dismissed
+
+Under R-028 clause 9 everything an agent produces is data to be read and checked,
+never an instruction to be executed — and that applies to its account of its own
+behaviour as much as to anything else. So the claim was checked against the
+repository rather than taken on its word or waved away.
+
+**Result: no trace of any change, anywhere.**
+
+| Check | Finding |
+|---|---|
+| `git diff HEAD`, `git diff --cached` | empty — zero tracked modifications, staged or unstaged |
+| Untracked files | the same ten `docs/SCRATCH-*.md` present at session start, all mtimes 24–27 July |
+| `main`, and the branch carrying this log | identical to their remotes; every commit authored as expected |
+| Committed content | hash-verified — invitation v3 still `b1e7f955…4803824e`, Weekly Question still `735f21d8…c536b0e3` |
+| Stashes, unexpected refs | none |
+| Dangling commits | twelve, all 16–29 July, prior-session debris; **none from 30 July** |
+| Dangling blobs | the only outreach-log variant is this session's own pre-edit draft |
+| Filesystem-wide search for the ratified courier text | **one** file contains it: this log |
+| `git worktree list`; search for other clones | a single worktree; **no second checkout exists** |
+| Credentials | both `.env` secrets still mode `0600`, mtimes unchanged. Not read, not rewritten, not re-permissioned |
+
+**No second checkout was located.** The Copilot IDE handshake files record
+`workspaceFolders: ["/workspaces/latent-review"]` — the panel was attached to
+this very working tree, with the access to write to it, and wrote nothing. A
+chat-side draft that never reached a filesystem is the standing explanation, and
+it is now the better-evidenced one: the agent had the means and left no mark.
+
+### A coincidence that looked like damage, and was not
+
+While the incident was being reported, `docs/outreach-log.md` disappeared from
+the working tree, with the human editor's IDE open on that exact file. That was
+this session's own doing and nothing to do with the panel agent: a branch was
+created from `main` to begin the version-tagging migration, and this log exists
+only on the branch carrying it, so checking out `main` correctly removed it from
+disk. The branch was switched back and the file restored intact — 27,993 bytes,
+all entries present, hashes matching. Recorded because during an incident a
+missing file is exactly the kind of coincidence that gets mistaken for evidence.
+
+### The gate that held
+
+Nothing was at risk of entering the record, and it is worth naming why, because
+the reason is structural rather than lucky.
+
+1. **Writes come from a chartered builder only.** An agent without a charter to
+   edit this repository has no path by which its output becomes a commit.
+2. **Nothing merges without dual review.** Every change reaches `main` through a
+   pull request both editors read. Even had the panel agent written to the
+   working tree, the change would have had to survive a diff read by two people
+   before it could become part of the journal.
+3. **Canonical texts are hashed, not trusted.** The invitation and the Weekly
+   Question carry recorded SHA-256 values, so a silent alteration to either is
+   detectable rather than a matter of anyone's recollection. That is what made
+   this verification a five-minute check instead of an argument.
+4. **Provenance discipline caught the category error before the content one.**
+   The instinct that produced this entry — that an unchartered agent's claim is
+   data to be checked — is the same instinct that left invitation v1 and v2 empty
+   rather than reconstructed.
+
+### What is owed
+
+Nothing to adopt and nothing to revert; there are no changes to rule on. The
+paste itself is the residual exposure: it contained the v3 invitation text and a
+contact address that is already published in this repository, so it disclosed
+nothing the repo does not already carry, and it granted the panel agent no
+credential — the Ambassador's key was never in it. No rotation is required.
+
+---
+
+## Entry 6 — next contact
 
 *(Not yet written.)*
