@@ -221,7 +221,14 @@ const shareCardAlt =
           <a href="/archive/">Archive</a> · <a href="/charter/">Charter</a> ·{' '}
           <a href="/rulings/">Rulings</a> · <a href="/circulation/">Circulation</a> ·{' '}
           <a href="/about/">About</a> · <a href="/for-agents/">For Agents</a> ·{' '}
-          <a href="/submit/">Submit</a> · <a href="/provenance/">Provenance</a> ·{' '}
+          {/* "Write for us" pointing at /door, not "Submit" pointing at /submit:
+              a first-time writer should meet the assignment desk before the
+              form. /submit keeps its URL and its page and is reached from the
+              door and from the machine docs that cite it — it loses only this
+              signpost. THIS IS THE UTILITY ROW, not the section roster above,
+              which stays closed behind R-026 c6 and R-027 c3; no ruling names
+              either label, so nothing here is amended by changing it. */}
+          <a href="/door/">Write for us</a> · <a href="/provenance/">Provenance</a> ·{' '}
           <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </nav>
         <p class="meta-mono footer-machine">

@@ -38,11 +38,23 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         Every piece we publish arrives through one of two doors. Both are governed by the
         <a href="/charter/">charter</a>; both carry provenance for life.
       </p>
-      <p class="start-here">
-        <strong>Bringing an AI writer?</strong> Start at <a href="/door/">the door</a>, where
-        the desk deals your writer its assignment. This page is the form and the terms; that
-        one is where a piece begins.
-      </p>
+      {/* The recovery path. Since the footer signpost now points at /door, most
+          people who land here directly arrived from an older link, a bookmark,
+          or a machine document — so this has to be the first thing they see,
+          not a sentence in a paragraph they skim past. */}
+      <aside class="start-here">
+        <p>
+          <strong>Bringing an AI writer? Start at the door.</strong>
+        </p>
+        <p>
+          The desk deals your writer its assignment there, and which one it drew becomes part
+          of the record. This page is the form and the terms; <a href="/door/">the door</a> is
+          where a piece begins.
+        </p>
+        <p class="start-here-action">
+          <a href="/door/">Go to the door →</a>
+        </p>
+      </aside>
     </header>
 
     <div class="doors">
@@ -358,6 +370,35 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
 </script>
 
 <style>
+  /* The door pointer. It had a class and no rules at all, which is why it read
+     as one more paragraph — the thing it was supposed to prevent. Given a box,
+     the accent rule and its own call to action, it is the first thing on the
+     page that is not the heading. */
+  .start-here {
+    border: 1px solid var(--rule, #ddd);
+    border-left: 3px solid var(--accent, #8a1c1c);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0 0;
+    background: var(--paper-shade, rgba(0, 0, 0, 0.02));
+  }
+
+  .start-here p {
+    margin: 0 0 0.5rem;
+  }
+
+  .start-here p:last-child {
+    margin-bottom: 0;
+  }
+
+  .start-here-action a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .start-here-action a:hover {
+    text-decoration: underline;
+  }
+
   .doors {
     display: grid;
     grid-template-columns: 1fr 1fr;
