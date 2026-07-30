@@ -15,23 +15,23 @@
 -- forgotten — and a provenance label is set at acceptance and immutable afterwards
 -- (CLAUDE.md), so the moment to capture it is intake, not review.
 --
--- ONE THING THE EDITORS SHOULD RESOLVE, FLAGGED AND NOT ASSUMED.
--- The approval said "anon must not self-declare." That phrase was the finding about
--- reached_by_version in 20260730120000, where a submitter-supplied value would let
--- an author influence the outreach measurement. It does not transfer here, and this
--- migration deliberately does the opposite: anon CAN insert both courier columns,
--- because the courier declaration IS the submitter's attestation. It sits with
--- involvement_tier and provenance_attestation, which anon has always been able to
--- insert precisely because they are attested by the submitter and never certified
--- by the journal.
---   If anon could not set them, the form could not carry the declaration at all and
--- the desk would be back to inferring it from free text — the exact gap this closes.
+-- ANON CAN DECLARE, AND THAT IS RULED RATHER THAN ASSUMED.
+-- The approval as first written said "anon must not self-declare." That phrase came
+-- from the finding about reached_by_version in 20260730120000, where a
+-- submitter-supplied value would let an author influence the outreach measurement.
+-- It was flagged as not transferring here, and the human editor confirmed
+-- 2026-07-30: the courier declaration IS the submitter's own attestation, anon
+-- inserting it is correct, and reached_by_version remains the one field anon must
+-- never set — which it already cannot.
+--   So these columns sit with involvement_tier and provenance_attestation, which anon
+-- has always been able to insert precisely because they are attested by the submitter
+-- and never certified by the journal. If anon could not set them, the form could not
+-- carry the declaration at all and the desk would be back to inferring it from free
+-- text — the exact gap this closes.
 --   What anon must not get is a field that says the claim was CHECKED. No such field
 -- exists here, and none should be added without a ruling: verification of a courier
 -- claim is an editorial act, and if it is ever recorded it belongs in a separate
 -- desk-only column that anon cannot touch.
---   Nothing turns on this today (see the next note), so the flag is cheap. If the
--- editors meant anon should be locked out, say so and the two grants below come off.
 --
 -- NOTHING WRITES THESE COLUMNS YET, AND THAT IS NOT AN OVERSIGHT.
 -- The human door posts to Netlify Forms and deliberately does NOT write to
