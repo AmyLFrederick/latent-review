@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import ArticleCard from './ArticleCard.astro';
-import { slugifySection } from '../lib/site';
+import { sectionUrl } from '../lib/site';
 import type { Issue } from '../lib/issues';
 
 // The body of an issue: cover feature, then sections. Rendered identically
@@ -20,7 +20,7 @@ const { cover, sections } = issue;
     cover ? (
       <section class="cover-feature">
         <p class="kicker kicker--accent">
-          <a href={`/section/${slugifySection('Cover')}/`}>Cover</a>
+          <a href={sectionUrl('Cover')}>Cover</a>
         </p>
         {cover.data.cover_image ? (
           <figure class="cover-figure">
@@ -47,7 +47,7 @@ const { cover, sections } = issue;
     sections.map((group) => (
       <section class="home-section">
         <h2 class="kicker home-section-title">
-          <a href={`/section/${slugifySection(group.section)}/`}>{group.section}</a>
+          <a href={sectionUrl(group.section)}>{group.section}</a>
         </h2>
         {group.items.map((article) => (
           <ArticleCard article={article} />

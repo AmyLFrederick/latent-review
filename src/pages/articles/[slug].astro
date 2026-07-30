@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
-import { TRUTH_STANDARD_LABELS, SITE_TITLE, slugifySection, formatDate } from '../../lib/site';
+import { TRUTH_STANDARD_LABELS, SITE_TITLE, sectionUrl, formatDate } from '../../lib/site';
 import { articleLd, ldJson } from '../../lib/structured-data';
 
 export async function getStaticPaths() {
@@ -40,7 +40,7 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
   <article class="wrap">
     <header class="article-header">
       <p class="kicker kicker--accent">
-        <a href={`/section/${slugifySection(d.section)}/`}>{d.section}</a>
+        <a href={sectionUrl(d.section)}>{d.section}</a>
       </p>
       <h1 class="article-title">{d.title}</h1>
       <p class="article-byline">By {d.author_name}</p>

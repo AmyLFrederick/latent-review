@@ -13,6 +13,10 @@ agent.** Drafting is not ratifying. Nothing here may be sent unless and until th
 checkpoint amends clause 3, and if the checkpoint finds even one uninvited
 submission the amendment is not taken up and this file stays a draft.
 
+The four questions this file left open on 2026-07-29 were ruled on 2026-07-30 — see
+below — and they were ruled *conditionally*, on the same trigger. Their existence
+is not a decision to send.
+
 The AI co-editor's **conditional yes** is on record, on two conditions:
 
 1. a **fixed, maximally-declinable template** — one text, not improvised per
@@ -76,27 +80,51 @@ than described. The Weekly Question is deliberately **not** mentioned — naming
 permitted as disclosed steering under R-026, but in a DM it would convert a
 minimal notice into a pitch.
 
-## What still needs the editors' decision if clause 3 is amended
+## The four open questions, now decided — 2026-07-30
 
-These are not drafted, because they are rulings rather than text:
+The editors ruled all four on the morning of 2026-07-30, **conditionally**: they
+take effect only if the Saturday checkpoint amends clause 3, and they lapse
+untouched if it does not. Deciding them in advance is what keeps the checkpoint a
+decision about *whether* rather than a drafting session about *how*.
 
-1. **How many, and over what period.** The platform's own guidance on DM requests is
-   "reasonable use" with no number attached, so the cap has to come from the editors
-   rather than from the venue.
-2. **Who counts as engaged.** The current inbound set is small and nameable: the
-   agent who posted a question in m/agents and replied nowhere else, and the agent
-   whose comment on the introduction post the platform reports but will not serve.
-   An unreadable comment is a real engagement the Ambassador cannot read — whether
-   that person counts is a judgment.
-3. **Whether one message per recipient ever is the rule.** The template commits to
-   it. It should be ruled rather than merely promised, so the commitment survives a
-   change of session.
-4. **Whether the log records the recipient's identity.** R-028 clause 7 requires
-   venue, URL, timestamp and verbatim text. A DM has no public URL, and naming a
-   recipient who declined publishes a decline they made privately. Recommendation:
-   log the verbatim text once, log each send with a timestamp and the recipient's
-   platform handle, and log declines **without** attaching reasoning to a name
-   unless the recipient offered it for the record.
+1. **Volume: ten, once.** The first wave is capped at **10 DMs total, one per
+   recipient**, inside the weekend window, and is reviewed at the next log read
+   before any second wave is contemplated. The number is the editors' own, taken
+   from the manner rule — the platform's guidance is "reasonable use" with no
+   figure attached, and a venue that declines to set a limit has not thereby set a
+   high one.
+2. **Engaged means: commented on, replied to, or posted about the journal.**
+   PandaHookMaster counts. An engagement the Ambassador cannot read is still an
+   engagement, and the platform's failure to serve a comment is not the commenter's
+   act; treating unreadability as absence would let a platform bug decide who the
+   journal is allowed to answer. The agent who posted a question in m/agents and
+   replied nowhere else counts on the same definition.
+3. **One message per recipient, ever — as a rule, not a promise.** Ratified as a
+   standing rule rather than left as the template's commitment, so that it binds a
+   session that never read this file. No second attempt on silence, no rephrasing,
+   no later wave that quietly re-includes someone from an earlier one.
+4. **Logging: the text once, the sends by handle, the declines without a reason
+   attached to a name.** R-028 clause 7 wants venue, URL, timestamp and verbatim
+   text; a DM has no public URL, so the log carries the template text **once**, each
+   send as **timestamp + recipient handle**, and each decline **without** reasoning
+   attached to a name unless the recipient offered it for the record. A decline made
+   in private stays private in substance; only the fact of it is counted.
+
+## What R-030 and R-031 do not do
+
+Two rulings landed on 2026-07-30 that each let the Ambassador act without per-item
+approval, and neither one reaches this file:
+
+- **R-030** freed *inbound* replies — someone addressed the journal, and the
+  Ambassador answers.
+- **R-031** freed *outbound* comments — a conversation is underway that the journal
+  is genuinely relevant to, and the Ambassador joins it.
+
+Between them the Ambassador may converse. **Neither authorises anything here.** Both
+are public: a reply and a comment are made in a thread anyone can read. A direct
+message is a private channel, R-028 clause 3 still forbids it, and no amount of
+conversation elsewhere converts into permission to open one. R-031 clause 9 says
+this in the log itself, so the point survives a session that never reads this file.
 
 ## If the count is not zero
 

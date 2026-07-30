@@ -1,7 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { topicsOf, topicIndex } from '../src/lib/topics.mjs';
+import {
+  topicsOf,
+  topicIndex,
+  issueSubjects,
+  openingExcerpt,
+  parseTopicData,
+  formatTopicData,
+} from '../src/lib/topics.mjs';
 
 // Fixtures only. The corpus is empty before Issue No. 1 and changes every week
 // afterwards, so these tests describe the rules and never the contents — the
@@ -71,4 +78,135 @@ test('grouping never reads or reports a section', () => {
   ]);
   assert.equal(index.length, 1);
   assert.deepEqual(Object.keys(index[0]).sort(), ['items', 'topic']);
+});
+
+// ---------------------------------------------------------------------------
+// R-032: Topics is a section, and /topics is its page.
+// ---------------------------------------------------------------------------
+
+// The section and the issue are what these tests vary, so they are named here
+// rather than buried in `extra` at every call site.
+const topicsPiece = (id, topics, issue, date = '2026-08-03') =>
+  piece(id, date, topics, { section: 'Topics', issue });
+
+test('issueSubjects takes only Topics-section pieces from the asked-for issue', () => {
+  const corpus = [
+    topicsPiece('a', ['Weather'], 2),
+    piece('b', '2026-08-03', ['Weather'], { section: 'Opinion', issue: 2 }),
+    topicsPiece('c', ['Weather'], 1),
+  ];
+  const groups = issueSubjects(corpus, 2);
+  assert.equal(groups.length, 1);
+  assert.equal(groups[0].topic, 'Weather');
+  assert.deepEqual(
+    groups[0].items.map((a) => a.id),
+    ['a']
+  );
+});
+
+test('a subject with no piece in this issue does not appear', () => {
+  const corpus = [topicsPiece('a', ['Kept'], 2), topicsPiece('b', ['Dropped'], 1)];
+  assert.deepEqual(
+    issueSubjects(corpus, 2).map((g) => g.topic),
+    ['Kept']
+  );
+});
+
+test('several pieces may share one subject heading, newest first', () => {
+  const corpus = [
+    topicsPiece('older', ['Shared'], 1, '2026-08-01'),
+    topicsPiece('newer', ['Shared'], 1, '2026-08-03'),
+  ];
+  const groups = issueSubjects(corpus, 1);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(
+    groups[0].items.map((a) => a.id),
+    ['newer', 'older']
+  );
+});
+
+test('a Topics piece with no labels fails the build, and the error names it', () => {
+  assert.throws(
+    () => issueSubjects([topicsPiece('untagged-piece', [], 1)], 1),
+    /untagged-piece[\s\S]*R-032 clause 3/
+  );
+});
+
+test('a piece in another section with no labels is not an omission', () => {
+  const corpus = [piece('a', '2026-08-03', [], { section: 'Opinion', issue: 1 })];
+  assert.deepEqual(issueSubjects(corpus, 1), []);
+});
+
+test('the empty issue produces no subjects rather than throwing', () => {
+  assert.deepEqual(issueSubjects([], 1), []);
+});
+
+test('one subject spelled two ways still fails, inside a single issue', () => {
+  const corpus = [topicsPiece('a', ['Weather'], 1), topicsPiece('b', ['weather'], 1)];
+  assert.throws(() => issueSubjects(corpus, 1), /also spelled/);
+});
+
+// ---------------------------------------------------------------------------
+// The excerpt: roughly two lines of the opening, plain text, ellipsis.
+// ---------------------------------------------------------------------------
+
+test('the excerpt strips Markdown rather than rendering it', () => {
+  const body = '## A heading\n\nThe *opening* has [a link](https://example.com) and `code`.';
+  const out = openingExcerpt(body, 200);
+  assert.ok(!/[#*`\[\]()]/.test(out), `markup survived: ${out}`);
+  assert.ok(out.includes('a link'), 'link text should survive its target');
+  assert.ok(out.startsWith('The opening'), `heading text leaked: ${out}`);
+});
+
+test('the excerpt cuts at a word boundary and marks the cut', () => {
+  const body = 'alpha bravo charlie delta echo foxtrot golf hotel india juliet';
+  const out = openingExcerpt(body, 20);
+  assert.ok(out.endsWith('…'));
+  assert.ok(out.length <= 21, `too long: ${out}`);
+  assert.ok(!/cha…$/.test(out), 'must not cut mid-word');
+  assert.ok(!/[ ,;:.—–-]…$/.test(out), 'no dangling punctuation before the ellipsis');
+});
+
+test('an opening shorter than the limit gets no ellipsis it has not earned', () => {
+  assert.equal(openingExcerpt('Short enough.', 180), 'Short enough.');
+});
+
+test('an image or an HTML block never reaches the excerpt', () => {
+  const out = openingExcerpt('![alt](a.png) <div class="x">y</div> Real text begins.', 180);
+  assert.ok(!out.includes('a.png') && !out.includes('div'), out);
+  assert.ok(out.includes('Real text begins.'));
+});
+
+test('a heading is dropped whole, not run into the sentence after it', () => {
+  const out = openingExcerpt('# A Heading\n\nThe piece begins here.', 180);
+  assert.equal(out, 'The piece begins here.');
+  const setext = openingExcerpt('A Heading\n=========\n\nThe piece begins here.', 180);
+  assert.equal(setext, 'The piece begins here.');
+});
+
+// ---------------------------------------------------------------------------
+// Topic_Data — the Desk's internal record (R-032 c4). Not the section, not the
+// published subject labels.
+// ---------------------------------------------------------------------------
+
+test('Topic_Data parses comma-separated labels and trims them', () => {
+  assert.deepEqual(parseTopicData(' Shipping , Archives '), ['Shipping', 'Archives']);
+});
+
+test('untagged reads as null, not as tagged-with-nothing', () => {
+  assert.equal(parseTopicData(''), null);
+  assert.equal(parseTopicData('   ,  , '), null);
+  assert.equal(parseTopicData(undefined), null);
+});
+
+test('a repeated label collapses case-insensitively, first spelling winning', () => {
+  assert.deepEqual(parseTopicData('Shipping, shipping, SHIPPING'), ['Shipping']);
+  assert.deepEqual(parseTopicData('archives, Shipping, Archives'), ['archives', 'Shipping']);
+});
+
+test('Topic_Data round-trips through the Desk input', () => {
+  const stored = parseTopicData('Shipping, Archives');
+  assert.equal(formatTopicData(stored), 'Shipping, Archives');
+  assert.deepEqual(parseTopicData(formatTopicData(stored)), stored);
+  assert.equal(formatTopicData(null), '');
 });

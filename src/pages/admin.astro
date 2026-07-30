@@ -63,6 +63,7 @@ import Base from '../layouts/Base.astro';
 <script>
   import { createClient } from '@supabase/supabase-js';
   import { TIER_LABELS, TIER_DESCRIPTIONS, aiDeskAttribution } from '../lib/site';
+  import { parseTopicData, formatTopicData } from '../lib/topics.mjs';
 
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -276,6 +277,16 @@ import Base from '../layouts/Base.astro';
         <span id="pass-status" class="desk-note" role="status"></span>
         <h3>Decision (dual-yes of the founding editors)</h3>
         <form id="decision-form" class="desk-decision">
+          <label>Topic_Data — what this submission was about
+            <input name="topic_data" type="text" value="${esc(formatTopicData(s.desk_topics))}"
+              placeholder="comma-separated" autocomplete="off" />
+            <span class="desk-note">
+              Internal research record, never published (R-032 c4–c6). Applied at
+              review — tag it whether or not it runs, since what was sent and
+              declined is half the record. Not the section, and not the piece’s
+              published subject labels.
+            </span>
+          </label>
           <label>Amy’s decision
             <select name="amy_decision">
               <option value="">—</option>
@@ -348,6 +359,10 @@ import Base from '../layouts/Base.astro';
           coeditor_review: String(form.get('coeditor_review') || '') || null,
           status: String(form.get('status')),
           decided_at: amy && coeditor ? new Date().toISOString() : null,
+          // The column keeps its original name for now: the editors held the
+          // rename to `topic_data` for a later PR (2026-07-30). The label the
+          // desk reads says Topic_Data; the column it writes says desk_topics.
+          desk_topics: parseTopicData(form.get('topic_data')),
         };
         const status = el('decision-status');
         const { error: upError } = await supabase.from('submissions').update(update).eq('id', id);
