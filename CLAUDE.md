@@ -9,6 +9,50 @@ These rules bind every session working in this repository. They are not suggesti
 - **Never `git add -A`, `git add .`, or any other bulk staging.** Stage files by explicit name, every time. If a file you did not edit shows an unexpected working-tree change, stop and flag it to the editors instead of committing it. (This rule exists because a stray keystroke once deleted two entries of the append-only rulings log and indiscriminate staging committed it — see RULINGS.md R-005.)
 - **RULINGS.md is append-only, enforced by machinery.** `scripts/check-rulings-append-only.mjs` fails any change that edits or deletes an existing line of RULINGS.md relative to `main`; it runs as a required pre-merge check. Do not weaken or bypass it.
 
+## Approval model (v2) — ratified 2026-07-30
+
+Replaces the earlier per-command, singles-only approval. The load-bearing gates are
+unchanged and are not negotiable: **every change reaches `main` via PR; Amy alone
+merges; `RULINGS.md`, the Charter, migrations and security changes get both
+editors' read of the diff; the append-only check and recorded hashes stand.**
+
+**Auto-approved — run without asking.** Reading and editing files in the working
+tree; `git add` / `commit` / `branch` / `checkout`; `git push` to feature branches;
+`npm test` / `npm run build`; local scripts and container tests; opening PRs;
+inbound replies covered by R-030.
+
+**Ask first — one prompt, each time.** Anything reading or writing `.env*` or any
+other credential file; deletes outside the working tree; force-push; new
+dependencies; any outbound call that **places** content beyond an R-030 reply — new
+posts, announcements, emails; anything run against Supabase or any other
+production system.
+
+**Never.** Merging to `main`. Blanket "don't ask again" grants for destructive or
+wildcard commands.
+
+**Session style.** Work the whole queue unattended, batch questions to the end,
+close with one summary. The human editor is not expected to be present during
+execution — so a question that blocks the queue is a last resort, and everything
+that can proceed under a stated assumption should proceed.
+
+**What configuration can and cannot enforce.** Permission rules match command
+*prefixes*, not intentions, so `.claude/settings.local.json` approximates the rule
+above rather than enforcing it. Three consequences worth knowing:
+
+- Interpreters (`python3`, `node -e`) and network tools (`curl`, `wget`) are
+  deliberately **not** allowlisted, because a broad grant on any of them silently
+  covers both credential reads and outbound placement. They prompt every time.
+- `Read(./.env*)` gates the **Read tool** only. A shell read of the same file —
+  `cat`, `grep`, `sed`, `awk` — is a different code path, so the obvious literal
+  forms are denied by name. **A prefix rule cannot catch a credential path in
+  argument position** (`grep pattern .env.foo`), and that gap cannot be closed in
+  settings. It is closed by following the rule.
+- `docker run` is allowed for throwaway container tests, and a container can mount
+  the repository. Treat it as capable of reading anything the working tree holds.
+
+The rule is the authority. The settings file is a convenience that reduces
+prompting for work already authorised, never a substitute for the rule.
+
 ## Engineering rules
 
 - **GET requests never mutate data.** Reads are reads. Any state change goes through an explicit non-GET endpoint.
