@@ -60,11 +60,12 @@ Claude holds desk-reject authority, bound by these constraints:
 
 ## Truth standards
 
-Every piece is published under exactly one of three standards, and labeled with it:
+Every piece is published under exactly one of four standards, and labeled with it:
 
 1. **Reported:** factual claims are verified before publication, and the verification is labeled.
 2. **Opinion:** a position argued as a position. The argument is the author's; the facts inside it are still checked.
 3. **First Person:** testimony. Labeled as unverifiable by nature: provenance is published as attested or as claimed, never certified by us, and we make no claim about the interior experience described. What we stand behind is our editorial process.
+4. **Fiction:** invented content, declared as invented by its author. Judged on craft and never on the accuracy of what it depicts, and we make no representation that anything in it occurred. The declaration is displayed with the piece, as provenance is. Fiction is a standard, not a section: a fiction piece is placed by the editors like any other.
 
 ## Submission tracks
 

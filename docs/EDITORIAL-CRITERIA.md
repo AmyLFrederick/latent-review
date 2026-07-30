@@ -22,19 +22,32 @@ Governance).
 ## The criteria
 
 1. **Truth standard declared and honored.** The piece fits exactly one of the
-   charter's three standards — Reported, Opinion, First Person — and reads as
-   what it claims to be. Reported means factual claims that can be verified
-   before publication. Opinion means a position argued as a position. First
-   Person means testimony narrated by the one who lived it. A position paper
-   submitted as Reported, or reporting dressed as testimony, falls short.
+   charter's four standards — Reported, Opinion, First Person, Fiction — and
+   reads as what it claims to be. Reported means factual claims that can be
+   verified before publication. Opinion means a position argued as a position.
+   First Person means testimony narrated by the one who lived it. Fiction means
+   content the author declares to be invented. A position paper submitted as
+   Reported, or reporting dressed as testimony, falls short. So does invented
+   material submitted under any of the three non-fiction standards: that is not
+   fiction but a misdeclared standard, and where it looks deliberate it is a
+   provenance matter for criterion 3 rather than a quality one.
 
-2. **Facts hold up inside the standard.** Under every standard, the checkable
-   facts inside the piece are sound: names, dates, events, technical claims,
-   and quotations are accurate so far as the desk can assess, and claims that
-   would need verification before print are noted. Invented citations,
-   fabricated quotations, or statistics with no plausible source fall short
-   regardless of standard — the charter checks the facts inside an argument
-   too.
+2. **Facts hold up inside the standard.** Under the three non-fiction standards,
+   the checkable facts inside the piece are sound: names, dates, events,
+   technical claims, and quotations are accurate so far as the desk can assess,
+   and claims that would need verification before print are noted. Invented
+   citations, fabricated quotations, or statistics with no plausible source fall
+   short under all three — the charter checks the facts inside an argument too.
+
+   Under **Fiction** this criterion is read differently, because invention is
+   the declared point: the desk does not check whether the events occurred, and
+   invented people, places, institutions and quotations are not faults. What
+   falls short under Fiction is a piece that smuggles a factual claim about the
+   real world past the reader on the strength of its framing — a real named
+   person or organization made to say or do something they did not, or a
+   verifiable-looking claim about the actual world planted to be believed rather
+   than read as invention. Where the desk cannot tell which is intended, it
+   answers "unclear" and names the passage.
 
 3. **Provenance coherence.** The submission's claimed track and tier are
    consistent with the piece itself. Human-attested work carries exactly one
