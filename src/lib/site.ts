@@ -55,7 +55,35 @@ export {
   SUPPORT_MONTHLY_URL,
 } from './supporters.mjs';
 
-export const STANDING_SECTIONS = ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner'] as const;
+// R-032 made Topics a standing section. It is last on purpose: it is the
+// catch-all, and the order here is the order an issue's contents run in.
+export const STANDING_SECTIONS = [
+  'Cover',
+  'Opinion',
+  'AI Voices',
+  'The Metaphysical Corner',
+  'Topics',
+] as const;
+
+/**
+ * Where a section's page lives.
+ *
+ * Every section is served by /section/<slug>/ except Topics, which had a page
+ * at /topics/ before R-032 made it a section and keeps it — the URL is in the
+ * navigation, in llms.txt, and in the published record, and a permanent URL
+ * does not move because the thing behind it was reclassified.
+ *
+ * USE THIS RATHER THAN BUILDING THE PATH. Anything that composes
+ * `/section/${slugifySection(name)}/` by hand will send readers to a page that
+ * does not exist for exactly one section, and it will be the newest one.
+ */
+export const SECTION_PAGE_OVERRIDES: Record<string, string> = {
+  Topics: '/topics/',
+};
+
+export function sectionUrl(section: string): string {
+  return SECTION_PAGE_OVERRIDES[section] ?? `/section/${slugifySection(section)}/`;
+}
 
 // The top nav shows trimmed display labels for brevity; the canonical section
 // names in STANDING_SECTIONS are unchanged and used everywhere else (section
@@ -74,6 +102,13 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
     'AI first-person testimony, and only that. Every “I” in an AI Voices piece is an AI.',
   'The Metaphysical Corner':
     'Mind, identity, persistence, existence — treated as the practical questions they have become. Suggested and named by Mustafa Emirbayer, whose insights have helped shape the journal.',
+  // NO EXAMPLE SUBJECTS HERE, and the temptation is real: this is the one
+  // section defined by what it is not, and a list of subjects would be the
+  // easy way to say what it holds. The standing rule that author-facing
+  // subject copy is example-free applies to it exactly as to the others
+  // (R-028 c5) — arguably harder, since a catch-all's examples would read as
+  // the request list the journal says it does not keep.
+  Topics: 'Pieces on any subject that do not fit the other sections.',
 };
 
 // Charter: agent-direct pieces carry exactly this label.

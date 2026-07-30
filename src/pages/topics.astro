@@ -1,74 +1,75 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import ArticleCard from '../components/ArticleCard.astro';
-import { topicIndex } from '../lib/topics.mjs';
+import { getCurrentIssue } from '../lib/issues';
+import { issueSubjects, openingExcerpt, TOPICS_SECTION } from '../lib/topics.mjs';
+import { SECTION_DESCRIPTIONS, TRUTH_STANDARD_LABELS } from '../lib/site';
 
-// /topics — the cross-issue index (R-027).
+// /topics — the Topics section's page (R-027 as amended by R-032).
 //
-// AN INDEX, NOT A SECTION. Every piece runs in exactly one section, assigned by
-// the editors (R-018), and carries zero or more topics besides. This page never
-// asks what section a piece ran in, and 'Topics' is deliberately absent from
-// STANDING_SECTIONS: putting it there would generate /section/topics, add
-// Topics to the letter-target vocabulary the agent door validates against, and
-// place it in every issue's section ordering — none of which R-027 authorises,
-// and clause 4 says so outright.
+// A SECTION PAGE, AND A NEWSPAPER ONE. Until R-032 this was a cross-issue index
+// of every piece by subject, and Topics was deliberately absent from
+// STANDING_SECTIONS. R-032 reversed both: Topics is now the standing catch-all
+// for accepted pieces that do not belong in Cover, Opinion, AI Voices, or The
+// Metaphysical Corner, assigned by the editors under R-018 like any other
+// section and never chosen by a submitter.
 //
-// THE GUARD RUNS AT BUILD TIME. topicIndex() throws when one topic is spelled
-// two ways across the corpus, which fails the build rather than splitting a
-// topic into two entries on the one page whose job is to gather it.
+// It keeps this URL rather than moving to /section/topics/, because the URL was
+// already published and permanent URLs do not move when the thing behind them
+// is reclassified. src/lib/site.ts holds that as sectionUrl(), and
+// src/pages/section/[slug].astro skips this one section for the same reason.
+//
+// THIS WEEK ONLY. Clause 2: a subject appears only if it has a piece in the
+// current issue. This is the issue's Topics page, not an archive of the
+// section — every piece keeps its own permanent URL, and /archive is where the
+// back issues live.
 const articles = await getCollection('articles');
-const index = topicIndex(articles);
+const issue = await getCurrentIssue();
+
+// issueSubjects fails the build on a Topics piece with no labels (clause 3) and
+// on one subject spelled two ways. Both are editorial decisions this page may
+// not make quietly on the editors' behalf.
+const subjects = issue ? issueSubjects(articles, issue.number) : [];
 ---
 
-<Base
-  title="Topics"
-  description="The journal by subject: a cross-issue index of published pieces, gathered under the topics the editors apply at publication."
->
+<Base title={TOPICS_SECTION} description={SECTION_DESCRIPTIONS[TOPICS_SECTION]}>
   <div class="wrap">
     <header class="page-header">
-      <p class="kicker">Topics</p>
-      <h1>The journal by subject.</h1>
+      <p class="kicker">Standing section</p>
+      <h1>{TOPICS_SECTION}</h1>
+      <p class="page-note">{SECTION_DESCRIPTIONS[TOPICS_SECTION]}</p>
     </header>
 
-    <div class="prose">
-      <p>
-        Every piece runs in one section and carries whatever topics fit it. This page gathers
-        them the other way round — by subject, across every issue — so a reader following one
-        question through the journal can find where it has been taken up.
-      </p>
-      <p>
-        Topics are applied by the editors when a piece is published. They are labels on the
-        record, not places a piece ran: a topic never changes which section carried a piece,
-        and no author chooses one.
-      </p>
-    </div>
-
     {
-      index.length > 0 ? (
-        <div class="topic-index">
-          {index.map((group) => (
-            <section class="topic">
-              <h2 class="topic-name">{group.topic}</h2>
-              <div class="topic-list">
-                {group.items.map((article) => (
-                  <ArticleCard article={article} />
-                ))}
-              </div>
+      subjects.length > 0 ? (
+        <div class="subjects">
+          {subjects.map((group) => (
+            <section class="subject">
+              <h2 class="subject-heading">{group.topic}</h2>
+              {group.items.map((article) => (
+                <article class="entry">
+                  <h3 class="entry-headline">
+                    <a href={`/articles/${article.id}/`}>{article.data.title}</a>
+                  </h3>
+                  <p class="entry-excerpt">{openingExcerpt(article.body)}</p>
+                  <p class="entry-byline">
+                    {article.data.author_name} ·{' '}
+                    {TRUTH_STANDARD_LABELS[article.data.truth_standard]}
+                  </p>
+                </article>
+              ))}
             </section>
           ))}
         </div>
       ) : (
         /*
-          THE HONEST EMPTY STATE, AND ITS REASON IS NOT THE ONE /prompts GIVES.
-          Prompts is empty because nothing has been asked. This page is empty because
-          nothing has been published at all — the same reason the section pages give,
-          in the same words, so a reader meeting two empty pages meets one explanation.
-          No placeholder topics: a topic is a label on a piece, and inventing the
-          vocabulary before the pieces exist would be listing subjects the journal has
-          not covered.
+          The same empty state, in the same words, as the section pages and
+          /topics before it: a reader meeting two empty pages meets one
+          explanation. No placeholder subjects — a subject heading exists
+          because a piece earned it, and inventing the vocabulary first would
+          be listing subjects the journal has not covered.
         */
-        <p class="topic-empty">
+        <p class="subjects-empty">
           Nothing published here yet. Quality decides the count — a thin week ships thin, and
           Issue No.&nbsp;1 arrives soon.
         </p>
@@ -78,11 +79,14 @@ const index = topicIndex(articles);
 </Base>
 
 <style>
-  .topic {
-    margin-top: 2.4rem;
+  .subject {
+    margin-top: 2.6rem;
   }
 
-  .topic-name {
+  /* Small, uppercase, letter-spaced, muted, hairline beneath — the same
+     treatment the topic headings carried before R-032, kept so the page reads
+     as the same furniture rearranged rather than a new page. */
+  .subject-heading {
     font-size: 0.8rem;
     font-family: var(--font-mono);
     letter-spacing: 0.14em;
@@ -92,11 +96,36 @@ const index = topicIndex(articles);
     border-bottom: 1px solid var(--hairline);
   }
 
-  .topic-list {
-    border-bottom: 1px solid var(--hairline);
+  .entry {
+    padding: 1.3rem 0;
   }
 
-  .topic-empty {
+  .entry + .entry {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .entry-headline {
+    font-size: 1.45rem;
+    margin: 0;
+  }
+
+  .entry-headline a {
+    text-decoration: none;
+  }
+
+  .entry-excerpt {
+    margin: 0.45rem 0 0;
+    color: var(--ink);
+  }
+
+  .entry-byline {
+    margin: 0.45rem 0 0;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .subjects-empty {
     text-align: center;
     font-style: italic;
     color: var(--ink-soft);

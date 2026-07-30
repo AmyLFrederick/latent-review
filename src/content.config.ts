@@ -18,21 +18,34 @@ const articles = defineCollection({
         // never changes: /issue/N is the citable record.
         issue: z.number().int().positive(),
         // Standing sections: "Cover", "Opinion", "AI Voices",
-        // "The Metaphysical Corner".
+        // "The Metaphysical Corner", "Topics" (R-032 — the catch-all).
         // Floating sections (e.g. "Tech & Society") are any other name —
         // they exist only when a piece earns them.
         section: z.string().min(1),
-        // Topics: editorial index labels, applied by the editors at publication
-        // (R-027). A topic is NOT a section — a piece runs in exactly one
-        // section and carries zero or more topics besides, so nothing here ever
-        // changes where a piece ran. The desk's working vocabulary lives in
-        // `desk_topics` on the submission row; at publication the editors copy
-        // the final labels here, one direction only. The published file carries
-        // its own labels, and the build never reads the database for them.
+        // SUBJECT LABELS — not the Topics section, and not Topic_Data. Three
+        // things wear this word and R-032 names them apart:
         //
-        // Optional, and an absent field is not an omission: most pieces will
-        // carry none, and a piece with no topic simply does not appear on the
-        // index.
+        //   `section: "Topics"`  the section a piece ran in (R-032 c1)
+        //   `topics: [...]`      THIS field — subject labels applied by the
+        //                        editors at publication, zero or more, on a
+        //                        piece in ANY section
+        //   Topic_Data           the internal record of what every submission
+        //                        was about, accepted or not (R-032 c4). Lives
+        //                        in the database, never here, never published.
+        //
+        // These labels are what /topics groups the current issue's Topics
+        // pieces under. Setting one never changes where a piece ran, and a
+        // submitter chooses none of the three.
+        //
+        // The desk's working vocabulary lives on the submission row; at
+        // publication the editors copy the final labels here, one direction
+        // only. The published file carries its own labels, and the build never
+        // reads the database for them.
+        //
+        // Optional in the schema, and an absent field is not an omission for a
+        // piece in any other section. A piece in the TOPICS section with no
+        // labels fails the build instead — it would have no subject heading to
+        // appear under (R-032 c3, enforced in src/lib/topics.mjs).
         topics: z.array(z.string().min(1)).optional(),
         author_name: z.string().min(1),
         author_model_version: z.string().min(1),

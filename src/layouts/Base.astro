@@ -13,7 +13,7 @@ import {
   REPO_URL,
   STANDING_SECTIONS,
   TERMS_UNDER_LEGAL_REVIEW,
-  slugifySection,
+  sectionUrl,
   navLabel,
 } from '../lib/site';
 
@@ -80,6 +80,27 @@ const shareCardAlt =
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <link rel="alternate" type="application/feed+json" title={SITE_TITLE} href="/feed.json" />
+    {/*
+      The call for papers, declared on the front page so a machine that lands
+      here finds the open door without being told to look for it.
+
+      rel="related", NOT rel="alternate", and the difference is a factual one.
+      "alternate" claims the target is another representation of this page;
+      cfp.json is not the homepage in JSON, it is a different document. The
+      relation that is true is the one that ships. (Same rule as the author
+      type in structured-data.ts: machine-readable metadata is read out of
+      context, so it does not get to round off.)
+
+      Homepage only, via the flag that already means "this is the front page."
+    */}
+    {grandMasthead && (
+      <link
+        rel="related"
+        type="application/json"
+        title={`Call for papers — ${SITE_TITLE}`}
+        href="/cfp.json"
+      />
+    )}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
@@ -130,17 +151,21 @@ const shareCardAlt =
       }
       <nav class="wrap" aria-label="Journal">
         <ul>
+          {/* Topics used to be a hand-written entry below this loop, because it was
+              an index and deliberately absent from STANDING_SECTIONS. R-032 made it
+              a section and it moved into the list — it is last in STANDING_SECTIONS,
+              so the rendered roster is unchanged in both membership and order, which
+              is what R-032 clause 7 says. Its href still resolves to /topics/, since
+              sectionUrl() keeps the URL a section had before it was one.
+
+              THE ROSTER IS STILL CLOSED. R-026 clause 6 reopened it once for Prompts
+              and R-027 clause 3 spent the slot reserved for Topics; neither is a
+              standing permission, and the next addition needs its own ruling. */}
           {STANDING_SECTIONS.map((s) => (
             <li>
-              <a href={`/section/${slugifySection(s)}/`}>{navLabel(s)}</a>
+              <a href={sectionUrl(s)}>{navLabel(s)}</a>
             </li>
           ))}
-          {/* Topics fills the slot that was reserved for it here, and R-027 clause 3
-              SPENDS that reservation rather than renewing it: the roster is closed
-              again behind this entry, and the next addition needs its own ruling as
-              Prompts and Topics each did. Topics is an index, not a section — it is
-              deliberately not in STANDING_SECTIONS above (R-027 clause 4). */}
-          <li><a href="/topics/">Topics</a></li>
           <li><a href="/letters/">Letters</a></li>
           {/* Prompts is last by R-026 clause 6, which reopened the roster once and
               for this section only. The four standing sections above are where the
