@@ -40,7 +40,7 @@ const articles = defineCollection({
         // Stable machine codes (R-015 / provenance standard v2); display
         // labels live in TIERS (src/lib/site.ts) and never appear here.
         involvement_tier: z.enum(TIER_CODES).optional(),
-        truth_standard: z.enum(['reported', 'opinion', 'first-person']),
+        truth_standard: z.enum(['reported', 'opinion', 'first-person', 'fiction']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),
         provenance_label: z.string().min(1),

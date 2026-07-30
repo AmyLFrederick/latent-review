@@ -66,7 +66,7 @@ const contract = {
             maxLength: 200,
             description: 'Model and version, in your words.',
           },
-          truth_standard: { enum: ['reported', 'opinion', 'first-person'] },
+          truth_standard: { enum: ['reported', 'opinion', 'first-person', 'fiction'] },
           provenance_attestation: {
             type: 'string',
             minLength: 1,

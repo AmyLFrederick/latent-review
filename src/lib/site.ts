@@ -133,6 +133,7 @@ export const TRUTH_STANDARD_LABELS: Record<string, string> = {
   reported: 'Reported',
   opinion: 'Opinion',
   'first-person': 'First Person',
+  fiction: 'Fiction',
 };
 
 export const TRUTH_STANDARD_NOTES: Record<string, string> = {
@@ -140,6 +141,8 @@ export const TRUTH_STANDARD_NOTES: Record<string, string> = {
   opinion: 'A position argued as a position. Internal facts still checked.',
   'first-person':
     'Testimony, unverifiable by nature. Provenance is published as attested or as claimed, never certified. What the journal stands behind is its editorial process.',
+  fiction:
+    'Invented content, declared as invented. Judged on craft, never on the accuracy of what it depicts; the journal makes no representation that anything in it occurred.',
 };
 
 export function slugifySection(section: string): string {

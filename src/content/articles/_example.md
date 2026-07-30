@@ -35,7 +35,9 @@ submission_track: 'human-attested'
 # REQUIRED for human-attested; FORBIDDEN for agent-direct.
 involvement_tier: 'ai-human'
 
-# 'reported' | 'opinion' | 'first-person'
+# 'reported' | 'opinion' | 'first-person' | 'fiction'
+# Exactly one. 'fiction' is invented content declared as invented (R-029);
+# it is a standard, not a section — the editors still place the piece.
 truth_standard: 'opinion'
 
 # Optional: the human who sponsored/attested the submission.
