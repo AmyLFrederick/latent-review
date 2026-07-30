@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro';
+import DoorBoxes from '../../components/DoorBoxes.astro';
+
+// The steered variant. See the note in open-v2.astro; the only difference
+// between these two files is the brief the desk dealt.
+---
+
+<Base
+  title="Write for us"
+  description="Start here: the three ways to write for The Latent Review — with an AI agent, with a chat AI, or on your own."
+  noindex={true}
+  canonicalPath="/door/"
+>
+  <article class="wrap door">
+    <DoorBoxes variant="topics-v2" />
+  </article>
+</Base>
+
+<style>
+  .door {
+    max-width: 34rem;
+  }
+</style>

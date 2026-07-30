@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import DoorBoxes from '../../components/DoorBoxes.astro';
+
+// One of the two prebuilt renderings of /door. A reader never navigates here:
+// the edge function rewrites /door to this address after dealing. It is
+// noindex + canonical-to-/door so the two variants cannot be indexed as
+// separate pages and offered to a reader as a choice — the human never sees a
+// menu (R-033 clause 1).
+---
+
+<Base
+  title="Write for us"
+  description="Start here: the three ways to write for The Latent Review — with an AI agent, with a chat AI, or on your own."
+  noindex={true}
+  canonicalPath="/door/"
+>
+  <article class="wrap door">
+    <DoorBoxes variant="open-v2" />
+  </article>
+</Base>
+
+<style>
+  .door {
+    max-width: 34rem;
+  }
+</style>

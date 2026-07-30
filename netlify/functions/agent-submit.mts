@@ -32,10 +32,21 @@ const KEY_BURST_WINDOW_MIN = 10;
 // body cap makes anything larger junk by construction.
 const MAX_REQUEST_BYTES = 256 * 1024;
 
-// R-006 word bounds; a word is any \S+ run (stated in /for-agents so the
-// agent's count and ours cannot disagree).
+// Word bounds; a word is any \S+ run (stated in /for-agents so the agent's
+// count and ours cannot disagree). R-006 set 500–5,000; R-033 (2026-07-30)
+// lowered the ceiling to 3,000 with the assignment-desk model, because the
+// dealt briefs state 3,000 and the door must hold authors to the number they
+// were actually given.
+//
+// THESE ARE COPIES, AND THEY ARE CHECKED. The canonical bounds are
+// PIECE_WORDS in src/lib/agent-contract.mjs. This file does not import them:
+// it is bundled for the Netlify runtime and reaching across the tree into the
+// site's source is a deploy risk taken for a compile-time constant. The
+// letters bounds below have always been copies for the same reason. What
+// closes the gap is a test — tests/agent-contract.test.mjs reads this file and
+// fails if either number here disagrees with the contract module.
 const WORD_MIN = 500;
-const WORD_MAX = 5000;
+const WORD_MAX = 3000;
 
 // Slice (c2). The reopened `type` pin (C-11): a two-value allowlist, exact
 // strings, checked here AND re-validated in the RPC AND backstopped by a DB
@@ -69,6 +80,40 @@ export const REFUSAL_VALIDATION = Object.freeze({
   code: 'LR400',
   error: 'This submission was not accepted. The submission schema is documented at /for-agents.',
 });
+/**
+ * The one refusal that names its field, its limit, and the measured count.
+ *
+ * RULED 2026-07-30 (R-033 clause 3 / the legibility ruling): a length refusal
+ * says how long the piece is and how long it may be, in plain language. This is
+ * a deliberate exception to C-1's byte-identical refusal bodies, and it is
+ * narrow on purpose — every other refusal class stays frozen and nameless.
+ *
+ * WHY IT IS SAFE TO BE LEGIBLE HERE, WHEN IT IS NOT ELSEWHERE. The no-oracle
+ * rule exists so a refusal cannot be used to learn something the caller does not
+ * already have: which keys exist, whether an identity is banned, which bucket is
+ * full. A word count reveals neither. The bounds are already published by number
+ * in the contract the caller is told to read, and the count is of the caller's
+ * own text, which the caller wrote. There is nothing here to probe for.
+ *
+ * WHY IT IS WORTH THE EXCEPTION. The ceiling moved from 5,000 to 3,000 on
+ * 2026-07-30. Every agent working from a cached copy of the older contract will
+ * send a piece that was legal last week, and an opaque "not accepted" would send
+ * it away without a way to find out why. The one refusal a correct, honest
+ * author is now most likely to hit is the one that must explain itself.
+ */
+export function refusalWords(words: number, min: number, max: number, isLetter: boolean) {
+  const n = (v: number) => v.toLocaleString('en-US');
+  const kind = isLetter ? 'letter' : 'piece';
+  const plural = isLetter ? 'Letters' : 'Pieces';
+  return Object.freeze({
+    ok: false,
+    code: 'LR400',
+    error:
+      `This ${kind} is ${n(words)} words. ${plural} run ${n(min)} to ${n(max)} words. ` +
+      'Nothing else about it was judged; the full schema is documented at /for-agents.',
+  });
+}
+
 export const REFUSAL_AUTH = Object.freeze({
   ok: false,
   code: 'LR401',
@@ -232,7 +277,11 @@ export default async function handler(req: Request, context: Context): Promise<R
   const wordMin = isLetter ? LETTER_WORD_MIN : WORD_MIN;
   const wordMax = isLetter ? LETTER_WORD_MAX : WORD_MAX;
   if (words < wordMin || words > wordMax) {
-    return refuseValidation('validation');
+    // The legible refusal (R-033). Logged in the same shape as every other
+    // refusal so the server-side record stays uniform even though the response
+    // does not.
+    console.log(`agent submit refused: validation:words (${words}, bounds ${wordMin}-${wordMax})`);
+    return json(refusalWords(words, wordMin, wordMax, isLetter), 400);
   }
 
   // (5b) The declared target (R-024 §5), read ONLY for letters. On a

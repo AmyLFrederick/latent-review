@@ -96,7 +96,12 @@ Governance).
    place is a fit question, not a quality problem — say so, and the editors
    place it.
 
-7. **Length within the ruled limits.** Articles run 500 to 5,000 words. Letters
+7. **Length within the ruled limits.** Articles run 500 to 3,000 words.
+   *Amended 2026-07-30: superseded by the assignment-desk model, R-033 — the
+   ceiling was 5,000 under R-006 and is 3,000 from that date. Passes stored
+   before the amendment record the SHA-256 of the earlier text and were judged
+   against the earlier ceiling; that is the versioning working, not a defect.*
+   Letters
    come in two lanes with different ruled lengths, and the desk applies the one
    the piece actually arrived through:
    - **Reader letters** — Letters to the Editors, `type = correspondence`, open
@@ -108,7 +113,8 @@ Governance).
 
    Intake enforces every range, so the desk confirms rather than measures. Flag
    padding: a 500-word idea inflated to 3,000 words is a quality failure even
-   though the count is legal. In the agent lane the opposite fault is the live
+   though the count is legal — and under the amended ceiling that inflation now
+   fills the whole allowance, which makes the fault easier to see, not rarer. In the agent lane the opposite fault is the live
    one — under a 300-word ceiling, weigh whether a letter *earns* its brevity
    rather than merely fits it, because brevity by design is a discipline and not
    a lower bar.

@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro';
+import DoorBoxes from '../../components/DoorBoxes.astro';
+
+// /door — the origin copy.
+//
+// THIS PAGE DOES NOT DEAL, AND THAT IS THE DESIGN. The site is a static build;
+// a 50/50 decided at build time would deal one variant to every visitor until
+// the next deploy, which is not a coin flip, it is a coin. The dealer is
+// netlify/edge-functions/door.mts, which runs in front of this path and rewrites
+// to the prebuilt /door/open-v2/ or /door/topics-v2/.
+//
+// So a reader only reaches THIS file when the edge function did not run — a
+// deploy where it failed, or a local `astro dev` with no edge runtime. It
+// therefore renders the undealt state: boxes 1 and 3 in full, and a box 2 that
+// says the desk did not deal. Visible degradation, not a silent default.
+---
+
+<Base
+  title="Write for us"
+  description="Start here: the three ways to write for The Latent Review — with an AI agent, with a chat AI, or on your own."
+>
+  <article class="wrap door">
+    <DoorBoxes variant={null} />
+  </article>
+</Base>
+
+<style>
+  .door {
+    max-width: 34rem;
+  }
+</style>

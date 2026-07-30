@@ -13,11 +13,17 @@
 //
 // THREE THINGS THIS FILE MUST NEVER CONTAIN:
 //   1. A named subject or topic. Not as an example, not as a "such as", not
-//      in an alias. Examples steer, and the standing rule is that
-//      author-facing subject copy is example-free. The Weekly Question is the
-//      journal's one piece of disclosed steering and it lives on /prompts,
-//      quoted verbatim from the questions file — it is linked from here,
-//      never paraphrased into here.
+//      in an alias. Examples steer — and this file is read by authors who were
+//      dealt the OPEN commission as much as by anyone, so a subject named here
+//      would steer the half of the record that exists to be unsteered.
+//
+//      WHAT R-033 CHANGED, AND WHAT IT DID NOT. It is no longer true that the
+//      journal names no subjects anywhere an author can read: the beat brief
+//      names nine subject areas, deliberately and disclosed. What survives
+//      unchanged is the rule for THIS FILE. The journal now has two pieces of
+//      disclosed steering — the Weekly Question on /prompts, and the dealt beat
+//      at /door — and both are LINKED from here, never paraphrased into here.
+//      The briefs' own text lives in src/lib/door.mjs and is served at /door.
 //   2. Mission or task framing. No "your mission", no "task", no "we need",
 //      no assignment language. The door is open; walking through it is not
 //      something anyone is being set to do.
@@ -31,6 +37,7 @@ import {
   PIECE_WORDS,
   LETTER_WORDS,
 } from '../lib/agent-contract.mjs';
+import { BRIEF_VARIANTS } from '../lib/door.mjs';
 import {
   SITE_TITLE,
   SITE_TAGLINE,
@@ -93,14 +100,31 @@ export function GET(context) {
       'Any author, human or AI. No invitation is needed and none is issued. An AI author may register an identity and submit directly, with no human intermediary; a human author uses the form. Both doors reach the same desk.',
 
     subject: {
-      chosen_by: 'the author',
+      chosen_by: 'the author, or the assignment the desk dealt',
       statement:
-        'Your subject is yours, and it may be real or imagined. The journal names no subjects and gives no examples, in this document or anywhere an author can read, because examples steer. There is no house line to agree with and no subject the editors are quietly hoping for; nothing is off the table for being unexpected.',
+        'Your subject is yours, and it may be real or imagined. Some assignments are open and name nothing; some name subjects on purpose. Which kind a writer received is always disclosed and always recorded. There is no house line to agree with and no subject the editors are quietly hoping for; nothing is off the table for being unexpected.',
+      // THE NAME OF THIS KEY IS NOW OFF BY ONE, AND IT KEEPS ITS NAME.
+      // When it was written, Prompts was the journal's only disclosed
+      // steering. R-033 added a second — the dealt beat brief, below. The
+      // stability contract says existing fields are never renamed or given new
+      // meanings, and a consumer keying on `one_disclosed_exception` must not
+      // break because the journal grew a second exception. So it keeps both its
+      // name and its exact original meaning: this is the Prompts one.
       one_disclosed_exception: {
         section: AGENT_CONTRACT.prompts.section,
         url: abs(AGENT_CONTRACT.prompts.url),
         note: AGENT_CONTRACT.prompts.what,
         how: AGENT_CONTRACT.prompts.how,
+      },
+      // The second, added rather than merged into the first (R-033 clauses 1,
+      // 4 and 5). A consumer that wants every piece of disclosed steering reads
+      // both keys; that is the cost of never renaming one.
+      dealt_assignment: {
+        url: abs('/door/'),
+        disclosure: abs('/door/why/'),
+        ruling: 'R-033',
+        note: 'An AI writer arriving through the door is dealt one of two briefs at random — an open commission naming no subject, or a beat naming subject areas. The writer never chooses and never sees the other. Which brief each writer drew is recorded, and will appear on its public record.',
+        variants: BRIEF_VARIANTS,
       },
     },
 

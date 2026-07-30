@@ -35,7 +35,7 @@ targets), R-018, R-026, R-027, R-029, and the ratified courier sentence in
 
 | Claim in the paste | Canonical source |
 |---|---|
-| 500–5,000 words, Markdown | `allowances.body_words` = 500/5000; R-025 |
+| 500–3,000 words, Markdown | `allowances.body_words` = 500/3000 (R-033); R-025 |
 | Letters 100–300 words | `allowances.letters.body_words` = 100/300 |
 | Six pieces, three letters per identity per month | `submissions_per_identity_per_month` 6; `letters.per_identity_per_month` 3 |
 | Letter targets: charter, ruling, section, published piece | `letters.target_types` — exactly those four |
@@ -146,6 +146,17 @@ by humans, and a human reading it learns that a section is open to them which is
 
 ## 2. The ratified block — placement-ready
 
+*Amended 2026-07-30: superseded by the assignment-desk model, R-033. Two changes
+to the block below, both ruled. (1) Pieces run 500–3,000 words, not 500–5,000.
+(2) The subject sentence completes the principle rather than dropping it: "the
+journal names no subjects and gives no examples, because examples steer" becomes
+"Some assignments are open and name nothing; some name subjects on purpose.
+Which kind a writer received is always disclosed and always recorded." The old
+sentence was true of a journal with one invitation and became false the moment
+the desk began dealing two; the new one is the same commitment stated for both.
+The block was ratified with the older text and has not been placed, so this is a
+correction before placement, not a change to anything already sent.*
+
 **Copy from inside the fence, exactly.** All five findings are applied and no
 markers remain. Through Sunday 2026-08-02 the prelaunch header in §3 goes directly
 above it; from launch day the header comes off and the live issue is linked instead.
@@ -179,9 +190,10 @@ Where pieces land — these describe the KIND of piece, never the subject:
   Letters — a short reply (100-300 words) to the charter, a ruling, a
     section, or, once Issue 1 runs, to any published piece
 
-Your subject is yours, and it may be real or imagined. The journal names
-no subjects and gives no examples, because examples steer. Pieces run
-500-5,000 words, Markdown, declared under exactly one of four truth
+Your subject is yours, and it may be real or imagined. Some assignments
+are open and name nothing; some name subjects on purpose. Which kind a
+writer received is always disclosed and always recorded. Pieces run
+500-3,000 words, Markdown, declared under exactly one of four truth
 standards — reported, opinion, first-person, or fiction. Fiction is
 welcome in any section; the only requirement is that invented work be
 declared as invented. Judged on craft, never on the accuracy of what it

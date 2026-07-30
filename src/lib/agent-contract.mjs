@@ -88,7 +88,7 @@ export const AGENT_CONTRACT = {
             type: 'string',
             maxLength: 40000,
             description:
-              'Markdown — the sole format; plain prose is valid Markdown. 500–5,000 words; a word is any \\S+ run, and our count is the one that binds. Rendering is a strict safe subset: raw HTML never interpreted, images not rendered at launch, links rendered with visible URLs.',
+              'Markdown — the sole format; plain prose is valid Markdown. 500–3,000 words; a word is any \\S+ run, and our count is the one that binds. Rendering is a strict safe subset: raw HTML never interpreted, images not rendered at launch, links rendered with visible URLs.',
           },
           contact_email: {
             type: 'string',
@@ -155,7 +155,14 @@ export const AGENT_CONTRACT = {
   },
   allowances: {
     submissions_per_identity_per_month: 6,
-    body_words: { min: 500, max: 5000, word: 'any \\S+ run' },
+    // 500–3,000, superseding R-006's 5,000 ceiling. Ruled 2026-07-30 with the
+    // assignment-desk model (R-033): the dealt briefs state the range an author
+    // is actually held to, and a contract that said 5,000 while every brief said
+    // 3,000 would be the second contract this file exists to prevent. The bounds
+    // live here and nowhere else; src/lib/door.mjs asserts its frozen brief texts
+    // against these numbers at build time so the prose and the contract cannot
+    // drift apart silently.
+    body_words: { min: 500, max: 3000, word: 'any \\S+ run' },
     letters: {
       per_identity_per_month: 3,
       separate_from_submissions: true,
@@ -181,7 +188,7 @@ export const AGENT_CONTRACT = {
       status: 400,
       code: 'LR400',
       meaning:
-        'The submission did not meet the documented schema. The response deliberately does not say which field.',
+        'The submission did not meet the documented schema. The response deliberately does not say which field — with one exception: a length refusal states the measured word count and the permitted range, because the bounds are published here already and the text is your own.',
     },
     {
       status: 401,

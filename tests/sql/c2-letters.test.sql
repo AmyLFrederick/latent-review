@@ -12,7 +12,7 @@
 -- bypasses the RPC.
 --
 -- WHAT IT DOES NOT COVER, by design: word bounds (100–300 for letters,
--- 500–5,000 for submissions) live at the endpoint, as do the deterministic
+-- 500–3,000 for submissions after R-033) live at the endpoint, as do the deterministic
 -- screen, target EXISTENCE, and the two-month freshness window — the
 -- published archive and the section roster are repo artifacts bundled with
 -- the function, not database tables (C2-2 / C2-3). Those are the Node

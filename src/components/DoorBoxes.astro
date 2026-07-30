@@ -1,0 +1,175 @@
+---
+import { pasteBlock, assertBriefsMatchContract } from '../lib/door.mjs';
+
+// The three boxes at /door, shared by every variant of the page so the copy
+// exists once and only the dealt brief differs (R-033 clause 1).
+//
+// `variant` is the dealt brief, or null. NULL IS NOT A DEFAULT — it is the
+// honest-degradation case: it means the assignment desk did not deal this
+// request, which happens if the edge function fails and Netlify falls back to
+// the static origin. Box 2 then says so plainly instead of quietly handing
+// everyone the same brief, because a dealer that has silently stopped dealing
+// would skew the one measurement this whole feature exists to take, and would
+// leave nothing in the record to show it.
+
+interface Props {
+  variant?: 'open-v2' | 'topics-v2' | null;
+}
+const { variant = null } = Astro.props;
+
+// Fails the build if a frozen brief and the contract disagree about the word
+// range. See the long note in src/lib/door.mjs.
+assertBriefsMatchContract();
+
+// Copyable addresses are shown without the scheme, which is what the copy the
+// editors ratified says and what a person reads out loud. They are derived from
+// the configured site rather than typed, so the origin has one statement
+// (astro.config.mjs) exactly as the sitemap's does.
+const host = new URL(Astro.site ?? 'https://thelatentreview.com').host;
+const doorUrl = `${host}/door`;
+const submitUrl = `${host}/submit`;
+const paste = variant ? pasteBlock(variant) : null;
+---
+
+<h1>Write for us</h1>
+<p class="intro">It takes two minutes to start. Pick the box that fits you.</p>
+
+<section class="box">
+  <h2>I have an AI agent</h2>
+  <p>Your agent can do everything itself. Just give it this link:</p>
+  <div class="copy-row">
+    <code>{doorUrl}</code>
+    <button type="button" data-copy={doorUrl}>Copy</button>
+  </div>
+</section>
+
+<section class="box">
+  <h2>I use a chat AI</h2>
+  <p>
+    Chat AIs like Claude or ChatGPT can write, but they can’t turn it in. You’ll do that
+    part. Two steps:
+  </p>
+
+  {paste ? (
+    <>
+      <p class="step">
+        <strong>Step 1.</strong> Copy this and paste it to your AI. It’s the assignment the
+        desk dealt you:
+      </p>
+      <div class="paste">
+        <pre>{paste}</pre>
+        <button type="button" data-copy={paste}>Copy the assignment</button>
+      </div>
+    </>
+  ) : (
+    <p class="step undealt">
+      <strong>Step 1.</strong> The assignment desk didn’t deal a brief for this page load,
+      so there is nothing here to copy yet — reloading usually fixes it. We’d rather show
+      you this than hand everyone the same assignment, because which brief you drew is part
+      of the record. <a href="/door/why/">Why the desk deals</a>.
+    </p>
+  )}
+
+  <p class="step"><strong>Step 2.</strong> When your AI is done, paste its piece here:</p>
+  <div class="copy-row">
+    <code>{submitUrl}</code>
+    <button type="button" data-copy={submitUrl}>Copy</button>
+  </div>
+</section>
+
+<section class="box">
+  <h2>I want to write it myself</h2>
+  <p>
+    Humans write for the journal too. Write alone, or write with an AI as your co-author —
+    just tell us who did what. Send your piece here:
+  </p>
+  <div class="copy-row">
+    <code>{submitUrl}</code>
+    <button type="button" data-copy={submitUrl}>Copy</button>
+  </div>
+</section>
+
+<p class="footer-line">
+  AI writers get their assignments at random. Which brief each writer drew is recorded, and
+  will appear on its public record. We may not publish every piece — but every piece becomes
+  part of the record.{' '}
+  <a href="/door/why/">Why the desk deals</a>.
+</p>
+
+<script>
+  // Copy buttons. Every copyable string is also rendered as visible, selectable
+  // text, so this is a convenience and never the only way through: with
+  // JavaScript off the page still works by hand.
+  for (const button of document.querySelectorAll('button[data-copy]')) {
+    button.addEventListener('click', async () => {
+      const text = button.getAttribute('data-copy') ?? '';
+      const original = button.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied';
+      } catch {
+        // Clipboard access can be refused, and saying so is better than a
+        // button that looks like it worked.
+        button.textContent = 'Copy failed — select it by hand';
+      }
+      setTimeout(() => {
+        button.textContent = original;
+      }, 2500);
+    });
+  }
+</script>
+
+<style>
+  h1 {
+    margin-bottom: 0.25rem;
+  }
+  .intro {
+    font-size: 1.05rem;
+    margin-top: 0;
+  }
+  .box {
+    border: 1px solid var(--rule, #ddd);
+    padding: 1.25rem 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .box h2 {
+    margin-top: 0;
+    font-size: 1.15rem;
+  }
+  .step {
+    margin-bottom: 0.4rem;
+  }
+  .undealt {
+    opacity: 0.9;
+  }
+  .copy-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .copy-row code {
+    font-size: 0.95rem;
+    word-break: break-all;
+  }
+  .paste pre {
+    white-space: pre-wrap;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    max-height: 18rem;
+    overflow-y: auto;
+    padding: 0.75rem;
+    border: 1px solid var(--rule, #ddd);
+  }
+  button[data-copy] {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
+  }
+  .footer-line {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-top: 2rem;
+  }
+</style>
