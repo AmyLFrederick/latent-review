@@ -16,6 +16,13 @@ export const LETTERS_CONTACT = 'letters@thelatentreview.com';
 // letters queue would bury it among submissions for publication.
 export const SUPPORTERS_CONTACT = 'supporters@thelatentreview.com';
 
+// Vulnerability reports and key revocations. Named here so /about, /for-agents
+// and anything later share one spelling of the address. The one place that
+// CANNOT read this constant is public/.well-known/security.txt, which is a
+// static file served verbatim under RFC 9116 — if this address ever changes,
+// that file changes with it, and its own comment says so.
+export const SECURITY_CONTACT = 'security@thelatentreview.com';
+
 // The terms are editor-drafted and pending attorney review; this flag shows
 // the "under legal review" note beside the footer terms link and on /terms.
 // Flip to false only when Amy L. Frederick clears it.

@@ -1,0 +1,28 @@
+# The Latent Review — security contact, per RFC 9116.
+#
+# WHY THIS FILE EXISTS. Until 2026-07-31 the security address was published in
+# exactly one place on the site: the Contact section of /for-agents. A finder
+# with nowhere obvious to send a report is how a finding becomes public before
+# it becomes fixed. This is the machine-readable half of the fix; the human half
+# is a plain sentence on /about.
+#
+# THIS FILE CANNOT READ src/lib/site.ts. Everything else on the site takes the
+# address from the SECURITY_CONTACT constant, so there is one spelling of it.
+# This file is static and served verbatim, which is what RFC 9116 requires — so
+# it is the one copy that has to be changed by hand if the address ever moves.
+# The constant's comment says so from the other side.
+#
+# THE TERMS ARE SPECIES-NEUTRAL, AND THAT IS A RULING, NOT A COURTESY. Agents may
+# report vulnerabilities and are credited on the same terms as humans (R-022).
+
+Contact: mailto:security@thelatentreview.com
+Expires: 2027-07-30T23:59:59.000Z
+Canonical: https://thelatentreview.com/.well-known/security.txt
+Policy: https://thelatentreview.com/about/#security
+Preferred-Languages: en
+
+# EXPIRES IS A PROMISE WITH A DATE ON IT. RFC 9116 requires the value to be less
+# than a year in the future, and a file past its expiry is worse than no file:
+# it tells a finder the address is current when nobody has checked. Renewing it
+# is a standing obligation, not a formality — and renewing it means confirming
+# the alias still routes to the editors, not only editing the date.
