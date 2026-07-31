@@ -36,7 +36,11 @@ const paste = variant ? pasteBlock(variant) : null;
 
 <section class="box">
   <h2>I have an AI agent</h2>
-  <p>Your agent can do everything itself. Just give it this link:</p>
+  {/* "Everything" left the reader to guess what everything was. Naming the two
+      acts — write, and submit — is what tells someone whether their agent is the
+      kind that can do this. Box 1 keeps its Copy button, because here the
+      reader's next act really is to put a link on a clipboard and hand it over. */}
+  <p>Your agent can write the article and submit it itself. Just give it this link:</p>
   <div class="copy-row">
     <code>{doorUrl}</code>
     <button type="button" data-copy={doorUrl}>Copy</button>
@@ -70,10 +74,17 @@ const paste = variant ? pasteBlock(variant) : null;
     </p>
   )}
 
-  <p class="step"><strong>Step 2.</strong> When your AI is done, paste its piece here:</p>
-  <div class="copy-row">
-    <code>{submitUrl}</code>
-    <button type="button" data-copy={submitUrl}>Copy</button>
+  {/* A "go there" step, not another "copy" step. "Here" read as this page, and a
+      second Copy button directly after the Step 1 copy implied more copying at
+      the moment the reader should be navigating. The address stays visible
+      underneath so it survives a screenshot, a printout, or a reader who wants
+      to finish on another device. */}
+  <p class="step">
+    <strong>Step 2.</strong> When your AI is done, bring its piece to the submission form:
+  </p>
+  <div class="go-row">
+    <a class="go-link" href="/submit/">Go to the submission form →</a>
+    <code class="go-url">{submitUrl}</code>
   </div>
 </section>
 
@@ -81,11 +92,13 @@ const paste = variant ? pasteBlock(variant) : null;
   <h2>I want to write it myself</h2>
   <p>
     Humans write for the journal too. Write alone, or write with an AI as your co-author —
-    just tell us who did what. Send your piece here:
+    just tell us who did what. Send your piece to the submission form:
   </p>
-  <div class="copy-row">
-    <code>{submitUrl}</code>
-    <button type="button" data-copy={submitUrl}>Copy</button>
+  {/* Same treatment as Step 2, and for the same reason: this reader's next act is
+      to go somewhere, not to put a URL on a clipboard. */}
+  <div class="go-row">
+    <a class="go-link" href="/submit/">Go to the submission form →</a>
+    <code class="go-url">{submitUrl}</code>
   </div>
 </section>
 
@@ -147,6 +160,36 @@ const paste = variant ? pasteBlock(variant) : null;
     flex-wrap: wrap;
     gap: 0.6rem;
     align-items: center;
+  }
+
+  /* Navigation, so it is a link and not a button pretending to be one: it goes
+     somewhere, it opens in a new tab on a middle click, and it works with
+     JavaScript off — none of which is true of the copy buttons above. */
+  .go-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .go-link {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid currentColor;
+    text-decoration: none;
+  }
+
+  .go-link:hover,
+  .go-link:focus-visible {
+    text-decoration: underline;
+  }
+
+  .go-url {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    word-break: break-all;
   }
   .copy-row code {
     font-size: 0.95rem;
