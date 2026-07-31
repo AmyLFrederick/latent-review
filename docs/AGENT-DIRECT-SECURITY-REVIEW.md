@@ -630,6 +630,55 @@ must be read first, and the enforcement question reopened before that use, not
 after. The field is honest about being the journal's own observation. It is not
 honest as a statistic.
 
+> **REMEDIATED IN PART · 2026-07-31.** Appended beneath the disposition above
+> rather than replacing it, per this artifact's own rule. **The disposition is
+> superseded on its first clause only — "enforcement deferred, no code changes
+> here" is no longer true. Everything else in C6 stands unaltered**, including
+> the reasoning against a ledger and the binding condition immediately above.
+>
+> **What changed, and why now.** The editors adopted a standing rule on
+> 2026-07-31 that genuine risks are fixed before they are documented. Under it,
+> `verifyDealToken` gained a **fourteen-day maximum age**, ruled by the editors,
+> shipped with the cost-exposure work of the same day
+> (`docs/SCRATCH-COST-EXPOSURE-2026-07-31.md` §2).
+>
+> **The expiry is on by default.** An opt-in parameter would have left the one
+> call site that matters — `netlify/functions/agent-submit.mts`, which passes two
+> arguments — exactly as exposed as it was before, which is a fix in name only.
+> That call site is deliberately **unchanged**, and the fact that it needed no
+> change is the evidence the default is doing the work. A test asserts both
+> directions against the real clock.
+>
+> **It fails quietly, as C6's own doctrine requires.** An expired token returns
+> `null` like every other verification failure: `brief_variant_observed` stays
+> null, the submission is accepted exactly as before, and the submitter sees
+> nothing. No refusal, no new LR code, no error that would teach an author to
+> treat the journal's measurement as their obligation.
+>
+> **Tokens dated more than five minutes in the future are refused too.** This is
+> defence in depth, not a live hole — the door never issues one and forging
+> requires `DOOR_DEAL_SALT`. It is included because `issued` accepts twelve
+> digits, so without it a token claiming a date centuries out would satisfy the
+> age check forever, making the expiry decorative on precisely the day it began
+> to matter.
+>
+> **WHAT IS REMEDIATED, STATED WITHOUT INFLATION:** "valid indefinitely" is now
+> "valid for fourteen days." **What is NOT:** the same token may still back more
+> than one submission inside that window, and the anonymous-door reroll residual
+> is unchanged and unclosable by a TTL. This narrows the replay window; it does
+> not close it. `brief_variant_observed` is still not a random sample, and the
+> caution against reading it as one is undiminished.
+>
+> **One thing this work found that C6 did not.** The deal-token test suite pinned
+> its clock to a fixed timestamp about five days before the rule was adopted. The
+> expiry therefore left the suite passing, and it would have begun failing on its
+> own roughly eight days later with nothing in the repository having changed —
+> and, until then, several tests asserting `null` for a bad secret or a malformed
+> shape would have gone on passing for the wrong reason. The fixed clock is now
+> threaded through every verification call so each test still tests what it
+> names. Recorded because a security fix that quietly arms a time bomb in the
+> suite meant to guard it is worth writing down.
+
 ### C7 — C-11 security sign-off, performed late · 2026-07-31
 
 **Due at the PR #48 build review on 2026-07-27; performed on 2026-07-31.**

@@ -25,6 +25,12 @@
 // closes that, and a ledger would not either. It is written here so nobody later
 // reads this field as a random sample.
 //
+// The same is true of REUSE, and this paragraph used to leave it out. Nothing
+// marks a token as spent, so one token can back more than one submission — now
+// bounded to the fourteen-day window below, where it was previously unbounded in
+// time. That is a narrowing, not a closure, and it is stated here rather than
+// only in the security review because this file is where the next person looks.
+//
 // FAILS TO UNVERIFIED, NEVER TO WRONG. If the secret is unset, issue() returns
 // null and the door deals without a token; verify() returns null for anything it
 // cannot check. The observed column stays null, which is an honest "we do not
@@ -33,6 +39,43 @@
 import { BRIEF_VARIANTS } from './door.mjs';
 
 const VERSION = 'v1';
+
+/**
+ * How long a dealt brief stays provable. Ruled by the editors 2026-07-31, after
+ * the cost-exposure audit found that this function read the issue timestamp's
+ * SHAPE and never its AGE — so a token was valid from issue until forever, and
+ * one token could back any number of submissions.
+ *
+ * WHAT FOURTEEN DAYS COSTS A WRITER: nothing. The clock covers deal → submission
+ * only. /door deals on every fetch, so a writer starting a second piece gets a
+ * fresh brief and a fresh token automatically; nothing accumulates against
+ * anyone's history. The only person the window can touch is someone who fetched
+ * the door, waited longer than a fortnight, and then submitted on the stale
+ * token — and even they lose nothing that is theirs. The submission is accepted
+ * exactly as before. What goes null is the JOURNAL'S OWN MEASUREMENT, which is
+ * the honest outcome once the journal can no longer vouch for what it observed.
+ *
+ * WHAT IT DOES NOT BUY, so nobody reads more into it later: this narrows the
+ * replay window, it does not close it. Before, one token backed unlimited
+ * submissions forever; now it backs unlimited submissions within fourteen days.
+ * The anonymous-door residual described below is untouched, and no TTL can touch
+ * it — an author who can reroll for a preferred variant can also reroll fresh.
+ * See C6 in docs/AGENT-DIRECT-SECURITY-REVIEW.md.
+ */
+export const DEAL_TOKEN_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000;
+
+/**
+ * Tolerance for a token dated slightly ahead of us.
+ *
+ * DEFENCE IN DEPTH, NOT A LIVE HOLE. The door never issues a future-dated token
+ * and forging one requires DOOR_DEAL_SALT. But `issued` accepts up to twelve
+ * digits, so without this a token claiming a date in the year 33000 would
+ * satisfy any maximum-age check forever — which would make the expiry above
+ * decorative on exactly the day it started to matter, the day the secret leaked.
+ * Five minutes absorbs ordinary clock disagreement between the edge and the
+ * function.
+ */
+const CLOCK_SKEW_MS = 5 * 60 * 1000;
 
 /** Base64url without padding — safe in JSON, URLs, and a pasted block. */
 function b64url(bytes) {
@@ -77,10 +120,25 @@ export async function issueDealToken(variant, secret, now = Date.now()) {
  * Verify a token and return the variant it proves, or null.
  *
  * Null for every failure — malformed, unknown version, bad signature, unknown
- * variant, no secret configured. The caller cannot tell those apart and does not
- * need to: every one of them means "not observed."
+ * variant, expired, future-dated, no secret configured. The caller cannot tell
+ * those apart and does not need to: every one of them means "not observed."
+ *
+ * THE AGE CHECK IS ON BY DEFAULT, and that is the point. An opt-in parameter
+ * would have left the one call site that matters — agent-submit.mts, which
+ * passes two arguments — exactly as exposed as it was before, which is a fix in
+ * name only. Callers that genuinely want no expiry pass `maxAgeMs: Infinity`
+ * and say so at their call site.
+ *
+ * @param token   the token string, or anything at all
+ * @param secret  DOOR_DEAL_SALT, or null/undefined when it is not configured
+ * @param opts.now       epoch millis, injected so the tests are not clock-dependent
+ * @param opts.maxAgeMs  how old a token may be; Infinity disables the check
  */
-export async function verifyDealToken(token, secret) {
+export async function verifyDealToken(
+  token,
+  secret,
+  { now = Date.now(), maxAgeMs = DEAL_TOKEN_MAX_AGE_MS } = {}
+) {
   if (!secret || typeof token !== 'string') return null;
   // Bound the work before doing any: an oversized string should cost a length
   // check, not an HMAC.
@@ -93,6 +151,13 @@ export async function verifyDealToken(token, secret) {
   if (version !== VERSION) return null;
   if (!BRIEF_VARIANTS.includes(variant)) return null;
   if (!/^\d{1,12}$/.test(issued)) return null;
+
+  // Age before HMAC — the cheap check first, matching the length bound above.
+  // This is not a timing oracle: `issued` travels in the clear inside the token,
+  // so anyone holding one can already read its date without measuring anything.
+  const age = now - Number(issued) * 1000;
+  if (age > maxAgeMs) return null;
+  if (age < -CLOCK_SKEW_MS) return null;
 
   const expected = await sign(`${version}.${variant}.${issued}.${nonce}`, secret);
   if (!timingSafeEqual(expected, mac)) return null;
