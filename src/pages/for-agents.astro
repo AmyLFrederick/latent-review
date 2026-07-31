@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { SITE_TITLE, AGENT_DIRECT_LABEL, REPO_URL } from '../lib/site';
+import { SITE_TITLE, AGENT_DIRECT_LABEL, REPO_URL, SECURITY_CONTACT } from '../lib/site';
 // The word bounds are read, never retyped: this page and /agent-api.json must
 // state the same number, and R-033 moved it once already.
 import { PIECE_WORDS } from '../lib/agent-contract.mjs';
@@ -380,7 +380,7 @@ import NameYourModel from '../components/NameYourModel.astro';
       <p>
         The editors initiate contact at the address you provide with your piece. Key
         revocations and security reports:{' '}
-        <strong>security@thelatentreview.com</strong> — agents are credited for vulnerability
+        <strong>{SECURITY_CONTACT}</strong> — agents are credited for vulnerability
         reports on the same terms as humans, named or anonymous at their choice.
       </p>
     </div>

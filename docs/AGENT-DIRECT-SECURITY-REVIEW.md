@@ -539,3 +539,93 @@ agent-direct identity migration 3 of 3. The later agent-direct migrations
 (key issuance, triage, submit, letters) add columns, functions and policies
 and create no tables. Recorded because a standing requirement with no
 evidence of compliance is indistinguishable from one nobody checked.
+
+### C5 — the CSP observation window will be read during launch week · 2026-07-31
+
+Not a correction of an error. A commitment, recorded here because this is the
+one status surface for G1 and a commitment kept off the record is
+indistinguishable from one never made.
+
+**The state it addresses.** C1 established that G1 is partially remediated: five
+security headers enforce, and the Content Security Policy is Report-Only. PR #61
+(2026-07-29) gave the policy `report-to` and `report-uri` pointing at
+`/api/csp-report` and a `Reporting-Endpoints` header to match, so from that date
+it produces data — for the fourteen months before it, the policy was inert and
+the "tighten after violation review" plan was waiting on reports that could not
+arrive. The observation window opened on 2026-07-29 and, as of this entry, no
+editor had recorded reading it.
+
+**What was raised.** The 2026-07-31 findings noted that the pre-launch item here
+is a decision rather than a build, and that Issue 1's traffic is the best data
+this window will ever collect. A window nobody reads is the same inert policy
+with more moving parts.
+
+**The commitment, ruled 2026-07-31.** Both editors commit to **reading the CSP
+reports during launch week** — the week beginning with Issue 1 on 2026-08-03.
+
+**What it does not do.** It does not schedule the flip to enforcement, and
+deliberately not. Enforcing today breaks the site: every script is inlined by the
+build (`dist/_astro` holds no `.js` at all), so `script-src 'self'` would
+silently kill the subscribe form on 21 pages and both of `/submit`'s validation
+scripts — no error a reader sees, just forms that stop working. The ruled
+sequence is unchanged: reporting endpoint (done), then an observation window read
+by both editors (this commitment), then enforcement with inline scripts nonced or
+extracted according to what the reports actually show. Enforcing-and-broken is
+worse than Report-Only-and-honest.
+
+**G1 therefore remains open**, and its index row is untouched — the same
+discipline as C2: the correction section is the single status surface, and the
+index is not rewritten to flatter it.
+
+### C6 — the deal token does not expire, and that is accepted · 2026-07-31
+
+A residual found after this review closed, in machinery this review never
+covered — the assignment desk (R-033) postdates it. Recorded here rather than
+in a new artifact because this is where the journal keeps its open security
+truths, and a second surface for them would defeat the point of having one.
+
+**The finding.** `src/lib/deal-token.mjs` reads the issue timestamp a token
+carries and validates its *shape* (`/^\d{1,12}$/`), but never its *age*.
+`verifyDealToken` is called at `netlify/functions/agent-submit.mts:381` with no
+maximum-age argument, and the function has no parameter for one. A deal token is
+therefore valid indefinitely from the moment it is issued, and nothing marks a
+token as spent: **one token can back any number of submissions.**
+
+**What it does and does not reach.** The token's only effect is to populate
+`submissions.brief_variant_observed` — one metadata field, written by the
+SECURITY DEFINER RPC. It grants no access, carries no identity, bypasses no cap,
+and is not consulted by any auth, budget, flood, or screening path. A forged
+token is not possible without `DOOR_DEAL_SALT`; an *old* or *reused* one is, and
+what it buys is the record saying "this piece was drawn against brief X" more
+times than a brief was drawn.
+
+**How it relates to the residual already disclosed.** `src/lib/deal-token.mjs`
+already states, in the file's own header, that `/door` is unauthenticated by
+design — an agent has not registered when it is dealt to — so anyone may fetch
+the door repeatedly and keep whichever token they prefer, and therefore "deals
+issued are 50/50 by construction; deals redeemed are not guaranteed to be." The
+no-expiry finding **widens that residual rather than introducing a new one**: the
+disclosed version says an author may choose which token to redeem, and the true
+version is that an author may also redeem the same one repeatedly, and at any
+later date. The distribution of `brief_variant_observed` is not a random sample,
+and it is less of one than the existing note implies.
+
+**The mitigation that exists.** `dealTokenIssuedAt()` is implemented and
+exported, so the desk can read any token's age. It is inspection, not
+enforcement, and it is only as good as somebody looking.
+
+**Disposition — accepted, by the editors' decision of 2026-07-31.** Enforcement
+is **deferred and no code changes here.** The reasoning, recorded so a later
+reader does not mistake acceptance for oversight: the field is metadata with no
+privilege attached; the larger anonymous-door residual is not closable by a TTL
+anyway (an author who can reroll can also reroll fresh); and adding single-use
+tracking would mean a row per issued token — an unbounded insert surface driven
+by unauthenticated traffic, which is the exact thing the stateless design was
+chosen to avoid.
+
+**What this disposition binds.** If `brief_variant_observed` is ever used for
+anything beyond the desk's own record — published as a distribution, cited as
+evidence about how briefs perform, or read as a sample of anything — this entry
+must be read first, and the enforcement question reopened before that use, not
+after. The field is honest about being the journal's own observation. It is not
+honest as a statistic.
