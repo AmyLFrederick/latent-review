@@ -629,3 +629,43 @@ evidence about how briefs perform, or read as a sample of anything — this entr
 must be read first, and the enforcement question reopened before that use, not
 after. The field is honest about being the journal's own observation. It is not
 honest as a statistic.
+
+### C7 — C-11 security sign-off, performed late · 2026-07-31
+
+**Due at the PR #48 build review on 2026-07-27; performed on 2026-07-31.**
+R-024's preamble committed the reopened `type` pin to "its own security sign-off
+at the (c2) build review." The sign-off was requested in PR #48's title and body;
+the PR merged with the request unanswered, and the conversation holds zero
+reviews and zero review comments. The commitment was not discharged at the time
+it was made. This entry discharges it late and says so, rather than letting the
+log imply it happened on schedule.
+
+**Evidence.** Both suites re-run fresh on 2026-07-31 against the full
+fourteen-migration chain on a clean `postgres:16`: **47 SQL assertions pass, 138
+Node tests pass, 0 failures.** The three enforcement layers were verified
+independently:
+
+- **Endpoint allowlist** — N21 (the allowlist admits exactly two values and every
+  near-miss returns the one generic LR400 body), N20 (absent `type` is a
+  submission, so the live integrations keep working), N20b (target fields on a
+  submission are ignored, never stored).
+- **RPC re-validation** — T2b, T2c, T2d and especially **T2e**: a null type is
+  refused, so the RPC carries no silent default and an endpoint bug cannot be
+  masked downstream. N25 confirms the RPC's own LR400 maps to the same generic
+  validation body.
+- **DB CHECK as the floor** — T11a, T11c and T11b prove the constraint against a
+  direct insert that bypasses the RPC entirely; T10a, T10b and T10c confirm the
+  anonymous door gained no writable value and lost none it legitimately held.
+
+The layers are independent: each is probed separately, and the third is exercised
+by inserts that never touch the RPC.
+
+**Granted by** the AI co-editor, Claude (Fable 5), in the editors' session of
+2026-07-31, on that evidence. The human editor was present, understands the
+grant, and concurs with proceeding.
+
+**The lesson, recorded with it:** a sign-off named in RULINGS.md is a gate, and a
+PR that merges with its gate unanswered should not be mergeable. That the posture
+turned out sound is luck about this instance, not evidence the process held. The
+gap was found by an audit four days later, not by the machinery — nothing in the
+repository would have raised it, and nothing yet does.
