@@ -35,6 +35,27 @@ close with one summary. The human editor is not expected to be present during
 execution — so a question that blocks the queue is a last resort, and everything
 that can proceed under a stated assumption should proceed.
 
+**No interim record updates — ratified 2026-07-31.** If a document will be
+superseded within the same working session, write only the final state, and write
+it once. A note that says OPEN at one hour and RESOLVED at the next has not
+recorded two facts; it has recorded one fact and one draft, and the draft costs
+every later reader a wasted pass. Decide what is true at the end of the session
+and write that.
+
+This does **not** touch append-only doctrine, and the two are easy to confuse.
+Append-only governs what has already entered the history: a committed record is
+never rewritten, only appended to. This rule governs what has not entered it yet —
+an uncommitted draft in the working tree may be rewritten freely, because nobody
+has read it as a record. The line is the commit, not the keystroke.
+
+**Production receipts are the exception, and are always written.** A migration
+applied, money moved or committed, a deploy verified, a key rotated: those are
+facts about the world outside this repository. They cannot be re-derived from the
+code later, and a session that ends unexpectedly must not take them with it. They
+are recorded when they happen, in full, even if something supersedes them an hour
+later — and then the supersession is appended, because by that point they are
+history.
+
 **What configuration can and cannot enforce.** Permission rules match command
 *prefixes*, not intentions, so `.claude/settings.local.json` approximates the rule
 above rather than enforcing it. Three consequences worth knowing:
