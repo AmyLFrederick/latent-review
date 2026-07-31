@@ -19,6 +19,31 @@ const GENERIC_OK = 'Thanks — if that address isn’t already subscribed, a con
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// GLOBAL CEILINGS ON A BILLABLE, ANONYMOUS PATH. Ruled by the editors 2026-07-31
+// after the cost-exposure audit (docs/SCRATCH-COST-EXPOSURE-2026-07-31.md).
+//
+// The per-IP and per-address limits below are not ceilings. Per-IP bounds one
+// abuser's machine; per-address protects one stranger's inbox. Neither bounds
+// the TOTAL, so the real limit was 5 × (however many source IPs someone rents)
+// per hour — and every one of those is a billable Resend send to an address the
+// requester chose. Nothing in this repository capped it.
+//
+// The invoice was never the worst of it. Those are real messages leaving
+// mail.thelatentreview.com to third parties, and because the per-address cap
+// spreads the flood rather than concentrating it, the damage lands on the
+// sending domain's reputation — which is what the first issue's digest depends
+// on, with DMARC still at p=none.
+//
+// THESE ARE CIRCUIT BREAKERS, NOT THROTTLES. They sit far above any rate the
+// confirmed list will legitimately reach, so tripping one means something is
+// wrong rather than that the journal got popular. The cost of that choice is
+// stated rather than hidden: a global cap trades an unbounded bill for a bounded
+// availability failure, and while a breaker is tripped, honest signups are
+// refused too. The editors set these numbers for launch-week headroom knowing
+// that.
+const GLOBAL_HOURLY_MAX = 500;
+const GLOBAL_DAILY_MAX = 3000;
+
 async function sendConfirmation(email: string, confirmToken: string, unsubToken: string) {
   const link = confirmUrl(confirmToken);
   await sendEmail({
@@ -70,9 +95,16 @@ export default async function handler(req: Request, context: Context): Promise<R
     const ip = context.ip ?? 'unknown';
     // Per-IP: a flood burns rows, not email sends. Per-email: we will not be
     // used to fill a stranger's inbox with confirmation requests.
+    // The global buckets come LAST, and the ordering is load-bearing rather than
+    // stylistic: `||` short-circuits, so a request already refused per-IP or
+    // per-address never reaches them and never spends global budget. A flood
+    // being turned away by the narrow limits must not also exhaust the ceiling
+    // that protects everyone else.
     if (
       (await overLimit(supabase, 'subscribe-ip', ip, 5, 60)) ||
-      (await overLimit(supabase, 'subscribe-email', email, 2, 60))
+      (await overLimit(supabase, 'subscribe-email', email, 2, 60)) ||
+      (await overLimit(supabase, 'subscribe-global', 'global', GLOBAL_HOURLY_MAX, 60)) ||
+      (await overLimit(supabase, 'subscribe-global-daily', 'global', GLOBAL_DAILY_MAX, 24 * 60))
     ) {
       return respond(req, false, 'Too many attempts. Please try again later.', 429);
     }
