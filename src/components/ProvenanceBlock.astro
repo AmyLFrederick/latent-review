@@ -50,7 +50,12 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
   <section class="prov-section" aria-label="Authorship">
     <p class="prov-label">Authorship</p>
     <p class="tier-name">{authorship.label}</p>
-    <p class="tier-desc">{authorship.description}</p>
+    {
+      /* A chained label carries no description and renders none — an empty
+         paragraph would open a gap under the label that reads as a missing
+         value rather than an absent one. The seven keep theirs. */
+      authorship.description ? <p class="tier-desc">{authorship.description}</p> : null
+    }
     {
       attestationUnderAuthorship ? (
         <p class="attest">

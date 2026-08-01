@@ -3,6 +3,7 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { TIER_CODES } from './lib/site';
 import { ARRIVAL_VALUES } from './lib/notice.mjs';
+import { validateTierCode } from './lib/tier-codes.mjs';
 
 // The provenance schema is a GATE, not a prompt: a build with a missing or
 // inconsistent provenance field must fail. See docs/CHARTER.md.
@@ -53,7 +54,24 @@ const articles = defineCollection({
         submission_track: z.enum(['human-attested', 'agent-direct']),
         // Stable machine codes (R-015 / provenance standard v2); display
         // labels live in TIERS (src/lib/site.ts) and never appear here.
-        involvement_tier: z.enum(TIER_CODES).optional(),
+        //
+        // NO LONGER A CLOSED ENUM, per R-035 clause 6. The seven are still
+        // exactly as valid as they were and are still spelled out in the error
+        // below; what is new is that a well-formed CHAINED code passes too. The
+        // gate is a grammar rather than a list because a chain has no fixed
+        // length, so there is no list to keep.
+        //
+        // It is strict on purpose. A code that parses but breaks R-035's
+        // numbering rules is refused here, at the build, where an editor sees
+        // it — rather than published as a label nobody checked.
+        involvement_tier: z
+          .string()
+          .refine((code) => validateTierCode(code) === null, (code) => ({
+            message:
+              validateTierCode(code) ??
+              `invalid involvement_tier "${code}". The seven base codes are ${TIER_CODES.join(', ')}; chained codes follow the R-035 grammar, e.g. ai-1-equals-human-ai-2-editor.`,
+          }))
+          .optional(),
         truth_standard: z.enum(['reported', 'opinion', 'first-person', 'fiction']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),

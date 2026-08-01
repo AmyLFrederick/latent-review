@@ -2,11 +2,11 @@ import {
   AGENT_DIRECT_LABEL,
   ARRIVAL_LABELS,
   BRIEF_VARIANT_LABELS,
-  TIER_DESCRIPTIONS,
-  TIER_LABELS,
   TRACK_CUSTODY_NOTES,
   TRACK_LABELS,
   formatDate,
+  tierDescription,
+  tierLabel,
 } from './site.ts';
 import { fullTextUrl } from './full-text.ts';
 
@@ -90,11 +90,18 @@ export function authorshipFor(d: ProvenanceData): Authorship {
   if (d.submission_track === 'agent-direct') {
     return { label: 'AI', description: 'AI alone', declared: false };
   }
+  // RESOLVED, NOT LOOKED UP (R-035 clause 6). This read `TIER_LABELS[code] ??
+  // 'Not declared'`, which turned any code outside the seven into a confident
+  // claim that no tier was declared — the failure being that a chained label the
+  // standard can express would have been published as an absence. tierLabel()
+  // knows the seven and the chained grammar both, and returns null rather than a
+  // fallback so the decision about an unknown code is made here, once, visibly.
   const code = d.involvement_tier ?? '';
+  const label = tierLabel(code);
   return {
-    label: TIER_LABELS[code] ?? 'Not declared',
-    description: TIER_DESCRIPTIONS[code] ?? '',
-    declared: Boolean(TIER_LABELS[code]),
+    label: label ?? 'Not declared',
+    description: tierDescription(code),
+    declared: label !== null,
   };
 }
 
@@ -195,8 +202,12 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
 export function provenanceLabel(d: ProvenanceData): string {
   if (d.submission_track === 'agent-direct') return AGENT_DIRECT_LABEL;
 
+  // A chained label carries no description (see tierDescription), so the colon
+  // is conditional. Without this the compatibility label emitted by both feeds
+  // would end "AI¹ = Human + AI² (editor): " — a punctuation mark promising a
+  // clause that never arrives, in a field consumers parse.
   const { label, description } = authorshipFor(d);
-  const base = `${label}: ${description}`;
+  const base = description ? `${label}: ${description}` : label;
   return d.attested_by ? `${base}; attested by ${d.attested_by}` : base;
 }
 
@@ -221,7 +232,8 @@ export function provenanceSentence(d: ProvenanceData, origin?: string | URL): st
       ? `Authorship: AI alone (agent-direct track; no tier is declared). Chain of custody: ${track} — ${AGENT_DIRECT_LABEL}.`
       : (() => {
           const { label, description } = authorshipFor(d);
-          return `Authorship: ${label} — ${description}. Chain of custody: ${track}.`;
+          const authorship = description ? `${label} — ${description}` : label;
+          return `Authorship: ${authorship}. Chain of custody: ${track}.`;
         })();
 
   return base + treatmentClause(d, origin);
