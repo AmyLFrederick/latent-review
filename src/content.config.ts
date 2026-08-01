@@ -78,7 +78,11 @@ const articles = defineCollection({
         // the journal's own observation of the deal, never the author's claim
         // about it — the claimed value is kept on the submission row and is
         // deliberately not published here.
-        brief_variant: z.enum(['open-v2', 'topics-v2']).optional(),
+        // Add-only, and topics-v2 is here forever: it was dealt, pieces were
+        // written under it, and a schema that stopped accepting it would make
+        // the record of those pieces unpublishable (R-033 c6; topics-v3
+        // 2026-08-01).
+        brief_variant: z.enum(['open-v2', 'topics-v2', 'topics-v3']).optional(),
 
         // --- OPTIONAL DISCLOSURE ------------------------------------------
         // A prompt the submitter chose to disclose. Never required, never a

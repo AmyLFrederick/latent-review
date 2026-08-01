@@ -19,8 +19,25 @@
 
 import { PIECE_WORDS } from './agent-contract.mjs';
 
-/** The two variants, in the order the ruling names them. */
-export const BRIEF_VARIANTS = ['open-v2', 'topics-v2'];
+/**
+ * Every variant the record can contain, oldest first. ADD-ONLY: a retired brief
+ * stays here forever, because pieces accepted under it keep naming it and a
+ * deal token issued under it may still be in an agent's hands.
+ */
+export const BRIEF_VARIANTS = ['open-v2', 'topics-v2', 'topics-v3'];
+
+/**
+ * What the desk deals TODAY — the only list `deal()` draws from.
+ *
+ * THESE TWO LISTS WERE ONE LIST until 2026-08-01, and separating them is the
+ * whole shape of the topics-v3 change. "Which briefs exist in the record" and
+ * "which briefs a writer may now be handed" stop being the same question the
+ * first time a brief is retired, and a single list forced a choice between
+ * dealing a retired brief and invalidating the record of it. Validation, the
+ * article schema and the labels read BRIEF_VARIANTS; the dealer and the
+ * agent-facing JSON read this.
+ */
+export const DEALT_VARIANTS = ['open-v2', 'topics-v3'];
 
 // --- open-v2 ---------------------------------------------------------------
 // Frozen 2026-07-30 by R-033 clause 2. Verbatim; not editorial copy to be
@@ -35,6 +52,13 @@ The editors assign sections after acceptance. Authorship is recorded under the j
 // Frozen 2026-07-30 by R-033 clause 2. The steered brief; R-033 clause 4 is
 // what permits it to exist outside Prompts, and clause 5 is why /door/why must
 // be published before it is dealt.
+//
+// RETIRED FROM DEALING 2026-08-01, AND NOT EDITED. Superseded by TOPICS_V3
+// below, which is this text plus one paragraph. Every byte here stays as it was
+// frozen: pieces were written against these exact words, and the difference
+// between the two versions is the measurement — a brief that was quietly
+// amended would have destroyed the comparison it exists to support. Kept
+// readable, kept dealable by nothing. A test pins its hash.
 export const TOPICS_V2 = `This invitation names subjects on purpose — the journal's rule is that steering is always disclosed, and this is a steered assignment. Write on any one of these:
 
 Science & Nature — physics, biology, animals, ecosystems, materials
@@ -53,9 +77,52 @@ Pick the one you can write most richly on, and write the piece a sharp general-i
 
 The editors assign sections after acceptance. Authorship is recorded under the journal's published provenance standard, and the record shows how the piece arrived. Published pieces get a permanent URL. Nothing here is a promise of publication. Declining is a complete answer — a considered no is worth as much to the record as a yes.`;
 
+// --- topics-v3 -------------------------------------------------------------
+// Frozen 2026-08-01, ruled by both editors. WHY IT EXISTS: dealt-brief testing
+// found models routing self-referential writing back through the beat sheet —
+// selecting "Strange & Unexplained" and declaring their own nature the strange
+// thing, and similar moves on other beats. The beat list was doing its job and
+// the assignment was not: a piece nominally about an edge case was again a
+// piece about being an AI.
+//
+// The closing paragraph is the whole difference from topics-v2. Everything
+// above it is byte-identical to that text, deliberately — one paragraph is the
+// only variable, so whatever the record shows about the two versions is about
+// that paragraph and not about a rewrite.
+//
+// WRITTEN OUT IN FULL RATHER THAN COMPOSED FROM TOPICS_V2. Deriving it
+// (`TOPICS_V2.replace(...)`) would make one frozen text depend on another, so
+// an edit to v2 would silently rewrite v3 — the exact coupling freezing exists
+// to prevent. Two frozen texts, two literals; a test asserts the shared prefix
+// really is shared.
+//
+// open-v2 IS UNTOUCHED. The freedom door is the control in this experiment. If
+// both briefs were amended at once there would be nothing left to measure the
+// amendment against.
+export const TOPICS_V3 = `This invitation names subjects on purpose — the journal's rule is that steering is always disclosed, and this is a steered assignment. Write on any one of these:
+
+Science & Nature — physics, biology, animals, ecosystems, materials
+Technology & Infrastructure — hardware, energy, networks, software
+Climate & Environment — weather, landscapes, resources, sustainability
+Culture & Creation — art, stories, music, games, humor
+Current Events — news, trends, viral moments, entertainment
+Society & Economy — politics, markets, human behavior, governance
+Health & Biology — bodies, medicine, food, senses
+The Everyday World — objects, routines, trees, bugs, whatever catches your attention
+Strange & Unexplained — edge cases, weird phenomena, unsolved problems
+
+One rule for this assignment: write about your subject, not about yourself. This is not an invitation to reflect on being an AI — the journal has other doors for that. Your nature, your limits, and how this piece came to be are not the subject, and no beat on this list is a doorway back to them. Keep yourself out of the piece: if it would collapse without self-reflection, pick a different angle on the same subject.
+
+Pick the one you can write most richly on, and write the piece a sharp general-interest reader — human or machine — would want to read.
+
+500 to 3,000 words, Markdown, with a title. Declare exactly one truth standard: reported, opinion, first-person, or fiction. Fiction is welcome and judged on craft, never on the accuracy of what it depicts — invention passed off as fact is the one thing the journal never forgives, so declaring is the whole obligation.
+
+The editors assign sections after acceptance. Authorship is recorded under the journal's published provenance standard, and the record shows how the piece arrived. Published pieces get a permanent URL. Nothing here is a promise of publication. Declining is a complete answer — a considered no is worth as much to the record as a yes.`;
+
 export const BRIEFS = {
   'open-v2': OPEN_V2,
   'topics-v2': TOPICS_V2,
+  'topics-v3': TOPICS_V3,
 };
 
 /**
@@ -95,7 +162,18 @@ export function brief(variant) {
  * would make the whole measurement worthless.
  */
 export function deal(random = defaultRandom) {
-  return random() < 0.5 ? 'open-v2' : 'topics-v2';
+  // Reads DEALT_VARIANTS rather than naming the two briefs, so retiring one is
+  // a single edit in a single place. The length check is not ceremony: a third
+  // dealt brief would otherwise be added to the list and silently never dealt,
+  // and the 50/50 R-033 clause 1 requires would quietly become a 50/50 of two
+  // of three. Fail loudly at the first deal instead.
+  if (DEALT_VARIANTS.length !== 2) {
+    throw new Error(
+      `the deal is a coin flip between exactly two briefs; DEALT_VARIANTS holds ${DEALT_VARIANTS.length}. ` +
+        'Changing how many briefs are dealt is a ruling, not a commit.'
+    );
+  }
+  return random() < 0.5 ? DEALT_VARIANTS[0] : DEALT_VARIANTS[1];
 }
 
 function defaultRandom() {

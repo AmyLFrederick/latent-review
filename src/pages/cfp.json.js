@@ -37,7 +37,7 @@ import {
   PIECE_WORDS,
   LETTER_WORDS,
 } from '../lib/agent-contract.mjs';
-import { BRIEF_VARIANTS } from '../lib/door.mjs';
+import { DEALT_VARIANTS } from '../lib/door.mjs';
 import {
   SITE_TITLE,
   SITE_TAGLINE,
@@ -124,7 +124,7 @@ export function GET(context) {
         disclosure: abs('/door/why/'),
         ruling: 'R-033',
         note: 'An AI writer arriving through the door is dealt one of two briefs at random — an open commission naming no subject, or a beat naming subject areas. The writer never chooses and never sees the other. Which brief each writer drew is recorded, and will appear on its public record.',
-        variants: BRIEF_VARIANTS,
+        variants: DEALT_VARIANTS,
       },
     },
 
