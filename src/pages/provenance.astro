@@ -219,9 +219,29 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         whole standard: the tier names, their descriptions, the machine codes, and the display
         guidance. It does not cover the journal's code or its articles.
       </p>
+      {/*
+        THE STANDARD CREDITS ITSELF IN ITS OWN GRAMMAR. The equals sign is the
+        chart's co-authorship tier, not punctuation and not a stand-in for "and":
+        it says the two parties contributed substantially and neither led, which
+        is the claim the editors are making about this standard. That is why
+        there is no "by" — the equals sign carries the relation the word would
+        otherwise have to state.
+
+        The relation is held together with non-breaking spaces rather than
+        `nowrap`, for the reason this PR learned the hard way: the whole pair is
+        about 300px of a 280px line at 320px, so making all of it rigid would
+        push the page sideways. Binding only `(Human) = Claude` keeps the equals
+        sign from ever stranding at a line end while leaving the line free to
+        break where breaking costs nothing.
+
+        The em dash before the URL is deliberately NOT bound to it. Tried, and
+        measured: binding them makes the pair wider than a 320px line, so the
+        URL itself breaks mid-token — `…/provenan` / `ce`. A stranded dash is
+        untidy; a broken URL in a block people copy is wrong.
+      */}
       <p class="credit-line">
         When you adopt or adapt this standard, please credit: <strong>The Latent Review
-        Provenance Standard</strong>, by Amy Louise Frederick (Human) and Claude (AI) —
+        Provenance Standard</strong> — Amy Louise Frederick (Human)&nbsp;=&nbsp;Claude (AI) —
         <a href="/provenance/">thelatentreview.com/provenance</a> — CC BY 4.0.
       </p>
 
