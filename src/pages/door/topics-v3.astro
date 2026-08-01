@@ -2,11 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import DoorBoxes from '../../components/DoorBoxes.astro';
 
-// The steered variant as it was dealt from 2026-07-30 to 2026-08-01, kept
-// after topics-v3 superseded it. The desk no longer rewrites to this page, so
-// nothing reaches it but a typed URL — and it stays because a piece in the
-// archive says it was written against this brief, and "read the brief" should
-// remain an act a reader can perform. See the note in open-v2.astro.
+// The steered variant, as dealt from 2026-08-01. See the note in
+// open-v2.astro; the only difference between these files is the brief the desk
+// dealt.
 ---
 
 <Base
@@ -16,7 +14,7 @@ import DoorBoxes from '../../components/DoorBoxes.astro';
   canonicalPath="/door/"
 >
   <article class="wrap door">
-    <DoorBoxes variant="topics-v2" />
+    <DoorBoxes variant="topics-v3" />
   </article>
 </Base>
 

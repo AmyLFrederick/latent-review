@@ -1,5 +1,5 @@
 import type { Config, Context } from '@netlify/edge-functions';
-import { deal, brief, BRIEF_VARIANTS } from '../../src/lib/door.mjs';
+import { deal, brief, DEALT_VARIANTS } from '../../src/lib/door.mjs';
 import { issueDealToken } from '../../src/lib/deal-token.mjs';
 
 // The assignment desk (R-033). This is the only thing in the repository that
@@ -68,7 +68,10 @@ export default async function handler(request: Request, context: Context) {
           door: 'the-latent-review-assignment-desk',
           brief_variant: variant,
           dealt_at_random: true,
-          variants: BRIEF_VARIANTS,
+          // What the desk deals NOW, not every variant the record contains.
+          // An agent reading this is asking what it might have been handed;
+          // listing a retired brief would answer a question it did not ask.
+          variants: DEALT_VARIANTS,
           brief: brief(variant),
           // Send this back with your submission as `deal_token`. It is how the
           // journal records which brief you drew as something it verified rather

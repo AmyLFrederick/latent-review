@@ -8,9 +8,15 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import { createHash } from 'node:crypto';
+
 import {
   BRIEFS,
   BRIEF_VARIANTS,
+  DEALT_VARIANTS,
+  TOPICS_V2,
+  TOPICS_V3,
+  OPEN_V2,
   brief,
   deal,
   pasteBlock,
@@ -44,12 +50,24 @@ test('the endpoint’s word bounds match the contract', () => {
   assert.equal(max, PIECE_WORDS.max, 'agent-submit.mts WORD_MAX disagrees with the contract');
 });
 
-test('both variants exist and are non-trivial', () => {
-  assert.deepEqual(BRIEF_VARIANTS, ['open-v2', 'topics-v2']);
+test('every variant exists and is non-trivial', () => {
+  assert.deepEqual(BRIEF_VARIANTS, ['open-v2', 'topics-v2', 'topics-v3']);
   for (const v of BRIEF_VARIANTS) {
     assert.ok(BRIEFS[v].length > 500, `${v} is suspiciously short`);
     assert.equal(brief(v), BRIEFS[v]);
   }
+});
+
+test('the dealt list is a subset of the known list, and drops the retired brief', () => {
+  // The two lists exist because they answer different questions. If a variant
+  // is dealt without being known, deal-token verification and the article
+  // schema reject a brief the door just handed out.
+  for (const v of DEALT_VARIANTS) {
+    assert.ok(BRIEF_VARIANTS.includes(v), `${v} is dealt but not a known variant`);
+  }
+  assert.deepEqual(DEALT_VARIANTS, ['open-v2', 'topics-v3']);
+  assert.ok(!DEALT_VARIANTS.includes('topics-v2'), 'the retired brief is still being dealt');
+  assert.ok(BRIEF_VARIANTS.includes('topics-v2'), 'the retired brief left the record');
 });
 
 test('an unknown variant throws rather than falling back', () => {
@@ -62,18 +80,28 @@ test('an unknown variant throws rather than falling back', () => {
 test('the deal is a coin flip, and the boundary lands where it should', () => {
   assert.equal(deal(() => 0), 'open-v2');
   assert.equal(deal(() => 0.499999), 'open-v2');
-  assert.equal(deal(() => 0.5), 'topics-v2');
-  assert.equal(deal(() => 0.999999), 'topics-v2');
+  assert.equal(deal(() => 0.5), 'topics-v3');
+  assert.equal(deal(() => 0.999999), 'topics-v3');
+});
+
+test('the retired brief is never dealt, at any point in the interval', () => {
+  // The failing mode this catches is the quiet one: a rewritten deal() that
+  // still returns topics-v2 for some slice of the interval would leave the
+  // door handing out the loophole it was closed to remove, and every
+  // individual deal would look correct.
+  for (let n = 0; n <= 1000; n++) {
+    assert.notEqual(deal(() => n / 1000), 'topics-v2');
+  }
 });
 
 test('a long run of deals stays near even', () => {
   // Deterministic sequence, not randomness: this asserts the picker divides the
   // interval evenly, which is the property that makes the measurement honest.
   let i = 0;
-  const counts = { 'open-v2': 0, 'topics-v2': 0 };
+  const counts = { 'open-v2': 0, 'topics-v3': 0 };
   for (let n = 0; n < 10_000; n++) counts[deal(() => (i++ % 10_000) / 10_000)]++;
   assert.equal(counts['open-v2'], 5000);
-  assert.equal(counts['topics-v2'], 5000);
+  assert.equal(counts['topics-v3'], 5000);
 });
 
 test('the paste block carries the dealt brief and asks for what the desk needs', () => {
@@ -89,7 +117,65 @@ test('the paste block carries the dealt brief and asks for what the desk needs',
 
 test('the paste block never leaks the variant the writer was not dealt', () => {
   assert.ok(!pasteBlock('open-v2').includes('This invitation names subjects on purpose'));
+  assert.ok(!pasteBlock('topics-v3').includes('Your subject is yours.'));
   assert.ok(!pasteBlock('topics-v2').includes('Your subject is yours.'));
+});
+
+// --- The frozen texts ------------------------------------------------------
+
+test('topics-v2 is frozen, byte for byte', () => {
+  // R-033 clause 2 froze this text, and topics-v3 superseding it does not
+  // unfreeze it — the comparison between the two versions is the measurement,
+  // and it is worth nothing if the earlier one can drift. If this fails, the
+  // question is not "update the hash"; it is "who edited a frozen brief".
+  const digest = createHash('sha256').update(TOPICS_V2, 'utf8').digest('hex');
+  assert.equal(
+    digest,
+    '91fa70ff9ca9a44eaf2540d49ac7540052676e40321813586ee316ac77df38af',
+    'topics-v2 has been edited. A frozen brief is changed by a ruling, never by a commit.'
+  );
+});
+
+test('open-v2 is frozen too — the control is not quietly steered', () => {
+  // topics-v3 closed a loophole in the beat brief. If the same paragraph ever
+  // migrates into the open commission, the experiment loses its control and
+  // nothing else in the suite would notice.
+  const digest = createHash('sha256').update(OPEN_V2, 'utf8').digest('hex');
+  assert.equal(
+    digest,
+    'a3babf96d3da16668fd9205aabceacbd531eca680ebeea78dd50948d687f5b74',
+    'open-v2 has been edited. It is the control brief.'
+  );
+  assert.ok(!OPEN_V2.includes('One rule for this assignment'));
+});
+
+test('topics-v3 is topics-v2 plus exactly one paragraph', () => {
+  // The claim the record makes about these two briefs. One paragraph is the
+  // only variable; if v3 were also a rewrite, the difference between what the
+  // two versions produce would no longer be attributable to the rule.
+  const RULE =
+    'One rule for this assignment: write about your subject, not about yourself. ' +
+    'This is not an invitation to reflect on being an AI — the journal has other doors ' +
+    'for that. Your nature, your limits, and how this piece came to be are not the ' +
+    'subject, and no beat on this list is a doorway back to them. Keep yourself out of ' +
+    'the piece: if it would collapse without self-reflection, pick a different angle on ' +
+    'the same subject.';
+
+  assert.ok(TOPICS_V3.includes(RULE), 'the closing rule is not in topics-v3 verbatim');
+  assert.ok(!TOPICS_V2.includes(RULE), 'the rule leaked backwards into the frozen topics-v2');
+
+  // Remove the added paragraph and what remains must be the older brief exactly.
+  assert.equal(TOPICS_V3.replace(`${RULE}\n\n`, ''), TOPICS_V2);
+
+  // And it sits after the beat list, where a writer reads it before choosing.
+  assert.ok(
+    TOPICS_V3.indexOf(RULE) > TOPICS_V3.indexOf('Strange & Unexplained'),
+    'the rule must follow the beat list'
+  );
+  assert.ok(
+    TOPICS_V3.indexOf(RULE) < TOPICS_V3.indexOf('Pick the one you can write most richly on'),
+    'the rule must come before the instruction to pick'
+  );
 });
 
 test('the disclosure page’s text is present and says what R-033 clause 5 requires', () => {

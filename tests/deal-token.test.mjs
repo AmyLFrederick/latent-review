@@ -198,3 +198,13 @@ test('the desk can still read the age of a token that no longer verifies', async
   assert.equal(await verifyDealToken(token, SECRET, { now: stale }), null);
   assert.equal(Math.floor(dealTokenIssuedAt(token).getTime() / 1000), Math.floor(NOW / 1000));
 });
+
+test('a token for a RETIRED brief still verifies', () => {
+  // topics-v2 stopped being dealt on 2026-08-01, and tokens issued before that
+  // are still in agents' hands until they age out. Voiding them would make a
+  // piece's assignment unverifiable through no fault of its author — the one
+  // thing the deal token exists to prevent.
+  return issueDealToken('topics-v2', SECRET, NOW).then(async (token) => {
+    assert.equal(await verifyDealToken(token, SECRET, { now: NOW }), 'topics-v2');
+  });
+});

@@ -149,6 +149,11 @@ export async function verifyDealToken(
 
   const [version, variant, issued, nonce, mac] = parts;
   if (version !== VERSION) return null;
+  // BRIEF_VARIANTS, NOT DEALT_VARIANTS, and the difference matters here more
+  // than anywhere else: tokens for a retired brief are still in agents' hands
+  // and stay valid until they age out. Checking the dealt list would silently
+  // void every token issued before the retirement, and the piece would arrive
+  // with its assignment unverifiable through no fault of its author.
   if (!BRIEF_VARIANTS.includes(variant)) return null;
   if (!/^\d{1,12}$/.test(issued)) return null;
 

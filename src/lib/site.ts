@@ -148,9 +148,14 @@ export const TRACK_CUSTODY_NOTES: Record<string, string> = {
 // Which brief the desk dealt (R-033). The deal is the journal's own
 // observation, recorded server-side at /door and copied to the piece at
 // acceptance; it is never the author's claim about which brief they were given.
+// A retired variant keeps its label forever — a published piece dealt topics-v2
+// still has to render. The two beat versions read the same to a reader because
+// the reader-facing fact is the same one: a beat, dealt at random. Which
+// version is stored, not displayed.
 export const BRIEF_VARIANT_LABELS: Record<string, string> = {
   'open-v2': 'Open commission, dealt at random by the desk',
   'topics-v2': 'Beat, dealt at random by the desk',
+  'topics-v3': 'Beat, dealt at random by the desk',
 };
 
 // Charter: the order of names names who led; the equals sign names
