@@ -223,3 +223,23 @@ this list by becoming a PR.
   never reads the count. This is a one-line change to the reporting arithmetic
   only. Recorded because a check that always cries "1 added" trains its readers
   to ignore its output, which is the failure mode the check exists to prevent.
+- **May the desk correct attested fields? — UNRULED, on the editors' list**
+  (raised 2026-08-01 by the courier-field review; deliberately not answered in
+  that PR). The desk's UPDATE grant from `20260717120000` covers only the five
+  decision columns — `status`, `amy_decision`, `coeditor_decision`,
+  `coeditor_review`, `decided_at`. So `involvement_tier` and
+  `provenance_attestation` are **not** desk-correctable today, and the courier
+  columns, which R-034's migration does grant, are an exception rather than an
+  instance of a rule. The question is whether that exception should become the
+  rule, stay an exception, or be withdrawn.
+  It is genuinely two-sided, which is why it is recorded rather than settled:
+  a submitter who mistypes their own attestation currently has no path to a
+  correction except a visible correction after publication, and the desk reading
+  an obvious slip cannot fix it. Against that, an attested field the desk can
+  rewrite is no longer purely the submitter's claim, and the whole force of
+  *claimed, never certified* rests on nobody else having touched it. R-034
+  settles who may **write** a field at intake; it does not reach who may
+  **amend** one afterwards, and the two should not be conflated by whoever picks
+  this up. Note also that provenance labels are immutable from acceptance
+  onward (CLAUDE.md) — so any answer here governs the window before acceptance
+  only, and must say so.

@@ -113,8 +113,20 @@ grant insert (courier_submission, courier_author_identity)
 grant insert (prompt_disclosure)
   on table public.submissions to anon;
 
--- The desk may correct a courier declaration, as it may correct any attested field
--- before acceptance.
+-- The desk may correct a courier declaration.
+--
+-- STATED NARROWLY ON PURPOSE. An earlier draft of this comment read "as it may
+-- correct any attested field before acceptance," which was not true: the desk's
+-- UPDATE grant from 20260717120000 covers only the five decision columns
+-- (status, amy_decision, coeditor_decision, coeditor_review, decided_at), so
+-- involvement_tier and provenance_attestation are not desk-correctable today.
+-- These two columns are therefore the exception, not an instance of a rule.
+--
+-- Whether the desk SHOULD be able to correct attested fields is an open question
+-- on the editors' list and is deliberately not answered here — a migration
+-- comment is the wrong place to settle an editorial question, and a comment that
+-- describes a practice the grants do not implement is how the first version of
+-- this line went wrong.
 grant update (courier_submission, courier_author_identity)
   on table public.submissions to authenticated;
 
