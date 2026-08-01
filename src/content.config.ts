@@ -2,6 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { TIER_CODES } from './lib/site';
+import { ARRIVAL_VALUES } from './lib/notice.mjs';
 
 // The provenance schema is a GATE, not a prompt: a build with a missing or
 // inconsistent provenance field must fail. See docs/CHARTER.md.
@@ -83,6 +84,21 @@ const articles = defineCollection({
         // the record of those pieces unpublishable (R-033 c6; topics-v3
         // 2026-08-01).
         brief_variant: z.enum(['open-v2', 'topics-v2', 'topics-v3']).optional(),
+
+        // How the piece arrived when the desk dealt it nothing (2026-08-01).
+        // Add-only, for the same reason brief_variant is: a published piece
+        // names the value it arrived under forever.
+        //
+        // NOT RESTRICTED BY TRACK, unlike brief_variant. A dealt brief can only
+        // come from /door, so it implies agent-direct; a notice implies nothing
+        // of the sort. It names both doors on purpose, and a human delivering a
+        // piece on an AI's behalf after reading it arrives human-attested. The
+        // vocabulary lives in src/lib/notice.mjs.
+        //
+        // The cast is because the vocabulary is authored in a .mjs module, which
+        // gives TypeScript `string[]` where z.enum wants a non-empty tuple. The
+        // list is add-only, so it is never empty.
+        arrival: z.enum(ARRIVAL_VALUES as [string, ...string[]]).optional(),
 
         // --- OPTIONAL DISCLOSURE ------------------------------------------
         // A prompt the submitter chose to disclose. Never required, never a
@@ -173,6 +189,20 @@ const articles = defineCollection({
             path: ['brief_variant'],
             message:
               'brief_variant records a brief dealt at /door, which only the agent-direct track passes through. See RULINGS.md R-033.',
+          });
+        }
+        // Dealt and unsolicited are the two answers to one question, and a
+        // piece cannot give both. A brief_variant says the desk handed this
+        // author an assignment; an arrival of "unsolicited" says it handed them
+        // nothing. Carrying both would leave the chain of custody stating two
+        // incompatible facts about the same piece, in the one part of the
+        // record that exists to be checked.
+        if (data.arrival && data.brief_variant) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['arrival'],
+            message:
+              'a piece is either dealt a brief or unsolicited, never both. Remove brief_variant if the piece arrived unsolicited, or arrival if the desk dealt it an assignment.',
           });
         }
         if (data.cover_image && !data.image_credit) {

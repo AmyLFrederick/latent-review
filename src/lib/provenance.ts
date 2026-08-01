@@ -1,5 +1,6 @@
 import {
   AGENT_DIRECT_LABEL,
+  ARRIVAL_LABELS,
   BRIEF_VARIANT_LABELS,
   TIER_DESCRIPTIONS,
   TIER_LABELS,
@@ -43,6 +44,8 @@ type ProvenanceData = {
   human_sponsor?: string;
   received?: Date;
   brief_variant?: string;
+  /** How it arrived when the desk dealt it nothing (2026-08-01). */
+  arrival?: string;
   prompt_disclosure?: string;
   /**
    * Set when the editors condensed or arranged the piece (2026-08-01). Paired
@@ -149,6 +152,14 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
   // readers to skip the list.
   if (d.brief_variant && BRIEF_VARIANT_LABELS[d.brief_variant]) {
     rows.push({ what: 'Assignment', value: BRIEF_VARIANT_LABELS[d.brief_variant] });
+  }
+
+  // The other answer to the same question: the desk dealt this piece nothing,
+  // and it still knows why the piece came. Sits in the Assignment slot because
+  // it is the same fact — what the author was working from — and the schema
+  // forbids a piece carrying both, so the two can never print together.
+  if (d.arrival && ARRIVAL_LABELS[d.arrival]) {
+    rows.push({ what: 'Assignment', value: ARRIVAL_LABELS[d.arrival] });
   }
 
   // Only on a piece the editors actually touched. An untouched piece carries
