@@ -149,7 +149,9 @@ test('N7b: every validation refusal and every screen refusal share one LR400 bod
   const cases = [
     { ...validPayload(), title: '' }, // too short
     { ...validPayload(), truth_standard: 'gospel' }, // bad enum
-    { ...validPayload(), body: words(200) }, // under word floor
+    // A length failure is NOT in this set any more: R-033 made it the one
+    // refusal that names its field and echoes its numbers. It has its own test
+    // below, and the no-oracle property still holds for everything here.
     { ...validPayload(), title: 'a‮b' }, // screen: bidi
     { ...validPayload(), body: `${words(600)} ​` }, // screen: invisible
     '{not json', // parse failure
@@ -202,17 +204,24 @@ test('N7d: meter failure fails closed with the ruled 503, never an unmetered pas
   }
 });
 
-// --- N8: word-count boundaries (499/500/5,000/5,001) -----------------------
+// --- N8: word-count boundaries (499/500/3,000/3,001) -----------------------
+//
+// The ceiling moved from 5,000 to 3,000 on 2026-07-30 (R-033, the
+// assignment-desk model). 5,000 is retained below as an explicit REFUSAL case
+// rather than deleted: the old ceiling is exactly the length an agent working
+// from a cached copy of the previous contract will send, so it is the boundary
+// most worth having a named test for.
 
-test('N8: the R-006 word bounds refuse at 499 and 5,001, pass at 500 and 5,000', async () => {
-  // Single-letter words: 5,000 of them are 9,999 chars, well inside the
+test('N8: the ruled word bounds refuse at 499 and 3,001, pass at 500 and 3,000', async () => {
+  // Single-letter words: 3,000 of them are 5,999 chars, well inside the
   // 40,000-char DB cap, so only the word count is under test here.
   const shortWords = (n) => Array.from({ length: n }, () => 'w').join(' ');
   for (const [count, expected] of [
     [499, 400],
     [500, 201],
-    [5000, 201],
-    [5001, 400],
+    [3000, 201],
+    [3001, 400],
+    [5000, 400], // the superseded ceiling — now refused
   ]) {
     stub.rateCounts = [0, 0, 0];
     stub.rpc = () => ok(UUID);
@@ -222,6 +231,61 @@ test('N8: the R-006 word bounds refuse at 499 and 5,001, pass at 500 and 5,000',
     );
     assert.equal(res.status, expected, `${count} words`);
   }
+});
+
+test('N8b: a length refusal is legible — it states the count and the range', async () => {
+  // R-033's deliberate exception to the byte-identical refusal bodies. The
+  // agent most likely to hit this is an honest one working from the superseded
+  // 5,000-word contract, so 5,000 is the case tested.
+  const shortWords = (n) => Array.from({ length: n }, () => 'w').join(' ');
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = () => ok(UUID);
+  const res = await submit(
+    request({ ...validPayload(), body: shortWords(5000) }, generateAgentKey()),
+    ctx
+  );
+  assert.equal(res.status, 400);
+  const body = JSON.parse(await res.text());
+  assert.equal(body.code, 'LR400');
+  assert.match(body.error, /5,000 words/); // the measured count
+  assert.match(body.error, /500 to 3,000 words/); // the current range, in words
+  assert.match(body.error, /\/for-agents/);
+});
+
+test('N8c: a letter’s length refusal names the letter bounds, not the piece bounds', async () => {
+  // Letters were out of scope for the word-count change, but not for
+  // legibility: an opaque refusal in one lane and a legible one in the other
+  // would be an inconsistency with nothing behind it.
+  const shortWords = (n) => Array.from({ length: n }, () => 'w').join(' ');
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = () => ok(UUID);
+  const res = await submit(
+    request(
+      {
+        ...validPayload(),
+        type: 'letter',
+        target_type: 'charter',
+        body: shortWords(400),
+      },
+      generateAgentKey()
+    ),
+    ctx
+  );
+  assert.equal(res.status, 400);
+  const body = JSON.parse(await res.text());
+  assert.match(body.error, /This letter is 400 words/);
+  assert.match(body.error, /Letters run 100 to 300 words/);
+});
+
+test('N8d: the legible refusal is the ONLY one that echoes anything', async () => {
+  // Guards the exception from spreading. Every other 400 stays frozen and
+  // nameless; if a future change makes another refusal chatty, this fails.
+  const res = await submit(
+    request({ ...validPayload(), truth_standard: 'gospel' }, generateAgentKey()),
+    ctx
+  );
+  assert.equal(res.status, 400);
+  assert.equal(await res.text(), JSON.stringify(REFUSAL_VALIDATION));
 });
 
 // --- N9: the screen, per character class, with the false-positive guard ----
@@ -595,4 +659,57 @@ test('N26: a fresh published piece is a valid target and a stale one is not', as
     __setArchiveRootForTests(null);
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// --- N27: optional prompt disclosure (item 7, 2026-07-31) -----------------
+// Never required, never a refusal, screened like every other submitter string,
+// and written by the post-receipt statement rather than the intake RPC.
+
+test('N27: a submission without prompt_disclosure is accepted unchanged', async () => {
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = () => ok(UUID);
+  const res = await submit(request(validPayload(), generateAgentKey()), ctx);
+  assert.equal(res.status, 201);
+  // Nothing to annotate, so no post-insert update is issued at all.
+  const updates = stub.requests.filter(
+    (r) => r.url.includes('/rest/v1/submissions') && r.method === 'PATCH'
+  );
+  assert.equal(updates.length, 0, 'an absent disclosure must not trigger a write');
+});
+
+test('N27b: a disclosed prompt is stored by the post-receipt statement, not the RPC', async () => {
+  stub.rateCounts = [0, 0, 0];
+  let rpcArgs = null;
+  stub.rpc = (_name, args) => {
+    rpcArgs = args;
+    return ok(UUID);
+  };
+  const res = await submit(
+    request({ ...validPayload(), prompt_disclosure: 'Write about doors.\nBe brief.' }, generateAgentKey()),
+    ctx
+  );
+  assert.equal(res.status, 201);
+
+  // The intake RPC never sees it — it must not be able to refuse a submission.
+  assert.ok(
+    !Object.keys(rpcArgs ?? {}).some((k) => k.includes('prompt')),
+    'prompt_disclosure must not be an RPC parameter'
+  );
+
+  const patch = stub.requests.find(
+    (r) => r.url.includes('/rest/v1/submissions') && r.method === 'PATCH'
+  );
+  assert.ok(patch, 'a disclosed prompt should be written after the receipt');
+  assert.match(patch.body, /Write about doors/);
+});
+
+test('N27c: an over-long disclosure is refused as validation, with the one generic body', async () => {
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = rpcUnreachable;
+  const res = await submit(
+    request({ ...validPayload(), prompt_disclosure: 'x'.repeat(4001) }, generateAgentKey()),
+    ctx
+  );
+  assert.equal(res.status, 400);
+  assert.equal(await res.text(), JSON.stringify(REFUSAL_VALIDATION));
 });

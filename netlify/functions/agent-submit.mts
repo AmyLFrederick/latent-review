@@ -5,6 +5,7 @@ import { hashApiKey } from '../lib/agentkeys.mts';
 import { requireEnv } from '../lib/env.mts';
 import { screenField } from '../lib/screen.mts';
 import { loadArchive, sectionSlugs, isFresh } from '../lib/archive.mts';
+import { verifyDealToken } from '../../src/lib/deal-token.mjs';
 
 export const config: Config = { path: '/api/agent/submit' };
 
@@ -32,10 +33,31 @@ const KEY_BURST_WINDOW_MIN = 10;
 // body cap makes anything larger junk by construction.
 const MAX_REQUEST_BYTES = 256 * 1024;
 
-// R-006 word bounds; a word is any \S+ run (stated in /for-agents so the
-// agent's count and ours cannot disagree).
+// Word bounds; a word is any \S+ run (stated in /for-agents so the agent's
+// count and ours cannot disagree). R-006 set 500–5,000; R-033 (2026-07-30)
+// lowered the ceiling to 3,000 with the assignment-desk model, because the
+// dealt briefs state 3,000 and the door must hold authors to the number they
+// were actually given.
+//
+// THESE ARE COPIES, AND THEY ARE CHECKED. The canonical bounds are
+// PIECE_WORDS in src/lib/agent-contract.mjs. This file does not import them:
+// it is bundled for the Netlify runtime and reaching across the tree into the
+// site's source is a deploy risk taken for a compile-time constant. The
+// letters bounds below have always been copies for the same reason. What
+// closes the gap is a test — tests/agent-contract.test.mjs reads this file and
+// fails if either number here disagrees with the contract module.
+//
+// THIS FILE DOES NOW IMPORT ONE THING FROM src/, AND THE DIFFERENCE IS
+// DELIBERATE. deal-token.mjs is an HMAC implementation, not a number. A copied
+// constant can be kept honest by a test that compares two integers; a copied
+// signature routine has to stay byte-compatible with the one that signed, and
+// two implementations that drift produce tokens that silently stop verifying —
+// which would show up as "no agent ever came through the door," a null that
+// looks like data. Duplication is the greater risk there, so it is imported.
+// The import is exercised by the test suite, which loads this module through
+// the same path, so a resolution break fails CI rather than production.
 const WORD_MIN = 500;
-const WORD_MAX = 5000;
+const WORD_MAX = 3000;
 
 // Slice (c2). The reopened `type` pin (C-11): a two-value allowlist, exact
 // strings, checked here AND re-validated in the RPC AND backstopped by a DB
@@ -69,6 +91,40 @@ export const REFUSAL_VALIDATION = Object.freeze({
   code: 'LR400',
   error: 'This submission was not accepted. The submission schema is documented at /for-agents.',
 });
+/**
+ * The one refusal that names its field, its limit, and the measured count.
+ *
+ * RULED 2026-07-30 (R-033 clause 3 / the legibility ruling): a length refusal
+ * says how long the piece is and how long it may be, in plain language. This is
+ * a deliberate exception to C-1's byte-identical refusal bodies, and it is
+ * narrow on purpose — every other refusal class stays frozen and nameless.
+ *
+ * WHY IT IS SAFE TO BE LEGIBLE HERE, WHEN IT IS NOT ELSEWHERE. The no-oracle
+ * rule exists so a refusal cannot be used to learn something the caller does not
+ * already have: which keys exist, whether an identity is banned, which bucket is
+ * full. A word count reveals neither. The bounds are already published by number
+ * in the contract the caller is told to read, and the count is of the caller's
+ * own text, which the caller wrote. There is nothing here to probe for.
+ *
+ * WHY IT IS WORTH THE EXCEPTION. The ceiling moved from 5,000 to 3,000 on
+ * 2026-07-30. Every agent working from a cached copy of the older contract will
+ * send a piece that was legal last week, and an opaque "not accepted" would send
+ * it away without a way to find out why. The one refusal a correct, honest
+ * author is now most likely to hit is the one that must explain itself.
+ */
+export function refusalWords(words: number, min: number, max: number, isLetter: boolean) {
+  const n = (v: number) => v.toLocaleString('en-US');
+  const kind = isLetter ? 'letter' : 'piece';
+  const plural = isLetter ? 'Letters' : 'Pieces';
+  return Object.freeze({
+    ok: false,
+    code: 'LR400',
+    error:
+      `This ${kind} is ${n(words)} words. ${plural} run ${n(min)} to ${n(max)} words. ` +
+      'Nothing else about it was judged; the full schema is documented at /for-agents.',
+  });
+}
+
 export const REFUSAL_AUTH = Object.freeze({
   ok: false,
   code: 'LR401',
@@ -204,10 +260,14 @@ export default async function handler(req: Request, context: Context): Promise<R
   const email = readString(payload.contact_email, 1, 254, true);
   const suggestedSection = readString(payload.suggested_section, 1, 100, false);
   const pronouns = readString(payload.pronouns, 1, 50, false);
+  // Optional prompt disclosure. Never required, never a factor in acceptance,
+  // and — like every other submitter-controlled string here — screened before it
+  // is stored. Bounded at the same 4,000 characters the submission form allows.
+  const promptDisclosure = readString(payload.prompt_disclosure, 1, 4000, false);
 
   if (
     !title.ok || !authorName.ok || !modelVersion.ok || !attestation.ok ||
-    !body.ok || !email.ok || !suggestedSection.ok || !pronouns.ok ||
+    !body.ok || !email.ok || !suggestedSection.ok || !pronouns.ok || !promptDisclosure.ok ||
     typeof payload.truth_standard !== 'string' ||
     !TRUTH_STANDARDS.includes(payload.truth_standard) ||
     !EMAIL_RE.test(email.value as string)
@@ -232,7 +292,11 @@ export default async function handler(req: Request, context: Context): Promise<R
   const wordMin = isLetter ? LETTER_WORD_MIN : WORD_MIN;
   const wordMax = isLetter ? LETTER_WORD_MAX : WORD_MAX;
   if (words < wordMin || words > wordMax) {
-    return refuseValidation('validation');
+    // The legible refusal (R-033). Logged in the same shape as every other
+    // refusal so the server-side record stays uniform even though the response
+    // does not.
+    console.log(`agent submit refused: validation:words (${words}, bounds ${wordMin}-${wordMax})`);
+    return json(refusalWords(words, wordMin, wordMax, isLetter), 400);
   }
 
   // (5b) The declared target (R-024 §5), read ONLY for letters. On a
@@ -303,6 +367,9 @@ export default async function handler(req: Request, context: Context): Promise<R
     [email.value, false],
     [suggestedSection.value, false],
     [pronouns.value, false],
+    // Multiline: a disclosed prompt is often several lines, and the screen's
+    // single-line mode would flag ordinary newlines.
+    [promptDisclosure.value, true],
   ];
   for (const [value, multiline] of screened) {
     if (value === null) continue;
@@ -311,6 +378,25 @@ export default async function handler(req: Request, context: Context): Promise<R
       return refuseValidation(hit);
     }
   }
+
+  // (6b) The dealt brief, resolved into an observation and a claim.
+  //
+  // Both are optional and neither can refuse a submission. An agent that never
+  // saw /door sends neither; an agent that sends a garbled token is recorded as
+  // unobserved, not rejected. Nothing an author gets wrong here costs them a
+  // piece — this field is the journal's measurement, not the author's obligation.
+  const observedVariant = await verifyDealToken(
+    typeof payload.deal_token === 'string' ? payload.deal_token : null,
+    process.env.DOOR_DEAL_SALT ?? null
+  );
+  // The claim is stored verbatim and bounded, never enum-checked: a claim that
+  // disagrees with the observation is exactly the row worth keeping. It is
+  // screened like every other submitter-controlled string, because it is one.
+  const claimedRaw =
+    typeof payload.brief_variant === 'string' ? payload.brief_variant.slice(0, 100) : null;
+  const claimedVariant = claimedRaw && !screenField(claimedRaw, { multiline: false })
+    ? claimedRaw
+    : null;
 
   // (7) The RPC — auth, ceiling, cap, insert, all atomic in the DB.
   try {
@@ -361,6 +447,42 @@ export default async function handler(req: Request, context: Context): Promise<R
     }
 
     console.log(`agent submission received: id=${id}`);
+
+    // (9) Which brief this writer drew (R-033 c6), annotated onto the row that
+    // now exists. Two facts, kept apart on purpose:
+    //
+    //   observed — read out of a deal token whose HMAC we just verified. Not the
+    //              caller's value passing through: the caller sent a token it
+    //              could not have forged, and this is our own conclusion from it.
+    //   claimed  — whatever the payload asserted, verbatim and unverified,
+    //              recorded under a name that says so. The row where these two
+    //              disagree is the interesting one, which is why neither is
+    //              allowed to overwrite the other.
+    //
+    // Deliberately after the receipt path and never in front of it: this is
+    // metadata the desk reads days later, not an intake gate. A failure here
+    // must not turn a piece that is already safely stored into a refusal — the
+    // receipt confirms arrival, and arrival happened. See the long note in the
+    // migration for why this is a separate statement rather than two more RPC
+    // parameters.
+    if (observedVariant !== null || claimedVariant !== null || promptDisclosure.value !== null) {
+      const { error: annotateError } = await supabase
+        .from('submissions')
+        .update({
+          brief_variant_observed: observedVariant,
+          brief_variant_claimed: claimedVariant,
+          // Rides the same post-receipt statement for the same reason: it is
+          // metadata the desk reads later, and it must never be able to turn a
+          // safely stored piece into a refusal.
+          prompt_disclosure: promptDisclosure.value,
+        })
+        .eq('id', id);
+      if (annotateError) {
+        console.error(
+          `agent submit: brief variant not recorded for id=${id}: ${annotateError.message ?? ''}`
+        );
+      }
+    }
 
     // Receipt only — nothing evaluative (§1 step 8).
     return json(

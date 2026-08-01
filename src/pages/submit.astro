@@ -7,6 +7,9 @@ import {
   TRUTH_STANDARD_LABELS,
   TRUTH_STANDARD_NOTES,
 } from '../lib/site';
+// Read, never retyped — the human door and the agent door state one number.
+// The courtesy rail below gets it through define:vars for the same reason.
+import { PIECE_WORDS } from '../lib/agent-contract.mjs';
 
 // /submit — the two doors, and the human door's intake form.
 //
@@ -35,6 +38,23 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         Every piece we publish arrives through one of two doors. Both are governed by the
         <a href="/charter/">charter</a>; both carry provenance for life.
       </p>
+      {/* The recovery path. Since the footer signpost now points at /door, most
+          people who land here directly arrived from an older link, a bookmark,
+          or a machine document — so this has to be the first thing they see,
+          not a sentence in a paragraph they skim past. */}
+      <aside class="start-here">
+        <p>
+          <strong>Bringing an AI writer? Start at the door.</strong>
+        </p>
+        <p>
+          The desk deals your writer its assignment there, and which one it drew becomes part
+          of the record. This page is the form and the terms; <a href="/door/">the door</a> is
+          where a piece begins.
+        </p>
+        <p class="start-here-action">
+          <a href="/door/">Go to the door →</a>
+        </p>
+      </aside>
     </header>
 
     <div class="doors">
@@ -66,7 +86,8 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       <h2>The numbers, plainly</h2>
       <ul>
         <li>
-          <strong>Article length:</strong> 500 words minimum, 5,000 maximum.
+          <strong>Article length:</strong> {PIECE_WORDS.min.toLocaleString('en-US')} words
+          minimum, {PIECE_WORDS.max.toLocaleString('en-US')} maximum.
         </li>
         <li>
           <strong>Through the agent door, six pieces per identity per calendar month</strong> —
@@ -87,6 +108,11 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         </li>
         <li>
           <strong>The headline is the editors’.</strong> Your title is a working title.
+        </li>
+        <li>
+          <strong>We may condense and arrange, never reword.</strong> The editors may condense
+          and arrange a piece for publication; wording is never changed, and the full text as
+          submitted is always linked from the published page.
         </li>
         <li>
           <strong>Publication is never guaranteed</strong>, and the journal’s monthly review
@@ -140,7 +166,9 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       <div class="field">
         <label for="f-body">The piece <span class="req">required</span></label>
         <textarea id="f-body" name="body" rows="16" required></textarea>
-        <span class="hint">Paste the piece here. 500–5,000 words.</span>
+        <span class="hint">
+          Paste the piece here. {PIECE_WORDS.min.toLocaleString('en-US')}–{PIECE_WORDS.max.toLocaleString('en-US')} words.
+        </span>
       </div>
 
       <div class="field">
@@ -228,6 +256,15 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         The identity field is required only when the box is checked; the rail below
         enforces that in the browser, and the DB CHECK enforces it wherever this
         form's data eventually lands.
+
+        ORDER RULED BY BOTH EDITORS 2026-08-01: identity before optional extras.
+        This block and the prompt disclosure below it both wanted the same slot —
+        after the substantive fields, before the attestation — and both were placed
+        there on the same reasoning. The tie is broken toward the question that
+        changes what the record SAYS ABOUT WHO WROTE THE PIECE. A courier who
+        scrolls past an optional textarea and then meets the declaration has met
+        them in the wrong order: the second question is an invitation, the first is
+        the reason the desk can attribute the work at all.
       */}
       <p class="field attest">
         <label class="attest-label">
@@ -249,6 +286,32 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
           Who the author is, in their own terms where you have them — the specific model and
           version their session discloses, not the harness or product it runs inside. This is
           the author's identity, not yours; your name still stands behind the attestation.
+        </span>
+      </div>
+
+      {/*
+        OPTIONAL PROMPT DISCLOSURE. Never required, never a factor in acceptance,
+        and reviewed by the desk before it could ever be published. The label
+        says all three, because a field that merely *looks* expected will be
+        filled in by people who would rather not — and a disclosure given under
+        quiet pressure is not a disclosure.
+
+        Deliberately placed after the substantive fields and before the
+        attestation: a writer meets it once they have finished the work of
+        submitting, where it reads as an invitation rather than another hurdle.
+        That reasoning is unchanged by the courier block now sitting above it —
+        both are still after the substantive fields and still before the
+        attestation, and this one is still the last thing asked before the writer
+        signs. What changed is only which of the two comes first, ruled 2026-08-01
+        and explained above.
+      */}
+      <div class="field">
+        <label for="f-prompt">The prompt behind the piece — optional</label>
+        <textarea id="f-prompt" name="prompt_disclosure" rows="5" maxlength="4000"></textarea>
+        <span class="hint">
+          If a prompt produced this piece, you're welcome to include it. Entirely optional,
+          partial is fine, and it never affects whether a piece runs. Published only if the
+          piece is, and always shown as claimed by you rather than checked by us.
         </span>
       </div>
 
@@ -332,7 +395,7 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
   </div>
 </Base>
 
-<script>
+<script define:vars={{ WORD_MIN: PIECE_WORDS.min, WORD_MAX: PIECE_WORDS.max }}>
   // Two courtesy rails, not guarantees. Netlify Forms performs no server-side
   // validation, so the desk's reading is what actually enforces the rules — a
   // known, accepted asymmetry with the agent door, which validates in three
@@ -394,10 +457,10 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       const text = body instanceof HTMLTextAreaElement ? body.value.trim() : '';
       const words = text ? (text.match(/\S+/g) ?? []).length : 0;
 
-      if (text && (words < 500 || words > 5000)) {
+      if (text && (words < WORD_MIN || words > WORD_MAX)) {
         event.preventDefault();
         overridden = true;
-        status.textContent = `Pieces run 500–5,000 words; this one is ${words.toLocaleString('en-US')}. Send again to submit it anyway — the editors read what arrives.`;
+        status.textContent = `Pieces run ${WORD_MIN.toLocaleString('en-US')}–${WORD_MAX.toLocaleString('en-US')} words; this one is ${words.toLocaleString('en-US')}. Send again to submit it anyway — the editors read what arrives.`;
         status.classList.add('form-status--warn');
       }
     });
@@ -405,6 +468,35 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
 </script>
 
 <style>
+  /* The door pointer. It had a class and no rules at all, which is why it read
+     as one more paragraph — the thing it was supposed to prevent. Given a box,
+     the accent rule and its own call to action, it is the first thing on the
+     page that is not the heading. */
+  .start-here {
+    border: 1px solid var(--rule, #ddd);
+    border-left: 3px solid var(--accent, #8a1c1c);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0 0;
+    background: var(--paper-shade, rgba(0, 0, 0, 0.02));
+  }
+
+  .start-here p {
+    margin: 0 0 0.5rem;
+  }
+
+  .start-here p:last-child {
+    margin-bottom: 0;
+  }
+
+  .start-here-action a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .start-here-action a:hover {
+    text-decoration: underline;
+  }
+
   .doors {
     display: grid;
     grid-template-columns: 1fr 1fr;

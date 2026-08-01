@@ -63,6 +63,7 @@ import Base from '../layouts/Base.astro';
 <script>
   import { createClient } from '@supabase/supabase-js';
   import { TIER_LABELS, TIER_DESCRIPTIONS, aiDeskAttribution } from '../lib/site';
+  import { parseTopicData, formatTopicData } from '../lib/topics.mjs';
 
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
   const key = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -84,6 +85,67 @@ import Base from '../layouts/Base.astro';
         /[&<>"']/g,
         (c) => `&#${c.charCodeAt(0)};`
       );
+
+    // Which brief this writer drew (R-033 c6). Three facts, and the desk is
+    // shown all three because the whole point of the design is that they are
+    // different kinds of knowledge:
+    //
+    //   observed — what the journal verified from the deal token
+    //   claimed  — what the submission asserted, unverified
+    //   the record — what the editors set at acceptance, immutable after
+    //
+    // Disagreement is surfaced, never quietly reconciled. A piece whose claim
+    // contradicts the observation is not necessarily dishonest — a courier may
+    // have retyped it, an agent may have guessed — but it is the row a human
+    // should look at rather than a row a form should silently pick a winner for.
+    function renderBriefEvidence(s: any): string {
+      if (!s.brief_variant_observed && !s.brief_variant_claimed && !s.brief_variant) return '';
+      const disagrees =
+        s.brief_variant_observed &&
+        s.brief_variant_claimed &&
+        s.brief_variant_observed !== s.brief_variant_claimed;
+      return `
+        <p class="desk-note desk-brief">
+          <strong>Assignment drawn:</strong>
+          observed ${s.brief_variant_observed ? `<code>${esc(s.brief_variant_observed)}</code>` : '— (no verifiable deal token)'}
+          · claimed ${s.brief_variant_claimed ? `<code>${esc(s.brief_variant_claimed)}</code>` : '—'}
+          ${s.brief_variant ? `· <strong>recorded ${esc(s.brief_variant)}</strong>` : ''}
+          ${disagrees ? '<br /><strong>These disagree.</strong> The observation is what the journal verified; the claim is what the submission said. Decide which the record should carry, and remember it cannot be changed afterwards.' : ''}
+        </p>`;
+    }
+
+    // Set at acceptance, immutable thereafter. Once it holds a value the field
+    // renders read-only, because the database trigger will refuse a change and a
+    // form that offers an edit the database rejects is worse than one that says
+    // plainly that the field is closed.
+    function renderBriefVariantField(s: any): string {
+      if (s.brief_variant) {
+        return `
+          <label>Assignment drawn — recorded
+            <input type="text" value="${esc(s.brief_variant)}" readonly />
+            <span class="desk-note">
+              Set at acceptance and immutable (R-033 c6), like a provenance label.
+              A wrong label is corrected as a visible correction, never edited here.
+            </span>
+          </label>`;
+      }
+      const suggested = s.brief_variant_observed ?? '';
+      return `
+        <label>Assignment drawn — set at acceptance
+          <select name="brief_variant">
+            <option value="">— not recorded —</option>
+            <option value="open-v2" ${suggested === 'open-v2' ? 'selected' : ''}>open-v2 (open commission)</option>
+            <option value="topics-v3" ${suggested === 'topics-v3' ? 'selected' : ''}>topics-v3 (beat)</option>
+            <option value="topics-v2" ${suggested === 'topics-v2' ? 'selected' : ''}>topics-v2 (beat, retired 2026-08-01)</option>
+          </select>
+          <span class="desk-note">
+            Defaults to what the deal token proved, so acceptance normally confirms
+            rather than types. <strong>Immutable once saved.</strong> Leave unset for a
+            piece that did not come through the door; R-033 c6 requires it set before
+            the piece is published.
+          </span>
+        </label>`;
+    }
 
     async function refresh() {
       const { data } = await supabase.auth.getSession();
@@ -269,6 +331,7 @@ import Base from '../layouts/Base.astro';
           · ${esc(s.truth_standard)} · contact ${esc(s.contact_email)}
         </p>
         <p><strong>Provenance attestation:</strong> ${esc(s.provenance_attestation)}</p>
+        ${renderBriefEvidence(s)}
         <div class="prose desk-body">${esc(s.body).replace(/\n/g, '<br />')}</div>
         <h3>AI desk review</h3>
         <div id="pass-list">${passes.map(renderPass).join('') || '<p class="desk-note">No pass yet.</p>'}</div>
@@ -276,6 +339,17 @@ import Base from '../layouts/Base.astro';
         <span id="pass-status" class="desk-note" role="status"></span>
         <h3>Decision (dual-yes of the founding editors)</h3>
         <form id="decision-form" class="desk-decision">
+          ${renderBriefVariantField(s)}
+          <label>Topic_Data — what this submission was about
+            <input name="topic_data" type="text" value="${esc(formatTopicData(s.desk_topics))}"
+              placeholder="comma-separated" autocomplete="off" />
+            <span class="desk-note">
+              Internal research record, never published (R-032 c4–c6). Applied at
+              review — tag it whether or not it runs, since what was sent and
+              declined is half the record. Not the section, and not the piece’s
+              published subject labels.
+            </span>
+          </label>
           <label>Amy’s decision
             <select name="amy_decision">
               <option value="">—</option>
@@ -348,7 +422,16 @@ import Base from '../layouts/Base.astro';
           coeditor_review: String(form.get('coeditor_review') || '') || null,
           status: String(form.get('status')),
           decided_at: amy && coeditor ? new Date().toISOString() : null,
+          // The column keeps its original name for now: the editors held the
+          // rename to `topic_data` for a later PR (2026-07-30). The label the
+          // desk reads says Topic_Data; the column it writes says desk_topics.
+          desk_topics: parseTopicData(form.get('topic_data')),
         };
+        // Only ever sent when it is being set for the first time: once recorded
+        // the field renders read-only and is absent from the form, so a save
+        // cannot resend it and cannot trip the immutability trigger.
+        const briefVariant = String(form.get('brief_variant') || '');
+        if (briefVariant) (update as any).brief_variant = briefVariant;
         const status = el('decision-status');
         const { error: upError } = await supabase.from('submissions').update(update).eq('id', id);
         status.textContent = upError ? `Save failed: ${upError.message}` : 'Saved.';

@@ -28,11 +28,16 @@ leaves room; agents may never dip into the reserve.
   No queue-behind-the-cap, no silent drop.
 - Windows are calendar months, UTC.
 
-## Length limits (R-006, R-007)
+## Length limits (R-006, R-007, R-033)
+
+*Amended 2026-07-30: superseded by the assignment-desk model, R-033 — the
+article maximum was 5,000 words under R-006 and is 3,000 from that date. The
+correspondence row is untouched; the Letters word-count standard is out of
+scope for that ruling.*
 
 | Type | Minimum | Maximum |
 |------|---------|---------|
-| Submission (article) | 500 words | 5,000 words |
+| Submission (article) | 500 words | 3,000 words |
 | Correspondence (letter) | — | 500 words |
 
 Enforced at intake with honest error messages that state the limit and the

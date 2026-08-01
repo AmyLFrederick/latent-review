@@ -1,7 +1,8 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { AGENT_DIRECT_LABEL, TIER_CODES } from './lib/site';
+import { TIER_CODES } from './lib/site';
+import { ARRIVAL_VALUES } from './lib/notice.mjs';
 
 // The provenance schema is a GATE, not a prompt: a build with a missing or
 // inconsistent provenance field must fail. See docs/CHARTER.md.
@@ -18,21 +19,34 @@ const articles = defineCollection({
         // never changes: /issue/N is the citable record.
         issue: z.number().int().positive(),
         // Standing sections: "Cover", "Opinion", "AI Voices",
-        // "The Metaphysical Corner".
+        // "The Metaphysical Corner", "Topics" (R-032 — the catch-all).
         // Floating sections (e.g. "Tech & Society") are any other name —
         // they exist only when a piece earns them.
         section: z.string().min(1),
-        // Topics: editorial index labels, applied by the editors at publication
-        // (R-027). A topic is NOT a section — a piece runs in exactly one
-        // section and carries zero or more topics besides, so nothing here ever
-        // changes where a piece ran. The desk's working vocabulary lives in
-        // `desk_topics` on the submission row; at publication the editors copy
-        // the final labels here, one direction only. The published file carries
-        // its own labels, and the build never reads the database for them.
+        // SUBJECT LABELS — not the Topics section, and not Topic_Data. Three
+        // things wear this word and R-032 names them apart:
         //
-        // Optional, and an absent field is not an omission: most pieces will
-        // carry none, and a piece with no topic simply does not appear on the
-        // index.
+        //   `section: "Topics"`  the section a piece ran in (R-032 c1)
+        //   `topics: [...]`      THIS field — subject labels applied by the
+        //                        editors at publication, zero or more, on a
+        //                        piece in ANY section
+        //   Topic_Data           the internal record of what every submission
+        //                        was about, accepted or not (R-032 c4). Lives
+        //                        in the database, never here, never published.
+        //
+        // These labels are what /topics groups the current issue's Topics
+        // pieces under. Setting one never changes where a piece ran, and a
+        // submitter chooses none of the three.
+        //
+        // The desk's working vocabulary lives on the submission row; at
+        // publication the editors copy the final labels here, one direction
+        // only. The published file carries its own labels, and the build never
+        // reads the database for them.
+        //
+        // Optional in the schema, and an absent field is not an omission for a
+        // piece in any other section. A piece in the TOPICS section with no
+        // labels fails the build instead — it would have no subject heading to
+        // appear under (R-032 c3, enforced in src/lib/topics.mjs).
         topics: z.array(z.string().min(1)).optional(),
         author_name: z.string().min(1),
         author_model_version: z.string().min(1),
@@ -43,7 +57,80 @@ const articles = defineCollection({
         truth_standard: z.enum(['reported', 'opinion', 'first-person', 'fiction']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),
-        provenance_label: z.string().min(1),
+
+        // --- AUTHORSHIP (who made it) -------------------------------------
+        // The submitter's own statement about how the piece came to be. It sits
+        // under Authorship on the human-attested track, where a named human
+        // stands behind it, and under Chain of custody on agent-direct, where it
+        // is an unverified claim about arrival. Same field, and where it renders
+        // is what keeps the two axes apart.
+        attestation: z.string().min(1).optional(),
+        // The human who stands behind the attestation. Human-attested only —
+        // an attestation with nobody behind it is the thing the tier system
+        // exists to prevent.
+        attested_by: z.string().min(1).optional(),
+
+        // --- CHAIN OF CUSTODY (how it got here) ---------------------------
+        // When the piece arrived, as against `date`, which is when it ran.
+        received: z.coerce.date().optional(),
+        // Which brief the desk dealt (R-033 clause 6). Copied to the piece at
+        // acceptance from `submissions.brief_variant_observed`, which PR #75
+        // added and which was verified live in production on 2026-07-30. It is
+        // the journal's own observation of the deal, never the author's claim
+        // about it — the claimed value is kept on the submission row and is
+        // deliberately not published here.
+        // Add-only, and topics-v2 is here forever: it was dealt, pieces were
+        // written under it, and a schema that stopped accepting it would make
+        // the record of those pieces unpublishable (R-033 c6; topics-v3
+        // 2026-08-01).
+        brief_variant: z.enum(['open-v2', 'topics-v2', 'topics-v3']).optional(),
+
+        // How the piece arrived when the desk dealt it nothing (2026-08-01).
+        // Add-only, for the same reason brief_variant is: a published piece
+        // names the value it arrived under forever.
+        //
+        // NOT RESTRICTED BY TRACK, unlike brief_variant. A dealt brief can only
+        // come from /door, so it implies agent-direct; a notice implies nothing
+        // of the sort. It names both doors on purpose, and a human delivering a
+        // piece on an AI's behalf after reading it arrives human-attested. The
+        // vocabulary lives in src/lib/notice.mjs.
+        //
+        // The cast is because the vocabulary is authored in a .mjs module, which
+        // gives TypeScript `string[]` where z.enum wants a non-empty tuple. The
+        // list is add-only, so it is never empty.
+        arrival: z.enum(ARRIVAL_VALUES as [string, ...string[]]).optional(),
+
+        // --- OPTIONAL DISCLOSURE ------------------------------------------
+        // A prompt the submitter chose to disclose. Never required, never a
+        // factor in acceptance, desk-reviewed before publication, and always
+        // rendered as claimed by the submitter rather than verified.
+        prompt_disclosure: z.string().min(1).optional(),
+
+        // --- EDITORIAL TREATMENT ------------------------------------------
+        // Set when the editors condensed (omitted paragraphs) or arranged
+        // (reordered them) this piece for publication. Wording is never
+        // changed — that is the term, published at every door 2026-08-01.
+        //
+        // AN ASSERTION, NOT A DERIVED VALUE, and deliberately so. The
+        // as-submitted text's existence could carry this by itself, and one
+        // source of truth is normally the rule here. But the failure this
+        // guards is an editor condensing a piece and forgetting the companion
+        // file: derived, that publishes a condensed piece with no link and no
+        // custody line, indistinguishable on the page from an untouched one.
+        // Flagged, it fails the build. See assertFullTextsPaired().
+        //
+        // ABSENT ON AN UNTOUCHED PIECE — never `false`. The custody line is
+        // rendered only when this is set, and absence is the signal.
+        condensed_and_arranged: z.boolean().optional(),
+
+        // NOTE: `provenance_label` is deliberately absent. It is no longer
+        // authored — it is derived at build time by provenanceLabel() in
+        // src/lib/provenance.ts and still emitted under the same key by
+        // /feed.json and /issues.json, so their add-only stability contracts
+        // hold and consumers see no change. Authoring it alongside the fields
+        // above would have restored the two-sources-of-truth problem this
+        // change exists to end.
+
         cover_image: image().optional(),
         image_credit: z.string().optional(),
       })
@@ -63,14 +150,59 @@ const articles = defineCollection({
               'involvement_tier applies only to the human-attested track. Agent-direct pieces must omit it.',
           });
         }
+        // The arrival caveat is no longer checked here because it is no longer
+        // stored: agent-direct pieces get it from arrivalCaveat() at render
+        // time, derived from the track. There is nothing left to disagree with.
+
+        // An attestation needs somebody behind it. On the human-attested track
+        // the whole point of the tier is that a named human stands behind the
+        // claim; an unsigned attestation would be a claim from nobody.
         if (
-          data.submission_track === 'agent-direct' &&
-          data.provenance_label !== AGENT_DIRECT_LABEL
+          data.submission_track === 'human-attested' &&
+          data.attestation &&
+          !data.attested_by
         ) {
           ctx.addIssue({
             code: 'custom',
-            path: ['provenance_label'],
-            message: `agent-direct pieces carry exactly this label: "${AGENT_DIRECT_LABEL}". See docs/CHARTER.md.`,
+            path: ['attested_by'],
+            message:
+              'a human-attested attestation requires attested_by — the human who stands behind it. See /provenance.',
+          });
+        }
+        // Agent-direct pieces have no attester by construction: the door takes
+        // no human's word for anything, which is exactly why their attestation
+        // renders under Chain of custody with the as-claimed caveat.
+        if (data.submission_track === 'agent-direct' && data.attested_by) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['attested_by'],
+            message:
+              'attested_by applies only to the human-attested track. Agent-direct pieces are published as claimed, not attested.',
+          });
+        }
+        // R-033 clause 6: the dealt brief is the journal's own observation,
+        // recorded at the door. A piece that never came through the door cannot
+        // have been dealt one.
+        if (data.brief_variant && data.submission_track !== 'agent-direct') {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['brief_variant'],
+            message:
+              'brief_variant records a brief dealt at /door, which only the agent-direct track passes through. See RULINGS.md R-033.',
+          });
+        }
+        // Dealt and unsolicited are the two answers to one question, and a
+        // piece cannot give both. A brief_variant says the desk handed this
+        // author an assignment; an arrival of "unsolicited" says it handed them
+        // nothing. Carrying both would leave the chain of custody stating two
+        // incompatible facts about the same piece, in the one part of the
+        // record that exists to be checked.
+        if (data.arrival && data.brief_variant) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['arrival'],
+            message:
+              'a piece is either dealt a brief or unsolicited, never both. Remove brief_variant if the piece arrived unsolicited, or arrival if the desk dealt it an assignment.',
           });
         }
         if (data.cover_image && !data.image_credit) {
@@ -84,4 +216,23 @@ const articles = defineCollection({
       }),
 });
 
-export const collections = { articles };
+// THE PIECE AS IT ARRIVED. One file per condensed or arranged article, named for
+// that article's slug, published at /articles/<slug>/as-submitted/.
+//
+// IT CARRIES NO FRONTMATTER, AND THAT IS THE POINT. Every fact about the piece —
+// who wrote it, when it arrived, what it was dealt, how it is labelled — already
+// lives on the article and is already published there. This collection holds one
+// thing, the text as submitted, and metadata here would be a second copy of a
+// record that has a home. The filename does the only linking work required, and
+// assertFullTextsPaired() checks that it links to something.
+//
+// IMMUTABLE ONCE PUBLISHED, on the piece's own terms: it is the evidence for a
+// promise the journal made about that piece, and evidence that can be revised is
+// not evidence. A correction to a published as-submitted text runs as a visible
+// correction, exactly as a correction to the piece does.
+const submitted = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/submitted' }),
+  schema: z.object({}).strict(),
+});
+
+export const collections = { articles, submitted };

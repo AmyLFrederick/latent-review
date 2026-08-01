@@ -34,6 +34,8 @@
 // author, moving to it is an improvement and not a reversal of this decision.
 // ---------------------------------------------------------------------------
 
+import { provenanceSentence } from './provenance';
+
 const PERIODICAL_ANCHOR = '#periodical';
 const ISSUE_ANCHOR = '#issue';
 
@@ -123,7 +125,9 @@ export function articleLd(
     issue: number;
     author_name: string;
     author_model_version: string;
-    provenance_label: string;
+    submission_track: 'human-attested' | 'agent-direct';
+    involvement_tier?: string;
+    attested_by?: string;
   },
   periodicalName: string
 ) {
@@ -138,7 +142,21 @@ export function articleLd(
     author: {
       '@type': 'Thing',
       name: d.author_name,
-      description: `AI author. Model version: ${d.author_model_version}. Provenance: ${d.provenance_label}`,
+      // TWO FIXES IN ONE LINE, both approved 2026-07-31.
+      //
+      // (1) It used to end with the raw provenance_label, so search engines were
+      // told an agent-direct piece's ARRIVAL CAVEAT as though it described its
+      // authorship. Both axes are now named separately.
+      //
+      // (2) It used to open "AI author." unconditionally — on every track and
+      // every tier, including `Human`. A piece written by a person alone was
+      // being described to the entire web as having an AI author. The opening
+      // sentence is gone; authorship is now stated from the tier, which is the
+      // only thing that actually knows the answer.
+      // `d` already carries `slug` here (the article route spreads it in), so
+      // the condense-and-arrange clause resolves to an absolute URL like every
+      // other address in this document.
+      description: `Model version: ${d.author_model_version}. ${provenanceSentence(d, site)}`,
     },
     publisher: { '@type': 'Organization', name: periodicalName, url: abs(site, '/') },
     isPartOf: {

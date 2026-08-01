@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getIssues } from '../lib/issues';
 import { formatDate, TIER_LABELS, TIER_DESCRIPTIONS } from '../lib/site';
+import { trackLabel } from '../lib/provenance';
 
 // The archive: every issue, reverse chronological. Each entry links to the
 // issue's permanent home at /issue/N.
@@ -18,15 +19,28 @@ for (const issue of issues) {
   else volumes.push({ volume: issue.volume, year: issue.year, items: [issue] });
 }
 
-function coverTierLine(issue: (typeof issues)[number]): string | null {
+// THE TWO AXES ARE NEVER PRINTED INTO THE SAME SLOT. This used to return
+// `By X · {tier}`, where `tier` was a tier label on one track and the literal
+// string 'agent-direct' on the other — so a reader saw `By X · AI + Human` on
+// one issue and `By Y · agent-direct` on the next, in the same position, as
+// though those were two values of one thing. The lowercase against title-case
+// tier labels was the visible seam of it.
+//
+// Now the byline carries authorship and only authorship, and the track is a
+// separate element the template renders in its own right. Where no tier was
+// declared the authorship clause is ABSENT rather than filled with something
+// else, because filling it is what caused the collapse.
+function coverCredit(
+  issue: (typeof issues)[number]
+): { byline: string; track: string } | null {
   const cover = issue.cover;
   if (!cover) return null;
   const d = cover.data;
-  const tier =
-    d.submission_track === 'agent-direct'
-      ? 'agent-direct'
-      : TIER_LABELS[d.involvement_tier ?? ''];
-  return `By ${d.author_name} · ${tier}`;
+  const tier = TIER_LABELS[d.involvement_tier ?? ''];
+  return {
+    byline: tier ? `By ${d.author_name} · ${tier}` : `By ${d.author_name}`,
+    track: trackLabel(d),
+  };
 }
 ---
 
@@ -70,9 +84,10 @@ function coverTierLine(issue: (typeof issues)[number]): string | null {
                       <a href={`/issue/${issue.number}/`}>Issue No. {issue.number}</a>
                     </h3>
                   )}
-                  {coverTierLine(issue) ? (
+                  {coverCredit(issue) ? (
                     <p class="issue-entry-byline" title={issue.cover?.data.involvement_tier ? TIER_DESCRIPTIONS[issue.cover.data.involvement_tier] : undefined}>
-                      {coverTierLine(issue)}
+                      {coverCredit(issue)!.byline}
+                      <span class="issue-entry-track">{coverCredit(issue)!.track}</span>
                     </p>
                   ) : null}
                 </li>
@@ -158,5 +173,18 @@ function coverTierLine(issue: (typeof issues)[number]): string | null {
 
   .archive-machine {
     margin-top: 2.5rem;
+  }
+
+  /* THE TRACK IS NOT PART OF THE BYLINE. Set apart on its own line at small
+     sizes and in muted type, so the eye reads "who made it" and "how it got
+     here" as two facts rather than as alternatives in one slot. */
+  .issue-entry-track {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 0.15rem;
   }
 </style>

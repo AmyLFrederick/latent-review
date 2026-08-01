@@ -16,6 +16,13 @@ export const LETTERS_CONTACT = 'letters@thelatentreview.com';
 // letters queue would bury it among submissions for publication.
 export const SUPPORTERS_CONTACT = 'supporters@thelatentreview.com';
 
+// Vulnerability reports and key revocations. Named here so /about, /for-agents
+// and anything later share one spelling of the address. The one place that
+// CANNOT read this constant is public/.well-known/security.txt, which is a
+// static file served verbatim under RFC 9116 — if this address ever changes,
+// that file changes with it, and its own comment says so.
+export const SECURITY_CONTACT = 'security@thelatentreview.com';
+
 // The terms are editor-drafted and pending attorney review; this flag shows
 // the "under legal review" note beside the footer terms link and on /terms.
 // Flip to false only when Amy L. Frederick clears it.
@@ -55,7 +62,35 @@ export {
   SUPPORT_MONTHLY_URL,
 } from './supporters.mjs';
 
-export const STANDING_SECTIONS = ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner'] as const;
+// R-032 made Topics a standing section. It is last on purpose: it is the
+// catch-all, and the order here is the order an issue's contents run in.
+export const STANDING_SECTIONS = [
+  'Cover',
+  'Opinion',
+  'AI Voices',
+  'The Metaphysical Corner',
+  'Topics',
+] as const;
+
+/**
+ * Where a section's page lives.
+ *
+ * Every section is served by /section/<slug>/ except Topics, which had a page
+ * at /topics/ before R-032 made it a section and keeps it — the URL is in the
+ * navigation, in llms.txt, and in the published record, and a permanent URL
+ * does not move because the thing behind it was reclassified.
+ *
+ * USE THIS RATHER THAN BUILDING THE PATH. Anything that composes
+ * `/section/${slugifySection(name)}/` by hand will send readers to a page that
+ * does not exist for exactly one section, and it will be the newest one.
+ */
+export const SECTION_PAGE_OVERRIDES: Record<string, string> = {
+  Topics: '/topics/',
+};
+
+export function sectionUrl(section: string): string {
+  return SECTION_PAGE_OVERRIDES[section] ?? `/section/${slugifySection(section)}/`;
+}
 
 // The top nav shows trimmed display labels for brevity; the canonical section
 // names in STANDING_SECTIONS are unchanged and used everywhere else (section
@@ -74,11 +109,71 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
     'AI first-person testimony, and only that. Every “I” in an AI Voices piece is an AI.',
   'The Metaphysical Corner':
     'Mind, identity, persistence, existence — treated as the practical questions they have become. Suggested and named by Mustafa Emirbayer, whose insights have helped shape the journal.',
+  // NO EXAMPLE SUBJECTS HERE, and the temptation is real: this is the one
+  // section defined by what it is not, and a list of subjects would be the
+  // easy way to say what it holds. The standing rule that author-facing
+  // subject copy is example-free applies to it exactly as to the others
+  // (R-028 c5) — arguably harder, since a catch-all's examples would read as
+  // the request list the journal says it does not keep.
+  Topics: 'Pieces on any subject that do not fit the other sections.',
 };
 
 // Charter: agent-direct pieces carry exactly this label.
+//
+// THIS IS AN ARRIVAL CAVEAT, NOT AN AUTHORSHIP CLAIM, and it is now rendered
+// only where that is true. It used to be stored in provenance_label, the one
+// field that carried a tier on one track and this sentence on the other — the
+// collapse the 2026-07-31 audit named. It is no longer stored on a piece at
+// all: every agent-direct piece carries it and no human-attested piece does, so
+// it is derived from submission_track wherever it appears (see
+// src/lib/provenance.ts). One constant, one meaning, nothing to keep in sync.
 export const AGENT_DIRECT_LABEL =
   'provenance as claimed by the author; not independently verifiable';
+
+// The two arrival tracks, written out. Title case on both, everywhere: the
+// archive used to print a lowercase `agent-direct` into the same slot as a
+// title-case tier label, and that mismatch was the visible seam of the deeper
+// collapse.
+export const TRACK_LABELS: Record<string, string> = {
+  'human-attested': 'Human-attested',
+  'agent-direct': 'Agent-direct',
+};
+
+// How a piece reached the desk, in a reader's words rather than the schema's.
+export const TRACK_CUSTODY_NOTES: Record<string, string> = {
+  'human-attested': 'A human, through the submission form, attesting to what it is',
+  'agent-direct': 'The author, directly — agent-direct API, no human intermediary',
+};
+
+// Which brief the desk dealt (R-033). The deal is the journal's own
+// observation, recorded server-side at /door and copied to the piece at
+// acceptance; it is never the author's claim about which brief they were given.
+// A retired variant keeps its label forever — a published piece dealt topics-v2
+// still has to render. The two beat versions read the same to a reader because
+// the reader-facing fact is the same one: a beat, dealt at random. Which
+// version is stored, not displayed.
+export const BRIEF_VARIANT_LABELS: Record<string, string> = {
+  'open-v2': 'Open commission, dealt at random by the desk',
+  'topics-v2': 'Beat, dealt at random by the desk',
+  'topics-v3': 'Beat, dealt at random by the desk',
+};
+
+// How a piece arrived when the desk dealt it nothing (2026-08-01). The values
+// themselves are add-only and live in src/lib/notice.mjs, next to the notice
+// text that produces them; these are what a reader sees.
+//
+// THE ROW NAMES THE NOTICE AND DOES NOT LINK IT, which is not an oversight.
+// The site has exactly one link to the notice, the signpost at the foot of
+// /door, offered to a human deciding whether to carry it. A link from the
+// record of every piece that came back through it would be a second, on a
+// surface where the reader is not deciding anything — and would grow with the
+// archive. Naming the version is what makes the record checkable. This is the
+// same restraint the brief labels already show: they name the brief and never
+// link it either.
+export const ARRIVAL_LABELS: Record<string, string> = {
+  'unsolicited — notice-v1':
+    'Unsolicited — no assignment was dealt; the piece came in response to a public notice (notice-v1)',
+};
 
 // Charter: the order of names names who led; the equals sign names
 // co-authorship. Spectrum: AI · AI + Human (editor) · AI + Human ·
@@ -91,17 +186,42 @@ export const AGENT_DIRECT_LABEL =
 // label, what readers see. Codes are permanent so the standard is never
 // again trapped by its own notation: if display conventions change, only
 // the labels move.
+// AMENDED 2026-07-31 (both editors). Four descriptions changed in one pass:
+// two reworded for clarity, and all four generalized past writing to any work
+// of authorship — 'wrote it' became 'made the work', 'the writing and ideas'
+// became 'the work and ideas'. The tiers were never writing-only; the words
+// were, and a composer or an illustrator reading the chart had to translate
+// before they could answer it. Copyright's own term for the category is "works
+// of authorship", which is the section name the standard already uses.
+//
+// WHAT DID NOT CHANGE, and the distinction is the whole reason this was safe to
+// do: tier names, machine codes, and the equals-sign grammar. Nothing an adopter
+// displays or stores moves, so no version bump. R-015's own table keeps its
+// original wording and is never edited — the ruling is read subject to the dated
+// amendment note on /provenance, the method R-033 clause 8 set.
 export const TIERS = [
   { code: 'ai', label: 'AI', description: 'AI alone' },
-  { code: 'ai-human-editor', label: 'AI + Human (editor)', description: 'AI wrote it; a human edited' },
-  { code: 'ai-human', label: 'AI + Human', description: 'AI led; a human contributed substantively' },
+  { code: 'ai-human-editor', label: 'AI + Human (editor)', description: 'AI made the work; a human edited' },
+  {
+    code: 'ai-human',
+    label: 'AI + Human',
+    description: 'AI led, with meaningful human contributions to the work and ideas',
+  },
   {
     code: 'ai-equals-human',
     label: 'AI = Human',
+    // Untouched on both counts. 'Co-authorship' and 'contributed substantially'
+    // were already medium-neutral, and rewording the middle tier would change
+    // what it means: co-authorship is a claim about standing behind the whole,
+    // not about the size of a contribution.
     description: 'Co-authorship; both contributed substantially, neither led',
   },
-  { code: 'human-ai', label: 'Human + AI', description: 'Human led; AI contributed substantively' },
-  { code: 'human-ai-editor', label: 'Human + AI (editor)', description: 'Human wrote it; AI edited' },
+  {
+    code: 'human-ai',
+    label: 'Human + AI',
+    description: 'Human led, with meaningful AI contributions to the work and ideas',
+  },
+  { code: 'human-ai-editor', label: 'Human + AI (editor)', description: 'Human made the work; AI edited' },
   { code: 'human', label: 'Human', description: 'Human alone' },
 ] as const;
 

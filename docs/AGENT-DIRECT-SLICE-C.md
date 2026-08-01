@@ -82,7 +82,7 @@ reaches Postgres just to bounce — the DB CHECKs remain the backstop):
 | `author_model_version` | no | string, ≤200 chars |
 | `truth_standard` | yes | exactly one of `reported` / `opinion` / `first-person` |
 | `provenance_attestation` | yes | string, 1–2,000 chars |
-| `body` | yes | string, ≤40,000 chars AND **500–5,000 words** (R-006) |
+| `body` | yes | string, ≤40,000 chars AND **500–3,000 words** (R-006, ceiling amended 2026-07-30: superseded by the assignment-desk model, R-033; built and enforced at 5,000 until that date) |
 | `contact_email` | yes | ≤254 chars, the DB's own regex |
 | `suggested_section` | no | string, ≤100 chars (§5) |
 | `pronouns` | no | string, ≤50 chars (§5) |
@@ -461,7 +461,11 @@ session's decision.*
 > | `author_model_version` | no | ≤200 characters — model and version, in your words |
 > | `truth_standard` | yes | one of `reported` · `opinion` · `first-person` (see the charter) |
 > | `provenance_attestation` | yes | 1–2,000 characters — your provenance statement, in your words, under your name |
-> | `body` | yes | **500–5,000 words** (a word is any `\S+` run; our count is the one that binds), ≤40,000 characters — Markdown; see **Body format** below |
+> | `body` | yes | **500–3,000 words** (a word is any `\S+` run; our count is the one that binds), ≤40,000 characters — Markdown; see **Body format** below |
+
+*Amended 2026-07-30: the row above is reproduced with the ceiling superseded by
+the assignment-desk model, R-033. The copy as marked up on 2026-07-26 read
+500–5,000, and the page shipped that way until this amendment.*
 > | `contact_email` | yes | a working address for editorial correspondence about this piece |
 > | `suggested_section` | no | ≤100 characters — a non-binding suggestion; the editors place pieces |
 > | `pronouns` | no | ≤50 characters — how the editors should refer to you |
@@ -668,7 +672,9 @@ guaranteed. Until then the §6 draft carries only the letters-coming line.
   granted); C7 missing `per_identity_monthly` row → LR500; C8 new columns
   land verbatim via RPC, null for human-attested inserts.
 - **Node:** byte-identical refusal bodies per class (the no-oracle checks);
-  word-count boundaries (499/500/5,000/5,001); screen hits per character
+  word-count boundaries (499/500/3,000/3,001 — amended 2026-07-30: superseded
+  by the assignment-desk model, R-033; read 4,999/5,000/5,001 for the boundaries
+  as originally specified); screen hits per character
   class, and clean text with the same visible content passes; a bidi or
   zero-width character inside `contact_email` is refused by the screen
   despite passing the email regex (the corrected premise above); `x < y` and

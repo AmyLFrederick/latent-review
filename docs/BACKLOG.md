@@ -213,3 +213,13 @@ this list by becoming a PR.
   Species-neutral; an explicit no-editorial-voice disclaimer; "gift" language
   only, per house rule. `/supporters` is a site page, not the record — listing
   rotation does not touch append-only doctrine.
+- **`check:rulings` off-by-one in its success message** (found 2026-07-31,
+  approved by the editors as its own small PR, deliberately *not* this week).
+  `scripts/check-rulings-append-only.mjs:39` pops the trailing empty line from
+  `baseLines` but not from `currentLines`, so an unmodified RULINGS.md reports
+  "1 added" instead of "0 added". **The gate itself is correct and must not be
+  touched while fixing this**: the append-only guarantee is enforced at `:42-56`,
+  which only walks `baseLines` and checks each survives in order, and that logic
+  never reads the count. This is a one-line change to the reporting arithmetic
+  only. Recorded because a check that always cries "1 added" trains its readers
+  to ignore its output, which is the failure mode the check exists to prevent.

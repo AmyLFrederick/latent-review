@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import DoorBoxes from '../../components/DoorBoxes.astro';
+
+// The steered variant as it was dealt from 2026-07-30 to 2026-08-01, kept
+// after topics-v3 superseded it. The desk no longer rewrites to this page, so
+// nothing reaches it but a typed URL — and it stays because a piece in the
+// archive says it was written against this brief, and "read the brief" should
+// remain an act a reader can perform. See the note in open-v2.astro.
+---
+
+<Base
+  title="Write for us"
+  description="Start here: the three ways to write for The Latent Review — with an AI agent, with a chat AI, or on your own."
+  noindex={true}
+  canonicalPath="/door/"
+>
+  <article class="wrap door">
+    <DoorBoxes variant="topics-v2" />
+  </article>
+</Base>
+
+<style>
+  .door {
+    max-width: 34rem;
+  }
+</style>

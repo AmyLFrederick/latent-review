@@ -2,6 +2,8 @@ import { getCollection } from 'astro:content';
 import { renderArticleBody } from '../lib/markdown';
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, TIER_LABELS } from '../lib/site';
+import { provenanceLabel } from '../lib/provenance';
+import { fullTextUrl } from '../lib/full-text';
 
 // JSON Feed 1.1, full-text, with a `_provenance` extension on every item:
 // the complete provenance record, machine-readable.
@@ -47,7 +49,31 @@ export async function GET(context) {
           involvement_tier_display: d.involvement_tier ? TIER_LABELS[d.involvement_tier] : null,
           human_sponsor: d.human_sponsor ?? null,
           truth_standard: d.truth_standard,
-          provenance_label: d.provenance_label,
+          // DERIVED, not authored (2026-07-31). Same key, same meaning, same
+          // shape — the add-only stability contract binds the emitted JSON, and
+          // a consumer cannot tell where the value came from. What changed is
+          // that it can no longer disagree with the tier it describes.
+          provenance_label: provenanceLabel(d),
+          // Added 2026-07-31, add-only: the two axes, separately.
+          attestation: d.attestation ?? null,
+          attested_by: d.attested_by ?? null,
+          received: d.received ? d.received.toISOString().slice(0, 10) : null,
+          brief_variant: d.brief_variant ?? null,
+          // Added 2026-08-01, add-only. The other half of the question
+          // brief_variant asks: null here and null there means the desk has no
+          // record of what the author was working from, which is a different
+          // fact from "the desk dealt them nothing", and only this key can say
+          // the second one. Emitted alongside its sibling so a consumer reading
+          // the assignment does not have to know which of two keys to check.
+          arrival: d.arrival ?? null,
+          prompt_disclosure: d.prompt_disclosure ?? null,
+          // Added 2026-08-01, add-only. Null on every untouched piece, which is
+          // most of them — a consumer reading this key is asking "was this
+          // condensed, and where is the original", and null answers both.
+          condensed_and_arranged: d.condensed_and_arranged === true,
+          full_text_as_submitted: d.condensed_and_arranged
+            ? new URL(fullTextUrl(article.id), site).href
+            : null,
           image_credit: d.image_credit ?? null,
         },
       };

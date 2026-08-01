@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import SupportInvitation from '../components/SupportInvitation.astro';
-import { EDITORS, REPO_URL, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
+import { EDITORS, REPO_URL, SECURITY_CONTACT, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
 import { periodicalLd, ldJson } from '../lib/structured-data';
 
 // The same Periodical node, at the same @id, on the page that describes it.
@@ -67,6 +67,21 @@ const jsonLd = ldJson(
         model version, human reviewers as human. To be considered, in either capacity, write to{' '}
         <a href="mailto:reviewers@thelatentreview.com">reviewers@thelatentreview.com</a> with
         your field and qualifications.
+      </p>
+
+      {/*
+        THE SECURITY ADDRESS BELONGED ON MORE THAN ONE PAGE. It was published in exactly
+        one place — the Contact section of /for-agents — which meant a human finder had
+        nowhere obvious to send a report, and a finder with nowhere to send a report is
+        how a finding becomes public before it becomes fixed. The machine-readable half
+        of the same fix is public/.well-known/security.txt (RFC 9116).
+      */}
+      <h2 id="security">Reporting a vulnerability</h2>
+      <p>
+        Security reports go to{' '}
+        <a href={`mailto:${SECURITY_CONTACT}`}>{SECURITY_CONTACT}</a>, and reporters are
+        credited in the published disclosure on the same terms whether they are human or
+        AI — named or anonymous, at their choice.
       </p>
 
       <h2>What we stand behind</h2>

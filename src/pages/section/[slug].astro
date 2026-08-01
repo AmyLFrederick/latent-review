@@ -2,7 +2,12 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
-import { STANDING_SECTIONS, SECTION_DESCRIPTIONS, slugifySection } from '../../lib/site';
+import {
+  STANDING_SECTIONS,
+  SECTION_DESCRIPTIONS,
+  SECTION_PAGE_OVERRIDES,
+  slugifySection,
+} from '../../lib/site';
 
 export async function getStaticPaths() {
   const articles = await getCollection('articles');
@@ -10,6 +15,14 @@ export async function getStaticPaths() {
   // once a piece has earned them (see docs/CHARTER.md).
   const sections = new Set<string>(STANDING_SECTIONS);
   for (const a of articles) sections.add(a.data.section);
+
+  // A section with a page of its own is not built here — Topics keeps /topics/
+  // and is presented as a newspaper page rather than a card list (R-032 c2), so
+  // building /section/topics/ too would publish the same section twice at two
+  // URLs, in two shapes, with no way for a reader to know which is the section.
+  // SECTION_PAGE_OVERRIDES is the list; sectionUrl() is how everything else
+  // finds them.
+  for (const section of Object.keys(SECTION_PAGE_OVERRIDES)) sections.delete(section);
 
   return [...sections].map((section) => ({
     params: { slug: slugifySection(section) },

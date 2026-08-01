@@ -15,23 +15,43 @@
 -- forgotten — and a provenance label is set at acceptance and immutable afterwards
 -- (CLAUDE.md), so the moment to capture it is intake, not review.
 --
--- ANON CAN DECLARE, AND THAT IS RULED RATHER THAN ASSUMED.
+-- ANON CAN DECLARE, AND IT IS NOW RULED RATHER THAN FLAGGED — R-034, 2026-08-01.
 -- The approval as first written said "anon must not self-declare." That phrase came
 -- from the finding about reached_by_version in 20260730120000, where a
 -- submitter-supplied value would let an author influence the outreach measurement.
--- It was flagged as not transferring here, and the human editor confirmed
--- 2026-07-30: the courier declaration IS the submitter's own attestation, anon
--- inserting it is correct, and reached_by_version remains the one field anon must
--- never set — which it already cannot.
+-- It was flagged here as not transferring, and both editors ruled on it 2026-08-01:
+-- the governing line is CLAIMED VERSUS OBSERVED, not anonymous versus authenticated.
+-- A submitter may write their own claims about their own submission; they may never
+-- write the journal's own observations.
 --   So these columns sit with involvement_tier and provenance_attestation, which anon
 -- has always been able to insert precisely because they are attested by the submitter
 -- and never certified by the journal. If anon could not set them, the form could not
 -- carry the declaration at all and the desk would be back to inferring it from free
 -- text — the exact gap this closes.
 --   What anon must not get is a field that says the claim was CHECKED. No such field
--- exists here, and none should be added without a ruling: verification of a courier
+-- exists here, and none may be added without a ruling: verification of a courier
 -- claim is an editorial act, and if it is ever recorded it belongs in a separate
 -- desk-only column that anon cannot touch.
+--
+-- WHY THIS MIGRATION ALSO TOUCHES prompt_disclosure.
+-- Applying the rule found an asymmetry that was never decided, only arrived at.
+-- 20260731120000 added prompt_disclosure — an optional, submitter-attested field
+-- arriving through the same public door as these two — and granted anon nothing.
+-- Under R-034 that is simply wrong: a disclosed prompt is the submitter's claim about
+-- their own submission, and it sits on the claimed side of the line with the tier and
+-- the attestation. The grant is added below rather than left for later, because an
+-- inconsistency between two migrations is read by whoever comes next as a distinction
+-- somebody intended.
+--   Nothing changes behaviourally today. The human door posts to Netlify Forms and
+-- the agent door writes as service_role, so neither grant is exercised by anything
+-- currently running. What is fixed is the precedent the schema teaches.
+--
+-- RESTAMPED 2026-08-01 (was 20260730140000). Three later-stamped migrations —
+-- 20260731000000, 20260731120000 and 20260801120000 — merged and were applied in
+-- production while this PR was open, so the original stamp would have inserted this
+-- file behind the last migration applied on the remote, which `supabase db push`
+-- refuses without --include-all. The contents are unchanged by the rename; only the
+-- position in the sequence is.
 --
 -- NOTHING WRITES THESE COLUMNS YET, AND THAT IS NOT AN OVERSIGHT.
 -- The human door posts to Netlify Forms and deliberately does NOT write to
@@ -85,6 +105,14 @@ alter table public.submissions
 grant insert (courier_submission, courier_author_identity)
   on table public.submissions to anon;
 
+-- The same rule, applied to the field that was missed. See the R-034 note in the
+-- header: prompt_disclosure is a submitter's claim about their own submission, so it
+-- belongs on the intake surface beside the tier and the attestation. Additive and
+-- idempotent — `grant` on an already-granted column is a no-op, so this is safe on a
+-- database where a later migration has already fixed it by hand.
+grant insert (prompt_disclosure)
+  on table public.submissions to anon;
+
 -- The desk may correct a courier declaration, as it may correct any attested field
 -- before acceptance.
 grant update (courier_submission, courier_author_identity)
@@ -129,6 +157,12 @@ begin
 
   if not has_column_privilege('anon', 'public.submissions', 'courier_author_identity', 'insert') then
     problems := problems || 'anon cannot insert courier_author_identity'::text;
+  end if;
+
+  -- R-034 applied to the field 20260731120000 missed. Asserted here rather than
+  -- assumed, because this grant is the whole reason that clause is in this file.
+  if not has_column_privilege('anon', 'public.submissions', 'prompt_disclosure', 'insert') then
+    problems := problems || 'anon cannot insert prompt_disclosure — the R-034 asymmetry fix did not take'::text;
   end if;
 
   if not has_column_privilege('authenticated', 'public.submissions', 'courier_submission', 'update') then

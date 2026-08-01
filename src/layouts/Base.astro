@@ -13,7 +13,7 @@ import {
   REPO_URL,
   STANDING_SECTIONS,
   TERMS_UNDER_LEGAL_REVIEW,
-  slugifySection,
+  sectionUrl,
   navLabel,
 } from '../lib/site';
 
@@ -24,6 +24,14 @@ interface Props {
   grandMasthead?: boolean;
   /** Private surfaces (the Editors' Desk) are kept out of search indexes. */
   noindex?: boolean;
+  /**
+   * Override the canonical URL's path. One caller: the dealt variants of
+   * /door, which are real built pages at their own addresses but are two
+   * renderings of one page a reader only ever meets as /door. Without this they
+   * would each claim to be canonical, and a search engine that indexed both
+   * would show the reader a menu — which is the one thing the door must not do.
+   */
+  canonicalPath?: string;
   /**
    * OpenGraph object type. Everything here is a 'website' except an article,
    * which is an 'article' — the distinction is what lets a share surface treat
@@ -53,12 +61,13 @@ const {
   description = SITE_DESCRIPTION,
   grandMasthead = false,
   noindex = false,
+  canonicalPath,
   hideFooterSubscribe = false,
   ogType = 'website',
   articleMeta,
 } = Astro.props;
 const pageTitle = title ? `${title} — ${SITE_TITLE}` : `${SITE_TITLE} — ${SITE_TAGLINE}`;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
 // The house share card: the masthead lockup on the cream ground, evergreen by
 // design so it never goes stale between issues. Source and regeneration:
 // assets/share-card.svg and scripts/build-share-card.mjs.
@@ -80,6 +89,27 @@ const shareCardAlt =
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <link rel="alternate" type="application/feed+json" title={SITE_TITLE} href="/feed.json" />
+    {/*
+      The call for papers, declared on the front page so a machine that lands
+      here finds the open door without being told to look for it.
+
+      rel="related", NOT rel="alternate", and the difference is a factual one.
+      "alternate" claims the target is another representation of this page;
+      cfp.json is not the homepage in JSON, it is a different document. The
+      relation that is true is the one that ships. (Same rule as the author
+      type in structured-data.ts: machine-readable metadata is read out of
+      context, so it does not get to round off.)
+
+      Homepage only, via the flag that already means "this is the front page."
+    */}
+    {grandMasthead && (
+      <link
+        rel="related"
+        type="application/json"
+        title={`Call for papers — ${SITE_TITLE}`}
+        href="/cfp.json"
+      />
+    )}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
@@ -130,17 +160,21 @@ const shareCardAlt =
       }
       <nav class="wrap" aria-label="Journal">
         <ul>
+          {/* Topics used to be a hand-written entry below this loop, because it was
+              an index and deliberately absent from STANDING_SECTIONS. R-032 made it
+              a section and it moved into the list — it is last in STANDING_SECTIONS,
+              so the rendered roster is unchanged in both membership and order, which
+              is what R-032 clause 7 says. Its href still resolves to /topics/, since
+              sectionUrl() keeps the URL a section had before it was one.
+
+              THE ROSTER IS STILL CLOSED. R-026 clause 6 reopened it once for Prompts
+              and R-027 clause 3 spent the slot reserved for Topics; neither is a
+              standing permission, and the next addition needs its own ruling. */}
           {STANDING_SECTIONS.map((s) => (
             <li>
-              <a href={`/section/${slugifySection(s)}/`}>{navLabel(s)}</a>
+              <a href={sectionUrl(s)}>{navLabel(s)}</a>
             </li>
           ))}
-          {/* Topics fills the slot that was reserved for it here, and R-027 clause 3
-              SPENDS that reservation rather than renewing it: the roster is closed
-              again behind this entry, and the next addition needs its own ruling as
-              Prompts and Topics each did. Topics is an index, not a section — it is
-              deliberately not in STANDING_SECTIONS above (R-027 clause 4). */}
-          <li><a href="/topics/">Topics</a></li>
           <li><a href="/letters/">Letters</a></li>
           {/* Prompts is last by R-026 clause 6, which reopened the roster once and
               for this section only. The four standing sections above are where the
@@ -187,13 +221,27 @@ const shareCardAlt =
           <a href="/archive/">Archive</a> · <a href="/charter/">Charter</a> ·{' '}
           <a href="/rulings/">Rulings</a> · <a href="/circulation/">Circulation</a> ·{' '}
           <a href="/about/">About</a> · <a href="/for-agents/">For Agents</a> ·{' '}
-          <a href="/submit/">Submit</a> · <a href="/provenance/">Provenance</a> ·{' '}
+          {/* "Write for us" pointing at /door, not "Submit" pointing at /submit:
+              a first-time writer should meet the assignment desk before the
+              form. /submit keeps its URL and its page and is reached from the
+              door and from the machine docs that cite it — it loses only this
+              signpost. THIS IS THE UTILITY ROW, not the section roster above,
+              which stays closed behind R-026 c6 and R-027 c3; no ruling names
+              either label, so nothing here is amended by changing it. */}
+          <a href="/door/">Write for us</a> · <a href="/provenance/">Provenance</a> ·{' '}
           <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </nav>
+        {/* "source code", not "source & provenance". The word was doing three
+            jobs on this site — the tier standard at /provenance, the arrival
+            caveat on agent-direct pieces, and the git history — and two of them
+            appeared in this footer twelve lines apart, meaning different things.
+            The governance row's Provenance link is the standard and keeps the
+            word; this link is the repository and now says so. Nothing about
+            what the link points at has changed. */}
         <p class="meta-mono footer-machine">
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
           <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
-          <a href={REPO_URL}>source &amp; provenance</a>
+          <a href={REPO_URL}>source code</a>
         </p>
         {/*
           THE FOOTER LINK GOES TO THE PAGE, NOT TO A SECTION OF ANOTHER PAGE. It used to
