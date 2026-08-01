@@ -11,6 +11,8 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   authorshipFor,
@@ -20,7 +22,7 @@ import {
   provenanceSentence,
   trackLabel,
 } from '../src/lib/provenance.ts';
-import { AGENT_DIRECT_LABEL, TIER_DESCRIPTIONS } from '../src/lib/site.ts';
+import { AGENT_DIRECT_LABEL, TIER_DESCRIPTIONS, TIERS } from '../src/lib/site.ts';
 
 const human = {
   author_name: 'Amy Louise Frederick',
@@ -185,4 +187,89 @@ test('track labels are title case on both tracks', () => {
   // title-case tier labels in the same slot.
   assert.equal(trackLabel(human), 'Human-attested');
   assert.equal(trackLabel(agent), 'Agent-direct');
+});
+
+// --- Chained labels (ruled 2026-08-01) --------------------------------------
+//
+// The published standard is what adopters copy under CC BY 4.0, so its ruled
+// text is treated the way this repository treats every other ratified string:
+// pinned, and changed by a ruling rather than by a commit.
+
+/**
+ * A local copy of the helper in notice.test.mjs — an .astro file with
+ * everything a reader never sees removed. Duplicated rather than shared
+ * because two copies is cheaper than a test-utils module; if a third test file
+ * needs it, that is the point at which it should be extracted.
+ */
+function renderedTemplate(rel) {
+  return readFileSync(fileURLToPath(new URL(`../${rel}`, import.meta.url)), 'utf8')
+    .replace(/^---[\s\S]*?\n---/, '')
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+    .replace(/<script>[\s\S]*?<\/script>/g, '')
+    .replace(/<style>[\s\S]*?<\/style>/g, '');
+}
+
+/**
+ * The visible copy of /provenance, reduced to comparable text: markup dropped,
+ * JSX string-literal spacers resolved, whitespace collapsed — and
+ * `<sup>N</sup>` folded back to the Unicode superscript the ruling was written
+ * in. That last step is the point of the helper. The page renders the numerals
+ * as markup because the display rule demands a size and weight the Unicode
+ * characters cannot be given, so a byte-for-byte check against the ratified
+ * sentence has to undo exactly that one substitution and nothing else.
+ */
+const SUPERSCRIPTS = { 1: '¹', 2: '²' };
+
+function visibleText(rel) {
+  return renderedTemplate(rel)
+    .replace(/<sup class="tier-num">([12])<\/sup>/g, (_, d) => SUPERSCRIPTS[d])
+    .replace(/\{'\s*'\}/g, ' ')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+test('the ruled chaining paragraph appears on /provenance, word for word', () => {
+  // Ratified by both editors 2026-08-01. If this fails, the question is not
+  // "update the string" — it is who edited ratified text, and under which
+  // ruling.
+  const ruled =
+    'Tiers may chain, read left to right, when a work passes through more hands. ' +
+    'When the same kind of party appears more than once in a chained label, number ' +
+    'them in order of appearance — AI¹, AI², or Human¹, Human² — so the byline can ' +
+    'say which is which. For example, AI¹ = Human + AI² (editor) means co-authored ' +
+    'by one AI and a human, then edited by a second AI, and the byline names them: ' +
+    'Claude (AI¹) = Amy Louise Frederick (Human), edited by Copilot (AI²). Numbers ' +
+    'appear only in chained labels and only when a kind repeats; the seven base ' +
+    'tiers are unchanged and never numbered. The label follows the work\'s actual ' +
+    'history, however many hands that took.';
+
+  assert.ok(
+    visibleText('src/pages/provenance.astro').includes(ruled),
+    'the ratified chaining paragraph is not on /provenance verbatim'
+  );
+});
+
+test('every numeral in a chained label is superscript markup, never a raw character', () => {
+  // The display rule is enforceable only on markup: .tier-num is what carries
+  // the weight and the size floor, and a bare ¹ in the source would render at
+  // whatever the fallback font chose and answer to no CSS at all. It would also
+  // pass the verbatim test above while failing the ruling — which is why this
+  // check reads the SOURCE rather than the normalized text.
+  const source = renderedTemplate('src/pages/provenance.astro');
+  assert.ok(!/[¹²³]/.test(source), 'a raw Unicode superscript reached the page copy');
+  assert.ok(
+    source.includes('<sup class="tier-num">1</sup>'),
+    'the numbered notation is missing its styled superscript markup'
+  );
+});
+
+test('the seven base tiers stay unnumbered, on the page and in the codes', () => {
+  // The add-only promise, checked where it could actually break: the ruling
+  // says the base tiers are "unchanged and never numbered", so no digit may
+  // appear in any of the seven codes and no base label may acquire one.
+  for (const tier of TIERS) {
+    assert.ok(!/\d/.test(tier.code), `base code ${tier.code} acquired a number`);
+    assert.ok(!/\d/.test(tier.label), `base label ${tier.label} acquired a number`);
+  }
 });
