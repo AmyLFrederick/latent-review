@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getIssues } from '../lib/issues';
 import { formatDate, tierLabel, tierDescription } from '../lib/site';
+import TierLabel from '../components/TierLabel.astro';
 import { trackLabel } from '../lib/provenance';
 
 // The archive: every issue, reverse chronological. Each entry links to the
@@ -30,15 +31,21 @@ for (const issue of issues) {
 // separate element the template renders in its own right. Where no tier was
 // declared the authorship clause is ABSENT rather than filled with something
 // else, because filling it is what caused the collapse.
+//
+// THE BYLINE IS NO LONGER ONE STRING, and that is R-035 clause 3's doing rather
+// than a refactor for its own sake: a numbered tier has to reach the template as
+// its own value so <TierLabel> can set the numerals as markup. Composing
+// `By X · AI¹ = Human` into a string first would have hard-coded a plain
+// superscript character into the one place the rule says to style it.
 function coverCredit(
   issue: (typeof issues)[number]
-): { byline: string; track: string } | null {
+): { author: string; tier: string | null; track: string } | null {
   const cover = issue.cover;
   if (!cover) return null;
   const d = cover.data;
-  const tier = tierLabel(d.involvement_tier);
   return {
-    byline: tier ? `By ${d.author_name} · ${tier}` : `By ${d.author_name}`,
+    author: d.author_name,
+    tier: tierLabel(d.involvement_tier),
     track: trackLabel(d),
   };
 }
@@ -86,7 +93,13 @@ function coverCredit(
                   )}
                   {coverCredit(issue) ? (
                     <p class="issue-entry-byline" title={tierDescription(issue.cover?.data.involvement_tier) || undefined}>
-                      {coverCredit(issue)!.byline}
+                      By {coverCredit(issue)!.author}
+                      {coverCredit(issue)!.tier ? (
+                        <>
+                          {' · '}
+                          <TierLabel label={coverCredit(issue)!.tier!} />
+                        </>
+                      ) : null}
                       <span class="issue-entry-track">{coverCredit(issue)!.track}</span>
                     </p>
                   ) : null}

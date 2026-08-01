@@ -63,6 +63,7 @@ import Base from '../layouts/Base.astro';
 <script>
   import { createClient } from '@supabase/supabase-js';
   import { tierLabel, tierDescription, aiDeskAttribution } from '../lib/site';
+  import { splitLabelSuperscripts } from '../lib/tier-codes.mjs';
   import { parseTopicData, formatTopicData } from '../lib/topics.mjs';
 
   const url = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -85,6 +86,24 @@ import Base from '../layouts/Base.astro';
         /[&<>"']/g,
         (c) => `&#${c.charCodeAt(0)};`
       );
+
+    // R-035 clause 3 reaches the desk too. This builds the same markup
+    // <TierLabel> emits, for the one surface that assembles its HTML as strings
+    // rather than as a template.
+    //
+    // ESCAPING IS UNCHANGED BY IT. The text runs still go through esc(); the
+    // numerals are digits this code derived from a validated code, never
+    // anything a submitter typed. Returns null for an unknown code so the caller
+    // keeps its own escaped fallback rather than printing an empty cell.
+    const tierHtml = (code: unknown): string | null => {
+      const label = tierLabel(code as string);
+      if (!label) return null;
+      return splitLabelSuperscripts(label)
+        .map((part: { sup?: string; text?: string }) =>
+          part.sup ? `<sup class="tier-num">${part.sup}</sup>` : esc(part.text)
+        )
+        .join('');
+    };
 
     // Which brief this writer drew (R-033 c6). Three facts, and the desk is
     // shown all three because the whole point of the design is that they are
@@ -205,7 +224,7 @@ import Base from '../layouts/Base.astro';
                 <td>${esc(new Date(r.created_at).toISOString().slice(0, 10))}</td>
                 <td><a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>${r.type === 'correspondence' ? ' <em>(letter)</em>' : ''}</td>
                 <td>${esc(r.author_name)}</td>
-                <td>${esc(r.involvement_tier ? (tierLabel(r.involvement_tier) ?? r.involvement_tier) : '—')}</td>
+                <td>${r.involvement_tier ? (tierHtml(r.involvement_tier) ?? esc(r.involvement_tier)) : '—'}</td>
                 <td class="desk-status desk-status--${esc(r.status)}">${esc(r.status.replace('_', ' '))}</td>
               </tr>`
               )
@@ -327,7 +346,7 @@ import Base from '../layouts/Base.astro';
         <p class="desk-note">
           ${esc(s.author_name)}${s.author_model_version ? ` (${esc(s.author_model_version)})` : ''}
           · ${esc(s.submission_track)}
-          · tier ${esc(s.involvement_tier ? (tierLabel(s.involvement_tier) ?? s.involvement_tier) : '—')}${s.involvement_tier && tierDescription(s.involvement_tier) ? ` (${esc(tierDescription(s.involvement_tier))})` : ''}
+          · tier ${s.involvement_tier ? (tierHtml(s.involvement_tier) ?? esc(s.involvement_tier)) : '—'}${s.involvement_tier && tierDescription(s.involvement_tier) ? ` (${esc(tierDescription(s.involvement_tier))})` : ''}
           · ${esc(s.truth_standard)} · contact ${esc(s.contact_email)}
         </p>
         <p><strong>Provenance attestation:</strong> ${esc(s.provenance_attestation)}</p>

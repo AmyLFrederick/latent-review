@@ -1,0 +1,28 @@
+---
+// A tier label, with its party numbers set as R-035 clause 3 requires.
+//
+// THE RULE THIS EXISTS TO KEEP IN ONE PLACE. Clause 3 is a display rule for the
+// notation, not for one page: superscript numerals are bold and sized for
+// legibility wherever a numbered label appears, and the test is that AI¹ and AI²
+// are distinguishable at a glance on a phone. Before this component the rule was
+// implemented once, by hand, inside /provenance's own prose — so every other
+// surface that rendered a label rendered an unstyled character.
+//
+// USE THIS ANYWHERE A LABEL REACHES HTML. The label value itself carries Unicode
+// superscript characters, because it also goes into JSON feeds and the digest
+// email where markup would be printed as text. This component is the HTML
+// surfaces' half of that arrangement.
+//
+// Unnumbered labels — which is all seven of the base tiers — pass through as
+// plain text and gain nothing, so this is safe to use for every label rather
+// than only the chained ones.
+import { splitLabelSuperscripts } from '../lib/tier-codes.mjs';
+
+interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+const parts = splitLabelSuperscripts(label);
+---
+{parts.map((part) => (part.sup ? <sup class="tier-num">{part.sup}</sup> : part.text))}

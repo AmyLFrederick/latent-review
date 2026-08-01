@@ -206,6 +206,56 @@ export function formatTierCode(code) {
   return out;
 }
 
+/** The superscript characters, read back the other way. */
+const SUPERSCRIPT_DIGITS = Object.freeze({
+  '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
+  '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+});
+
+/**
+ * Split a display label into text runs and party numbers, so a surface that can
+ * render markup can satisfy R-035 clause 3.
+ *
+ * "AI¹ = Human + AI² (editor)" becomes
+ *   [{text:'AI'}, {sup:'1'}, {text:' = Human + AI'}, {sup:'2'}, {text:' (editor)'}]
+ *
+ * WHY THE LABEL IS SPLIT RATHER THAN BUILT AS MARKUP IN THE FIRST PLACE. The
+ * label is one string that has to mean the same thing in a JSON feed, in the
+ * digest email and on a page, so the value carries characters and each surface
+ * decides how to render them. Only the HTML surfaces call this; the feeds and the
+ * email keep the characters, which is the correct answer where markup is not
+ * available and the alternative is a tag printed as text.
+ *
+ * Consecutive superscripts are read as ONE number, so ¹⁰ is ten rather than a one
+ * beside a zero.
+ */
+export function splitLabelSuperscripts(label) {
+  if (typeof label !== 'string' || label.length === 0) return [];
+  const parts = [];
+  let text = '';
+  let i = 0;
+
+  while (i < label.length) {
+    if (label[i] in SUPERSCRIPT_DIGITS) {
+      if (text) {
+        parts.push({ text });
+        text = '';
+      }
+      let digits = '';
+      while (i < label.length && label[i] in SUPERSCRIPT_DIGITS) {
+        digits += SUPERSCRIPT_DIGITS[label[i]];
+        i += 1;
+      }
+      parts.push({ sup: digits });
+    } else {
+      text += label[i];
+      i += 1;
+    }
+  }
+  if (text) parts.push({ text });
+  return parts;
+}
+
 /** Does this code chain — i.e. is it beyond the seven canonical common cases? */
 export function isChainedTierCode(code) {
   const parsed = parseTierCode(code);

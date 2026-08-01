@@ -16,6 +16,7 @@ import {
   isChainedTierCode,
   parseTierCode,
   validateTierCode,
+  splitLabelSuperscripts,
   MAX_PARTY_NUMBER,
 } from '../src/lib/tier-codes.mjs';
 import { TIERS, tierLabel, tierDescription } from '../src/lib/site.ts';
@@ -155,4 +156,50 @@ test('THE FIX — an unknown code resolves to null, not to a confident label', (
 test('a chained label carries no description, and that is not an error', () => {
   assert.equal(tierDescription('ai-human'), 'AI led, with meaningful human contributions to the work and ideas');
   assert.equal(tierDescription('ai-1-equals-human-ai-2-editor'), '');
+});
+
+// --- 6. Splitting a label for markup (R-035 clause 3) ----------------------
+
+test('an unnumbered label splits to a single text run and gains nothing', () => {
+  // All seven base tiers take this path. If it ever produced markup for them,
+  // every existing published label would change shape.
+  for (const tier of TIERS) {
+    assert.deepEqual(
+      splitLabelSuperscripts(tier.label),
+      [{ text: tier.label }],
+      `base label "${tier.label}" was split`
+    );
+  }
+});
+
+test('a numbered label splits into text runs and party numbers', () => {
+  assert.deepEqual(splitLabelSuperscripts('AI¹ = Human + AI² (editor)'), [
+    { text: 'AI' },
+    { sup: '1' },
+    { text: ' = Human + AI' },
+    { sup: '2' },
+    { text: ' (editor)' },
+  ]);
+});
+
+test('consecutive superscripts read as ONE number, not two', () => {
+  // ¹⁰ is ten. Splitting it into a one beside a zero would render AI¹⁰ as two
+  // parties that do not exist.
+  assert.deepEqual(splitLabelSuperscripts('AI¹⁰'), [{ text: 'AI' }, { sup: '10' }]);
+});
+
+test('splitting a label round-trips its visible characters', () => {
+  // Nothing is dropped and nothing is invented: the parts, reassembled, are the
+  // label again. This is what keeps the markup path from quietly editing copy.
+  const label = 'Human¹ + AI + Human² (editor)';
+  const rebuilt = splitLabelSuperscripts(label)
+    .map((p) => (p.sup ? { 1: '¹', 2: '²' }[Number(p.sup)] : p.text))
+    .join('');
+  assert.equal(rebuilt, label);
+});
+
+test('splitting is safe on empty and non-string input', () => {
+  for (const input of ['', null, undefined, 7]) {
+    assert.deepEqual(splitLabelSuperscripts(input), []);
+  }
 });
