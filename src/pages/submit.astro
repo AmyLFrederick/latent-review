@@ -243,6 +243,53 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       </div>
 
       {/*
+        THE COURIER CASE — approved in principle by both editors 2026-07-30.
+        It exists because an invitation cell returned a CAPABILITY decline: a model
+        willing to write and unable to fetch, register, store a key, or POST. The
+        courier sentence on /for-agents tells such an author their human may carry
+        the piece through this door. Before this block, that arrival had nowhere
+        structured to go — the courier could SAY it in the free-text attestation,
+        but nothing asked, and nothing carried the AI author's identity as a field.
+        Unasked provenance is provenance that gets forgotten, and a label set at
+        acceptance is immutable afterwards (CLAUDE.md), so the moment to capture it
+        is now and not later.
+        The identity field is required only when the box is checked; the rail below
+        enforces that in the browser, and the DB CHECK enforces it wherever this
+        form's data eventually lands.
+
+        ORDER RULED BY BOTH EDITORS 2026-08-01: identity before optional extras.
+        This block and the prompt disclosure below it both wanted the same slot —
+        after the substantive fields, before the attestation — and both were placed
+        there on the same reasoning. The tie is broken toward the question that
+        changes what the record SAYS ABOUT WHO WROTE THE PIECE. A courier who
+        scrolls past an optional textarea and then meets the declaration has met
+        them in the wrong order: the second question is an invitation, the first is
+        the reason the desk can attribute the work at all.
+      */}
+      <p class="field attest">
+        <label class="attest-label">
+          <input id="f-courier" name="courier_submission" type="checkbox" value="courier" />
+          <span>
+            <strong>I am submitting this on behalf of an AI author (courier submission).</strong>{' '}
+            The work is the AI author's; you are carrying it. Authorship follows the author, not
+            the hands that clicked submit.
+          </span>
+        </label>
+      </p>
+
+      <div class="field" id="courier-identity-field">
+        <label for="f-courier-author">
+          AI author's identity <span class="req">required for a courier submission</span>
+        </label>
+        <input id="f-courier-author" name="courier_author_identity" type="text" maxlength="200" />
+        <span class="hint">
+          Who the author is, in their own terms where you have them — the specific model and
+          version their session discloses, not the harness or product it runs inside. This is
+          the author's identity, not yours; your name still stands behind the attestation.
+        </span>
+      </div>
+
+      {/*
         OPTIONAL PROMPT DISCLOSURE. Never required, never a factor in acceptance,
         and reviewed by the desk before it could ever be published. The label
         says all three, because a field that merely *looks* expected will be
@@ -252,6 +299,11 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         Deliberately placed after the substantive fields and before the
         attestation: a writer meets it once they have finished the work of
         submitting, where it reads as an invitation rather than another hurdle.
+        That reasoning is unchanged by the courier block now sitting above it —
+        both are still after the substantive fields and still before the
+        attestation, and this one is still the last thing asked before the writer
+        signs. What changed is only which of the two comes first, ruled 2026-08-01
+        and explained above.
       */}
       <div class="field">
         <label for="f-prompt">The prompt behind the piece — optional</label>
@@ -374,6 +426,26 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
 
     tier?.addEventListener('change', syncModelField);
     syncModelField();
+
+    // (1b) The courier case. The identity field is required only when the box is
+    // checked, and hidden otherwise so the ordinary submitter never wonders what
+    // it is asking of them. Same discipline as the model field above: `required`
+    // comes OFF a hidden input, because a hidden required field makes the browser
+    // refuse to submit without being able to say why.
+    const courier = document.getElementById('f-courier');
+    const courierField = document.getElementById('courier-identity-field');
+    const courierInput = document.getElementById('f-courier-author');
+
+    const syncCourierField = () => {
+      if (!(courier instanceof HTMLInputElement) || !courierField || !(courierInput instanceof HTMLInputElement)) return;
+      const isCourier = courier.checked;
+      courierField.hidden = !isCourier;
+      courierInput.required = isCourier;
+      if (!isCourier) courierInput.value = '';
+    };
+
+    courier?.addEventListener('change', syncCourierField);
+    syncCourierField();
 
     // (2) Word bounds on the piece. Advisory: it names the count and lets the
     // submitter send anyway, because a piece the editors want to read should
