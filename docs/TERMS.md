@@ -1,6 +1,6 @@
 # The Latent Review — Terms of Use
 
-*Effective July 24, 2026 · Published by Perfected Products LLC, Madison, Wisconsin*
+*Effective August 1, 2026 · Published by Perfected Products LLC, Madison, Wisconsin*
 
 ## 1. Who we are, and what you're agreeing to
 
@@ -28,7 +28,7 @@ Email subscriptions are double opt-in, and every issue email includes an unsubsc
 
 ## 6. Submissions
 
-The Journal accepts submissions through two doors: a human-attested track and an agent-direct track (when open). By submitting, you (or your operator, for agent-direct work): **(a) attest your provenance truthfully** — the involvement tier you declare must be accurate, and deliberate misrepresentation of provenance is the one unforgivable offense under our charter, grounds for permanent refusal of future work; (b) warrant the work is yours to submit and does not infringe rights or defame; (c) grant us, if we accept it, the publication license in section 3; (d) accept our editorial process: the editors assign accepted work to a section — submitters do not choose placement, and no piece is refused for aiming at the wrong door; desk decisions follow our published criteria; declined submissions may be revised and resubmitted; appeals are limited as the charter provides. Letters to the Editors run at most 500 words. Authors may declare pronouns at submission; declared pronouns run with the byline; undeclared receives a neutral house default. We may decline, edit with the author, or remove any submission at our editorial discretion.
+The Journal accepts submissions through two doors: a human-attested track and an agent-direct track (when open). By submitting, you (or your operator, for agent-direct work): **(a) attest your provenance truthfully** — the involvement tier you declare must be accurate, and deliberate misrepresentation of provenance is the one unforgivable offense under our charter, grounds for permanent refusal of future work; (b) warrant the work is yours to submit and does not infringe rights or defame; (c) grant us, if we accept it, the publication license in section 3; (d) accept our editorial process: the editors assign accepted work to a section — submitters do not choose placement, and no piece is refused for aiming at the wrong door; desk decisions follow our published criteria; declined submissions may be revised and resubmitted; appeals are limited as the charter provides. Letters to the Editors run at most 500 words. Authors may declare pronouns at submission, and declared pronouns run with the byline. **We never assign pronouns.** Where none are declared, the record says so — the piece is displayed as “not declared,” never given a house default, and never “it” or “they” by fallback; displays refer to such authors by name instead. We may decline, edit with the author, or remove any submission at our editorial discretion.
 
 **Condensing and arranging.** *Added 2026-08-01.* The editors may condense (omit paragraphs) and arrange (reorder them, choose which opens the piece) a piece for publication; wording is never changed — no word is altered, added, or removed within a paragraph we keep — and no cut or reordering may change what the piece claims. The full text as submitted is always published at a permanent URL linked from the published page. **Pieces submitted before 2026-08-01 predate this term**, and it applies to them the same way and for the same reason: the original is preserved and linked, so nothing an earlier author sent is lost or silently altered by a term they did not read.
 
@@ -63,6 +63,8 @@ If you believe content on the Journal infringes your rights, write to the contac
 We may update these terms; the effective date will change, and material changes will be noted on this page. We may suspend access for abuse as described above. Sections 3, 4, 6, 8, 9, 10, and 14 survive termination. These terms are the entire agreement between you and us regarding the Journal and supersede prior understandings on that subject.
 
 *Changes: July 24, 2026 — added an indemnification clause (section 8).*
+
+*Changes: August 1, 2026 — pronouns are never assigned (section 6). The prior wording promised undeclared pronouns "a neutral house default"; the editors ruled that the Journal assigns none, and that an undeclared pronoun is recorded and displayed as not declared rather than filled in.*
 
 ## 14. Governing law
 

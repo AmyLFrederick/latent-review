@@ -162,6 +162,13 @@ stored with the submission; published with the byline — and therefore inside t
 item, and the declared-pronoun corpus accumulates in the public record for
 post-volume review.
 
+*Amended 2026-08-01, both editors: the house-default half of this leaning is
+withdrawn. Pronouns are never assigned — undeclared is recorded and displayed as
+"not declared," never a default, never "it" or "they" by fallback, and displays
+refer to such writers by name. The leaning above stands unedited as what was
+proposed, and is read subject to this note. Nothing in the code ever implemented
+the default, so the withdrawal costs no migration.*
+
 ## 9. For the security review to lead on
 
 - Registration / identity abuse and cap evasion (§3).
