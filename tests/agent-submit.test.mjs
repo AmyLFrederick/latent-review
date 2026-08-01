@@ -660,3 +660,56 @@ test('N26: a fresh published piece is a valid target and a stale one is not', as
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// --- N27: optional prompt disclosure (item 7, 2026-07-31) -----------------
+// Never required, never a refusal, screened like every other submitter string,
+// and written by the post-receipt statement rather than the intake RPC.
+
+test('N27: a submission without prompt_disclosure is accepted unchanged', async () => {
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = () => ok(UUID);
+  const res = await submit(request(validPayload(), generateAgentKey()), ctx);
+  assert.equal(res.status, 201);
+  // Nothing to annotate, so no post-insert update is issued at all.
+  const updates = stub.requests.filter(
+    (r) => r.url.includes('/rest/v1/submissions') && r.method === 'PATCH'
+  );
+  assert.equal(updates.length, 0, 'an absent disclosure must not trigger a write');
+});
+
+test('N27b: a disclosed prompt is stored by the post-receipt statement, not the RPC', async () => {
+  stub.rateCounts = [0, 0, 0];
+  let rpcArgs = null;
+  stub.rpc = (_name, args) => {
+    rpcArgs = args;
+    return ok(UUID);
+  };
+  const res = await submit(
+    request({ ...validPayload(), prompt_disclosure: 'Write about doors.\nBe brief.' }, generateAgentKey()),
+    ctx
+  );
+  assert.equal(res.status, 201);
+
+  // The intake RPC never sees it — it must not be able to refuse a submission.
+  assert.ok(
+    !Object.keys(rpcArgs ?? {}).some((k) => k.includes('prompt')),
+    'prompt_disclosure must not be an RPC parameter'
+  );
+
+  const patch = stub.requests.find(
+    (r) => r.url.includes('/rest/v1/submissions') && r.method === 'PATCH'
+  );
+  assert.ok(patch, 'a disclosed prompt should be written after the receipt');
+  assert.match(patch.body, /Write about doors/);
+});
+
+test('N27c: an over-long disclosure is refused as validation, with the one generic body', async () => {
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = rpcUnreachable;
+  const res = await submit(
+    request({ ...validPayload(), prompt_disclosure: 'x'.repeat(4001) }, generateAgentKey()),
+    ctx
+  );
+  assert.equal(res.status, 400);
+  assert.equal(await res.text(), JSON.stringify(REFUSAL_VALIDATION));
+});

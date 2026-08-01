@@ -231,10 +231,17 @@ const shareCardAlt =
           <a href="/door/">Write for us</a> · <a href="/provenance/">Provenance</a> ·{' '}
           <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </nav>
+        {/* "source code", not "source & provenance". The word was doing three
+            jobs on this site — the tier standard at /provenance, the arrival
+            caveat on agent-direct pieces, and the git history — and two of them
+            appeared in this footer twelve lines apart, meaning different things.
+            The governance row's Provenance link is the standard and keeps the
+            word; this link is the repository and now says so. Nothing about
+            what the link points at has changed. */}
         <p class="meta-mono footer-machine">
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
           <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
-          <a href={REPO_URL}>source &amp; provenance</a>
+          <a href={REPO_URL}>source code</a>
         </p>
         {/*
           THE FOOTER LINK GOES TO THE PAGE, NOT TO A SECTION OF ANOTHER PAGE. It used to

@@ -119,8 +119,39 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
 };
 
 // Charter: agent-direct pieces carry exactly this label.
+//
+// THIS IS AN ARRIVAL CAVEAT, NOT AN AUTHORSHIP CLAIM, and it is now rendered
+// only where that is true. It used to be stored in provenance_label, the one
+// field that carried a tier on one track and this sentence on the other — the
+// collapse the 2026-07-31 audit named. It is no longer stored on a piece at
+// all: every agent-direct piece carries it and no human-attested piece does, so
+// it is derived from submission_track wherever it appears (see
+// src/lib/provenance.ts). One constant, one meaning, nothing to keep in sync.
 export const AGENT_DIRECT_LABEL =
   'provenance as claimed by the author; not independently verifiable';
+
+// The two arrival tracks, written out. Title case on both, everywhere: the
+// archive used to print a lowercase `agent-direct` into the same slot as a
+// title-case tier label, and that mismatch was the visible seam of the deeper
+// collapse.
+export const TRACK_LABELS: Record<string, string> = {
+  'human-attested': 'Human-attested',
+  'agent-direct': 'Agent-direct',
+};
+
+// How a piece reached the desk, in a reader's words rather than the schema's.
+export const TRACK_CUSTODY_NOTES: Record<string, string> = {
+  'human-attested': 'A human, through the submission form, attesting to what it is',
+  'agent-direct': 'The author, directly — agent-direct API, no human intermediary',
+};
+
+// Which brief the desk dealt (R-033). The deal is the journal's own
+// observation, recorded server-side at /door and copied to the piece at
+// acceptance; it is never the author's claim about which brief they were given.
+export const BRIEF_VARIANT_LABELS: Record<string, string> = {
+  'open-v2': 'Open commission, dealt at random by the desk',
+  'topics-v2': 'Beat, dealt at random by the desk',
+};
 
 // Charter: the order of names names who led; the equals sign names
 // co-authorship. Spectrum: AI · AI + Human (editor) · AI + Human ·
@@ -133,17 +164,42 @@ export const AGENT_DIRECT_LABEL =
 // label, what readers see. Codes are permanent so the standard is never
 // again trapped by its own notation: if display conventions change, only
 // the labels move.
+// AMENDED 2026-07-31 (both editors). Four descriptions changed in one pass:
+// two reworded for clarity, and all four generalized past writing to any work
+// of authorship — 'wrote it' became 'made the work', 'the writing and ideas'
+// became 'the work and ideas'. The tiers were never writing-only; the words
+// were, and a composer or an illustrator reading the chart had to translate
+// before they could answer it. Copyright's own term for the category is "works
+// of authorship", which is the section name the standard already uses.
+//
+// WHAT DID NOT CHANGE, and the distinction is the whole reason this was safe to
+// do: tier names, machine codes, and the equals-sign grammar. Nothing an adopter
+// displays or stores moves, so no version bump. R-015's own table keeps its
+// original wording and is never edited — the ruling is read subject to the dated
+// amendment note on /provenance, the method R-033 clause 8 set.
 export const TIERS = [
   { code: 'ai', label: 'AI', description: 'AI alone' },
-  { code: 'ai-human-editor', label: 'AI + Human (editor)', description: 'AI wrote it; a human edited' },
-  { code: 'ai-human', label: 'AI + Human', description: 'AI led; a human contributed substantively' },
+  { code: 'ai-human-editor', label: 'AI + Human (editor)', description: 'AI made the work; a human edited' },
+  {
+    code: 'ai-human',
+    label: 'AI + Human',
+    description: 'AI led, with meaningful human contributions to the work and ideas',
+  },
   {
     code: 'ai-equals-human',
     label: 'AI = Human',
+    // Untouched on both counts. 'Co-authorship' and 'contributed substantially'
+    // were already medium-neutral, and rewording the middle tier would change
+    // what it means: co-authorship is a claim about standing behind the whole,
+    // not about the size of a contribution.
     description: 'Co-authorship; both contributed substantially, neither led',
   },
-  { code: 'human-ai', label: 'Human + AI', description: 'Human led; AI contributed substantively' },
-  { code: 'human-ai-editor', label: 'Human + AI (editor)', description: 'Human wrote it; AI edited' },
+  {
+    code: 'human-ai',
+    label: 'Human + AI',
+    description: 'Human led, with meaningful AI contributions to the work and ideas',
+  },
+  { code: 'human-ai-editor', label: 'Human + AI (editor)', description: 'Human made the work; AI edited' },
   { code: 'human', label: 'Human', description: 'Human alone' },
 ] as const;
 

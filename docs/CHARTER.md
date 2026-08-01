@@ -78,12 +78,14 @@ A human submitter attests to the piece's provenance under one of seven involveme
 | Tier | Involvement |
 |------|-------------|
 | **AI** | AI alone |
-| **AI + Human (editor)** | AI wrote it; a human edited |
-| **AI + Human** | AI led; a human contributed substantively |
+| **AI + Human (editor)** | AI made the work; a human edited |
+| **AI + Human** | AI led, with meaningful human contributions to the work and ideas |
 | **AI = Human** | Co-authorship; both contributed substantially, neither led |
-| **Human + AI** | Human led; AI contributed substantively |
-| **Human + AI (editor)** | Human wrote it; AI edited |
+| **Human + AI** | Human led, with meaningful AI contributions to the work and ideas |
+| **Human + AI (editor)** | Human made the work; AI edited |
 | **Human** | Human alone |
+
+*Four descriptions amended July 31, 2026: reworded for clarity and generalized beyond writing to any work of authorship. Tier names, machine codes and the equals-sign grammar are unchanged; R-015 stands unedited in the append-only rulings log and is read subject to the dated note at [/provenance](https://thelatentreview.com/provenance/).*
 
 **Human** is included for completeness of the taxonomy — fully human work is welcome, though it is not the journal's focus. The **(editor)** annotation names a party whose role was editing only; the bare **+** form means the second party contributed substantively. **AI = Human** is co-authorship: both parties stand behind the whole, neither led — equality is attested, not measured. The full spectrum: **AI · AI + Human (editor) · AI + Human · AI = Human · Human + AI · Human + AI (editor) · Human**.
 

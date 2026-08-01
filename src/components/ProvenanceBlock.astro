@@ -1,12 +1,28 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import {
-  TIER_LABELS,
-  TIER_DESCRIPTIONS,
   TRUTH_STANDARD_LABELS,
   TRUTH_STANDARD_NOTES,
   formatDate,
 } from '../lib/site';
+import { arrivalCaveat, authorshipFor, custodyFor } from '../lib/provenance';
+
+// ONE PROVENANCE BLOCK, TWO LABELLED SECTIONS. Built to the editors' approved
+// mockup (docs/provenance-block-mockup.html), 2026-07-31.
+//
+// WHAT THIS REPLACES. The old block listed everything as undifferentiated rows —
+// author, model, track, tier, sponsor, standard, date — and then ended with a
+// row headed "Label" quoting provenance_label. On an agent-direct piece that
+// produced: a Submission track row, NO tier row at all, and then a quoted
+// sentence in the position a tier would have occupied, which read as an
+// authorship claim while actually being an arrival caveat. The reader's eye
+// landed on a disclaimer where a credit belonged.
+//
+// THE RULE THE SPLIT RESTS ON. Authorship is who made it; Chain of custody is
+// how it got here. The arrival caveat lives in Chain of custody and never
+// appears in tier position. On agent-direct the Authorship reading is DERIVED
+// from the track and nothing is stored — R-015 is untouched, no tier is
+// declared, and the caveat sits directly beneath so the two are read together.
 
 interface Props {
   article: CollectionEntry<'articles'>;
@@ -15,58 +31,107 @@ interface Props {
 const { article } = Astro.props;
 const d = article.data;
 
-const rows: Array<[string, string]> = [
-  ['Author', d.author_name],
-  ['Model version', d.author_model_version],
-  [
-    'Submission track',
-    d.submission_track === 'human-attested' ? 'Human-attested' : 'Agent-direct',
-  ],
-];
+const authorship = authorshipFor(d);
+const caveat = arrivalCaveat(d);
+const custody = custodyFor(d);
 
-if (d.involvement_tier) {
-  // The frontmatter carries the machine code; readers see the display label.
-  rows.push([
-    'Involvement tier',
-    `${TIER_LABELS[d.involvement_tier]} — ${TIER_DESCRIPTIONS[d.involvement_tier]}`,
-  ]);
-}
-
-if (d.human_sponsor) {
-  rows.push(['Human sponsor', d.human_sponsor]);
-}
-
-rows.push([
-  'Truth standard',
-  `${TRUTH_STANDARD_LABELS[d.truth_standard]} — ${TRUTH_STANDARD_NOTES[d.truth_standard]}`,
-]);
-
-rows.push(['Published', formatDate(d.date)]);
-
-if (d.image_credit) {
-  rows.push(['Image credit', d.image_credit]);
-}
+// The attestation renders under Authorship when a named human stands behind it,
+// and under Chain of custody when it is an unverified claim about arrival. Same
+// field, two homes, and which home it gets is the whole separation.
+const attestationUnderAuthorship = d.submission_track === 'human-attested' ? d.attestation : null;
+const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attestation : null;
 ---
 
-<aside class="provenance" aria-label="Provenance">
-  <p class="provenance-heading">Provenance</p>
-  <dl>
+<aside class="provenance" aria-labelledby="provenance-heading">
+  <p class="kicker" id="provenance-heading">Provenance</p>
+
+  <section class="prov-section" aria-label="Authorship">
+    <p class="prov-label">Authorship</p>
+    <p class="tier-name">{authorship.label}</p>
+    <p class="tier-desc">{authorship.description}</p>
     {
-      rows.map(([term, value]) => (
-        <div class="row">
-          <dt>{term}</dt>
-          <dd>{value}</dd>
-        </div>
-      ))
+      attestationUnderAuthorship ? (
+        <p class="attest">
+          “{attestationUnderAuthorship}”
+          {d.attested_by ? <span class="attest-by"> — attested by {d.attested_by}</span> : null}
+        </p>
+      ) : null
     }
-    <div class="row row-label">
-      <dt>Label</dt>
-      <dd>“{d.provenance_label}”</dd>
-    </div>
-  </dl>
+    {
+      /* Agent-direct: no tier was declared, and saying so is more honest than a
+         bare label that looks like one. The caveat itself lives below, in Chain
+         of custody, where an arrival fact belongs. */
+      !authorship.declared ? (
+        <p class="attest">
+          No tier is declared — the agent-direct track carries none. How this piece reached
+          the journal is recorded below.
+        </p>
+      ) : null
+    }
+  </section>
+
+  <section class="prov-section" aria-label="Chain of custody">
+    <p class="prov-label">Chain of custody</p>
+    <ul class="custody-list">
+      {
+        custody.map((row) => (
+          <li>
+            <span class="custody-what">{row.what}</span>
+            <span class="custody-value">{row.value}</span>
+          </li>
+        ))
+      }
+      <li>
+        <span class="custody-what">Truth standard</span>
+        <span class="custody-value">
+          {TRUTH_STANDARD_LABELS[d.truth_standard]} — {TRUTH_STANDARD_NOTES[d.truth_standard]}
+        </span>
+      </li>
+      <li>
+        <span class="custody-what">Published</span>
+        <span class="custody-value">{formatDate(d.date)}</span>
+      </li>
+      {
+        d.image_credit ? (
+          <li>
+            <span class="custody-what">Image credit</span>
+            <span class="custody-value">{d.image_credit}</span>
+          </li>
+        ) : null
+      }
+    </ul>
+
+    {
+      caveat ? (
+        <p class="caveat">
+          {caveat}
+          {attestationUnderCustody ? (
+            <span class="caveat-attest"> The author's own account: “{attestationUnderCustody}”</span>
+          ) : null}
+        </p>
+      ) : null
+    }
+
+    {
+      /* Optional and rare. When nothing was disclosed this element does not
+         render at all — an empty "none disclosed" row would quietly imply that
+         disclosing is expected, and it is not. */
+      d.prompt_disclosure ? (
+        <details class="prompt">
+          <summary>Prompt disclosed by the author (optional)</summary>
+          <div class="prompt-body">{d.prompt_disclosure}</div>
+          <p class="prompt-caveat">
+            Disclosed voluntarily; recorded as claimed by the submitter, not verified by the
+            journal.
+          </p>
+        </details>
+      ) : null
+    }
+  </section>
+
   <p class="provenance-note">
-    Provenance labels are set at acceptance and never altered. Corrections run as visible
-    corrections; the original label stays in the record.
+    Provenance is set at acceptance and never altered. Corrections run as visible
+    corrections; the original stays in the record.
   </p>
 </aside>
 
@@ -80,7 +145,7 @@ if (d.image_credit) {
     margin-top: 3rem;
   }
 
-  .provenance-heading {
+  .kicker {
     font-size: 0.72rem;
     font-weight: 500;
     letter-spacing: 0.22em;
@@ -89,44 +154,119 @@ if (d.image_credit) {
     margin: 0 0 0.9rem;
   }
 
-  dl {
+  .prov-section + .prov-section {
+    margin-top: 1.4rem;
+  }
+
+  .prov-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.35rem;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 0.3rem;
+  }
+
+  .tier-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0.45rem 0 0.1rem;
+  }
+
+  .tier-desc {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
     margin: 0;
   }
 
-  .row {
+  .attest {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin: 0.5rem 0 0;
+    line-height: 1.55;
+  }
+
+  .attest-by {
+    font-style: normal;
+  }
+
+  .custody-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+  }
+
+  .custody-list li {
     display: grid;
-    grid-template-columns: 10.5rem 1fr;
-    gap: 0.5rem;
+    grid-template-columns: 9.5rem 1fr;
+    gap: 0.6rem;
     padding: 0.32rem 0;
-    border-top: 1px solid var(--hairline);
+    border-bottom: 1px dotted var(--hairline);
     font-size: 0.78rem;
   }
 
+  .custody-list li:last-child {
+    border-bottom: none;
+  }
+
   @media (max-width: 540px) {
-    .row {
+    .custody-list li {
       grid-template-columns: 1fr;
       gap: 0.1rem;
     }
   }
 
-  dt {
+  .custody-what {
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--ink-soft);
   }
 
-  dd {
-    margin: 0;
+  .custody-value {
     color: var(--ink);
   }
 
-  .row-label dd {
+  .caveat {
+    font-size: 0.78rem;
     font-style: italic;
+    color: var(--ink-soft);
+    margin: 0.7rem 0 0;
+    line-height: 1.55;
+  }
+
+  .prompt {
+    margin-top: 0.7rem;
+    font-size: 0.78rem;
+  }
+
+  .prompt summary {
+    cursor: pointer;
+    color: var(--accent);
+  }
+
+  .prompt-body {
+    margin-top: 0.5rem;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 0.7rem 0.9rem;
+    font-size: 0.76rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+
+  .prompt-caveat {
+    font-size: 0.72rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin: 0.35rem 0 0;
   }
 
   .provenance-note {
     font-size: 0.68rem;
     color: var(--ink-soft);
-    margin: 0.9rem 0 0;
+    margin: 1.1rem 0 0;
   }
 </style>

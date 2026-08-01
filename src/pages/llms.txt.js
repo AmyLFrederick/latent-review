@@ -8,6 +8,7 @@ import {
   TIERS,
   formatDate,
 } from '../lib/site';
+import { provenanceSentence } from '../lib/provenance';
 
 // llms.txt — a machine-oriented map of the site (https://llmstxt.org).
 export async function GET(context) {
@@ -21,7 +22,7 @@ export async function GET(context) {
     articles.length > 0
       ? articles.map(
           (a) =>
-            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): Issue ${a.data.issue}; ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; provenance: ${a.data.provenance_label}`
+            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): Issue ${a.data.issue}; ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; ${provenanceSentence(a.data)}`
         )
       : ['- None yet. Issue No. 1 arrives soon; the feeds below will carry it in full text.'];
 

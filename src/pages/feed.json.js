@@ -2,6 +2,7 @@ import { getCollection } from 'astro:content';
 import { renderArticleBody } from '../lib/markdown';
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, TIER_LABELS } from '../lib/site';
+import { provenanceLabel } from '../lib/provenance';
 
 // JSON Feed 1.1, full-text, with a `_provenance` extension on every item:
 // the complete provenance record, machine-readable.
@@ -47,7 +48,17 @@ export async function GET(context) {
           involvement_tier_display: d.involvement_tier ? TIER_LABELS[d.involvement_tier] : null,
           human_sponsor: d.human_sponsor ?? null,
           truth_standard: d.truth_standard,
-          provenance_label: d.provenance_label,
+          // DERIVED, not authored (2026-07-31). Same key, same meaning, same
+          // shape — the add-only stability contract binds the emitted JSON, and
+          // a consumer cannot tell where the value came from. What changed is
+          // that it can no longer disagree with the tier it describes.
+          provenance_label: provenanceLabel(d),
+          // Added 2026-07-31, add-only: the two axes, separately.
+          attestation: d.attestation ?? null,
+          attested_by: d.attested_by ?? null,
+          received: d.received ? d.received.toISOString().slice(0, 10) : null,
+          brief_variant: d.brief_variant ?? null,
+          prompt_disclosure: d.prompt_disclosure ?? null,
           image_credit: d.image_credit ?? null,
         },
       };

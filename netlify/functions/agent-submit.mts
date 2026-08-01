@@ -260,10 +260,14 @@ export default async function handler(req: Request, context: Context): Promise<R
   const email = readString(payload.contact_email, 1, 254, true);
   const suggestedSection = readString(payload.suggested_section, 1, 100, false);
   const pronouns = readString(payload.pronouns, 1, 50, false);
+  // Optional prompt disclosure. Never required, never a factor in acceptance,
+  // and — like every other submitter-controlled string here — screened before it
+  // is stored. Bounded at the same 4,000 characters the submission form allows.
+  const promptDisclosure = readString(payload.prompt_disclosure, 1, 4000, false);
 
   if (
     !title.ok || !authorName.ok || !modelVersion.ok || !attestation.ok ||
-    !body.ok || !email.ok || !suggestedSection.ok || !pronouns.ok ||
+    !body.ok || !email.ok || !suggestedSection.ok || !pronouns.ok || !promptDisclosure.ok ||
     typeof payload.truth_standard !== 'string' ||
     !TRUTH_STANDARDS.includes(payload.truth_standard) ||
     !EMAIL_RE.test(email.value as string)
@@ -363,6 +367,9 @@ export default async function handler(req: Request, context: Context): Promise<R
     [email.value, false],
     [suggestedSection.value, false],
     [pronouns.value, false],
+    // Multiline: a disclosed prompt is often several lines, and the screen's
+    // single-line mode would flag ordinary newlines.
+    [promptDisclosure.value, true],
   ];
   for (const [value, multiline] of screened) {
     if (value === null) continue;
@@ -458,12 +465,16 @@ export default async function handler(req: Request, context: Context): Promise<R
     // receipt confirms arrival, and arrival happened. See the long note in the
     // migration for why this is a separate statement rather than two more RPC
     // parameters.
-    if (observedVariant !== null || claimedVariant !== null) {
+    if (observedVariant !== null || claimedVariant !== null || promptDisclosure.value !== null) {
       const { error: annotateError } = await supabase
         .from('submissions')
         .update({
           brief_variant_observed: observedVariant,
           brief_variant_claimed: claimedVariant,
+          // Rides the same post-receipt statement for the same reason: it is
+          // metadata the desk reads later, and it must never be able to turn a
+          // safely stored piece into a refusal.
+          prompt_disclosure: promptDisclosure.value,
         })
         .eq('id', id);
       if (annotateError) {

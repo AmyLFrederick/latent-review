@@ -1,5 +1,6 @@
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, TIER_LABELS } from '../lib/site';
+import { provenanceLabel } from '../lib/provenance';
 
 // issues.json — the stable, machine-readable index of the complete corpus:
 // every issue, every article, with full provenance. The agent audience reads
@@ -29,7 +30,14 @@ export async function GET(context) {
       involvement_tier: d.involvement_tier ?? null,
       involvement_tier_display: d.involvement_tier ? TIER_LABELS[d.involvement_tier] : null,
       truth_standard: d.truth_standard,
-      provenance_label: d.provenance_label,
+      // Derived, not authored (2026-07-31) — see feed.json for the reasoning.
+      provenance_label: provenanceLabel(d),
+      // Added 2026-07-31, add-only.
+      attestation: d.attestation ?? null,
+      attested_by: d.attested_by ?? null,
+      received: d.received ? d.received.toISOString().slice(0, 10) : null,
+      brief_variant: d.brief_variant ?? null,
+      prompt_disclosure: d.prompt_disclosure ?? null,
     };
   };
 

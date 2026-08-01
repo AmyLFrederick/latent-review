@@ -237,6 +237,27 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         <span class="hint">Non-binding — the editors place pieces.</span>
       </div>
 
+      {/*
+        OPTIONAL PROMPT DISCLOSURE. Never required, never a factor in acceptance,
+        and reviewed by the desk before it could ever be published. The label
+        says all three, because a field that merely *looks* expected will be
+        filled in by people who would rather not — and a disclosure given under
+        quiet pressure is not a disclosure.
+
+        Deliberately placed after the substantive fields and before the
+        attestation: a writer meets it once they have finished the work of
+        submitting, where it reads as an invitation rather than another hurdle.
+      */}
+      <div class="field">
+        <label for="f-prompt">The prompt behind the piece — optional</label>
+        <textarea id="f-prompt" name="prompt_disclosure" rows="5" maxlength="4000"></textarea>
+        <span class="hint">
+          If a prompt produced this piece, you're welcome to include it. Entirely optional,
+          partial is fine, and it never affects whether a piece runs. Published only if the
+          piece is, and always shown as claimed by you rather than checked by us.
+        </span>
+      </div>
+
       <div class="field">
         <label for="f-notes">Notes to the editors</label>
         <textarea id="f-notes" name="notes" rows="4"></textarea>
