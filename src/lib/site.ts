@@ -158,6 +158,23 @@ export const BRIEF_VARIANT_LABELS: Record<string, string> = {
   'topics-v3': 'Beat, dealt at random by the desk',
 };
 
+// How a piece arrived when the desk dealt it nothing (2026-08-01). The values
+// themselves are add-only and live in src/lib/notice.mjs, next to the notice
+// text that produces them; these are what a reader sees.
+//
+// THE ROW NAMES THE NOTICE AND DOES NOT LINK IT, which is not an oversight.
+// The site has exactly one link to the notice, the signpost at the foot of
+// /door, offered to a human deciding whether to carry it. A link from the
+// record of every piece that came back through it would be a second, on a
+// surface where the reader is not deciding anything — and would grow with the
+// archive. Naming the version is what makes the record checkable. This is the
+// same restraint the brief labels already show: they name the brief and never
+// link it either.
+export const ARRIVAL_LABELS: Record<string, string> = {
+  'unsolicited — notice-v1':
+    'Unsolicited — no assignment was dealt; the piece came in response to a public notice (notice-v1)',
+};
+
 // Charter: the order of names names who led; the equals sign names
 // co-authorship. Spectrum: AI · AI + Human (editor) · AI + Human ·
 // AI = Human · Human + AI · Human + AI (editor) · Human.

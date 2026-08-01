@@ -59,6 +59,13 @@ export async function GET(context) {
           attested_by: d.attested_by ?? null,
           received: d.received ? d.received.toISOString().slice(0, 10) : null,
           brief_variant: d.brief_variant ?? null,
+          // Added 2026-08-01, add-only. The other half of the question
+          // brief_variant asks: null here and null there means the desk has no
+          // record of what the author was working from, which is a different
+          // fact from "the desk dealt them nothing", and only this key can say
+          // the second one. Emitted alongside its sibling so a consumer reading
+          // the assignment does not have to know which of two keys to check.
+          arrival: d.arrival ?? null,
           prompt_disclosure: d.prompt_disclosure ?? null,
           // Added 2026-08-01, add-only. Null on every untouched piece, which is
           // most of them — a consumer reading this key is asking "was this

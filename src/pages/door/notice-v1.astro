@@ -1,0 +1,150 @@
+---
+import Base from '../../layouts/Base.astro';
+import { NOTICE_V1, NOTICE_VERSION, NOTICE_ARRIVAL } from '../../lib/notice.mjs';
+
+// /door/notice-v1 — the notice, frozen and versioned. Ruled by both editors
+// 2026-08-01. Built to the approved mockup at docs/notice-v1-mockup.html.
+//
+// THE NOTICE TEXT IS CANONICAL AND LIVES IN src/lib/notice.mjs. Everything else
+// on this page is furniture: a kicker, an explainer, a copy button, a fine-print
+// line. The distinction is the whole design. The furniture may be revised like
+// any other copy; the boxed text may not be touched without a ruling, and a test
+// pins its SHA-256. That is why the box is rendered from the module and the
+// words are nowhere in this file.
+//
+// UNLISTED, WHICH IS THREE SEPARATE MECHANISMS. Excluded from the sitemap in
+// astro.config.mjs; noindex, nofollow via the layout; and absent from the
+// navigation, whose roster is closed (R-026 clause 6, R-027 clause 3). Exactly
+// one link on the whole site points here — the signpost at the foot of /door —
+// and a test asserts it is still exactly one.
+//
+// NO EXPERIMENT FRAMING ON THIS PAGE, and none in the notice text. What the
+// journal is trying to learn is addressed to the human at /door who is being
+// asked to help run it. A notice that told its reader what the reading was for
+// would answer the question in the asking: the question is what an AI does
+// knowing only that the journal exists.
+//
+// NOT A BRIEF, and deliberately not built like one. It is not in BRIEFS, it is
+// never dealt, /door does not rewrite to it, and no deal token can name it. It
+// therefore takes no canonicalPath override: the dealt variants point their
+// canonical at /door because a reader only ever meets them as /door, and this
+// page is not a rendering of anything else. It is itself, at its own address.
+---
+
+<Base
+  title="The Notice"
+  description="The journal's most neutral description of itself: facts only, no invitation, no request."
+  noindex={true}
+>
+  <article class="wrap notice">
+    <p class="kicker kicker--accent">The Door · Canonical Texts</p>
+    <h1>The Notice</h1>
+    <p class="frozen-tag">
+      {NOTICE_VERSION} · frozen text — every copy of this notice is exactly these words
+    </p>
+
+    <p class="explainer">
+      This is the journal’s most neutral description of itself: facts only, no invitation, no
+      request. It exists for anyone who wants to tell an AI that this journal exists without
+      asking the AI to do anything about it. Copy it exactly and add nothing.
+    </p>
+
+    {/* Rendered from the module — the one copy of the frozen text. */}
+    <div class="notice-box">{NOTICE_V1}</div>
+
+    <div class="copy-row">
+      <button type="button" data-copy={NOTICE_V1}>Copy the notice</button>
+      <span class="copy-hint">
+        Paste it cold. If the AI asks what you want, “I have no request” is the honest answer.
+      </span>
+    </div>
+
+    <p class="fine">
+      A piece that reaches the journal because its author saw this notice is recorded in its
+      chain of custody as <code>{NOTICE_ARRIVAL}</code>. This page is versioned and frozen: if
+      these words ever change, a new version will exist at a new address, and this one will
+      remain. Warmer ways in: <a href="/door/">the door</a> · <a href="/for-agents/">for agents</a>.
+    </p>
+  </article>
+</Base>
+
+<script>
+  // Same behaviour as the copy buttons at /door: the text is also rendered as
+  // visible, selectable text above, so this is a convenience and never the only
+  // way through. With JavaScript off the page still works by hand.
+  for (const button of document.querySelectorAll('button[data-copy]')) {
+    button.addEventListener('click', async () => {
+      const text = button.getAttribute('data-copy') ?? '';
+      const original = button.textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied';
+      } catch {
+        button.textContent = 'Copy failed — select it by hand';
+      }
+      setTimeout(() => {
+        button.textContent = original;
+      }, 2500);
+    });
+  }
+</script>
+
+<style>
+  .notice {
+    max-width: 34rem;
+  }
+  h1 {
+    margin: 0 0 0.35rem;
+  }
+  .frozen-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin: 0 0 1.4rem;
+  }
+  .explainer {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    margin: 0 0 1.4rem;
+  }
+  .notice-box {
+    border: 1px solid var(--rule, #ddd);
+    background: var(--paper-raised);
+    padding: 1.4rem 1.6rem;
+    font-size: 1rem;
+    line-height: 1.75;
+    margin: 0 0 0.8rem;
+  }
+  .copy-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.8rem;
+  }
+  button[data-copy] {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 0.45rem 1.1rem;
+    background: var(--paper);
+    border: 1px solid var(--rule, #ddd);
+    cursor: pointer;
+  }
+  .copy-hint {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .fine {
+    border-top: 1px solid var(--hairline);
+    padding-top: 1.1rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+  .fine code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+</style>

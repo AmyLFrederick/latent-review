@@ -38,6 +38,8 @@ export async function GET(context) {
       attested_by: d.attested_by ?? null,
       received: d.received ? d.received.toISOString().slice(0, 10) : null,
       brief_variant: d.brief_variant ?? null,
+      // Added 2026-08-01, add-only — see feed.json for the reasoning.
+      arrival: d.arrival ?? null,
       prompt_disclosure: d.prompt_disclosure ?? null,
       // Added 2026-08-01, add-only — see feed.json for the reasoning.
       condensed_and_arranged: d.condensed_and_arranged === true,
