@@ -1,0 +1,95 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { SITE_TITLE, formatDate } from '../../../lib/site';
+import { assertFullTextsPaired } from '../../../lib/full-text';
+
+// THE PIECE AS IT ARRIVED, at a permanent public URL beside the piece itself.
+//
+// WHY IT NESTS UNDER THE ARTICLE rather than living in a collection of its own
+// at /as-submitted/<slug>/: the permanence promise this page carries is the
+// PIECE'S promise, not a separate one. A URL that reads as a suffix of the
+// article's own address says that out loud, and it survives any later change to
+// how full texts are stored — nothing in the address claims a home of its own.
+//
+// NOINDEX, AND CANONICAL TO THE PIECE. This is the same work in an earlier
+// state; two indexed pages of near-identical text would compete with each other
+// in search, and a reader arriving cold should land on the published piece. It
+// is public, permanent and linked from the piece — that is what the term
+// requires, and being findable in a search engine is not the same thing as
+// being public.
+
+export async function getStaticPaths() {
+  const [articles, fullTexts] = await Promise.all([
+    getCollection('articles'),
+    getCollection('submitted'),
+  ]);
+
+  // The pairing gate. It runs here AND on the article route, because either
+  // page rendering while the other's data is missing is the failure this
+  // catches, and a build that skips one route must not skip the check.
+  assertFullTextsPaired(articles, fullTexts);
+
+  const byId = new Map(articles.map((a) => [a.id, a]));
+  return fullTexts.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, article: byId.get(entry.id) },
+  }));
+}
+
+const { entry, article } = Astro.props;
+const d = article.data;
+const { Content } = await render(entry);
+---
+
+<Base
+  title={`${d.title} — as submitted`}
+  description={`The full text of “${d.title}” exactly as it was submitted, before the editors condensed and arranged it for publication.`}
+  noindex={true}
+  canonicalPath={`/articles/${article.id}/`}
+>
+  <article class="wrap as-submitted">
+    <header class="page-header">
+      <p class="kicker">As submitted</p>
+      <h1>{d.title}</h1>
+      <p class="article-byline">By {d.author_name}</p>
+      <p class="page-note">
+        This is the piece exactly as it arrived, before the editors condensed and arranged it.
+        The editors may omit paragraphs and reorder them; they never change wording, and no cut
+        or reordering may change what a piece claims. This page is how you check that rather
+        than take our word for it.
+      </p>
+      <p class="meta-mono as-meta">
+        {d.received ? <>Received {formatDate(d.received)} · </> : null}
+        <a href={`/articles/${article.id}/`}>Read the published piece</a>
+      </p>
+    </header>
+
+    <hr class="single-rule" />
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <p class="page-note as-footer">
+      Published by {SITE_TITLE} at a permanent URL under the same terms as the piece itself:
+      set at publication and never altered. Corrections run as visible corrections.
+    </p>
+  </article>
+</Base>
+
+<style>
+  .as-submitted {
+    max-width: 42rem;
+  }
+
+  .as-meta {
+    margin-top: 0.9rem;
+  }
+
+  .as-footer {
+    margin-top: 2.4rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hairline);
+  }
+</style>

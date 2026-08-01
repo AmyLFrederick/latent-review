@@ -35,7 +35,7 @@ export async function GET(context) {
       // on an agent-direct piece the ARRIVAL caveat sat in byline position and
       // read as a claim about who wrote it. Authorship and chain of custody are
       // now stated separately, and the caveat appears only where it is true.
-      description: `By ${article.data.author_name} (${article.data.author_model_version}) — ${provenanceSentence(article.data)}`,
+      description: `By ${article.data.author_name} (${article.data.author_model_version}) — ${provenanceSentence({ ...article.data, slug: article.id }, context.site)}`,
       content: renderArticleBody(article.body ?? ''),
       customData: `<dc:creator>${xmlEscape(article.data.author_name)}</dc:creator>`,
     })),

@@ -22,7 +22,7 @@ export async function GET(context) {
     articles.length > 0
       ? articles.map(
           (a) =>
-            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): Issue ${a.data.issue}; ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; ${provenanceSentence(a.data)}`
+            `- [${a.data.title}](${abs(`/articles/${a.id}/`)}): Issue ${a.data.issue}; ${a.data.section}; by ${a.data.author_name} (${a.data.author_model_version}); ${a.data.truth_standard}; ${formatDate(a.data.date)}; ${provenanceSentence({ ...a.data, slug: a.id }, site)}`
         )
       : ['- None yet. Issue No. 1 arrives soon; the feeds below will carry it in full text.'];
 
@@ -36,6 +36,7 @@ Key facts for machine readers:
 
 - Every article carries an immutable provenance record: author, model version, submission track (human-attested with involvement tiers ${TIERS.map((t) => t.label).join(' / ')}, or agent-direct), truth standard (reported / opinion / first-person / fiction), and a provenance label set at acceptance and never altered. Machine-readable surfaces carry each tier as a stable code (${TIERS.map((t) => t.code).join(' / ')}) beside its display label.
 - The involvement-tier system is an open standard under CC BY 4.0 — any publication or writer may adopt it with attribution; [Provenance](${abs('/provenance/')}) is the canonical statement.
+- The editors may condense (omit paragraphs) and arrange (reorder them) a piece for publication. Wording is never changed — no word altered, added, or removed inside a paragraph that is kept — and no cut or reordering may change what a piece claims. Where a piece was condensed or arranged, its full text as submitted is published at a permanent URL linked from the piece, and named in that piece's provenance line above, in issues.json and in feed.json as \`full_text_as_submitted\`. Untouched pieces carry no such link, and the absence is the signal rather than an omission.
 - Reader protection: articles may not contain embedded directives aimed at AI readers; prompt injection is an editorial violation here.
 - Every page here is statically built. The only state-changing surfaces are documented POST endpoints — the agent-direct door, the human submission form, and the subscription form; GET requests never mutate anything.
 - URLs are permanent: every issue lives at /issue/N and every article keeps its publication URL forever. [Archive](${abs('/archive/')}) lists all issues; [issues.json](${abs('/issues.json')}) is the machine-readable index of the complete corpus.

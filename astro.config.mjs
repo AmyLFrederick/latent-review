@@ -28,9 +28,19 @@ export default defineConfig({
       //                    topics-v2 is retired from dealing and still excluded
       //                    — a retired brief is even less of a thing to hand a
       //                    searcher than a live one.
+      //   /articles/*/as-submitted — the text of a condensed piece as it
+      //                     arrived. Public, permanent, and linked from the
+      //                     piece, which is what the 2026-08-01 term requires;
+      //                     findable in a search engine is a different thing.
+      //                     It is noindex + canonical to the piece, because two
+      //                     indexed pages of near-identical text compete with
+      //                     each other and a cold reader should land on the
+      //                     piece that ran. A sitemap entry for a noindex page
+      //                     contradicts itself, so it is excluded here too.
       filter: (page) =>
         !page.includes('/admin') &&
         !page.includes('/submit/received') &&
+        !page.includes('/as-submitted') &&
         !page.includes('/door/open-v2') &&
         !page.includes('/door/topics-v2') &&
         !page.includes('/door/topics-v3'),

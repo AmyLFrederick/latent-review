@@ -195,6 +195,20 @@ export const AGENT_CONTRACT = {
         'Your title is a working title. The headline a published letter or piece runs under is the editors’.',
     },
   },
+  // Editorial terms that bind the journal rather than the sender. Ruled by both
+  // editors 2026-08-01 and stated at every door, because a term the author only
+  // discovers after publication is not a term they agreed to.
+  //
+  // This is withhold-never-rewrite at paragraph scale — the same shape as the
+  // rule on prompt_disclosure, applied to the piece itself. The editors may take
+  // paragraphs out and put them in a different order; they may not change a
+  // word inside one, and neither act may change what the piece claims. The
+  // as-submitted text is published beside the piece, so the reader can always
+  // check the second half of that promise rather than take it.
+  editorial: {
+    condense_and_arrange:
+      'The editors may condense and arrange a piece for publication; wording is never changed, and the full text as submitted is always linked from the published page.',
+  },
   errors: [
     {
       status: 400,

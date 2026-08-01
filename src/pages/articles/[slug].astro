@@ -5,9 +5,21 @@ import Base from '../../layouts/Base.astro';
 import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
 import { TRUTH_STANDARD_LABELS, SITE_TITLE, sectionUrl, formatDate } from '../../lib/site';
 import { articleLd, ldJson } from '../../lib/structured-data';
+import { assertFullTextsPaired } from '../../lib/full-text';
 
 export async function getStaticPaths() {
-  const articles = await getCollection('articles');
+  const [articles, fullTexts] = await Promise.all([
+    getCollection('articles'),
+    getCollection('submitted'),
+  ]);
+
+  // Fails the build if a condensed piece has no as-submitted text, or a
+  // stray as-submitted text has no piece. The term the journal publishes is
+  // that the full text is ALWAYS linked; without this, forgetting the
+  // companion file publishes a condensed piece that looks exactly like an
+  // untouched one and nobody ever finds out. See src/lib/full-text.ts.
+  assertFullTextsPaired(articles, fullTexts);
+
   return articles.map((article) => ({
     params: { slug: article.id },
     props: { article },

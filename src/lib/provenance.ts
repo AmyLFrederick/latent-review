@@ -7,6 +7,7 @@ import {
   TRACK_LABELS,
   formatDate,
 } from './site.ts';
+import { fullTextUrl } from './full-text.ts';
 
 // PROVENANCE, SPLIT INTO ITS TWO AXES. One module, so no surface has to work out
 // the split for itself and no two surfaces can work it out differently.
@@ -43,6 +44,13 @@ type ProvenanceData = {
   received?: Date;
   brief_variant?: string;
   prompt_disclosure?: string;
+  /**
+   * Set when the editors condensed or arranged the piece (2026-08-01). Paired
+   * with `slug`, which is what the link to the as-submitted text is built from
+   * — the caller passes it because a piece's own data does not carry its id.
+   */
+  condensed_and_arranged?: boolean;
+  slug?: string;
   date: Date;
 };
 
@@ -101,6 +109,14 @@ export function arrivalCaveat(d: ProvenanceData): string | null {
 export interface CustodyRow {
   what: string;
   value: string;
+  /**
+   * An optional link closing the row. Added 2026-08-01 for the condense-and-
+   * arrange term, which is the first custody fact a reader can check for
+   * themselves rather than take on the journal's word — so it is the first one
+   * that needs somewhere to send them.
+   */
+  href?: string;
+  hrefText?: string;
 }
 
 /**
@@ -133,6 +149,19 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
   // readers to skip the list.
   if (d.brief_variant && BRIEF_VARIANT_LABELS[d.brief_variant]) {
     rows.push({ what: 'Assignment', value: BRIEF_VARIANT_LABELS[d.brief_variant] });
+  }
+
+  // Only on a piece the editors actually touched. An untouched piece carries
+  // nothing here, and the absence is the signal — a "not condensed" row on
+  // every other piece would teach readers to skip the row on the one piece
+  // where it says something.
+  if (d.condensed_and_arranged && d.slug) {
+    rows.push({
+      what: 'Editorial treatment',
+      value: 'Condensed and arranged by the editors',
+      href: fullTextUrl(d.slug),
+      hrefText: 'full text as submitted',
+    });
   }
 
   return rows;
@@ -174,11 +203,35 @@ export function trackLabel(d: ProvenanceData): string {
  * absence rather than leaving a gap, because an absent field invites a guess and
  * a named absence does not.
  */
-export function provenanceSentence(d: ProvenanceData): string {
+export function provenanceSentence(d: ProvenanceData, origin?: string | URL): string {
   const track = trackLabel(d);
-  if (d.submission_track === 'agent-direct') {
-    return `Authorship: AI alone (agent-direct track; no tier is declared). Chain of custody: ${track} — ${AGENT_DIRECT_LABEL}.`;
-  }
-  const { label, description } = authorshipFor(d);
-  return `Authorship: ${label} — ${description}. Chain of custody: ${track}.`;
+  const base =
+    d.submission_track === 'agent-direct'
+      ? `Authorship: AI alone (agent-direct track; no tier is declared). Chain of custody: ${track} — ${AGENT_DIRECT_LABEL}.`
+      : (() => {
+          const { label, description } = authorshipFor(d);
+          return `Authorship: ${label} — ${description}. Chain of custody: ${track}.`;
+        })();
+
+  return base + treatmentClause(d, origin);
+}
+
+/**
+ * The condense-and-arrange fact, for the one-line surfaces (2026-08-01).
+ *
+ * Empty on an untouched piece, which is nearly all of them — this sentence
+ * feeds RSS, llms.txt and JSON-LD, and a standing "not condensed" clause on
+ * every item would be noise that teaches a machine reader to ignore the field
+ * on the one item where it says something. Absence is the signal here exactly
+ * as it is in the block.
+ *
+ * The URL is absolute when an origin is given and relative when it is not. A
+ * relative path is fine inside the site and useless inside a feed a reader
+ * pulled somewhere else, so every caller that has an origin passes it.
+ */
+function treatmentClause(d: ProvenanceData, origin?: string | URL): string {
+  if (!d.condensed_and_arranged || !d.slug) return '';
+  const path = fullTextUrl(d.slug);
+  const url = origin ? new URL(path, origin).href : path;
+  return ` Condensed and arranged by the editors — wording unchanged; the full text as submitted is published at ${url}.`;
 }
