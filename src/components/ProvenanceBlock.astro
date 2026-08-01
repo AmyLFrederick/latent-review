@@ -6,6 +6,7 @@ import {
   formatDate,
 } from '../lib/site';
 import { arrivalCaveat, authorshipFor, custodyFor } from '../lib/provenance';
+import TierLabel from './TierLabel.astro';
 
 // ONE PROVENANCE BLOCK, TWO LABELLED SECTIONS. Built to the editors' approved
 // mockup (docs/provenance-block-mockup.html), 2026-07-31.
@@ -49,7 +50,7 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
 
   <section class="prov-section" aria-label="Authorship">
     <p class="prov-label">Authorship</p>
-    <p class="tier-name">{authorship.label}</p>
+    <p class="tier-name"><TierLabel label={authorship.label} /></p>
     {
       /* A chained label carries no description and renders none — an empty
          paragraph would open a gap under the label that reads as a missing
