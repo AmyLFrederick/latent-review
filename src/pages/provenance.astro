@@ -111,6 +111,39 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         required: a work by several authors of one kind may simply carry the plain tier, and a
         finer relation is declared only when the authors want the record to carry it (R-020).
       </p>
+      {/*
+        CHAINED LABELS, ruled by both editors 2026-08-01. The paragraph below is
+        the ratified text; the only thing added to it is markup.
+
+        It sits after R-020 and not before it because the two extend the grammar
+        along different axes and this one reads as the second step: R-020 says
+        the relations compose ACROSS parties of one kind at a single moment;
+        this says labels compose ACROSS MOMENTS, as a work passes from hand to
+        hand. Numbering is what the second reading needs and the first did not —
+        once a kind can appear at two different moments, "AI" alone stops being
+        able to say which AI.
+
+        The superscripts are <sup> markup rather than the Unicode superscript
+        characters. That decision is a display one and its reasoning lives with
+        the CSS at .tier-num, where the display rule is implemented.
+      */}
+      <p>
+        Tiers may chain, read left to right, when a work passes through more hands. When the
+        same kind of party appears more than once in a chained label, number them in order of
+        appearance — <strong>AI<sup class="tier-num">1</sup></strong>,{' '}
+        <strong>AI<sup class="tier-num">2</sup></strong>, or{' '}
+        <strong>Human<sup class="tier-num">1</sup></strong>,{' '}
+        <strong>Human<sup class="tier-num">2</sup></strong> — so the byline can say which is
+        which. For example,{' '}
+        <strong>
+          AI<sup class="tier-num">1</sup> = Human + AI<sup class="tier-num">2</sup> (editor)
+        </strong>{' '}
+        means co-authored by one AI and a human, then edited by a second AI, and the byline
+        names them: Claude (AI<sup class="tier-num">1</sup>) = Amy Louise Frederick (Human),
+        edited by Copilot (AI<sup class="tier-num">2</sup>). Numbers appear only in chained
+        labels and only when a kind repeats; the seven base tiers are unchanged and never
+        numbered. The label follows the work's actual history, however many hands that took.
+      </p>
       <p>
         In this journal's own use, a tier is set at acceptance and never altered; corrections
         run as visible corrections. Adopters set their own editorial rules — the standard is
@@ -204,6 +237,31 @@ import { TIERS, SITE_TITLE } from '../lib/site';
           ))}
         </tbody>
       </table>
+      {/*
+        THE CHAINED ENCODING IS DERIVED, NOT INVENTED. Every part of it is a rule
+        the seven codes above already obey — `+` is a hyphen (ai-human), `=` is
+        -equals- (ai-equals-human), (editor) is a trailing -editor
+        (ai-human-editor). The only new thing is the number, and it can never
+        collide with what exists because no code above contains a digit.
+
+        Stated as a rule rather than a second table on purpose: a chain can be
+        any length, so a table of chained codes would be a table of examples
+        pretending to be an enumeration. The seven are enumerable and are
+        enumerated; the grammar is not, and is written out instead.
+      */}
+      <p>
+        When a label chains, its code chains with it, in the same grammar the seven already
+        use: <strong>+</strong> becomes a hyphen, <strong>=</strong> becomes{' '}
+        <code>-equals-</code>, <strong>(editor)</strong> becomes a trailing{' '}
+        <code>-editor</code>, and a numbered party carries its number as a suffix —{' '}
+        <code>ai-1</code>, <code>ai-2</code>. So{' '}
+        <strong>
+          AI<sup class="tier-num">1</sup> = Human + AI<sup class="tier-num">2</sup> (editor)
+        </strong>{' '}
+        encodes as <code>ai-1-equals-human-ai-2-editor</code>. This is an addition and not a
+        change: the seven codes above are untouched, remain valid, and never carry a number —
+        a number appears only where a kind repeats in a chain.
+      </p>
 
       <h2 id="license">License</h2>
       <p>
@@ -269,6 +327,23 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         not derived — it is quoted. Left typed on purpose (editors' ruling,
         2026-07-28).
       */}
+      <p>
+        <strong>v2, amended August 1, 2026.</strong> Labels may chain. A tier label now reads
+        left to right across the hands a work actually passed through, and where the same kind
+        of party appears twice in one chain, the parties are numbered in order of appearance —{' '}
+        <strong>AI<sup class="tier-num">1</sup></strong>,{' '}
+        <strong>AI<sup class="tier-num">2</sup></strong> — so a byline can name which is which.
+        Machine codes chain in the grammar the existing codes already use, a numbered party
+        taking its number as a suffix (<code>ai-1</code>, <code>ai-2</code>). The seven base
+        tiers are unchanged and are never numbered, and a chained label is available, never
+        required — a work that one tier describes honestly carries that tier.
+        <em>
+          No version bump: this is add-only. Every existing display label and machine code
+          still means exactly what it meant and still validates, so nothing an adopter
+          displays or stores changes. The grammar gained a construct and gave up nothing —
+          the same reasoning under which same-kind relations were added (R-020).
+        </em>
+      </p>
       <p>
         <strong>v2, amended July 31, 2026.</strong> Four tier descriptions changed, in one
         pass. Two were reworded for clarity — “contributed substantively” became “with
@@ -353,6 +428,44 @@ import { TIERS, SITE_TITLE } from '../lib/site';
   .machine-code code {
     overflow-wrap: normal;
     word-break: keep-all;
+  }
+
+  /* THE NUMBERED SUPERSCRIPT (ruled 2026-08-01: bold, and never so small it
+     disappears at body-text or mobile sizes). The test the ruling set is that
+     AI¹ and AI² are distinguishable at a glance on a phone, and everything here
+     serves that one sentence.
+
+     MARKUP, NOT THE UNICODE CHARACTERS ¹ (U+00B9) AND ² (U+00B2). Three reasons,
+     and the third decided it. A font's built-in superscript glyphs are already
+     scaled, so CSS cannot lift them to a legibility floor — asking for bold and
+     bigger fights the glyph instead of setting it. They also render from
+     whichever font wins the fallback stack, and Georgia's superscripts are not
+     Source Serif's. And some screen readers voice U+00B2 as "squared", which
+     would turn a second AI author into a mathematical claim about the first.
+
+     SIZED AGAINST A FLOOR, not purely relatively. A plain 0.7em is 11px in body
+     prose and 9.5px inside .amend-note, and 9.5px is where a raised digit stops
+     being read and starts being noticed — in the one place a reader is most
+     likely to be checking a label carefully. The floor makes the digit ~12px
+     wherever it appears; the em term is kept so the numeral still tracks any
+     context set larger than body.
+
+     `line-height: 0` with a relative offset rather than `vertical-align: super`,
+     because the latter grows the line box: a numbered label would silently open
+     up the leading of whatever paragraph it landed in, and these labels appear
+     mid-prose.
+
+     LINING, TABULAR FIGURES. Source Serif 4 can serve old-style figures, where 1
+     and 2 sit at different heights — at 12px and raised, that reads as a
+     rendering fault rather than as the distinction the whole notation rests on. */
+  .tier-num {
+    font-weight: 700;
+    font-size: max(0.7em, 0.75rem);
+    font-variant-numeric: lining-nums tabular-nums;
+    line-height: 0;
+    position: relative;
+    top: -0.45em;
+    margin-left: 0.04em;
   }
 
   /* BELOW 24rem THE TABLE STOPS BEING A TABLE, because at that width it stopped
