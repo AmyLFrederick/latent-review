@@ -2012,3 +2012,83 @@ index 0000000..4686b6c
 +  assert.equal(trackLabel(agent), 'Agent-direct');
 +});
 ````
+
+---
+
+# 8. AMENDMENT BEFORE COMMIT — the tier chart generalized beyond writing
+
+*Appended 2026-07-31, after both editors ruled, and folded into this same PR as
+one pass rather than a follow-on. Sections 1–7 above are left exactly as they
+were read: the diff they quote is superseded on four lines, and those four lines
+are quoted here in full. Nothing else in the packet moves.*
+
+**What was ruled.** The tier descriptions were written in the vocabulary of
+writing — "wrote it", "the writing and ideas" — while the tiers themselves have
+never been about writing. A composer, an illustrator or anyone submitting a work
+that is not prose had to translate the chart before they could answer it. The
+standard's own section name is **Authorship**, after copyright's "works of
+authorship", and the descriptions now say what that name already claimed.
+
+**The four lines, in `src/lib/site.ts`:**
+
+| Code | Was | Is |
+|------|-----|-----|
+| `ai-human-editor` | AI wrote it; a human edited | AI made the work; a human edited |
+| `ai-human` | AI led, with meaningful human contributions to the **writing** and ideas | AI led, with meaningful human contributions to the **work** and ideas |
+| `human-ai` | Human led, with meaningful AI contributions to the **writing** and ideas | Human led, with meaningful AI contributions to the **work** and ideas |
+| `human-ai-editor` | Human wrote it; AI edited | Human made the work; AI edited |
+
+`ai`, `ai-equals-human` and `human` are untouched. **AI = Human** keeps
+"contributed substantially" deliberately: co-authorship is a claim about
+standing behind the whole, not about the size of a contribution.
+
+**What did not change, which is why no version bump.** Tier names, machine
+codes, and the equals-sign grammar. Nothing an adopter displays or stores moves.
+
+**On `/provenance`:**
+
+- The chart's intro line now names the scope before asking the question: *"Every
+  piece here is a work of authorship — writing, art, music, anything made. Pick
+  the one tier that honestly describes how yours was made."*
+- The standard's tagline returns to the header, generalized: *"An open standard
+  for disclosing how humans and AI share creative work. Free to adopt, adapt,
+  and display — CC BY 4.0."* It had been displaced when the page became a guide;
+  the header now greets an author on the first line and tells an adopter what
+  they may take on the second.
+- **One amendment note, not two, and one changelog entry, not two.** The
+  rewording and the generalization were decided in the same session and ship in
+  the same commit, so they are recorded as the single amendment they are. A note
+  that grew by accretion across one afternoon would read as two events to
+  everyone who came after (CLAUDE.md, no interim record updates).
+
+**The mockups are not edited either**, and their chart still shows the
+pre-amendment wording. They are the editors' own documents, committed exactly as
+supplied, and §1's copy ruling already governs the case: the mockups are the
+shape, not the final copy.
+
+**R-015 is not edited.** Its table keeps the original wording in the append-only
+log and is read subject to the dated note on `/provenance` — the method R-033
+clause 8 set, used here for the second time.
+
+**Ripple, complete:** `src/lib/site.ts`, `/provenance` (chart, tagline, note,
+changelog), `tests/provenance.test.mjs` (two assertions repinned, one new guard
+added), `src/content/articles/_example.md` (schema comments). Every other
+surface renders from `TIERS` and needed no edit — the submit `<select>`, the
+article block, `/archive`'s tooltip, the Desk, and the derived
+`provenance_label` in `feed.json` and `issues.json` all followed the constant.
+
+**The new guard**, `no tier description is written in writing-only terms`, fails
+the suite if `writing`, `wrote`, `written` or `writer` ever reappears in a tier
+description. The drift it exists to catch is a likely one: this journal
+publishes mostly prose, and "wrote it" is the word that comes to hand the next
+time a tier is edited.
+
+**The Charter, ruled into this PR.** `docs/CHARTER.md` §Submission tracks
+carried R-015's original table — it had not tracked the earlier rewording in
+this branch either, so the constitution and the site were two revisions apart.
+Both editors ruled the table into this same change rather than a follow-on PR,
+their read covering it, and it now carries the four amended descriptions with a
+one-line dated note at the point of change pointing to `/provenance` for the
+full statement. The constitution and the standard now say the same words, and
+the only place the original wording survives is the append-only log, where it
+belongs.

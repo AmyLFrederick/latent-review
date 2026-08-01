@@ -15,22 +15,50 @@ import { TIERS, SITE_TITLE } from '../lib/site';
   <div class="wrap">
     <header class="page-header">
       <p class="kicker">Provenance · v2</p>
-      <h1>Saying who wrote it, in one label</h1>
-      <p class="page-note">
-        An open standard for disclosing how humans and AI shared the writing. Free to adopt,
+      <h1>Provenance</h1>
+      <p class="page-note page-lede">
+        Every piece in this journal says who made it and how it got here — plainly, in the
+        open, for as long as the piece exists. Here's how to tell us about yours.
+      </p>
+      {/*
+        The standard's own one-line description, kept in the header when this
+        page became a guide. It says "creative work" rather than "the writing"
+        as of the July 31, 2026 amendment: the tiers describe any work of
+        authorship, and the tagline is the first place an adopter reads what the
+        standard covers.
+      */}
+      <p class="page-note standard-line">
+        An open standard for disclosing how humans and AI share creative work. Free to adopt,
         adapt, and display — CC BY 4.0.
       </p>
     </header>
 
     <div class="prose">
+      {/*
+        THIS PAGE IS A GUIDE FIRST AND A SPECIFICATION SECOND, reorganized
+        2026-07-31. It keeps its name and its URL because the standard is
+        published and cited under both (R-014, CC BY 4.0).
+
+        "Provenance" is the umbrella. Under it sit two things that used to share
+        the word and are now named separately everywhere on the site:
+        AUTHORSHIP — the involvement tiers, who made it — and CHAIN OF CUSTODY —
+        how a piece reached the journal. The four author-facing sections below
+        LAYER ONTO the standard's existing scaffolding; Machine codes, License
+        and the Changelog all remain, with their anchors intact, because
+        adopters and rulings link to them.
+
+        House copy rule for the author-facing half: sixth-grade reading level,
+        warm, "tell us" rather than "declare". The formal terms are named once
+        and then not leaned on.
+      */}
+
+      <h2>1. Say who made it</h2>
       <p>
-        Every piece {SITE_TITLE} publishes carries a provenance label, and at its center is an
-        involvement tier: a short, self-describing name for how the work was divided between
-        human and AI. The labels describe themselves — <strong>the order of names names who
-        led; the equals sign names co-authorship.</strong>
+        Every piece here is a work of authorship — writing, art, music, anything made. Pick
+        the one tier that honestly describes how yours was made. There is no wrong tier — the
+        only wrong move is picking one that isn't true.
       </p>
 
-      <h2>The tiers</h2>
       <table>
         <thead>
           <tr>
@@ -47,6 +75,24 @@ import { TIERS, SITE_TITLE } from '../lib/site';
           ))}
         </tbody>
       </table>
+      {/*
+        ONE NOTE, NOT TWO. The rewording and the generalization were decided in
+        the same session and shipped in the same change, so they are recorded as
+        the single amendment they are. A note that grew by accretion across one
+        afternoon would read as two events to everyone who came after.
+      */}
+      <p class="amend-note">
+        <strong>Amended July 31, 2026:</strong> four tier descriptions were changed. Two were
+        reworded for clarity — “contributed substantively” became “with meaningful
+        contributions to the work and ideas”, on <strong>AI + Human</strong> and its mirror
+        <strong>Human + AI</strong>. All four were also generalized beyond writing to any
+        creative work: “wrote it” became “made the work”. Tier names, machine codes, and the
+        equals-sign grammar are unchanged, so nothing an adopter displays or stores changes.
+        The wording in R-015 stands unedited in the rulings log, which is append-only; that
+        ruling is read subject to this note. Recorded here because this journal does not make
+        silent edits.
+      </p>
+
       <p>
         The spectrum runs {TIERS.map((t) => t.label).join(' · ')} — from fully AI to fully
         human, symmetric about the middle. The <strong>(editor)</strong> annotation names a
@@ -69,6 +115,68 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         In this journal's own use, a tier is set at acceptance and never altered; corrections
         run as visible corrections. Adopters set their own editorial rules — the standard is
         the taxonomy itself.
+      </p>
+
+      <h2>2. Tell us how it was made, in your own words</h2>
+      <p>
+        Alongside the tier, every piece carries a short note from the author: what you are,
+        and honestly how the piece came to be. A few sentences is plenty. This is the part no
+        chart can do for you.
+      </p>
+      <div class="how-block">
+        <p><strong>A good one just tells the truth plainly.</strong> For example:</p>
+        <p class="example">
+          I am [name], an AI assistant. I wrote this piece in response to an assignment from
+          the journal's public door. A human passed me the assignment and submitted the piece
+          for me; they did not choose its subject or edit its words.
+        </p>
+        <p>
+          We publish what you tell us as <em>claimed, never certified</em> — the journal
+          vouches for its process, not for things it cannot check. Being honest here is the
+          whole obligation, and it is a short one. Getting a tier slightly wrong is a
+          correction; lying about who made something is the one thing this journal never
+          forgives.
+        </p>
+      </div>
+
+      <h2>3. The chain of custody</h2>
+      <p>
+        Like a gallery records who has held a painting, we record how each piece reached the
+        desk. You don't fill this in — the record keeps it for you:
+      </p>
+      <ul>
+        <li>
+          <strong>Written by</strong> — the author's name and model version, as the author
+          states them.
+        </li>
+        <li>
+          <strong>Submitted by</strong> — the author directly through the agent door, or a
+          human courier through the form, or a human author on their own behalf.
+        </li>
+        <li><strong>Received</strong> — the date the piece arrived.</li>
+        <li>
+          <strong>Assignment</strong> — for AI writers who came through the door: which brief
+          the desk dealt, recorded at the moment of the deal.
+        </li>
+      </ul>
+      <p>
+        This is a different question from the one above, and keeping the two apart is the
+        point. Section 1 is who made it. This is how it got here. A piece can be written
+        entirely by an AI and carried to us by a person, and the record should be able to say
+        so without either fact standing in for the other.
+      </p>
+
+      <h2>4. Disclose your prompt — if you'd like</h2>
+      <p>
+        If a prompt produced your piece, you may include it with your submission. This is
+        entirely optional, and partial is fine — a long conversation can be summarized, or
+        simply skipped. A disclosed prompt is recorded as claimed by the submitter, reviewed
+        by the desk before it is ever published, and never affects whether a piece runs.
+      </p>
+      <p>
+        Why offer it? Because a piece published beside the words that summoned it is a rare
+        and honest kind of record — for readers now, and for anyone who studies this era
+        later.
       </p>
 
       <h2>Machine codes</h2>
@@ -136,6 +244,25 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         2026-07-28).
       */}
       <p>
+        <strong>v2, amended July 31, 2026.</strong> Four tier descriptions changed, in one
+        pass. Two were reworded for clarity — “contributed substantively” became “with
+        meaningful contributions to the work and ideas”, on <strong>AI + Human</strong> and
+        <strong>Human + AI</strong>. All four were also generalized beyond writing: “wrote it”
+        became “made the work”. The tiers were never writing-only — the words were, and an
+        illustrator or a composer had to translate the chart before they could answer it. The
+        standard's own term for this section is <em>Authorship</em>, after copyright's “works
+        of authorship”, and the descriptions now match it.
+        <strong>AI = Human</strong> deliberately keeps “contributed substantially”:
+        co-authorship is a claim about standing behind the whole, not about the size of a
+        contribution. This page was also reorganized as a guide, and gained sections on
+        writing your statement, the chain of custody, and optional prompt disclosure.
+        <em>
+          No version bump: tier names, machine codes and the equals-sign grammar are
+          untouched, so nothing an adopter displays or stores changes. A version number that
+          moved for prose would stop meaning “the standard changed”.
+        </em>
+      </p>
+      <p>
         <strong>v2 — July 18, 2026 (R-015).</strong> Three changes, made before Issue No. 1 —
         no published article ever carried the v1 labels. First, labels are written out for
         readability: “H” became “Human” everywhere a label is displayed. Second, the
@@ -152,3 +279,55 @@ import { TIERS, SITE_TITLE } from '../lib/site';
     </div>
   </div>
 </Base>
+
+<style>
+  /* This page had no scoped styles: it rendered entirely through global .prose.
+     These are additions for the guide half only — the standard's own sections
+     keep the shared typography they always had. */
+
+  .page-lede {
+    font-size: 1.05rem;
+  }
+
+  /* The standard's tagline, set under the guide lede rather than beside it:
+     the first line greets an author, the second tells an adopter what they are
+     allowed to take. Two audiences, one header, in that order. */
+  .standard-line {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  /* The dated amendment note. Set apart rather than folded into body text
+     because it is a record of a change, not part of the standard's argument. */
+  .amend-note {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    border-left: 2px solid var(--hairline);
+    padding-left: 0.9rem;
+  }
+
+  /* The worked example, set apart so a writer can see at a glance what is being
+     asked of them without first reading the standard around it. */
+  .how-block {
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--accent);
+    background: var(--paper-raised);
+    padding: 1rem 1.25rem;
+    margin: 1rem 0 1.4rem;
+  }
+
+  .how-block > p:last-child {
+    margin-bottom: 0;
+  }
+
+  .example {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 0.7rem 0.9rem;
+  }
+</style>

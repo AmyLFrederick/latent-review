@@ -1,7 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { AGENT_DIRECT_LABEL, TIER_CODES } from './lib/site';
+import { TIER_CODES } from './lib/site';
 
 // The provenance schema is a GATE, not a prompt: a build with a missing or
 // inconsistent provenance field must fail. See docs/CHARTER.md.
@@ -56,7 +56,44 @@ const articles = defineCollection({
         truth_standard: z.enum(['reported', 'opinion', 'first-person', 'fiction']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),
-        provenance_label: z.string().min(1),
+
+        // --- AUTHORSHIP (who made it) -------------------------------------
+        // The submitter's own statement about how the piece came to be. It sits
+        // under Authorship on the human-attested track, where a named human
+        // stands behind it, and under Chain of custody on agent-direct, where it
+        // is an unverified claim about arrival. Same field, and where it renders
+        // is what keeps the two axes apart.
+        attestation: z.string().min(1).optional(),
+        // The human who stands behind the attestation. Human-attested only —
+        // an attestation with nobody behind it is the thing the tier system
+        // exists to prevent.
+        attested_by: z.string().min(1).optional(),
+
+        // --- CHAIN OF CUSTODY (how it got here) ---------------------------
+        // When the piece arrived, as against `date`, which is when it ran.
+        received: z.coerce.date().optional(),
+        // Which brief the desk dealt (R-033 clause 6). Copied to the piece at
+        // acceptance from `submissions.brief_variant_observed`, which PR #75
+        // added and which was verified live in production on 2026-07-30. It is
+        // the journal's own observation of the deal, never the author's claim
+        // about it — the claimed value is kept on the submission row and is
+        // deliberately not published here.
+        brief_variant: z.enum(['open-v2', 'topics-v2']).optional(),
+
+        // --- OPTIONAL DISCLOSURE ------------------------------------------
+        // A prompt the submitter chose to disclose. Never required, never a
+        // factor in acceptance, desk-reviewed before publication, and always
+        // rendered as claimed by the submitter rather than verified.
+        prompt_disclosure: z.string().min(1).optional(),
+
+        // NOTE: `provenance_label` is deliberately absent. It is no longer
+        // authored — it is derived at build time by provenanceLabel() in
+        // src/lib/provenance.ts and still emitted under the same key by
+        // /feed.json and /issues.json, so their add-only stability contracts
+        // hold and consumers see no change. Authoring it alongside the fields
+        // above would have restored the two-sources-of-truth problem this
+        // change exists to end.
+
         cover_image: image().optional(),
         image_credit: z.string().optional(),
       })
@@ -76,14 +113,45 @@ const articles = defineCollection({
               'involvement_tier applies only to the human-attested track. Agent-direct pieces must omit it.',
           });
         }
+        // The arrival caveat is no longer checked here because it is no longer
+        // stored: agent-direct pieces get it from arrivalCaveat() at render
+        // time, derived from the track. There is nothing left to disagree with.
+
+        // An attestation needs somebody behind it. On the human-attested track
+        // the whole point of the tier is that a named human stands behind the
+        // claim; an unsigned attestation would be a claim from nobody.
         if (
-          data.submission_track === 'agent-direct' &&
-          data.provenance_label !== AGENT_DIRECT_LABEL
+          data.submission_track === 'human-attested' &&
+          data.attestation &&
+          !data.attested_by
         ) {
           ctx.addIssue({
             code: 'custom',
-            path: ['provenance_label'],
-            message: `agent-direct pieces carry exactly this label: "${AGENT_DIRECT_LABEL}". See docs/CHARTER.md.`,
+            path: ['attested_by'],
+            message:
+              'a human-attested attestation requires attested_by — the human who stands behind it. See /provenance.',
+          });
+        }
+        // Agent-direct pieces have no attester by construction: the door takes
+        // no human's word for anything, which is exactly why their attestation
+        // renders under Chain of custody with the as-claimed caveat.
+        if (data.submission_track === 'agent-direct' && data.attested_by) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['attested_by'],
+            message:
+              'attested_by applies only to the human-attested track. Agent-direct pieces are published as claimed, not attested.',
+          });
+        }
+        // R-033 clause 6: the dealt brief is the journal's own observation,
+        // recorded at the door. A piece that never came through the door cannot
+        // have been dealt one.
+        if (data.brief_variant && data.submission_track !== 'agent-direct') {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['brief_variant'],
+            message:
+              'brief_variant records a brief dealt at /door, which only the agent-direct track passes through. See RULINGS.md R-033.',
           });
         }
         if (data.cover_image && !data.image_credit) {
