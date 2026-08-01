@@ -59,7 +59,7 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         only wrong move is picking one that isn't true.
       </p>
 
-      <table>
+      <table class="stackable">
         <thead>
           <tr>
             <th>Tier</th>
@@ -69,7 +69,7 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         <tbody>
           {TIERS.map((tier) => (
             <tr>
-              <td><strong>{tier.label}</strong></td>
+              <td class="tier-name"><strong>{tier.label}</strong></td>
               <td>{tier.description}</td>
             </tr>
           ))}
@@ -188,7 +188,7 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         the article schema, <a href="/issues.json"><code>issues.json</code></a>, and
         <a href="/feed.json"><code>feed.json</code></a>.
       </p>
-      <table>
+      <table class="stackable">
         <thead>
           <tr>
             <th>Machine code</th>
@@ -198,8 +198,8 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         <tbody>
           {TIERS.map((tier) => (
             <tr>
-              <td><code>{tier.code}</code></td>
-              <td>{tier.label}</td>
+              <td class="machine-code"><code>{tier.code}</code></td>
+              <td class="tier-name">{tier.label}</td>
             </tr>
           ))}
         </tbody>
@@ -215,8 +215,34 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         </a>
         . Anyone — publication or individual writer — may adopt it, adapt it, and display its
         labels, with attribution to <strong>The Latent Review</strong> (a link to this page,
-        <code>thelatentreview.com/provenance</code>, satisfies attribution). This license
-        covers the tier system alone, not the journal's code or articles.
+        <code>thelatentreview.com/provenance</code>, satisfies attribution). This covers the
+        whole standard: the tier names, their descriptions, the machine codes, and the display
+        guidance. It does not cover the journal's code or its articles.
+      </p>
+      {/*
+        THE STANDARD CREDITS ITSELF IN ITS OWN GRAMMAR. The equals sign is the
+        chart's co-authorship tier, not punctuation and not a stand-in for "and":
+        it says the two parties contributed substantially and neither led, which
+        is the claim the editors are making about this standard. That is why
+        there is no "by" — the equals sign carries the relation the word would
+        otherwise have to state.
+
+        The relation is held together with non-breaking spaces rather than
+        `nowrap`, for the reason this PR learned the hard way: the whole pair is
+        about 300px of a 280px line at 320px, so making all of it rigid would
+        push the page sideways. Binding only `(Human) = Claude` keeps the equals
+        sign from ever stranding at a line end while leaving the line free to
+        break where breaking costs nothing.
+
+        The em dash before the URL is deliberately NOT bound to it. Tried, and
+        measured: binding them makes the pair wider than a 320px line, so the
+        URL itself breaks mid-token — `…/provenan` / `ce`. A stranded dash is
+        untidy; a broken URL in a block people copy is wrong.
+      */}
+      <p class="credit-line">
+        When you adopt or adapt this standard, please credit: <strong>The Latent Review
+        Provenance Standard</strong> — Amy Louise Frederick (Human)&nbsp;=&nbsp;Claude (AI) —
+        <a href="/provenance/">thelatentreview.com/provenance</a> — CC BY 4.0.
       </p>
 
       <h2>Displaying it</h2>
@@ -298,6 +324,85 @@ import { TIERS, SITE_TITLE } from '../lib/site';
     color: var(--ink-soft);
   }
 
+  /* A TIER NAME IS ONE UNIT AND NEVER BREAKS.
+     "(editor)" is part of the label — it names what the second party did — and
+     when the column was narrow enough to wrap it, "AI + Human" sat on one line
+     with "(editor)" beneath, which reads as a footnote qualifying the tier
+     rather than as part of its name. Measured before the fix at 320px: the two
+     (editor) labels broke onto THREE lines, and every compound label broke onto
+     two; both (editor) labels still broke at 768px, so this was never only a
+     phone problem.
+
+     Applied to both tables — the chart and the machine-code table — because the
+     label renders in a column in each.
+
+     ON ITS OWN THIS RULE OVERFLOWS THE PAGE, which is why the media query below
+     exists rather than being tidiness. A rigid 188px label in a 280px line left
+     the description column unable to reach its own minimum, and the page
+     scrolled sideways by 42px at 320px. Measured, not predicted. */
+  .tier-name {
+    white-space: nowrap;
+  }
+
+  /* The consequence of the line above, in the machine-code table: with the
+     label column now rigid, the code column is what gives, and `.prose code`
+     carries `overflow-wrap: anywhere` — so `ai-human-editor` would break
+     mid-token into four lines at 320px. A machine code is a single identifier
+     that people copy; breaking it anywhere is worse than the wrap this PR set
+     out to fix. It breaks only at its own hyphens now, and nowhere else. */
+  .machine-code code {
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+
+  /* BELOW 24rem THE TABLE STOPS BEING A TABLE, because at that width it stopped
+     being readable as one. Measured at 320px with the labels made rigid: the
+     name column wants 188px of a 280px line, leaving 92px — about ten
+     characters — for the description, which then ran to seven lines. The rigid
+     label was also 42px wider than the line, so the page itself scrolled
+     sideways.
+
+     Two columns is the wrong shape for a 320px screen, and the honest fix is
+     not to shrink the type until it fits: it is to stack. The tier name sits on
+     its own line, the description beneath it, and both get the full measure.
+     Nothing is hidden, nothing scrolls, and the reading order is the one the
+     table already implied. The header row is dropped because "Tier /
+     Involvement" over a stacked pair labels nothing.
+
+     This is the only media query in the codebase. The layout is otherwise
+     fluid, and it stays that way — the breakpoint exists because a rigid label
+     has a width that fluidity cannot argue with. */
+  @media (max-width: 24rem) {
+    .stackable,
+    .stackable tbody,
+    .stackable tr,
+    .stackable td {
+      display: block;
+      width: auto;
+    }
+
+    .stackable thead {
+      display: none;
+    }
+
+    .stackable tr {
+      border-bottom: 1px solid var(--hairline);
+      padding: 0.55rem 0;
+    }
+
+    .stackable td {
+      border-bottom: 0;
+      padding: 0;
+    }
+
+    /* The name leads its pair, so it carries the space that separates one tier
+       from the next rather than sitting flush against its own description. */
+    .stackable td.tier-name,
+    .stackable td.machine-code {
+      margin-bottom: 0.15rem;
+    }
+  }
+
   /* The dated amendment note. Set apart rather than folded into body text
      because it is a record of a change, not part of the standard's argument. */
   .amend-note {
@@ -306,6 +411,16 @@ import { TIERS, SITE_TITLE } from '../lib/site';
     color: var(--ink-soft);
     border-left: 2px solid var(--hairline);
     padding-left: 0.9rem;
+  }
+
+  /* The requested credit, set as a block an adopter can lift whole. Given its
+     own box rather than run into the license paragraph because it is the thing
+     someone came to this section to copy, and prose around it makes them work
+     out where the credit stops. */
+  .credit-line {
+    border-left: 2px solid var(--hairline);
+    padding-left: 0.9rem;
+    font-size: 0.95rem;
   }
 
   /* The worked example, set apart so a writer can see at a glance what is being
