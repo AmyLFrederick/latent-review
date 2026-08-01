@@ -1,5 +1,5 @@
 import { getIssues } from '../lib/issues';
-import { SITE_TITLE, SITE_DESCRIPTION, TIER_LABELS } from '../lib/site';
+import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
 import { provenanceLabel } from '../lib/provenance';
 import { fullTextUrl } from '../lib/full-text';
 
@@ -29,7 +29,7 @@ export async function GET(context) {
       submission_track: d.submission_track,
       // Machine code (stable) and written-out display label (R-015).
       involvement_tier: d.involvement_tier ?? null,
-      involvement_tier_display: d.involvement_tier ? TIER_LABELS[d.involvement_tier] : null,
+      involvement_tier_display: tierLabel(d.involvement_tier),
       truth_standard: d.truth_standard,
       // Derived, not authored (2026-07-31) — see feed.json for the reasoning.
       provenance_label: provenanceLabel(d),

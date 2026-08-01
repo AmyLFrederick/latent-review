@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getIssues } from '../lib/issues';
-import { formatDate, TIER_LABELS, TIER_DESCRIPTIONS } from '../lib/site';
+import { formatDate, tierLabel, tierDescription } from '../lib/site';
 import { trackLabel } from '../lib/provenance';
 
 // The archive: every issue, reverse chronological. Each entry links to the
@@ -36,7 +36,7 @@ function coverCredit(
   const cover = issue.cover;
   if (!cover) return null;
   const d = cover.data;
-  const tier = TIER_LABELS[d.involvement_tier ?? ''];
+  const tier = tierLabel(d.involvement_tier);
   return {
     byline: tier ? `By ${d.author_name} · ${tier}` : `By ${d.author_name}`,
     track: trackLabel(d),
@@ -85,7 +85,7 @@ function coverCredit(
                     </h3>
                   )}
                   {coverCredit(issue) ? (
-                    <p class="issue-entry-byline" title={issue.cover?.data.involvement_tier ? TIER_DESCRIPTIONS[issue.cover.data.involvement_tier] : undefined}>
+                    <p class="issue-entry-byline" title={tierDescription(issue.cover?.data.involvement_tier) || undefined}>
                       {coverCredit(issue)!.byline}
                       <span class="issue-entry-track">{coverCredit(issue)!.track}</span>
                     </p>

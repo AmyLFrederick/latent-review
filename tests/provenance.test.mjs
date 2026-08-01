@@ -273,3 +273,42 @@ test('the seven base tiers stay unnumbered, on the page and in the codes', () =>
     assert.ok(!/\d/.test(tier.label), `base label ${tier.label} acquired a number`);
   }
 });
+
+// --- Chained codes reaching the display path (R-035 clause 6) ---------------
+
+test('a chained tier is DECLARED and renders its label, not "Not declared"', () => {
+  // The exact failure R-035 clause 6 recorded. Before the resolver, this piece
+  // rendered as an absence in the authorship slot while carrying a perfectly
+  // valid label in its record.
+  const a = authorshipFor({ ...human, involvement_tier: 'ai-1-equals-human-ai-2-editor' });
+  assert.equal(a.label, 'AI¹ = Human + AI² (editor)');
+  assert.equal(a.declared, true);
+  assert.equal(a.description, '', 'a chained label carries no canned description');
+});
+
+test('an unrecognised tier still reads as undeclared', () => {
+  // The resolver widened what counts as valid; it must not have made everything
+  // valid. A code that breaks R-035's numbering is still not a label.
+  const a = authorshipFor({ ...human, involvement_tier: 'ai-equals-human-ai-editor' });
+  assert.equal(a.label, 'Not declared');
+  assert.equal(a.declared, false);
+});
+
+test('the derived label does not promise a clause it cannot deliver', () => {
+  // provenance_label is emitted by both feeds under a stability contract. With
+  // no description, the colon has to go — "AI¹ = Human + AI² (editor): " is a
+  // punctuation mark advertising a phrase that never arrives.
+  const label = provenanceLabel({ ...human, involvement_tier: 'ai-1-equals-human-ai-2-editor' });
+  assert.equal(label, 'AI¹ = Human + AI² (editor); attested by Amy Louise Frederick');
+  assert.ok(!label.includes(': '), 'an empty description left its colon behind');
+});
+
+test('the one-line sentence drops its dash when there is no description', () => {
+  const s = provenanceSentence({
+    ...human,
+    involvement_tier: 'ai-1-equals-human-ai-2-editor',
+    attested_by: undefined,
+  });
+  assert.match(s, /Authorship: AI¹ = Human \+ AI² \(editor\)\. Chain of custody:/);
+  assert.ok(!s.includes('— .'), 'a dangling em dash survived an empty description');
+});

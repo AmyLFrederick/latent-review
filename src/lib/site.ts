@@ -62,6 +62,12 @@ export {
   SUPPORT_MONTHLY_URL,
 } from './supporters.mjs';
 
+// The chained-code grammar (R-035 clause 4), kept in a plain-JS module for the
+// same reason as the two above: the tests and the content-schema gate both read
+// it, and it has no dependency of its own to drag along.
+// @ts-expect-error — plain-JS module shared with the tests
+import { formatTierCode } from './tier-codes.mjs';
+
 // R-032 made Topics a standing section. It is last on purpose: it is the
 // catch-all, and the order here is the order an issue's contents run in.
 export const STANDING_SECTIONS = [
@@ -236,6 +242,44 @@ export const TIER_LABELS: Record<string, string> = Object.fromEntries(
 export const TIER_DESCRIPTIONS: Record<string, string> = Object.fromEntries(
   TIERS.map((t) => [t.code, t.description])
 );
+
+// THE RESOLVERS. Every surface that turns a stored code into something a reader
+// sees goes through these two rather than indexing the maps above, because the
+// maps know only the seven and a chained code is not in them (R-035 clause 6,
+// and the gap it recorded).
+//
+// The maps stay exported and are still the right thing for the two tables on
+// /provenance, which enumerate the canonical seven on purpose. What must not
+// happen again is a RENDER path indexing them directly: that is what produced a
+// confident "Not declared" for a label the standard can perfectly well express.
+
+/**
+ * The display label for any valid code — the seven, or a well-formed chain.
+ * Null for anything else, so a caller decides what an unknown code means rather
+ * than inheriting a decision made here.
+ */
+export function tierLabel(code: string | undefined | null): string | null {
+  if (!code) return null;
+  return TIER_LABELS[code] ?? formatTierCode(code);
+}
+
+/**
+ * The one-line description under a label, or '' where there is none.
+ *
+ * CHAINED LABELS CARRY NO DESCRIPTION, and that is a decision rather than an
+ * omission. The seven have hand-written descriptions because a name like
+ * "AI + Human" does not say what it means on its own. A chain does: it spells
+ * its relations out, party by party, which is the whole reason the notation
+ * chains. Generating prose for an arbitrary chain would produce a sentence no
+ * editor wrote, restating what the label already says.
+ *
+ * Callers must therefore treat '' as "no description" and omit the element
+ * rather than render an empty one.
+ */
+export function tierDescription(code: string | undefined | null): string {
+  if (!code) return '';
+  return TIER_DESCRIPTIONS[code] ?? '';
+}
 
 // Disclosure framing for the AI review desk (Editors' Desk): the desk pass is
 // attributed exactly this way — same model as the co-editor, different role.
