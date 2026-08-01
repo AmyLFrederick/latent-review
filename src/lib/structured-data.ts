@@ -153,7 +153,10 @@ export function articleLd(
       // being described to the entire web as having an AI author. The opening
       // sentence is gone; authorship is now stated from the tier, which is the
       // only thing that actually knows the answer.
-      description: `Model version: ${d.author_model_version}. ${provenanceSentence(d)}`,
+      // `d` already carries `slug` here (the article route spreads it in), so
+      // the condense-and-arrange clause resolves to an absolute URL like every
+      // other address in this document.
+      description: `Model version: ${d.author_model_version}. ${provenanceSentence(d, site)}`,
     },
     publisher: { '@type': 'Organization', name: periodicalName, url: abs(site, '/') },
     isPartOf: {

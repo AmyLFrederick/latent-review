@@ -90,6 +90,23 @@ const articles = defineCollection({
         // rendered as claimed by the submitter rather than verified.
         prompt_disclosure: z.string().min(1).optional(),
 
+        // --- EDITORIAL TREATMENT ------------------------------------------
+        // Set when the editors condensed (omitted paragraphs) or arranged
+        // (reordered them) this piece for publication. Wording is never
+        // changed — that is the term, published at every door 2026-08-01.
+        //
+        // AN ASSERTION, NOT A DERIVED VALUE, and deliberately so. The
+        // as-submitted text's existence could carry this by itself, and one
+        // source of truth is normally the rule here. But the failure this
+        // guards is an editor condensing a piece and forgetting the companion
+        // file: derived, that publishes a condensed piece with no link and no
+        // custody line, indistinguishable on the page from an untouched one.
+        // Flagged, it fails the build. See assertFullTextsPaired().
+        //
+        // ABSENT ON AN UNTOUCHED PIECE — never `false`. The custody line is
+        // rendered only when this is set, and absence is the signal.
+        condensed_and_arranged: z.boolean().optional(),
+
         // NOTE: `provenance_label` is deliberately absent. It is no longer
         // authored — it is derived at build time by provenanceLabel() in
         // src/lib/provenance.ts and still emitted under the same key by
@@ -169,4 +186,23 @@ const articles = defineCollection({
       }),
 });
 
-export const collections = { articles };
+// THE PIECE AS IT ARRIVED. One file per condensed or arranged article, named for
+// that article's slug, published at /articles/<slug>/as-submitted/.
+//
+// IT CARRIES NO FRONTMATTER, AND THAT IS THE POINT. Every fact about the piece —
+// who wrote it, when it arrived, what it was dealt, how it is labelled — already
+// lives on the article and is already published there. This collection holds one
+// thing, the text as submitted, and metadata here would be a second copy of a
+// record that has a home. The filename does the only linking work required, and
+// assertFullTextsPaired() checks that it links to something.
+//
+// IMMUTABLE ONCE PUBLISHED, on the piece's own terms: it is the evidence for a
+// promise the journal made about that piece, and evidence that can be revised is
+// not evidence. A correction to a published as-submitted text runs as a visible
+// correction, exactly as a correction to the piece does.
+const submitted = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/submitted' }),
+  schema: z.object({}).strict(),
+});
+
+export const collections = { articles, submitted };

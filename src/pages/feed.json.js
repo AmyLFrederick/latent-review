@@ -3,6 +3,7 @@ import { renderArticleBody } from '../lib/markdown';
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, TIER_LABELS } from '../lib/site';
 import { provenanceLabel } from '../lib/provenance';
+import { fullTextUrl } from '../lib/full-text';
 
 // JSON Feed 1.1, full-text, with a `_provenance` extension on every item:
 // the complete provenance record, machine-readable.
@@ -59,6 +60,13 @@ export async function GET(context) {
           received: d.received ? d.received.toISOString().slice(0, 10) : null,
           brief_variant: d.brief_variant ?? null,
           prompt_disclosure: d.prompt_disclosure ?? null,
+          // Added 2026-08-01, add-only. Null on every untouched piece, which is
+          // most of them — a consumer reading this key is asking "was this
+          // condensed, and where is the original", and null answers both.
+          condensed_and_arranged: d.condensed_and_arranged === true,
+          full_text_as_submitted: d.condensed_and_arranged
+            ? new URL(fullTextUrl(article.id), site).href
+            : null,
           image_credit: d.image_credit ?? null,
         },
       };
