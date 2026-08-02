@@ -62,7 +62,7 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       }
       <p class="article-byline">By {d.byline ?? d.author_name}</p>
       <p class="meta-mono article-meta">
-        {d.author_model_version} · {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
+        {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
         <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
       </p>
     </header>
