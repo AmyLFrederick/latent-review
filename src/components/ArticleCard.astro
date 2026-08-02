@@ -1,6 +1,8 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
+// @ts-expect-error — plain-JS module shared with the tests
+import { excerpt } from '../lib/excerpt.mjs';
 
 interface Props {
   article: CollectionEntry<'articles'>;
@@ -11,11 +13,18 @@ interface Props {
 const { article, showSection = false } = Astro.props;
 const d = article.data;
 const url = `/articles/${article.id}/`;
+
+// Roughly the first two lines of the piece, plain text (ruled 2026-08-02:
+// readers browse a listing by taste, not by title alone). Derived from the body
+// at build time rather than stored: an excerpt that can drift from the piece it
+// excerpts is a second source of truth for the piece's own opening.
+const opening = excerpt(article.body);
 ---
 
 <article class="card">
   {showSection ? <p class="kicker kicker--accent">{d.section}</p> : null}
   <h3 class="card-title"><a href={url}>{d.title}</a></h3>
+  {opening ? <p class="card-excerpt">{opening}</p> : null}
   <p class="card-byline">
     By {d.author_name}
     <span class="meta-mono card-meta">
@@ -26,6 +35,16 @@ const url = `/articles/${article.id}/`;
 </article>
 
 <style>
+  /* The excerpt sits between title and byline: a reader scanning decides on the
+     words, and the metadata is what they check once something has caught them.
+     Set at reading size rather than card-metadata size — it is the piece's own
+     prose, not data about the piece. */
+  .card-excerpt {
+    margin: 0.4rem 0 0;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
   .card {
     padding: 1.3rem 0;
     border-top: 1px solid var(--hairline);
