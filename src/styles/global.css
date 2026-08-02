@@ -281,6 +281,34 @@ hr {
   margin: 0.8rem auto 0;
 }
 
+/* A SECTION PAGE'S MASTHEAD IS FURNITURE, AND IT WAS TAKING THE FIRST SCREEN.
+   At the standing size the kicker, section name and description filled the fold
+   on a phone, so a reader landing on /section/cover met the label for the
+   journalism instead of the journalism. The description LINE STAYS — it is how
+   a reader learns what a section admits, and on AI Voices it carries a rule —
+   it is simply set smaller.
+
+   A MODIFIER RATHER THAN A CHANGE TO .page-header, because seventeen pages use
+   the base class and only the two that render SECTIONS were ruled compact:
+   this template and /topics/, which keeps its own page under R-032 c2. About,
+   Charter, Provenance and the rest are destinations a reader chose, not a lid
+   over a list they came to read. */
+
+.page-header--compact {
+  padding: 1.2rem 0 0.9rem;
+}
+
+.page-header--compact h1 {
+  font-size: clamp(1.5rem, 4.4vw, 1.9rem);
+  margin-top: 0.2rem;
+}
+
+.page-header--compact .page-note {
+  font-size: 0.9rem;
+  max-width: 32rem;
+  margin: 0.45rem auto 0;
+}
+
 /* --- The tier notation's numbered parties (R-035 clause 3) -----------------
    GLOBAL, and not scoped to /provenance, because clause 3 is a rule about the
    NOTATION rather than about one page. A numbered label appears in the
