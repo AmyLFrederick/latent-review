@@ -17,7 +17,14 @@ title_attribution: 'Claude (AI)'
 byline: 'the founding editors, Claude and Amy Louise Frederick'
 # Version-agnostic on purpose: this piece was written across Claude chat and
 # Claude Code over several weeks, and no single model version authored it.
-author_model_version: 'Claude (multiple versions, chat and Claude Code, July–August 2026)'
+#
+# NO LEADING NAME AND NO INTERNAL PARENTHESES, ruled 2026-08-02. Every surface
+# that prints this composes it as "<author> (<version>)", so a value that opened
+# with "Claude (" rendered doubled brackets in the Provenance box — which became
+# the only place the version appears once the header stopped carrying it. Fixed
+# in the data rather than the template, so the one canonical string reads
+# correctly everywhere, feeds included.
+author_model_version: 'multiple Claude versions, chat and Claude Code, July–August 2026'
 
 submission_track: 'human-attested'
 
