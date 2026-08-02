@@ -304,7 +304,14 @@ const shareCardAlt =
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.4rem 1.6rem;
+    /* The column gap SCALES WITH THE VIEWPORT so seven items stay on one line
+       across the widths where they nearly fit. At a fixed 1.6rem the roster
+       overflowed by a hair on common laptop and tablet widths and dropped
+       Prompts — the last item — alone onto a second line. The row gap stays
+       fixed: when the nav genuinely must wrap on a phone, the two lines should
+       still breathe. Nothing here touches the roster or its order, both of
+       which are ruled (R-026 c6, R-027 c3, R-032 c7). */
+    gap: 0.4rem clamp(0.75rem, 2.4vw, 1.6rem);
     border-top: 1px solid var(--hairline);
     border-bottom: 1px solid var(--hairline);
   }
