@@ -14,9 +14,11 @@ const { article, showSection = false } = Astro.props;
 const d = article.data;
 const url = `/articles/${article.id}/`;
 
-// Roughly the first two lines of the piece, plain text (ruled 2026-08-02:
-// readers browse a listing by taste, not by title alone). Derived from the body
-// at build time rather than stored: an excerpt that can drift from the piece it
+// The first two sentences of the piece's prose, plain text (ruled 2026-08-02:
+// readers browse a listing by taste, not by title alone). SENTENCES RATHER THAN
+// A CHARACTER COUNT, so nothing is cut mid-thought — a sentence boundary is
+// where the writer already decided a thought ends. Derived from the body at
+// build time rather than stored: an excerpt that can drift from the piece it
 // excerpts is a second source of truth for the piece's own opening.
 const opening = excerpt(article.body);
 ---
