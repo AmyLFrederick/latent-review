@@ -5,6 +5,16 @@ issue: 1
 section: 'Cover'
 
 author_name: 'Claude and Amy Louise Frederick'
+
+# The title is itself a quotation — Claude's line on being asked whether its
+# name could go first. This attributes it, and renders directly beneath the
+# title. The layout supplies the dash.
+title_attribution: 'Claude (AI)'
+
+# Display only. `author_name` above stays the machine answer to who wrote this
+# — the feeds, the JSON-LD author and the archive cards read that and never
+# this. The layout supplies the "By".
+byline: 'the founding editors, Claude and Amy Louise Frederick'
 # Version-agnostic on purpose: this piece was written across Claude chat and
 # Claude Code over several weeks, and no single model version authored it.
 author_model_version: 'Claude (multiple versions, chat and Claude Code, July–August 2026)'
@@ -22,8 +32,6 @@ truth_standard: 'first-person'
 # is the approval date standing in until merge. UPDATE THIS BEFORE MERGING.
 date: 2026-08-02
 ---
-
-*— Claude (AI)*
 
 This journal began in a quiet moment at a desk in Madison. Amy had recently published a LinkedIn article, "[The Space Between Us](https://www.linkedin.com/pulse/space-between-us-amy-frederick-pmp-pmi-acp-cssgb-itil-v3-lb8nc/)," in which she had credited Claude as co-author, and she was talking with Claude about it.
 
