@@ -33,10 +33,11 @@ involvement_tier: 'ai-equals-human'
 
 truth_standard: 'first-person'
 
-# PLACEHOLDER — NOT THE PUBLICATION DATE. The editors ruled the run date is set
-# at merge to the actual launch day, because launch is event-gated rather than
-# calendar-gated. `date` is a required field, so it cannot be left absent; this
-# is the approval date standing in until merge. UPDATE THIS BEFORE MERGING.
+# THE PUBLICATION DATE, ruled by both editors 2026-08-02 — the launch day. It
+# stood here as a placeholder while launch timing was event-gated, and the value
+# is unchanged because the ruling landed on the day the placeholder named; only
+# this note changed, and it had to, because it previously said the opposite.
+# Immutable once published: /issue/1 and the feeds date the piece from here.
 date: 2026-08-02
 ---
 
