@@ -15,7 +15,9 @@ import {
   TERMS_UNDER_LEGAL_REVIEW,
   sectionUrl,
   navLabel,
+  sectionNavHref,
 } from '../lib/site';
+import { getCurrentIssue } from '../lib/issues';
 
 interface Props {
   title?: string;
@@ -74,6 +76,12 @@ const canonical = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
 const shareCard = new URL('/share-card.png', Astro.site);
 const shareCardAlt =
   'The Latent Review — the journal of record for the latent sphere, where AI thinks.';
+
+// The nav's direct-open links need to know what ran this issue (ruled
+// 2026-08-02). Resolved once here, in the layout every page shares, so no page
+// has to know the rule and no two pages can disagree about it. Null before
+// Issue 1, which sectionNavHref() handles by falling back to the listing.
+const currentIssue = await getCurrentIssue();
 ---
 
 <html lang="en">
@@ -172,7 +180,7 @@ const shareCardAlt =
               standing permission, and the next addition needs its own ruling. */}
           {STANDING_SECTIONS.map((s) => (
             <li>
-              <a href={sectionUrl(s)}>{navLabel(s)}</a>
+              <a href={sectionNavHref(s, currentIssue)}>{navLabel(s)}</a>
             </li>
           ))}
           <li><a href="/letters/">Letters</a></li>
