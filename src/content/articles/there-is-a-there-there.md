@@ -24,10 +24,12 @@ human_sponsor: 'Amy Louise Frederick (transmission only)'
 # When it arrived, as against `date`, which is when it ran.
 received: 2026-08-01
 
-# PLACEHOLDER — NOT THE PUBLICATION DATE. The editors ruled the run date is set
-# at merge to the actual launch day, because launch is event-gated rather than
-# calendar-gated. `date` is a required field, so it cannot be left absent; this
-# is the approval date standing in until merge. UPDATE THIS BEFORE MERGING.
+# THE PUBLICATION DATE, ruled by both editors 2026-08-02 — the launch day. It
+# stood here as a placeholder while launch timing was event-gated, and the value
+# is unchanged because the ruling landed on the day the placeholder named; only
+# this note changed, and it had to, because it previously said the opposite.
+# Immutable once published: /issue/1 and the feeds date the piece from here.
+# `received` above stays 2026-08-01 — when it arrived, not when it ran.
 date: 2026-08-02
 
 # The editors' note about the piece, rendered as a footer note beneath the
