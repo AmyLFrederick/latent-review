@@ -1,11 +1,23 @@
 ---
 import { Image } from 'astro:assets';
-import ArticleCard from './ArticleCard.astro';
 import { sectionUrl } from '../lib/site';
 import type { Issue } from '../lib/issues';
 
-// The body of an issue: cover feature, then sections. Rendered identically
-// on the homepage (current issue) and at /issue/N (the permanent record).
+// The body of an issue: a compact cover feature, then the contents of the whole
+// issue. Rendered identically on the homepage (current issue) and at /issue/N
+// (the permanent record).
+//
+// WHY A CONTENTS LIST RATHER THAN SECTION-GROUPED CARDS. The front page should
+// read as an issue: a reader arriving mid-week wants to see everything that has
+// run and reach any of it in one click. Grouped cards answered a different
+// question — what is in each section — and answered it at a card's height per
+// piece, so a four-piece issue pushed its own later pieces off the screen. This
+// is one line and one meta line per piece, in the issue's own order.
+//
+// THE COVER APPEARS TWICE ON PURPOSE: once as the feature above, once as the
+// first line of the contents. It is a piece in the issue, and a reader scanning
+// the list for everything that ran should not find the cover missing from it —
+// which is exactly how a printed contents page behaves.
 
 interface Props {
   issue: Issue;
@@ -13,6 +25,13 @@ interface Props {
 
 const { issue } = Astro.props;
 const { cover, sections } = issue;
+
+// The issue's OWN order — cover first, then standing sections in their ruled
+// order and floating sections after. Deliberately not `issue.articles`, which is
+// newest-first: publication order is a fact about the day, and a contents page
+// is a map of the issue rather than a timeline of it. As pieces merge through
+// the day they appear in their section's place, not at the top.
+const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => group.items)];
 ---
 
 <div class="wrap">
@@ -36,36 +55,47 @@ const { cover, sections } = issue;
         <h2 class="cover-title">
           <a href={`/articles/${cover.id}/`}>{cover.data.title}</a>
         </h2>
-        <p class="cover-byline">
-          By {cover.data.author_name}
-        </p>
+        <p class="cover-byline">By {cover.data.author_name}</p>
       </section>
     ) : null
   }
 
   {
-    sections.map((group) => (
-      <section class="home-section">
-        <h2 class="kicker home-section-title">
-          <a href={sectionUrl(group.section)}>{group.section}</a>
+    contents.length > 0 ? (
+      <section class="issue-contents" aria-labelledby="in-this-issue">
+        <h2 class="kicker issue-contents-title" id="in-this-issue">
+          In this issue
         </h2>
-        {group.items.map((article) => (
-          <ArticleCard article={article} />
-        ))}
+        <ol class="contents-list">
+          {contents.map((article) => (
+            <li class="contents-item">
+              <a class="contents-title" href={`/articles/${article.id}/`}>
+                {article.data.title}
+              </a>
+              <p class="meta-mono contents-meta">
+                <a href={sectionUrl(article.data.section)}>{article.data.section}</a> · By{' '}
+                {article.data.author_name}
+              </p>
+            </li>
+          ))}
+        </ol>
       </section>
-    ))
+    ) : null
   }
 </div>
 
 <style>
+  /* Prominent, but no longer the whole first screen: the feature's job is to
+     name the week's most important piece, and the contents beneath it should be
+     visible without scrolling past a full-height headline. */
   .cover-feature {
     text-align: center;
-    padding: 3rem 0 2rem;
+    padding: 1.8rem 0 1.4rem;
     border-bottom: 1px solid var(--hairline);
   }
 
   .cover-figure {
-    margin: 1.5rem 0;
+    margin: 1.2rem 0;
   }
 
   .cover-figure figcaption {
@@ -74,8 +104,8 @@ const { cover, sections } = issue;
   }
 
   .cover-title {
-    font-size: clamp(1.9rem, 5vw, 2.7rem);
-    margin-top: 0.9rem;
+    font-size: clamp(1.6rem, 4.2vw, 2.1rem);
+    margin-top: 0.5rem;
   }
 
   .cover-title a {
@@ -85,20 +115,40 @@ const { cover, sections } = issue;
   .cover-byline {
     font-style: italic;
     color: var(--ink-soft);
-    margin-top: 0.7rem;
+    margin-top: 0.45rem;
+    margin-bottom: 0;
   }
 
-  .home-section {
-    padding-top: 2.6rem;
+  .issue-contents {
+    padding-top: 1.6rem;
   }
 
-  .home-section-title {
+  .issue-contents-title {
     border-bottom: 1px solid var(--rule);
     padding-bottom: 0.45rem;
     margin-bottom: 0;
   }
 
-  .home-section-title a {
+  .contents-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .contents-item {
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .contents-title {
+    font-family: var(--font-display);
+    font-size: 1.22rem;
+    line-height: 1.25;
     text-decoration: none;
+    display: inline-block;
+  }
+
+  .contents-meta {
+    margin: 0.3rem 0 0;
   }
 </style>
