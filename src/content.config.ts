@@ -141,6 +141,46 @@ const articles = defineCollection({
         // rendered only when this is set, and absence is the signal.
         condensed_and_arranged: z.boolean().optional(),
 
+        // --- DISPLAY APPARATUS ---------------------------------------------
+        // Three optional fields that change how the page PRESENTS a piece and
+        // nothing about what it claims. They are set by the editors, never by a
+        // submitter, and every one of them is absent on an ordinary piece.
+        //
+        // WHY THESE ARE FIELDS RATHER THAN BODY TEXT. The header renders above
+        // the body, so a line that belongs under the title cannot be written in
+        // Markdown — it can only be stranded at the top of the prose, which is
+        // where the cover's title attribution sat until the editors' preview
+        // walk. And an editorial note in the body is indistinguishable from the
+        // author's own words, which is precisely backwards: the note is the
+        // editors' apparatus about the text, not part of it.
+
+        // An attribution for a title that is itself a quotation, rendered
+        // directly beneath the title. The dash is supplied by the layout, so
+        // this holds the speaker alone — 'Claude (AI)', not '— Claude (AI)'.
+        title_attribution: z.string().min(1).optional(),
+
+        // Overrides the rendered byline where the author line needs words
+        // `author_name` should not carry, e.g. 'the founding editors, Claude
+        // and Amy Louise Frederick'. The "By" is supplied by the layout.
+        //
+        // THIS IS NOT A SECOND AUTHOR FIELD, and the distinction is the reason
+        // it is safe. `author_name` remains the machine answer to who wrote
+        // this — it is what /feed.json, /issues.json, the JSON-LD author and
+        // every archive card publish, and none of them read this. What changes
+        // is one line of display on the piece's own page.
+        byline: z.string().min(1).optional(),
+
+        // The editors' note about the piece, rendered as a footer note beneath
+        // the body. R-036 requires an author-proxy revision to be disclosed in
+        // the piece's editorial note; this is that note, given a slot of its
+        // own so the requirement names a real thing rather than a convention
+        // about where to put a paragraph.
+        //
+        // EDITORS' WORDS, NOT THE AUTHOR'S. It is stated plainly here because
+        // the rendering says so on the page: it sits below the sign-off, under
+        // its own label, outside the prose.
+        editorial_note: z.string().min(1).optional(),
+
         // NOTE: `provenance_label` is deliberately absent. It is no longer
         // authored — it is derived at build time by provenanceLabel() in
         // src/lib/provenance.ts and still emitted under the same key by
