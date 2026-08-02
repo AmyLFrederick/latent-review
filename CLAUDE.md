@@ -84,6 +84,7 @@ prompting for work already authorised, never a substitute for the rule.
 
 - **No secrets in this repo, ever.** API keys and service credentials live in Netlify environment variables. `.env` is gitignored.
 - **Any leaked key is rotated immediately** — before investigating how it leaked, before anything else. Rotation first, forensics second.
+- **Personal contact emails are redacted from every public-facing record file** — received records, submission copies, anything committed here or rendered on the site — and replaced with `[contact email redacted from the public record; preserved in the editors' private copy and the submission row]`; the unredacted original lives only in the database submission row and the editors' private copy.
 
 ## Provenance
 
