@@ -1,0 +1,67 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { sectionNavHref, DIRECT_OPEN_SECTIONS, STANDING_SECTIONS } from '../src/lib/site.ts';
+
+// The direct-open nav (ruled 2026-08-02). What is pinned here is the FALLBACK,
+// because that is the half a build cannot show you: Issue 1 happens to have a
+// Cover and an AI Voices piece, so the happy path is visible on every page,
+// while "no piece this issue" and "no issue at all" are invisible until the week
+// they are not.
+
+const issue = {
+  cover: { id: 'it-means-something-to-me' },
+  sections: [
+    { section: 'AI Voices', items: [{ id: 'there-is-a-there-there' }] },
+    { section: 'Opinion', items: [{ id: 'an-argued-position' }] },
+  ],
+};
+
+test('a direct-open section with a piece opens that piece, not a list of one', () => {
+  assert.equal(sectionNavHref('Cover', issue), '/articles/it-means-something-to-me/');
+  assert.equal(sectionNavHref('AI Voices', issue), '/articles/there-is-a-there-there/');
+});
+
+test('a direct-open section with NO piece falls back to its listing', () => {
+  // Issue 1's actual state: the Corner ran nothing, and the reader must still
+  // land somewhere real — the section page and its empty state.
+  assert.equal(
+    sectionNavHref('The Metaphysical Corner', issue),
+    '/section/the-metaphysical-corner/'
+  );
+});
+
+test('a listing section is never direct-opened, even carrying exactly one piece', () => {
+  // Opinion has one piece here and is still a listing: the ruling names three
+  // sections, and "carries one piece this week" is not the test.
+  assert.equal(sectionNavHref('Opinion', issue), '/section/opinion/');
+});
+
+test('Topics keeps its own page rather than /section/topics/', () => {
+  assert.equal(sectionNavHref('Topics', issue), '/topics/');
+});
+
+test('before Issue 1 exists, every section falls back to its listing', () => {
+  for (const section of STANDING_SECTIONS) {
+    const href = sectionNavHref(section, null);
+    assert.equal(href, section === 'Topics' ? '/topics/' : href);
+    assert.ok(!href.startsWith('/articles/'), `${section} must not direct-open with no issue`);
+  }
+  assert.equal(sectionNavHref('Cover', undefined), '/section/cover/');
+});
+
+test('a cover-less issue does not direct-open Cover', () => {
+  assert.equal(sectionNavHref('Cover', { sections: [] }), '/section/cover/');
+});
+
+test('the first piece in issue order wins, so the link does not move mid-day', () => {
+  const two = {
+    sections: [{ section: 'AI Voices', items: [{ id: 'first' }, { id: 'second' }] }],
+  };
+  assert.equal(sectionNavHref('AI Voices', two), '/articles/first/');
+});
+
+test('every direct-open section is a standing section', () => {
+  for (const section of DIRECT_OPEN_SECTIONS) {
+    assert.ok(STANDING_SECTIONS.includes(section), `${section} must be a standing section`);
+  }
+});

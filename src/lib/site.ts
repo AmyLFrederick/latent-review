@@ -94,6 +94,28 @@ export const SECTION_PAGE_OVERRIDES: Record<string, string> = {
   Topics: '/topics/',
 };
 
+/**
+ * Sections that carry ONE piece per issue, whose navigation link opens that
+ * piece directly rather than a listing of one item. Ruled 2026-08-02.
+ *
+ * THIS CHANGES A POINTER, NEVER AN ADDRESS. Every section page keeps its URL,
+ * its content and its place in the sitemap; the nav simply stops routing a
+ * reader through a one-item list to reach the thing the list contains. Nothing
+ * published moves, so the stability contract is untouched — which is the whole
+ * reason the mechanism is a nav href rather than a redirect on /section/<slug>/.
+ * A redirect would make one permanent URL mean a different article every issue,
+ * and would take the section's historical listing away with it.
+ *
+ * Opinion is deliberately absent: the ruling names three sections and Opinion is
+ * not among them, so it keeps its listing. Topics is absent because it is a
+ * listing section by R-032 clause 2 and by this ruling both.
+ */
+export const DIRECT_OPEN_SECTIONS: readonly string[] = [
+  'Cover',
+  'AI Voices',
+  'The Metaphysical Corner',
+];
+
 export function sectionUrl(section: string): string {
   return SECTION_PAGE_OVERRIDES[section] ?? `/section/${slugifySection(section)}/`;
 }
@@ -324,4 +346,44 @@ export function formatDate(date: Date): string {
     day: 'numeric',
     timeZone: 'UTC',
   });
+}
+
+/** The shape sectionNavHref needs — satisfied structurally by `Issue`. */
+type NavIssue = {
+  cover?: { id: string };
+  sections: { section: string; items: { id: string }[] }[];
+};
+
+/**
+ * Where a section's NAV LINK should point for a given issue.
+ *
+ * For the direct-open sections (Cover, AI Voices, The Metaphysical Corner) this
+ * is the issue's piece in that section, opened full text — those sections carry
+ * one piece per issue, and routing a reader through a list of one to reach it is
+ * a click that buys nothing. Every other section, and any direct-open section
+ * with NO piece this issue, falls back to the section page.
+ *
+ * THE FALLBACK IS NOT AN EDGE CASE, it is this week. The Metaphysical Corner has
+ * no piece in Issue 1, so its link resolves to its listing and a reader meets
+ * the section's empty state rather than a dead nav item. The same happens for
+ * any section between issues, and for the whole nav before Issue 1 exists.
+ *
+ * TYPED STRUCTURALLY, NOT AGAINST `Issue`, so this can live in site.ts and be
+ * unit-tested: issues.ts imports astro:content, which a plain node test cannot
+ * resolve, and the fallback behaviour here is exactly what wants pinning.
+ *
+ * If a section somehow carries more than one piece, the FIRST in issue order
+ * wins rather than the newest. `issue.articles` is newest-first and would make
+ * a nav link move when a second piece landed; the section's own grouped order is
+ * the issue's order, and it is stable across the day.
+ */
+export function sectionNavHref(section: string, issue: NavIssue | null | undefined): string {
+  if (issue && DIRECT_OPEN_SECTIONS.includes(section)) {
+    const piece =
+      section === 'Cover'
+        ? issue.cover
+        : issue.sections.find((group) => group.section === section)?.items[0];
+    if (piece) return `/articles/${piece.id}/`;
+  }
+  return sectionUrl(section);
 }
