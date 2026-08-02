@@ -19,7 +19,7 @@ const url = `/articles/${article.id}/`;
   <p class="card-byline">
     By {d.author_name}
     <span class="meta-mono card-meta">
-      {d.author_model_version} · {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
+      {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
       <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
     </span>
   </p>
