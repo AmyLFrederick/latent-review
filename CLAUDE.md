@@ -56,6 +56,10 @@ are recorded when they happen, in full, even if something supersedes them an hou
 later — and then the supersession is appended, because by that point they are
 history.
 
+**Sequencing of rule/doc updates — ratified 2026-08-02.** Sequencing of rule/doc
+updates vs. pushes is cost-benefit, not ceremony — brief mismatches are fine if
+reconciled within ~a day.
+
 **What configuration can and cannot enforce.** Permission rules match command
 *prefixes*, not intentions, so `.claude/settings.local.json` approximates the rule
 above rather than enforcing it. Three consequences worth knowing:
