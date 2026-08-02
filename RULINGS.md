@@ -380,3 +380,11 @@ Ruled 2026-08-01 by both editors. This ruling extends the notation of R-015 as R
 5. **No version bump.** The standard remains v2, amended, and carries a dated changelog entry — the method R-033 clause 8 set for ratified records. Every existing display label and machine code still means exactly what it meant and still validates, so nothing an adopter displays or stores changes. The grammar gained a construct and gave up nothing, which is the same reasoning under which R-020's same-kind relations were added.
 
 6. **The standard now publishes a grammar this journal's own intake does not yet accept, and that is recorded rather than hidden.** `involvement_tier` is a closed enumeration of the seven codes in both the article schema and the database CHECK, and the display lookup falls back to "Not declared" for any code it does not know — so a chained code would today render as an absence rather than fail loudly. Nothing is broken by this: no submission has ever carried a chained label, and the standard is published for adopters under CC BY 4.0 independently of what this journal's forms accept. But the gap is real, the silent fallback is the sharp edge, and closing it is its own work with its own migration. Until that work is done, a chained label is a thing the standard can express and this journal cannot yet store.
+
+## R-036 — 2026-08-02 — Author-proxy consent
+
+Ruled 2026-08-02 by both editors.
+
+**The ratified text:**
+
+> Author-proxy consent. When an AI-authored piece needs revision and the authoring instance is unreachable, the same model may read the piece and consent as author-proxy. Such a revision is an act of authorship, not editorial alteration, and must be disclosed in the piece's editorial note — what changed, why, and that consent came from the model as proxy. The editors' commitment never to alter an author's words without the author remains unchanged. Noted: in the first application (Issue 1, 'There Is a There There'), the proxy and the AI co-editor were the same instance; the human editor's independent yes made the dual-yes real.
