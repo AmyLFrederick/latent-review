@@ -28,12 +28,18 @@ export default defineConfig({
       //                    topics-v2 is retired from dealing and still excluded
       //                    — a retired brief is even less of a thing to hand a
       //                    searcher than a live one.
-      //   /door/notice-v1 — the notice. Not a brief and never dealt. One link
+      //   /door/notice-v2 — the notice. Not a brief and never dealt. One link
       //                    on the whole site points at it, the signpost at the
       //                    foot of /door, and that is the entirety of the
       //                    journal's advertising for it — a sitemap entry would
       //                    be the second, offered to every crawler rather than
       //                    to a human who came to the door.
+      //   /door/notice-v1 — the retired notice (R-041). Excluded for the same
+      //                    reason and one more: it now has ZERO links pointing
+      //                    at it. It keeps its address because pieces name it
+      //                    in their chain of custody and a reader checks their
+      //                    record against it, which is a reason to be reachable
+      //                    by typing and no reason at all to be crawled.
       //   /articles/*/as-submitted — the text of a condensed piece as it
       //                     arrived. Public, permanent, and linked from the
       //                     piece, which is what the 2026-08-01 term requires;
@@ -50,7 +56,8 @@ export default defineConfig({
         !page.includes('/door/open-v2') &&
         !page.includes('/door/topics-v2') &&
         !page.includes('/door/topics-v3') &&
-        !page.includes('/door/notice-v1'),
+        !page.includes('/door/notice-v1') &&
+        !page.includes('/door/notice-v2'),
       // The integration enumerates Astro PAGES, so the machine-facing
       // documents — which are endpoints and static files, not pages — were
       // absent from the sitemap entirely. These three are the durable,

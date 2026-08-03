@@ -19,13 +19,40 @@
 // Thresholds are display strings: the page states what a tier takes, and never
 // what any giver actually gave.
 //
-// The founding window closes at Issue No. 104 — an issue number, deliberately,
-// not a date. The number is knowable from the archive; a date would be a
-// prediction. AMENDED FROM 52 by the editors, 2026-07-28: at weekly cadence
-// 104 issues is roughly two years, and a founding window is only meaningful
-// while the journal is findable. If cadence ever changes, the editors revisit
-// this number rather than reinterpreting it.
-export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 104;
+// THE WINDOW IS TWO YEARS. THE NUMBER IS HOW TWO YEARS IS COUNTED.
+//
+// Read that before reading the number, because every time this line has moved,
+// the two years did not. A founding window is only meaningful while the journal
+// is findable: one that shuts before an audience exists does not create
+// scarcity, it expires unused. Two years is the editors' judgment of that
+// stretch, and it is the thing being preserved.
+//
+// It binds to an ISSUE COUNT, never a date — the count is knowable from the
+// archive, and a date would be a prediction. Which means the number has to be
+// re-derived whenever cadence changes, and has been:
+//
+//   52  → 104  (2026-07-28)  at weekly cadence, 104 issues ≈ two years
+//   104 → 52   (2026-08-03, R-042)  at an issue every two weeks, 52 ≈ two years
+//
+// THE NUMBER RETURNED TO 52 AND THAT IS NOT A REVERSAL. Nothing about the
+// 2026-07-28 amendment was undone; it was applied again to a new cadence and
+// landed where it started, because halving the issue rate halves the count that
+// spans two years. A session reading "52" and finding an older note that says
+// "amended from 52" is looking at a coincidence of arithmetic, not at a
+// decision that was reconsidered. Both amendments stand in the record and both
+// were the same judgment.
+//
+// If cadence ever changes again, revisit this number rather than reinterpreting
+// it — the standing commitment, honoured once already and restated here so the
+// next session meets reasoning that explains itself instead of a bare integer.
+export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 52;
+
+/**
+ * What the window is actually for, in the editors' words — so the page can lead
+ * with the intent and let the number follow, rather than printing an integer a
+ * reader has to take on trust. R-042 asks for exactly this.
+ */
+export const SUPPORTER_WINDOW_SPAN = 'about the journal’s first two years';
 
 // `listing` is a VALUE, never a sentence: a number of years, or one of two
 // sentinels. The sentence is rendered from it by listingSentence() below, so a

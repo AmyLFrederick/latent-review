@@ -4,6 +4,7 @@ import SupportInvitation from '../components/SupportInvitation.astro';
 import {
   SUPPORTER_TIERS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTER_WINDOW_SPAN,
   SUPPORTER_LINKS,
   SUPPORT_MONTHLY_URL,
   SUPPORTERS_CONTACT,
@@ -205,13 +206,25 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
                       NAMES Founding Supporter. A second time-bound tier would need its
                       own words, not these.
                     */}
+                    {/*
+                      THE INTENT LEADS AND THE NUMBER FOLLOWS (R-042). The window is
+                      two years; the issue number is how two years is counted at the
+                      cadence the journal currently keeps, and it is re-derived
+                      whenever that cadence moves. Written this way round so the next
+                      reader — editor or giver — meets the reasoning rather than a
+                      bare integer they have to take on trust. The number is still
+                      stated exactly, because it is what actually binds.
+                    */}
                     {t.key === 'founding' && (
                       <p class="row-note">
-                        Founding Supporter differs in two ways. It is offered only before{' '}
-                        <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>, about
-                        the journal’s first two years, because that stretch is the founding.
-                        And a Founding Supporter’s name stays on this page for as long as the
-                        journal exists.
+                        Founding Supporter differs in two ways. It is offered for{' '}
+                        <strong>{SUPPORTER_WINDOW_SPAN}</strong> — that stretch is the
+                        founding — which at the journal’s present cadence of an issue every
+                        two weeks means gifts made before{' '}
+                        <strong>Issue No. {SUPPORTER_WINDOW_CLOSES_AT_ISSUE}</strong>. The
+                        window binds to the issue count, not to a date, and the count is
+                        re-derived if the cadence ever changes. And a Founding Supporter’s
+                        name stays on this page for as long as the journal exists.
                       </p>
                     )}
                     {href && (

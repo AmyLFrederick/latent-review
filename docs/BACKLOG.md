@@ -3,40 +3,39 @@
 Deferred work, recorded so it isn't re-litigated from scratch. Items leave
 this list by becoming a PR.
 
-- **THREE THINGS R-039 OPENED AND DID NOT CLOSE — recorded 2026-08-03, all
-  three awaiting the editors.** The cadence ruling moved issues to every two
-  weeks and swept the site's present-tense copy with it. Three collisions were
-  found in that sweep that the ruling has no authority to settle, and none was
-  touched. They are listed here rather than fixed because each needs the
-  editors, and a session that guessed at any of them would be deciding
-  something it was not asked to decide.
+- **THE FOUR THINGS R-039 OPENED — ALL FOUR NOW CLOSED, 2026-08-03.** The
+  cadence ruling moved issues to every two weeks and swept the site's copy with
+  it. Four collisions surfaced that R-039 had no authority to settle; each was
+  recorded here untouched, and each was then ruled on the same day. Kept in this
+  file as the trail from "found" to "ruled", because the useful record is not
+  that they were fixed but that a sweep declined to fix them.
 
-  1. **The Founding Supporter window, Issue No. 104.** The window's own
-     reasoning — recorded further down this file and in `src/lib/supporters.mjs`
-     — measured 104 issues as "roughly two years **at weekly cadence**," and
-     committed the editors to a standing promise: *if cadence ever changes, the
-     editors revisit the number rather than reinterpreting it.* Cadence has now
-     changed, and the same 104 issues is roughly **four years**. The constant,
-     the reasoning paragraph and the page copy are all left exactly as they
-     stand, because reinterpreting them is the one thing that promise forbids.
-     This gates the $50,000 tier and is the most consequential of the three.
-  2. **Correspondence is "published weekly" inside a ruling.** R-007 has letters
-     "selected and published by the editors weekly," mirrored in
-     `docs/SUBMISSIONS.md`. Correspondence is a *floating section* — it runs
-     inside an issue — so at a fortnightly cadence a weekly floating section is
-     not a thing that can happen. RULINGS.md is append-only and this cannot be
-     edited into agreement; reconciling it needs its own ruling. Two obvious
-     shapes: letters run with each issue, or Correspondence gets a standing
-     home outside the issue. Neither file was changed.
-  3. **The notice (`notice-v1`) says "weekly" and is frozen by hash.** Its own
-     doctrine in `src/lib/notice.mjs` is explicit: the wording changes *by
-     ruling*, and it changes *by becoming notice-v2*, because v1 is pinned by
-     SHA-256 and published pieces name it in their arrival record. The sweep
-     therefore stopped at its door. Correcting it means a ruling, a `notice-v2`
-     text, a new page, and a second `ARRIVAL_VALUES` entry (add-only — v1 is
-     retired from placement, never removed). Until then the notice carries a
-     cadence claim that is no longer true, which is a real cost and is recorded
-     here rather than quietly absorbed.
+  1. **The Founding Supporter window → R-042.** Re-derived from Issue No. 104
+     to **Issue No. 52**, preserving the two years the original reasoning
+     intended rather than the integer it produced. The number returned to its
+     own former value, which is arithmetic and not a reversal — see the tier
+     section below, where the 2026-07-28 reasoning stands unedited and the
+     re-derivation is appended under it.
+  2. **Correspondence "published weekly" → R-040.** Letters now publish **per
+     issue**, following the issue cadence. All other R-007 terms stand,
+     including the 500-per-calendar-month intake cap, which counts arrivals and
+     was deliberately not converted. `docs/SUBMISSIONS.md` matches.
+  3. **The frozen notice → R-041.** `notice-v2` ratified, identical to v1 but
+     for the cadence clause, hash recorded. v1 keeps its address, its words, its
+     hash and its arrival value permanently, retired from placement and linked
+     from nowhere. No migration: `reached_by_version` has no enumerating CHECK,
+     by an earlier decision made for exactly this case.
+  4. **The stale empty-section copy.** `/topics` and `/section/[slug]` said
+     "Issue No. 1 arrives soon" after Issue No. 1 had run; both now read *This
+     section's first piece has not run yet.*
+
+  **Still open, and NOT part of the above:** four other surfaces still say
+  "Issue No. 1 arrives soon" — `/archive`, the homepage awaiting state,
+  `llms.txt`, and `IssueMasthead`. All four render **only when no issue exists
+  at all**, so none is reachable now that Issue No. 1 has published. They are
+  pre-launch fallbacks rather than live copy, which is why they were left out of
+  the empty-states fix; they are worth a pass whenever someone is in those files
+  anyway, and they are not urgent because nothing displays them.
 
 - **`/admin` subscriber dashboard.** For now the Supabase table view of
   `subscribers` is the dashboard (counts, statuses, manual fixes). A proper
@@ -165,7 +164,7 @@ this list by becoming a PR.
   | Sustainer | $1,000+ | indefinitely | one year |
   | Patron | $5,000+ | indefinitely | three years |
   | Benefactor | $20,000+ | indefinitely | ten years |
-  | **Founding Supporter** | $50,000+ | **before Issue No. 104** | **life of the journal** |
+  | **Founding Supporter** | $50,000+ | **before Issue No. 52** | **life of the journal** |
 
   *Founding Supporter is the only tier that closes, and the only listing that
   never does.*
@@ -185,6 +184,24 @@ this list by becoming a PR.
   which is inclusive and was an error; the page says **before** Issue No. 104,
   matching the machinery. Recorded because precision beats elegance in a clause
   that decides whether a $50,000 gift is accepted.
+
+  **RE-DERIVED TO ISSUE No. 52 — R-042, 2026-08-03.** The two paragraphs above
+  are left exactly as written, because R-042 rules that "the record of the
+  original reasoning stands" and because that reasoning is what produced this
+  amendment. R-039 moved the journal to an issue every two weeks. The standing
+  commitment above — *if cadence ever changes, the editors revisit the number
+  rather than reinterpreting it* — was therefore honoured: the two years were
+  re-derived at the new cadence and come to **52 issues**, so the window now
+  closes before Issue No. 52. Everything else about the tier is unchanged,
+  including the exclusive boundary, which now reads: open while the latest
+  published issue is below 52, shut once Issue 52 publishes.
+
+  **THE NUMBER RETURNING TO 52 IS NOT THE 2026-07-28 AMENDMENT UNDONE**, and
+  this note exists because the coincidence is genuinely misleading: the
+  paragraph above says "amended from 52" and the current value is 52. Nothing
+  was reconsidered. The same judgment — two years — was applied to a halved
+  issue rate and produced a halved count, which happened to be the value it
+  started from. Both amendments stand, and both are the same decision.
 
   **One source for tier facts: `SUPPORTER_TIERS` in `src/lib/supporters.mjs`.**
   Labels, thresholds and listing durations all render from it, listing

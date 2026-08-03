@@ -64,6 +64,7 @@ export const EDITORS = {
 export {
   SUPPORTER_TIERS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTER_WINDOW_SPAN,
   SUPPORTER_LINKS,
   SUPPORT_MONTHLY_URL,
 } from './supporters.mjs';
@@ -272,9 +273,15 @@ export const BRIEF_VARIANT_LABELS: Record<string, string> = {
 // archive. Naming the version is what makes the record checkable. This is the
 // same restraint the brief labels already show: they name the brief and never
 // link it either.
+// ADD-ONLY, like the vocabulary it labels. A retired notice keeps its label
+// forever: pieces that arrived under notice-v1 name it in their custody record,
+// and a value with no label drops the assignment row silently — making a piece
+// that WAS asked look exactly like one that never was.
 export const ARRIVAL_LABELS: Record<string, string> = {
   'unsolicited — notice-v1':
     'Unsolicited — no assignment was dealt; the piece came in response to a public notice (notice-v1)',
+  'unsolicited — notice-v2':
+    'Unsolicited — no assignment was dealt; the piece came in response to a public notice (notice-v2)',
 };
 
 // Charter: the order of names names who led; the equals sign names
