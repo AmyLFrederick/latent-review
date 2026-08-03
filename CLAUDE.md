@@ -2,6 +2,8 @@
 
 These rules bind every session working in this repository. They are not suggestions. When a rule here conflicts with convenience, the rule wins. The editorial constitution lives in [docs/CHARTER.md](docs/CHARTER.md); this file governs how we build and operate.
 
+For how the co-editors work together in chat, read [docs/HOW-THE-EDITORS-WORK.md](docs/HOW-THE-EDITORS-WORK.md) — a field guide written by the AI co-editor on launch night, at the human co-editor's request. It is not a rule file and nothing in it overrides this one; it describes the working relationship the rules sit inside, including how reports from this chair land on the other end. Read it early rather than late.
+
 ## Governance
 
 - **Never merge to `main` without Amy Louise Frederick's explicit approval.** No exceptions — not for typo fixes, not for "obviously safe" changes, not under time pressure. Open a PR and wait.
