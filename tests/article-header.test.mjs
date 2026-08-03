@@ -66,11 +66,47 @@ test('the piece keeps its date where the ruling says it stays', () => {
   assert.match(piece, /^date: 2026-08-02$/m);
 });
 
-test('the section kicker is scoped to the article header, never global', () => {
-  // `.kicker` is used on page headers, /prompts, the archive and the door.
-  // Enlarging it globally would resize the whole site to fix one header.
-  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
-  assert.match(page, /\.article-header \.kicker \{/, 'the kicker override is not scoped');
+test('the lead size is a MODIFIER, and the base kicker is untouched', () => {
+  // `.kicker` is used on page headers, /prompts, the archive, the door, the
+  // Provenance block and the Editors' Desk. The lead size reaches the handful
+  // of places a SECTION NAME heads a page, and it does that by adding a class
+  // rather than by changing the one every other surface reads.
+  //
+  // THIS REPLACED A SCOPED `.article-header .kicker` RULE. That worked while
+  // the article header was the only surface with a large kicker; it stopped
+  // working the moment the section pages needed the same size, because a rule
+  // scoped to one page cannot be shared by six. The invariant it protected —
+  // the base kicker does not grow — is what is asserted here instead.
   const global = readFileSync(repoPath('src/styles/global.css'), 'utf8');
-  assert.match(global, /\.kicker \{[^}]*font-size: 0\.75rem/, 'the GLOBAL kicker size was changed');
+  assert.match(global, /\.kicker \{[^}]*font-size: 0\.75rem/, 'the BASE kicker size was changed');
+  assert.match(global, /\.kicker--lead,/, 'the lead modifier is missing');
+
+  // One declaration block for both selectors: the size cannot be stated twice
+  // and drift between the class and its h1 form.
+  const lead = global.slice(global.indexOf('.kicker--lead,'));
+  const block = lead.slice(0, lead.indexOf('}') + 1);
+  assert.match(block, /\.page-header h1\.kicker--lead/, 'the h1 form is not in the same block');
+  assert.equal((block.match(/font-size:/g) ?? []).length, 1, 'the lead size is declared twice');
+});
+
+test('every page that leads with a section name uses the one lead class', () => {
+  // The whole point of the extension: one size wherever a section name heads a
+  // page. Asserted as a LIST, because the failure mode is a seventh surface
+  // that grows a section heading and quietly sets its own size.
+  const surfaces = [
+    ['src/pages/articles/[slug].astro', 'the article header'],
+    ['src/pages/prompts.astro', '/prompts'],
+    ['src/pages/prompts/archive.astro', '/prompts/archive'],
+    ['src/pages/letters.astro', '/letters'],
+    ['src/pages/archive.astro', '/archive'],
+    ['src/pages/section/[slug].astro', 'the section pages'],
+    ['src/pages/topics.astro', '/topics'],
+  ];
+  for (const [file, name] of surfaces) {
+    assert.match(
+      readFileSync(repoPath(file), 'utf8'),
+      /kicker--lead/,
+      `${name} no longer uses the shared lead kicker`
+    );
+  }
 });

@@ -66,7 +66,7 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
   <script type="application/ld+json" set:html={jsonLd} is:inline></script>
   <article class="wrap">
     <header class="article-header">
-      <p class="kicker kicker--accent">
+      <p class="kicker kicker--accent kicker--lead">
         <a href={sectionUrl(d.section)}>{d.section}</a>
       </p>
       {/*
@@ -207,24 +207,6 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
   .article-header {
     text-align: center;
     padding: 2.8rem 0 1.8rem;
-  }
-
-  /* THE SECTION KICKER, SET NEAR THE TITLE (editors, 2026-08-03). It keeps the
-     accent red and the letterspacing of every other kicker on the site and
-     gives up only its weight — unbolded, because at this size bold stops
-     reading as a label and starts competing with the headline it introduces.
-
-     SCOPED, NOT GLOBAL. `.kicker` is used on page headers, /prompts, the
-     archive and the door; enlarging it there would resize the whole site to
-     fix one header. This overrides it inside the article header alone.
-
-     ONE SIZE FOR EVERY SECTION. Nothing here keys off which section a piece
-     ran in, so COVER and THE METAPHYSICAL CORNER render identically — the
-     longest name in the roster sets no exception, and none of the seven
-     acquires a size of its own by accident. */
-  .article-header .kicker {
-    font-size: clamp(1.15rem, 3.6vw, 1.6rem);
-    font-weight: 400;
   }
 
   /* Roughly a quarter smaller than it was — clamp(1.9, 6vw, 2.8) became
