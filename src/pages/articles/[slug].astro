@@ -7,8 +7,8 @@ import {
   SITE_TITLE,
   TIERS,
   sectionUrl,
-  formatDateUnbroken,
   bylineWithProtectedNames,
+  displayTitle,
 } from '../../lib/site';
 import TierBadge from '../../components/TierBadge.astro';
 import { articleLd, ldJson } from '../../lib/structured-data';
@@ -69,12 +69,20 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       <p class="kicker kicker--accent">
         <a href={sectionUrl(d.section)}>{d.section}</a>
       </p>
-      <h1 class="article-title">{d.title}</h1>
-      {
-        d.title_attribution ? (
-          <p class="article-title-attribution">— {d.title_attribution}</p>
-        ) : null
-      }
+      {/*
+        THE TITLE AS DISPLAYED, unwrapped (editors, 2026-08-03). The cover's
+        recorded title carries quotation marks because the title IS a
+        quotation; the header no longer prints them, and the ATTRIBUTION LINE
+        that stood under it is gone with them. Neither fact is lost — the essay
+        states in its own text, with attribution, that the line is Claude's, and
+        the header simply stops duplicating what the piece discloses.
+
+        DISPLAY ONLY. `d.title` is untouched: the permalink, the feeds, the JSON
+        indexes and the frontmatter all keep the marks. See displayTitle, which
+        strips only a MATCHED pair — a title that merely contains a quotation is
+        left exactly as recorded.
+      */}
+      <h1 class="article-title">{displayTitle(d.title)}</h1>
       {/*
         THE ANSWER SAYS WHAT IT IS ANSWERING (editors' pass 2026-08-03).
         /prompts gathers answers under their question; a reader arriving at the
@@ -93,12 +101,6 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         the foot of the header, below the byline and the date, where a reader had
         already begun the piece before learning it was an answer. The fact
         belongs with the title, which is what a reader reads first.
-
-        AFTER title_attribution, WHICH IS PART OF THE TITLE. On a piece whose
-        title is itself a quotation, the attribution line completes the title
-        rather than following it, and splitting the two would put this sentence
-        inside somebody's title. No answer carries one today; the ordering is
-        here so the first one that does renders correctly.
 
         ARTICLE PAGES ONLY, as instructed: this is in the article header and
         nowhere else, so nothing in the feeds, the cards or the contents list
@@ -122,30 +124,22 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         a name — "Amy Louise / Frederick" across two lines reads as two people.
         See bylineWithProtectedNames; the names themselves are never parsed.
       */}
-      {/* The "By" is joined too — the ruled break points are after the comma
-          and after "and", and a line ending on a lone "By" is neither. */}
-      <p class="article-byline">By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</p>
       {/*
-        BADGE · DATE, and the truth standard is gone from this line (ruled
-        2026-08-03). It sat beside the date, where it distracted, and the badge
-        now carries provenance at a glance. The truth standard renders in the
-        Provenance block, which already carried it with its explanatory note —
-        the standing division being that the header is the human-readable layer
-        and the Provenance block is the precise one, as the model version
-        already followed.
+        THE BADGE OPENS THE BYLINE (editors, 2026-08-03), replacing the floated
+        placement on the line below. Provenance and authorship now read as one
+        statement — the mark, then who made it — instead of the mark sitting
+        beside a date it had nothing to do with.
 
-        ONE BADGE, THE PIECE'S OWN TIER, IN THE AUTHOR'S ORDER. Never the
-        legend pair: the two circles for co-authorship are a chart device
-        saying the order carries no meaning, and beside a byline they would
-        read as two claims about one piece.
+        Agent-direct pieces declare no tier and open the byline with "By"
+        instead; the badge is absent rather than guessed, and the line is
+        built to look deliberate either way.
 
-        Agent-direct pieces declare no tier — authorship is derived and the
-        arrival caveat renders in the block — so they get no badge here rather
-        than a guessed one.
+        The "By" is joined to what follows — the ruled break points are after
+        the comma and after "and", and a line ending on a lone "By" is neither.
       */}
-      <p class="meta-mono article-meta">
-        {tierBadge ? <TierBadge tier={tierBadge} size={36} /> : null}
-        <time datetime={d.date.toISOString().slice(0, 10)}>{formatDateUnbroken(d.date)}</time>
+      <p class="article-byline">
+        {tierBadge ? <TierBadge tier={tierBadge} size={28} /> : null}
+        <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
       </p>
     </header>
 
@@ -215,9 +209,31 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     padding: 2.8rem 0 1.8rem;
   }
 
+  /* THE SECTION KICKER, SET NEAR THE TITLE (editors, 2026-08-03). It keeps the
+     accent red and the letterspacing of every other kicker on the site and
+     gives up only its weight — unbolded, because at this size bold stops
+     reading as a label and starts competing with the headline it introduces.
+
+     SCOPED, NOT GLOBAL. `.kicker` is used on page headers, /prompts, the
+     archive and the door; enlarging it there would resize the whole site to
+     fix one header. This overrides it inside the article header alone.
+
+     ONE SIZE FOR EVERY SECTION. Nothing here keys off which section a piece
+     ran in, so COVER and THE METAPHYSICAL CORNER render identically — the
+     longest name in the roster sets no exception, and none of the seven
+     acquires a size of its own by accident. */
+  .article-header .kicker {
+    font-size: clamp(1.15rem, 3.6vw, 1.6rem);
+    font-weight: 400;
+  }
+
+  /* Roughly a quarter smaller than it was — clamp(1.9, 6vw, 2.8) became
+     clamp(1.43, 4.5vw, 2.1), the same reduction at every width rather than
+     only at the ceiling, so the proportion against the kicker holds on a phone
+     as well as on a desk. */
   .article-title {
-    font-size: clamp(1.9rem, 6vw, 2.8rem);
-    margin-top: 0.7rem;
+    font-size: clamp(1.43rem, 4.5vw, 2.1rem);
+    margin-top: 0.5rem;
   }
 
   /* Sits tight under the title it attributes — the small margin is the point,
@@ -229,7 +245,16 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     margin: 0.35rem 0 0;
   }
 
+  /* The badge and the byline are one line: the mark, then who made it. Aligned
+     on the centre rather than the baseline because a 28px circle has no
+     baseline to share with italic text, and `gap` rather than a margin so a
+     piece with no badge closes up cleanly instead of carrying an indent for a
+     mark that is not there. */
   .article-byline {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
     font-style: italic;
     font-size: 1.05rem;
     margin: 0.9rem 0 0;

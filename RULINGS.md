@@ -563,3 +563,19 @@ Ruled 2026-08-03 by both editors, resolving the divergence R-046 flagged and cou
 
 **One paragraph on that page carried this condition, and it was this one.** The page was checked for other ratified or frozen prose holding superseded operators; there is none. The July 31 amendment note names the tiers as they were called that day and is a dated record rather than ratified text, so it keeps its wording under the same reasoning R-046 gave.
 
+## R-048 — 2026-08-03 — The date leaves the article header
+
+Ruled 2026-08-03 by both editors, with the article header redesign.
+
+**The ratified text:**
+
+> Pieces belong to issues and the issue carries the date; each piece's date remains in its Provenance block, its frontmatter, and every machine surface — the stability contract governs, display moves, data does not.
+
+**What moved and what did not.** The header's date line is gone site-wide, on every section and every piece, current and future. The date itself is unchanged in `date:` frontmatter, in the Provenance block's *Published* row, in `issues.json`, `feed.json`, `rss.xml`, the JSON-LD and the digest. A consumer reading a date reads the same date it always did; a reader looking for one finds it on the piece, one block down, beside the rest of what the record holds about how the piece came to be.
+
+**Why the header could give it up.** A piece's date was doing two jobs there — locating the piece in time, which the issue already does, and standing as the last element of a metadata line that also carried the truth standard until earlier today. With the truth standard moved to the Provenance block and the badge moved into the byline, the date was the only thing left on a line of its own, which is a poor reason for a line.
+
+**This is the same division the model version and the truth standard already follow.** The header is the human-readable layer: section, title, who made it. The Provenance block is the precise layer: tier, model version, truth standard, dates, custody. Three facts have now moved along that line in one day, and the line is the reason each time rather than a preference about any one of them.
+
+**The permalink is untouched, as is every published URL.** Nothing about a piece's address depends on its date, and nothing here changes what `/issue/N` counts or what the archive lists.
+
