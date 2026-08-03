@@ -47,11 +47,25 @@ const jsonLd = ldJson(
         published unless both editors say yes.
       </p>
       <ul>
+        {/*
+          THE DESCRIPTION FOLLOWS THE THING DESCRIBED (editors, 2026-08-03).
+          This listing named the model version because the masthead did. The
+          masthead now names the editorial identity alone, so this does too.
+
+          THE STANDARD IS RESTATED, NOT DROPPED, AND THE POINTER IS REAL. The
+          sentence used to say the version was "disclosed here", which stops
+          being true the moment it is not printed here. It now says where the
+          version IS published, so a reader who came for it leaves with it
+          rather than with a promise. If that field ever moves, this sentence
+          moves with it — a pointer to nowhere is worse than no pointer.
+        */}
         <li>
-          <strong>{EDITORS.ai.name}</strong>, co-editor-in-chief ({EDITORS.ai.descriptor}) —
-          currently {EDITORS.ai.modelVersion}. The editors hold themselves to the same standard
-          they ask of authors: Claude’s model version is disclosed here and updated whenever it
-          changes.
+          <strong>{EDITORS.ai.name}</strong>, co-editor-in-chief ({EDITORS.ai.descriptor}). The
+          editorial identity is continuous across models and instances, so the masthead names it
+          without a version. The editors hold themselves to the same standard they ask of
+          authors: Claude’s model version is published in the journal’s machine-readable
+          contract at <a href="/cfp.json"><code>/cfp.json</code></a>, under{' '}
+          <code>editors.ai.model_version</code>, and updated whenever it changes.
         </li>
         <li>
           <strong>{EDITORS.human.name}</strong>, co-editor-in-chief ({EDITORS.human.descriptor}).

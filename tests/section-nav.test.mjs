@@ -103,32 +103,49 @@ test('AI Voices comes ahead of Opinion', () => {
   assert.ok(labels.indexOf('AI Voices') < labels.indexOf('Opinion'));
 });
 
-test('the Corner opens the second row, under its full name', () => {
-  // AMENDED FROM "last, alone on its row" (2026-08-03, same day). Letters had
-  // to close the nav, and whatever holds the second row is what a reader
-  // reaches last — so the Corner could not both have that row to itself and
-  // let Letters be last.
+test('the roster renders as three pinned rows, in the ruled arrangement', () => {
+  // FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk — and the
+  // same arrangement Mustafa proposed in his layout pass, reached a second time
+  // from the rendering.
   //
-  // What the Corner actually needed was TYPOGRAPHIC: its full name with room,
-  // instead of the "Metaphysical Corner" the nav printed when seven items had
-  // to survive one line. It still opens a row, still prints in full, and now
-  // shares that row with the shortest label in the roster.
-  const opener = NAV_ROSTER.find((e) => e.startsSecondRow);
-  assert.equal(opener.label, 'The Metaphysical Corner');
-  assert.equal(
-    NAV_ROSTER.filter((e) => e.startsSecondRow).length,
-    1,
-    'exactly one entry opens the second row, or the partition is ambiguous'
-  );
+  // The rows are asserted as a SHAPE rather than as three separate facts,
+  // because the thing that keeps being lost is the arrangement as a whole: a
+  // change that moves one entry between rows passes every individual check and
+  // still produces a nav nobody approved.
+  const rows = NAV_ROSTER.reduce((acc, entry) => {
+    if (entry.startsRow || acc.length === 0) acc.push([]);
+    acc[acc.length - 1].push(entry.label);
+    return acc;
+  }, []);
 
-  // The second row is the opener and everything after it: the Corner, then
-  // Letters. Five entries stay on the first row, one fewer than before.
-  const at = NAV_ROSTER.findIndex((e) => e.startsSecondRow);
-  assert.deepEqual(NAV_ROSTER.slice(at).map((e) => e.label), [
-    'The Metaphysical Corner',
-    'Letters',
+  assert.deepEqual(rows, [
+    ['Cover', 'AI Voices', 'Opinion', 'Topics'],
+    ['The Metaphysical Corner'],
+    ['Prompts', 'Letters'],
   ]);
-  assert.equal(at, 5, 'the first row holds five entries');
+});
+
+test('the Corner has a row to itself, under its full name', () => {
+  // Restored by the three-row arrangement. It was given up when Letters had to
+  // close a TWO-row nav — whatever held the second row was what a reader
+  // reached last, so the Corner could not both own that row and let Letters be
+  // last. A third row buys both.
+  const rows = NAV_ROSTER.reduce((acc, entry) => {
+    if (entry.startsRow || acc.length === 0) acc.push([]);
+    acc[acc.length - 1].push(entry);
+    return acc;
+  }, []);
+  const corner = rows.find((r) => r.some((e) => e.label === 'The Metaphysical Corner'));
+  assert.equal(corner.length, 1, 'the Corner shares its row');
+  assert.equal(corner[0].label, 'The Metaphysical Corner');
+});
+
+test('every row after the first is opened by an explicit marker', () => {
+  // The pinning itself. Rows exist because the roster says so, not because a
+  // width caused a wrap — that is what stopped the phone rendering from
+  // rearranging an arrangement the editors approved on a desk.
+  assert.equal(NAV_ROSTER.filter((e) => e.startsRow).length, 2, 'three rows need two markers');
+  assert.ok(!NAV_ROSTER[0].startsRow, 'the first entry opens a row by position, not by marker');
 });
 
 test('nothing in the roster is abbreviated: a section prints the name it has', () => {
