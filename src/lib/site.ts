@@ -176,24 +176,64 @@ export interface NavEntry {
   /** A page that is not a section. */
   href?: string;
   /**
-   * Set on the one entry that takes a row to itself (ruled 2026-08-03). The
-   * longest name in the roster gets the widest berth rather than the narrowest
-   * — which is what it got while the nav abbreviated it to fit.
+   * Set on the entry that OPENS the second row (ruled 2026-08-03, amended by
+   * the editors' pass of the same day). The longest name in the roster gets the
+   * widest berth rather than the narrowest — which is what it got while the nav
+   * abbreviated it to fit.
    */
-  ownRow?: boolean;
+  startsSecondRow?: boolean;
 }
 
+/**
+ * THE ORDER, AND THE ONE TENSION IT HAD TO RESOLVE.
+ *
+ * The editors ruled two things: **Letters comes last, because correspondence
+ * closes the book**, and **AI Voices comes ahead of Opinion**. Standing beside
+ * them was the 2026-08-03 design decision that the Corner takes the second row
+ * under its full name, with room.
+ *
+ * Those cannot all hold in their strictest forms, and the conflict is purely
+ * positional: whatever sits on the second row is what a reader's eye reaches
+ * last. If the Corner has that row to itself, the Corner closes the nav and
+ * Letters does not — whatever order the array is in.
+ *
+ * WHAT GAVE, AND WHY IT IS THE RIGHT THING TO GIVE. The Corner's requirement is
+ * about TYPOGRAPHY: the nav used to print "Metaphysical Corner", the article
+ * trimmed off, because seven items had to survive one line. The fix wanted was
+ * the full name with space around it; "alone" was the means to that, not the
+ * end. Letters' requirement is about SEQUENCE, and sequence has only one last
+ * position to give.
+ *
+ * So the Corner opens the second row rather than owning it, and Letters closes
+ * it. The Corner still leads a row, still prints its full name, and now shares
+ * that row with the shortest label in the roster — which leaves it more room
+ * than the six-item first row ever did. Row one drops from six items to five.
+ *
+ *   Row 1   Cover · AI Voices · Opinion · Topics · Prompts
+ *   Row 2   The Metaphysical Corner · Letters
+ *
+ * MEMBERSHIP IS UNCHANGED AND STILL CLOSED. The same seven entries: R-026
+ * clause 6 reopened the roster once for Prompts, R-027 clause 3 spent the slot
+ * reserved for Topics, and neither is a standing permission — the next addition
+ * needs its own ruling. R-027 clause 3's one positional requirement, Topics
+ * before Letters, holds and is asserted in the suite.
+ *
+ * This is the NAV's order and not an issue's. STANDING_SECTIONS remains the
+ * order an issue's contents run in, and nothing here touches it — reordering
+ * that to match this would move the Corner in every issue's contents to fix a
+ * line in the navigation.
+ */
 export const NAV_ROSTER: readonly NavEntry[] = [
   { label: 'Cover', section: 'Cover' },
-  { label: 'Opinion', section: 'Opinion' },
+  // AI Voices ahead of Opinion, ruled by the editors 2026-08-03.
   { label: 'AI Voices', section: 'AI Voices' },
+  { label: 'Opinion', section: 'Opinion' },
   { label: 'Topics', section: 'Topics' },
-  { label: 'Letters', href: '/letters/' },
   { label: 'Prompts', href: '/prompts/' },
-  // Row two, alone, under the name the section actually has. The nav used to
-  // print "Metaphysical Corner" — the article trimmed off — because seven
-  // items had to survive one line. They no longer do.
-  { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', ownRow: true },
+  // Row two opens here, under the name the section actually has.
+  { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsSecondRow: true },
+  // Last, and last on purpose: correspondence closes the book.
+  { label: 'Letters', href: '/letters/' },
 ];
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
