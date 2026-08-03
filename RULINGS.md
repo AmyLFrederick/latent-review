@@ -539,5 +539,5 @@ Ruled 2026-08-03 by both editors, completing the notation harmonisation begun in
 4. **The scratch and working documents in docs/.** Historical records of sessions, not surfaces a reader meets.
 5. **The frozen briefs and both notices.** Checked again: they name no tier, so no versioned successor was needed.
 
-**Chained labels take the same operators, which extends this ruling rather than quoting it.** R-046 names four base labels; applying the same rule to a chain is what keeps one grammar instead of two. Nothing can carry a chained code here — R-045 closed the schema to the seven — so the extension governs a formatter rather than any live label.
+**Chained labels take the same operators.** R-046's text names four base labels, and the chain case was raised with the editors as an open question on the day: confirmed the same day — *chains take the same operators, one grammar everywhere.* Recorded here so a later reader does not find a formatter doing something the ruling's own words do not say and take it for drift. Nothing can carry a chained code here, since R-045 closed the schema to the seven, so this governs a formatter rather than any live label.
 

@@ -11,9 +11,11 @@
 // repeats. `ai-human-editor` parses to "AI – Human (editor)" by the same rules
 // that turn `ai-1-equals-human-ai-2-editor` into "AI¹ = Human – AI² (editor)".
 //
-// THAT CHAINED FORM EXTENDS R-046 RATHER THAN QUOTING IT. The ruling names four
-// base labels; applying the same operator rule to a chain is what keeps ONE
-// grammar instead of two — but it means R-035's ratified example, which reads
+// THAT CHAINED FORM WAS AN EXTENSION OF R-046, AND THE EDITORS CONFIRMED IT
+// 2026-08-03: "chains take the same operators, one grammar everywhere." The
+// ruling's text names four base labels; the chain case was raised as a flag and
+// answered, so this is settled rather than inferred — which matters, because it
+// means R-035's ratified example, which reads
 // "AI¹ = Human + AI² (editor)" and is published verbatim at /provenance, no
 // longer matches what this function produces. That text is flagged and not
 // edited, per R-046's own clause. Nothing can carry a chained code here since
