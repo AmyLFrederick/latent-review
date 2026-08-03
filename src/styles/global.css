@@ -120,6 +120,32 @@ hr {
   text-decoration: none;
 }
 
+/* THE LEAD KICKER — the size a SECTION NAME takes when it heads a page.
+   Ruled for article headers 2026-08-03 and extended the same day to every
+   listing and section page, so one size answers "a section name heads this
+   page" wherever that is true.
+
+   IT SETS SIZE AND WEIGHT AND NOTHING ELSE. Colour stays with the surface:
+   the article header's section kicker is accent red, /prompts' is ink-soft,
+   and neither should change because they now share a size. A rule that also
+   set colour would quietly repaint four pages to fix one measurement.
+
+   THE h1 SELECTORS ARE NOT REDUNDANT, AND THERE ARE TWO OF THEM. On the
+   section pages the name is an h1, and both `.page-header h1` (2.4rem) and
+   `.page-header--compact h1` (its own clamp) outrank a bare class. The compact
+   one is the subtle case: it TIES with `.page-header h1.kicker--lead` on
+   specificity and is declared later, so it silently won and the section names
+   rendered at the compact size while the <p>-based ones took the lead size —
+   one rule, three results. Naming it explicitly is what makes the lead size
+   actually lead. All three selectors share one declaration block, so the size
+   cannot be stated twice and drift. */
+.kicker--lead,
+.page-header h1.kicker--lead,
+.page-header--compact h1.kicker--lead {
+  font-size: clamp(1.15rem, 3.6vw, 1.6rem);
+  font-weight: 400;
+}
+
 .kicker--accent {
   color: var(--accent);
 }

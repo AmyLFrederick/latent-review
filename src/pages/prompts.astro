@@ -81,8 +81,8 @@ const isUnasked = current !== null && current.status === 'unasked';
       "Prompts" was already printed here as a kicker. It reads exactly as it did;
       only the element changed.
     */}
-    <header class="page-header prompts-header">
-      <h1 class="kicker">Prompts</h1>
+    <header class="page-header page-header--compact">
+      <h1 class="kicker kicker--accent kicker--lead">Prompts</h1>
     </header>
 
     {/*
@@ -334,23 +334,6 @@ const isUnasked = current !== null && current.status === 'unasked';
      from the preview walk, not a hope about it. */
   .lede {
     font-size: 1.1rem;
-  }
-
-  /* THE HEADER IS ONE SMALL LINE NOW, so it takes a header's padding rather
-     than a masthead's: 3rem above and 2rem below was room made for display type
-     that is no longer there, and leaving it would have moved the question down
-     by exactly as much as removing the heading moved it up. */
-  .prompts-header {
-    padding: 2rem 0 0.4rem;
-  }
-
-  /* The h1 is the section name in the kicker's voice. `.page-header h1` sets
-     2.4rem globally and would otherwise win on specificity, printing "Prompts"
-     as display type — the heading this change removes, wearing a different
-     word. */
-  .prompts-header h1 {
-    font-size: 0.75rem;
-    margin-top: 0;
   }
 
   /* The motto, in the display face it had as a heading but at prose scale —

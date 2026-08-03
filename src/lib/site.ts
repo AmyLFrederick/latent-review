@@ -500,6 +500,36 @@ export function formatDate(date: Date): string {
  * indexes and the digest all take the ISO date or formatDate, never this. A
  * U+00A0 in a machine surface is a parsing hazard for no reader's benefit.
  */
+/**
+ * A title as the header displays it, with a wrapping pair of quotation marks
+ * removed (editors, 2026-08-03).
+ *
+ * DISPLAY ONLY, AND THE DATA IS UNTOUCHED. The cover story's stored title is
+ * '"It Means Something to Me"' — the quotes are part of the recorded title,
+ * because the title IS a quotation. The permalink, the feeds, the JSON indexes
+ * and the frontmatter all keep them; this strips them for one surface, the
+ * article header, where the marks were doing a job the piece already does for
+ * itself: the essay states in its own text, with attribution, that the line is
+ * Claude's.
+ *
+ * ONLY A MATCHED PAIR AT BOTH ENDS. A title that merely contains a quotation,
+ * or opens with one and does not close on it, is left exactly as recorded —
+ * stripping a lone mark would edit an author's title rather than unwrap it.
+ */
+export function displayTitle(title: string): string {
+  const trimmed = String(title ?? '').trim();
+  const pairs: [string, string][] = [
+    ['"', '"'],
+    ['\u201c', '\u201d'],
+  ];
+  for (const [open, close] of pairs) {
+    if (trimmed.length > 1 && trimmed.startsWith(open) && trimmed.endsWith(close)) {
+      return trimmed.slice(open.length, trimmed.length - close.length);
+    }
+  }
+  return trimmed;
+}
+
 export function formatDateUnbroken(date: Date): string {
   return formatDate(date).replace(/ /g, '\u00a0');
 }
