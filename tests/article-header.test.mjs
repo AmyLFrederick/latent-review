@@ -110,3 +110,42 @@ test('every page that leads with a section name uses the one lead class', () => 
     );
   }
 });
+
+test('the lead size actually leads — no page-header variant outranks it', () => {
+  // THE BUG THIS EXISTS FOR, and it was live: `.page-header--compact h1` ties
+  // with `.page-header h1.kicker--lead` on specificity and is declared later,
+  // so it silently won. The <p>-based section names took the lead size and the
+  // h1-based ones took the compact size — one rule, two results, and nothing
+  // failed.
+  //
+  // Asserted against the SOURCE cascade rather than a rendered size, because
+  // the failure is a tie broken by declaration order and that is exactly what
+  // a later edit reintroduces without noticing.
+  const css = readFileSync(repoPath('src/styles/global.css'), 'utf8');
+  const lead = css.slice(css.indexOf('.kicker--lead,'));
+  const block = lead.slice(0, lead.indexOf('}') + 1);
+
+  for (const selector of ['.page-header h1.kicker--lead', '.page-header--compact h1.kicker--lead']) {
+    assert.ok(block.includes(selector), `${selector} is missing from the lead rule`);
+  }
+  assert.equal((block.match(/font-size:/g) ?? []).length, 1, 'the lead size is declared twice');
+});
+
+test('no page carries its own section-heading size', () => {
+  // /prompts had a scoped `.prompts-header h1 { font-size: 0.75rem }` left over
+  // from when its kicker was deliberately small. It survived the extension and
+  // held that one page at the old size while six others grew — which is what a
+  // per-page override does the moment a shared rule arrives. There is none now,
+  // and the section pages all use the same header classes.
+  const prompts = readFileSync(repoPath('src/pages/prompts.astro'), 'utf8');
+  assert.ok(!/prompts-header/.test(prompts), '/prompts has a private header rule again');
+  assert.match(prompts, /<header class="page-header page-header--compact">/);
+
+  for (const file of ['src/pages/section/[slug].astro', 'src/pages/topics.astro']) {
+    assert.match(
+      readFileSync(repoPath(file), 'utf8'),
+      /<header class="page-header page-header--compact">/,
+      `${file} no longer shares the section-page header`
+    );
+  }
+});
