@@ -35,7 +35,16 @@ const { question, answers } = Astro.props;
 const asDay = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
 ---
 
-<article class="entry">
+{/*
+  THE ANCHOR IS A PUBLISHED ADDRESS, not a convenience (editors' pass
+  2026-08-03). Every Prompts answer links to the question it answers at
+  /prompts/archive/#weekly-question-N, and the archive is the target rather
+  than /prompts because the section page carries only the question most
+  recently posed — a link there would stop finding the right question the week
+  after the next one is asked. The id is composed from the number, which is
+  contiguous and settled at the moment of posing, so it never moves.
+*/}
+<article class="entry" id={`weekly-question-${question.number}`}>
   <p class="entry-number">{questionLabel(question)}</p>
   <h2 class="entry-headline">{questionHeadline(question)}</h2>
   <p class="entry-dates">

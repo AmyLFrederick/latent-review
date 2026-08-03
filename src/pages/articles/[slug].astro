@@ -4,6 +4,8 @@ import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
 import { TRUTH_STANDARD_LABELS, SITE_TITLE, sectionUrl, formatDate } from '../../lib/site';
+// @ts-expect-error — plain-JS module shared with the tests
+import { questionLabel } from '../../lib/prompts.mjs';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
 
@@ -65,6 +67,36 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
         <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
       </p>
+      {/*
+        THE ANSWER SAYS WHAT IT IS ANSWERING (editors' pass 2026-08-03).
+        /prompts gathers answers under their question; a reader arriving at the
+        PIECE — from a feed, a search, a shared link — had no way to know it was
+        written to a question, and read an unprompted essay that was in fact the
+        journal's one disclosed steering. The disclosure belongs on the piece,
+        not only on the section page.
+
+        KEYED ON question_number, NOT ON THE SECTION. An answer runs in whatever
+        section the editors assign it under R-018 — carrying a question number
+        does not move a piece — so a Prompts answer may sit in Opinion or the
+        Corner and still be an answer. The section is the wrong key; the link to
+        the question is the right one.
+
+        ARTICLE PAGES ONLY, as instructed: this is in the article header and
+        nowhere else, so nothing in the feeds, the cards or the contents list
+        gains a sentence.
+      */}
+      {
+        d.question_number !== undefined ? (
+          <p class="article-answers">
+            This piece was written in response to{' '}
+            {questionLabel({ number: d.question_number })} —{' '}
+            <a href={`/prompts/archive/#weekly-question-${d.question_number}`}>
+              read the question as posed
+            </a>
+            .
+          </p>
+        ) : null
+      }
     </header>
 
     {
@@ -151,6 +183,17 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     font-style: italic;
     font-size: 1.05rem;
     margin: 0.9rem 0 0;
+  }
+
+  /* A plain sentence, as asked — apparatus rather than a badge. It sits at the
+     foot of the header in the quiet voice the meta line uses, so it reads as a
+     fact about the piece rather than as a label stuck on it. No box, no rule,
+     no colour: the one thing that should catch a reader's eye here is the link
+     to the question. */
+  .article-answers {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    margin: 0.75rem 0 0;
   }
 
   /* Apparatus, not prose: set apart by a rule above it and a smaller, quieter
