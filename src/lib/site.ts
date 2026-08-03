@@ -182,41 +182,48 @@ export interface NavEntry {
   /** A page that is not a section. */
   href?: string;
   /**
-   * Set on the entry that OPENS the second row (ruled 2026-08-03, amended by
-   * the editors' pass of the same day). The longest name in the roster gets the
-   * widest berth rather than the narrowest — which is what it got while the nav
-   * abbreviated it to fit.
+   * Set on each entry that OPENS a row. The nav renders one <ul> per row, and
+   * this is where each one begins; the first entry needs no marker because a
+   * row starts there by definition.
+   *
+   * THE ROWS ARE A DECISION, NOT A CONSEQUENCE OF WIDTH. Marking them here is
+   * what stops responsive wrapping from rearranging an arrangement the editors
+   * walked on a phone and approved.
    */
-  startsSecondRow?: boolean;
+  startsRow?: boolean;
 }
 
 /**
- * THE ORDER, AND THE ONE TENSION IT HAD TO RESOLVE.
+ * THE NAVIGATION ROSTER — THREE DELIBERATE ROWS.
  *
- * The editors ruled two things: **Letters comes last, because correspondence
- * closes the book**, and **AI Voices comes ahead of Opinion**. Standing beside
- * them was the 2026-08-03 design decision that the Corner takes the second row
- * under its full name, with room.
+ *   Row 1   Cover · AI Voices · Opinion · Topics
+ *   Row 2   The Metaphysical Corner          (alone, centred)
+ *   Row 3   Prompts · Letters
  *
- * Those cannot all hold in their strictest forms, and the conflict is purely
- * positional: whatever sits on the second row is what a reader's eye reaches
- * last. If the Corner has that row to itself, the Corner closes the nav and
- * Letters does not — whatever order the array is in.
+ * FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk. It is
+ * Mustafa Emirbayer's original arrangement from his layout pass, arrived at a
+ * second time from the rendering rather than from the plan — recorded because
+ * the same instinct producing the same answer twice, by two routes, is worth
+ * more than either instance of it.
  *
- * WHAT GAVE, AND WHY IT IS THE RIGHT THING TO GIVE. The Corner's requirement is
- * about TYPOGRAPHY: the nav used to print "Metaphysical Corner", the article
- * trimmed off, because seven items had to survive one line. The fix wanted was
- * the full name with space around it; "alone" was the means to that, not the
- * end. Letters' requirement is about SEQUENCE, and sequence has only one last
- * position to give.
+ * WHAT THE THREE ROWS BUY, each of which a two-row nav gave up something to get:
  *
- * So the Corner opens the second row rather than owning it, and Letters closes
- * it. The Corner still leads a row, still prints its full name, and now shares
- * that row with the shortest label in the roster — which leaves it more room
- * than the six-item first row ever did. Row one drops from six items to five.
+ *   Letters is still last. It ends the final row, so correspondence still
+ *   closes the book — the requirement the two-row version could only satisfy by
+ *   putting the Corner beside it.
  *
- *   Row 1   Cover · AI Voices · Opinion · Topics · Prompts
- *   Row 2   The Metaphysical Corner · Letters
+ *   The Corner has its own centred row back, under its full name. That was the
+ *   2026-08-03 design decision, given up when Letters had to close a two-row
+ *   nav and now recovered without cost.
+ *
+ *   Prompts and Letters pair at the close. They are the two participatory
+ *   sections — the question a reader may answer, and the letter a reader may
+ *   send — and reading them together is the arrangement saying so.
+ *
+ * THE ROWS ARE PINNED, WHICH IS THE OTHER HALF OF THE RULING. Each row is its
+ * own <ul>, so no width can reflow one row's items into another's. The nav's
+ * previous shape was two rows on a desk and something else on a phone, which is
+ * what sent the editors back to it.
  *
  * MEMBERSHIP IS UNCHANGED AND STILL CLOSED. The same seven entries: R-026
  * clause 6 reopened the roster once for Prompts, R-027 clause 3 spent the slot
@@ -230,14 +237,16 @@ export interface NavEntry {
  * line in the navigation.
  */
 export const NAV_ROSTER: readonly NavEntry[] = [
+  // Row 1.
   { label: 'Cover', section: 'Cover' },
   // AI Voices ahead of Opinion, ruled by the editors 2026-08-03.
   { label: 'AI Voices', section: 'AI Voices' },
   { label: 'Opinion', section: 'Opinion' },
   { label: 'Topics', section: 'Topics' },
-  { label: 'Prompts', href: '/prompts/' },
-  // Row two opens here, under the name the section actually has.
-  { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsSecondRow: true },
+  // Row 2 — alone, centred, under the name the section actually has.
+  { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsRow: true },
+  // Row 3 — the two participatory sections, closing the nav.
+  { label: 'Prompts', href: '/prompts/', startsRow: true },
   // Last, and last on purpose: correspondence closes the book.
   { label: 'Letters', href: '/letters/' },
 ];

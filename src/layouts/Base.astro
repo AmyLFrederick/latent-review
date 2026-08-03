@@ -164,28 +164,27 @@ const currentIssue = await getCurrentIssue();
           </div>
         )
       }
-      {/* ONE ROSTER, RENDERED AS TWO ROWS. NAV_ROSTER in src/lib/site.ts is a
+      {/* ONE ROSTER, RENDERED AS ITS ROWS. NAV_ROSTER in src/lib/site.ts is a
           single ordered list and remains the only place the order is decided;
-          this partitions it at the entry marked startsSecondRow.
+          this splits it wherever an entry is marked startsRow, so adding or
+          moving a row is a change to the roster and never to this template.
 
-          TWO <ul>s RATHER THAN A FORCED WRAP. The rows used to be one list with
-          a full-width item, which made the break a property of CSS: at a width
-          the layout did not anticipate, the rows reflow and the arrangement the
-          editors approved is not the one a reader sees. Two lists make the
-          break structural, and it holds at every width — which is what "show us
-          on preview" is worth only if the preview is what ships.
+          ONE <ul> PER ROW RATHER THAN A FORCED WRAP, which is the whole of the
+          pinning. When the rows were one list broken by CSS, the arrangement
+          held at the widths the layout anticipated and became something else on
+          a phone — which is what sent the editors back to it. A list cannot
+          reflow its items into another list, so what is approved on one screen
+          is what renders on every screen.
 
           Sections resolve through sectionNavHref, so a direct-open section still
           opens this issue's piece; Topics still resolves to /topics/, the URL it
           kept when R-032 made it a section. */}
       <nav class="wrap nav-rows" aria-label="Journal">
-        {[
-          NAV_ROSTER.slice(
-            0,
-            NAV_ROSTER.findIndex((e) => e.startsSecondRow)
-          ),
-          NAV_ROSTER.slice(NAV_ROSTER.findIndex((e) => e.startsSecondRow)),
-        ].map((row) => (
+        {NAV_ROSTER.reduce((rows, entry) => {
+          if (entry.startsRow || rows.length === 0) rows.push([]);
+          rows[rows.length - 1].push(entry);
+          return rows;
+        }, [] as (typeof NAV_ROSTER)[number][][]).map((row) => (
           <ul>
             {row.map((entry) => (
               <li>
@@ -380,12 +379,21 @@ const currentIssue = await getCurrentIssue();
 
   /* The rows sit tight to each other: the padding above belongs to the block,
      not to each line, or the break would open a gap that reads as a divider. */
-  .nav-rows ul + ul {
-    padding-top: 0;
+  /* The rows are one bordered block with breaks inside it, not three stacked
+     bars: the vertical padding belongs to the block, so only the first row
+     takes the top of it and only the last row takes the bottom. Written for any
+     number of rows rather than for the current three, since the count now comes
+     from the roster. */
+  .nav-rows ul {
+    padding: 0.2rem 0;
   }
 
   .nav-rows ul:first-child {
-    padding-bottom: 0.25rem;
+    padding-top: 0.55rem;
+  }
+
+  .nav-rows ul:last-child {
+    padding-bottom: 0.55rem;
   }
 
   nav a {
@@ -403,15 +411,8 @@ const currentIssue = await getCurrentIssue();
 
   footer {
     margin-top: 4.5rem;
+    /* The ordinary space below Support, and the only space below it. */
     padding-bottom: 2.5rem;
-
-    /* THE SUPPORT ZONE — one measure, used above and below the link, which is
-       what makes it centred rather than merely spaced. Declared on the footer
-       because the two margins that consume it sit on different elements
-       (.footer-support and .footer-close) and a value defined on either would
-       not reach the other. Change it here and both sides move together; change
-       one margin alone and the centring is gone. */
-    --support-zone: clamp(3rem, 11vw, 6rem);
   }
 
   footer p {
@@ -447,13 +448,12 @@ const currentIssue = await getCurrentIssue();
     margin-top: 0.3rem;
   }
 
-  /* THE LOWER HALF OF THE SUPPORT ZONE. This rule closes the footer, and the
-     space above it is the same measure as the space above the link — that
-     equality is what centres Support between the links and the bottom line.
-     Reads the same custom property deliberately: two hand-tuned numbers would
-     agree on the day they were written and drift on any day after. */
+  /* ORDINARY SPACE, deliberately. This rule closes the footer and sits a normal
+     text-to-rule distance under the link — the air in this part of the page
+     belongs above Support, not below it. The footer's own padding-bottom is
+     what keeps the rule off the bottom of the window. */
   .footer-close {
-    margin-top: var(--support-zone);
+    margin-top: 0.9rem;
   }
 
   /* Human governance links — relocated from the top nav. Kept in the human
@@ -489,24 +489,21 @@ const currentIssue = await getCurrentIssue();
     letter-spacing: 0.14em;
     text-transform: uppercase;
 
-    /* SUPPORT IS VERTICALLY CENTRED IN ITS OWN ZONE — respecced by the editors
-       2026-08-03 after walking both widths, replacing a one-sided 20rem gap.
+    /* THE LARGE GAP IS ABOVE SUPPORT, BY RULING (editors, 2026-08-03), AND THE
+       SPACE BELOW IS ORDINARY — the footer's own bottom padding and nothing
+       more. Support stands apart from everything above it; it does not float
+       between two gaps.
 
-       THE GEOMETRY IS THE POINT, NOT THE NUMBER. Equal space above and below:
-       above, to the sitemap / source-code line; below, to the rule that closes
-       the footer. Both sides read from --support-zone on the footer, so they
-       cannot drift apart — the link floats in a band of its own rather than
-       hanging under the links above it.
+       A CENTRED GEOMETRY WAS TRIED AND DISCARDED, and the failure is worth
+       keeping because "just centre it" reads as the obvious fix here. Equal
+       margins put ~6rem over the link and ~6rem PLUS the footer's 2.5rem
+       padding under it, so the LARGER space landed underneath — the exact
+       opposite of the intent, and what the editors saw on the walk.
 
-       WHAT A FUTURE SESSION MUST PRESERVE: the two measures stay EQUAL. Tuning
-       the size is ordinary work; making one side larger than the other is not,
-       because it turns a centred element back into a spaced one and undoes what
-       was reviewed. If the zone needs to change, change --support-zone.
-
-       It scales with the viewport so the centring survives a phone, where a
-       fixed desktop measure would eat most of a screen, and a wide window,
-       where a fixed phone measure would close the band up. */
-    margin-top: var(--support-zone);
+       Scaled rather than fixed so the picture — large gap, link, small padding,
+       end of page — holds at both widths. A fixed desktop measure eats a phone
+       screen; a fixed phone measure closes the gap up on a wide window. */
+    margin-top: clamp(8rem, 16vw, 14rem);
   }
 
   .footer-support a {
