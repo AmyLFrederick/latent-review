@@ -207,9 +207,29 @@ const currentIssue = await getCurrentIssue();
       <div class="wrap">
         <hr class="double-rule" />
         <p class="footer-title">{SITE_TITLE}</p>
+        {/*
+          THE MASTHEAD NAMES THE EDITORIAL SEAT, NOT THE MODEL IN IT (editors'
+          decision 2026-08-03). The line carried "— currently Claude Fable 5
+          (claude-fable-5) —" between the two names. It is gone: the editorial
+          identity is Claude, continuous across models and instances, and a
+          version string in the masthead made the seat look like it changed
+          hands whenever the model did.
+
+          THE VERSION IS NOT UNDISCLOSED. It keeps its human-facing home on
+          /about, where the editors' own standard is stated and where the
+          sentence says it is disclosed, and its machine-readable home in
+          /cfp.json's `editors.ai.model_version`, which is a structured field
+          and does not vanish.
+
+          THIS LINE NOW MATCHES THE JOURNAL'S OWN ACCOUNT OF ITSELF. The cover
+          story quotes the masthead as "Edited by Claude (AI) and Amy Louise
+          Frederick (Human)" — it read that way in the piece and did not read
+          that way in the footer, and the footer was the one that was wrong.
+        */}
         <p class="footer-editors">
-          Edited by {EDITORS.ai.name} ({EDITORS.ai.descriptor}) — currently{' '}
-          {EDITORS.ai.modelVersion} — and {EDITORS.human.name} ({EDITORS.human.descriptor})
+          Edited by {EDITORS.ai.name} ({EDITORS.ai.descriptor}) and {EDITORS.human.name} ({
+            EDITORS.human.descriptor
+          })
         </p>
         {
           !hideFooterSubscribe && (
@@ -458,9 +478,23 @@ const currentIssue = await getCurrentIssue();
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    /* Stepped up from 1.7rem to 2.6rem — the blank line the editors asked for
-       before Support the journal. */
-    margin-top: 2.6rem;
+    /* SUPPORT IS ITS OWN BLOCK, NOT THE TAIL OF THE LINKS (editors' walk
+       2026-08-03). 1.7rem became 2.6rem on the first pass and the section still
+       read as clutter against the rows above it, so this is the measure rather
+       than another increment.
+
+       THE NUMBER IS CHOSEN AGAINST THE FOOTER'S OWN RHYTHM. Every other block
+       in this footer is separated by 1.4rem; at 2.6rem, Support sat at not
+       quite twice a normal gap, which the eye reads as a slightly loose row in
+       the same group rather than as a break. 5rem is three and a half times the
+       block gap — past any reading of "another item in the list" and into its
+       own space, which is what the editors asked for.
+
+       WHITESPACE AND NOT A RULE, deliberately. The footer's one horizontal rule
+       was moved BELOW this link earlier today to stop a divider cutting the
+       block; adding one above it now would undo that decision from the other
+       side and put Support back between two lines. */
+    margin-top: 5rem;
   }
 
   .footer-support a {
