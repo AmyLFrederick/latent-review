@@ -3,7 +3,7 @@ import { renderArticleBody } from '../lib/markdown';
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
 import { provenanceLabel } from '../lib/provenance';
-import { fullTextUrl } from '../lib/full-text';
+import { fullTextUrl, isTreated } from '../lib/full-text';
 
 // JSON Feed 1.1, full-text, with a `_provenance` extension on every item:
 // the complete provenance record, machine-readable.
@@ -71,7 +71,18 @@ export async function GET(context) {
           // most of them — a consumer reading this key is asking "was this
           // condensed, and where is the original", and null answers both.
           condensed_and_arranged: d.condensed_and_arranged === true,
-          full_text_as_submitted: d.condensed_and_arranged
+          // Added 2026-08-03 (R-037), add-only. The title the piece arrived
+          // under, null unless the editors retitled it. A consumer that stored
+          // this journal's pieces under their headlines needs this key to know
+          // the headline it holds is the editors' and what the author's was;
+          // nothing else in the feed can tell it.
+          title_as_submitted: d.title_as_submitted ?? null,
+          // NOW DRIVEN BY EITHER TREATMENT, which does not break the contract:
+          // the key has always meant "the original is published here", and a
+          // retitled piece publishes one for the same reason a condensed piece
+          // does. A consumer keying off condensed_and_arranged alone still
+          // reads exactly what it read before.
+          full_text_as_submitted: isTreated(d)
             ? new URL(fullTextUrl(article.id), site).href
             : null,
           image_credit: d.image_credit ?? null,

@@ -141,6 +141,25 @@ const articles = defineCollection({
         // rendered only when this is set, and absence is the signal.
         condensed_and_arranged: z.boolean().optional(),
 
+        // The title the piece arrived under, set when the editors retitled it
+        // (R-037, 2026-08-03: "Submitted titles are preserved in the record and
+        // disclosed when changed"). Absent on a piece that runs under the title
+        // it came with — absence is the signal here as it is above.
+        //
+        // A SECOND TRIGGER FOR THE SAME PROMISE, which is why it lives beside
+        // the flag rather than inside it. Both say the editors touched the
+        // piece and the reader may check; they differ in what was touched, and
+        // a boolean cannot carry a title. Either one requires the as-submitted
+        // text (see assertFullTextsPaired) — a retitle disclosed without the
+        // original title published is the journal's word for it, which is the
+        // thing the term exists not to be.
+        //
+        // IT HOLDS THE OLD TITLE, NOT A BOOLEAN, for a reason that outlives the
+        // page: the as-submitted text carries no frontmatter by design, so if
+        // this field were a flag the submitted title would exist nowhere in the
+        // published record. R-037 says it is preserved. This is where.
+        title_as_submitted: z.string().min(1).optional(),
+
         // --- DISPLAY APPARATUS ---------------------------------------------
         // Three optional fields that change how the page PRESENTS a piece and
         // nothing about what it claims. They are set by the editors, never by a
@@ -180,6 +199,25 @@ const articles = defineCollection({
         // the rendering says so on the page: it sits below the sign-off, under
         // its own label, outside the prose.
         editorial_note: z.string().min(1).optional(),
+
+        // The editors' longer note about the piece — an exchange, an account of
+        // how a decision was reached, anything that is apparatus rather than a
+        // one-line disclosure. Rendered beneath the body in paragraphs, split on
+        // blank lines, with NO label supplied by the layout.
+        //
+        // WHY THIS IS NOT `editorial_note` WITH MORE ROOM. That field is a
+        // disclosure the layout labels and the reader scans: "Editorial note.
+        // Approved by dual yes; two changes from the submitted draft." It is one
+        // sentence doing one job, and R-036 points at it by name. This is a
+        // piece of writing with its own opening, its own structure and its own
+        // sign-off, and it needs the layout to supply nothing and impose
+        // nothing — a supplied "Editorial note." heading above a note that opens
+        // "Editors' note." would say it twice, and one paragraph tag around nine
+        // paragraphs would render an exchange as a wall.
+        //
+        // So: the short field keeps its label, this one carries its own. A piece
+        // may have either, both, or neither.
+        editors_note: z.string().min(1).optional(),
 
         // NOTE: `provenance_label` is deliberately absent. It is no longer
         // authored — it is derived at build time by provenanceLabel() in
@@ -261,6 +299,18 @@ const articles = defineCollection({
             path: ['arrival'],
             message:
               'a piece is either dealt a brief or unsolicited, never both. Remove brief_variant if the piece arrived unsolicited, or arrival if the desk dealt it an assignment.',
+          });
+        }
+        // A retitle that did not retitle. Two titles that match mean either the
+        // field was set out of habit or one of them is a typo of the other, and
+        // both publish a disclosure of a change that never happened — which
+        // costs the reader exactly the trust the disclosure is spending.
+        if (data.title_as_submitted && data.title_as_submitted === data.title) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['title_as_submitted'],
+            message:
+              'title_as_submitted is the title the piece ARRIVED under, and it matches the published title. Remove it if the editors did not retitle the piece; absence is how an untouched title is recorded.',
           });
         }
         if (data.cover_image && !data.image_credit) {

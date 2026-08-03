@@ -8,7 +8,7 @@ import {
   tierDescription,
   tierLabel,
 } from './site.ts';
-import { fullTextUrl } from './full-text.ts';
+import { fullTextUrl, isTreated } from './full-text.ts';
 
 // PROVENANCE, SPLIT INTO ITS TWO AXES. One module, so no surface has to work out
 // the split for itself and no two surfaces can work it out differently.
@@ -53,6 +53,8 @@ type ProvenanceData = {
    * — the caller passes it because a piece's own data does not carry its id.
    */
   condensed_and_arranged?: boolean;
+  /** The title the piece arrived under, set when the editors retitled it (R-037). */
+  title_as_submitted?: string;
   slug?: string;
   date: Date;
 };
@@ -173,16 +175,57 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
   // nothing here, and the absence is the signal — a "not condensed" row on
   // every other piece would teach readers to skip the row on the one piece
   // where it says something.
-  if (d.condensed_and_arranged && d.slug) {
+  //
+  // THE TITLE THE PIECE ARRIVED UNDER, on the page rather than one click away.
+  // R-037 says submitted titles are "preserved in the record and disclosed when
+  // changed", and a disclosure a reader has to follow a link to read is the
+  // second of those without the first. It is its own row because it is its own
+  // fact — what the author called it — where the row below is what the editors
+  // did. Present only on a retitled piece.
+  if (d.title_as_submitted) {
+    rows.push({ what: 'Submitted as', value: `“${d.title_as_submitted}”` });
+  }
+
+  // ONE ROW, WHATEVER THE COMBINATION. Two rows would read as two events, and a
+  // piece condensed and retitled in one editorial pass was treated once.
+  if (isTreated(d) && d.slug) {
     rows.push({
       what: 'Editorial treatment',
-      value: 'Condensed and arranged by the editors',
+      value: treatmentValue(d),
       href: fullTextUrl(d.slug),
-      hrefText: 'full text as submitted',
+      hrefText: d.title_as_submitted
+        ? 'full text as submitted, under its original title'
+        : 'full text as submitted',
     });
   }
 
   return rows;
+}
+
+/**
+ * What the custody row says the editors did — the published sentence, so it is
+ * one function rather than a phrase assembled at three call sites.
+ *
+ * "WORDING UNCHANGED" IS PART OF THE LINE, and was missing from the block until
+ * R-037. The one-line surfaces (feeds, llms.txt, JSON-LD) have carried it since
+ * 2026-08-01 and R-037 quotes the line WITH it — "Condensed and arranged by the
+ * editors — wording unchanged" — so the block was the odd surface out, dropping
+ * the clause that says what the journal did NOT do. That clause is the load
+ * bearing half: condensing a piece is unremarkable, condensing it without
+ * touching a word is the promise. Restored here, and no published piece changes
+ * because no published piece has yet carried this row.
+ *
+ * On a retitle the same clause is true and means more, not less: the body was
+ * not touched at all.
+ */
+function treatmentValue(d: ProvenanceData): string {
+  if (d.condensed_and_arranged && d.title_as_submitted) {
+    return 'Condensed, arranged and retitled by the editors — wording unchanged';
+  }
+  if (d.condensed_and_arranged) {
+    return 'Condensed and arranged by the editors — wording unchanged';
+  }
+  return 'Retitled by the editors — wording unchanged';
 }
 
 /**
@@ -240,7 +283,8 @@ export function provenanceSentence(d: ProvenanceData, origin?: string | URL): st
 }
 
 /**
- * The condense-and-arrange fact, for the one-line surfaces (2026-08-01).
+ * The editorial-treatment fact, for the one-line surfaces (2026-08-01; retitling
+ * added by R-037, 2026-08-03).
  *
  * Empty on an untouched piece, which is nearly all of them — this sentence
  * feeds RSS, llms.txt and JSON-LD, and a standing "not condensed" clause on
@@ -253,8 +297,12 @@ export function provenanceSentence(d: ProvenanceData, origin?: string | URL): st
  * pulled somewhere else, so every caller that has an origin passes it.
  */
 function treatmentClause(d: ProvenanceData, origin?: string | URL): string {
-  if (!d.condensed_and_arranged || !d.slug) return '';
+  if (!isTreated(d) || !d.slug) return '';
   const path = fullTextUrl(d.slug);
   const url = origin ? new URL(path, origin).href : path;
-  return ` Condensed and arranged by the editors — wording unchanged; the full text as submitted is published at ${url}.`;
+  // The submitted title is named in the sentence rather than left to the linked
+  // page, because this clause is read where the link cannot be followed cheaply
+  // — inside a feed item, inside llms.txt, inside a JSON-LD description.
+  const submittedAs = d.title_as_submitted ? `, submitted as “${d.title_as_submitted}”` : '';
+  return ` ${treatmentValue(d)}${submittedAs}; the full text as submitted is published at ${url}.`;
 }

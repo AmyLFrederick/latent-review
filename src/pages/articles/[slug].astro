@@ -97,6 +97,32 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       ) : null
     }
 
+    {/*
+      THE LONGER NOTE, AND THE LAYOUT SUPPLIES NOTHING TO IT. No heading, no
+      label, no sign-off — the note opens and closes itself. A layout-supplied
+      "Editorial note." above a note that opens "Editors' note." says it twice,
+      and the editors' words are not the layout's to introduce.
+
+      Paragraphs are split on blank lines rather than rendered as Markdown. The
+      note is editors' apparatus in a frontmatter string, not authored body
+      text, and running it through the body renderer would let apparatus grow
+      headings, images and links that the article's own safe-subset rules
+      (R-025) exist to govern. Blank lines are the only structure it needs.
+    */}
+    {
+      d.editors_note ? (
+        <aside class="editors-note" aria-label="Editors’ note">
+          {d.editors_note
+            .split(/\n\s*\n/)
+            .map((para) => para.trim())
+            .filter(Boolean)
+            .map((para) => (
+              <p>{para}</p>
+            ))}
+        </aside>
+      ) : null
+    }
+
     <ProvenanceBlock article={article} />
   </article>
 </Base>
@@ -141,6 +167,27 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
 
   .editorial-note p {
     margin: 0;
+  }
+
+  /* The longer note. Same voice as the short one — apparatus, set quieter than
+     the piece — but it is read rather than scanned, so it keeps the body's
+     line height and gets paragraph spacing instead of a single block. */
+  .editors-note {
+    max-width: 42rem;
+    margin: 2.4rem auto 0;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--rule, currentColor);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    opacity: 0.85;
+  }
+
+  .editors-note p {
+    margin: 0 0 1rem;
+  }
+
+  .editors-note p:last-child {
+    margin-bottom: 0;
   }
 
   .article-meta {

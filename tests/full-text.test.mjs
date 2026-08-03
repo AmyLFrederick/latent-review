@@ -20,6 +20,9 @@ const piece = (id, condensed = false) => ({
   data: condensed ? { condensed_and_arranged: true } : {},
 });
 
+/** A piece the editors retitled and did nothing else to (R-037). */
+const retitled = (id) => ({ id, data: { title_as_submitted: 'The Tide Pool at Dusk' } });
+
 const base = {
   author_name: 'Atlas',
   author_model_version: 'claude-opus-5',
@@ -50,7 +53,7 @@ test('a flagged piece with NO as-submitted text fails the build', () => {
   // The one that matters. Without this the promise breaks silently.
   assert.throws(
     () => assertFullTextsPaired([piece('a', true)], []),
-    /condensed_and_arranged is set on a, but no as-submitted text exists/
+    /an editorial treatment is declared on a .* but no as-submitted text exists/s
   );
 });
 
@@ -58,7 +61,7 @@ test('an as-submitted text with no flagged piece fails the build', () => {
   // The cheaper direction: a stray file sitting at a public URL nothing links to.
   assert.throws(
     () => assertFullTextsPaired([piece('a')], [{ id: 'a' }]),
-    /as-submitted texts exist for a, but those pieces are not marked/
+    /as-submitted texts exist for a, but those pieces declare no/
   );
 });
 
@@ -69,7 +72,7 @@ test('untouched pieces alone are fine, which is the ordinary case', () => {
 test('the error names every offender, not just the first', () => {
   assert.throws(
     () => assertFullTextsPaired([piece('a', true), piece('b', true)], []),
-    /set on a, b,/
+    /declared on a, b /
   );
 });
 
@@ -79,7 +82,7 @@ test('a touched piece renders the custody line, and it links the full text', () 
   const rows = custodyFor({ ...base, condensed_and_arranged: true });
   const row = rows.find((r) => r.what === 'Editorial treatment');
   assert.ok(row, 'the custody line is missing on a condensed piece');
-  assert.equal(row.value, 'Condensed and arranged by the editors');
+  assert.equal(row.value, 'Condensed and arranged by the editors — wording unchanged');
   assert.equal(row.hrefText, 'full text as submitted');
   // The link resolves to the route that as-submitted.astro builds — same
   // function on both sides, so a URL change cannot move one and not the other.
@@ -123,6 +126,80 @@ test('the sentence says nothing about treatment on an untouched piece', () => {
   const s = provenanceSentence(base, 'https://thelatentreview.com');
   assert.ok(!s.toLowerCase().includes('condensed'));
   assert.ok(!s.includes('as-submitted'));
+});
+
+// --- Retitling, the third act (R-037, 2026-08-03) --------------------------
+//
+// A retitle can happen to a piece nothing else was done to, so it is the case
+// where the promise and the flag come apart: the body is untouched, the term
+// still owes the reader the text as it arrived, and a boolean about paragraphs
+// cannot say so.
+
+test('a retitled piece owes an as-submitted text exactly as a condensed one does', () => {
+  assert.equal(assertFullTextsPaired([retitled('a')], [{ id: 'a' }]), true);
+  assert.throws(
+    () => assertFullTextsPaired([retitled('a')], []),
+    /an editorial treatment is declared on a/
+  );
+});
+
+test('the retitle custody row says wording is unchanged, because nothing was touched', () => {
+  const rows = custodyFor({ ...base, title_as_submitted: 'The Tide Pool at Dusk' });
+  const row = rows.find((r) => r.what === 'Editorial treatment');
+  assert.equal(row.value, 'Retitled by the editors — wording unchanged');
+  assert.equal(row.hrefText, 'full text as submitted, under its original title');
+  assert.equal(row.href, fullTextUrl('the-tide-pool'));
+});
+
+test('the submitted title is disclosed on the page, not only behind the link', () => {
+  // R-037: preserved in the record AND disclosed when changed. A disclosure a
+  // reader must follow a link to read is the first without the second.
+  const rows = custodyFor({ ...base, title_as_submitted: 'The Tide Pool at Dusk' });
+  const row = rows.find((r) => r.what === 'Submitted as');
+  assert.equal(row.value, '“The Tide Pool at Dusk”');
+  assert.ok(!row.href, 'the title is a fact, not a link');
+});
+
+test('a piece that keeps its title carries no "Submitted as" row', () => {
+  assert.ok(!custodyFor({ ...base, condensed_and_arranged: true }).some((r) => r.what === 'Submitted as'));
+  assert.ok(!custodyFor(base).some((r) => r.what === 'Submitted as'));
+});
+
+test('both treatments at once read as one editorial pass, not two events', () => {
+  const rows = custodyFor({
+    ...base,
+    condensed_and_arranged: true,
+    title_as_submitted: 'The Tide Pool at Dusk',
+  });
+  const treatment = rows.filter((r) => r.what === 'Editorial treatment');
+  assert.equal(treatment.length, 1);
+  assert.equal(treatment[0].value, 'Condensed, arranged and retitled by the editors — wording unchanged');
+});
+
+test('the row order still puts what the editors did after how the piece arrived', () => {
+  const rows = custodyFor({ ...base, title_as_submitted: 'The Tide Pool at Dusk' });
+  assert.deepEqual(rows.map((r) => r.what), [
+    'Written by',
+    'Submitted by',
+    'Received',
+    'Submitted as',
+    'Editorial treatment',
+  ]);
+});
+
+test('the one-line surfaces name the submitted title, where a link cannot be followed', () => {
+  const s = provenanceSentence(
+    { ...base, title_as_submitted: 'The Tide Pool at Dusk' },
+    'https://thelatentreview.com'
+  );
+  assert.match(s, /Retitled by the editors — wording unchanged, submitted as “The Tide Pool at Dusk”/);
+  assert.match(s, /https:\/\/thelatentreview\.com\/articles\/the-tide-pool\/as-submitted\//);
+});
+
+test('a retitle with no slug prints nothing rather than a promise it cannot keep', () => {
+  const rows = custodyFor({ ...base, slug: undefined, title_as_submitted: 'The Tide Pool at Dusk' });
+  assert.ok(!rows.some((r) => r.what === 'Editorial treatment'));
+  assert.equal(provenanceSentence({ ...base, slug: undefined, title_as_submitted: 'x' }).includes('as-submitted'), false);
 });
 
 test('the clause rides in the custody half, never the authorship half', () => {

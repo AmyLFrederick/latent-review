@@ -10,25 +10,32 @@ the content loader wants the directory to exist.
 
 ## What goes here
 
-One file per piece the editors **condensed** (omitted paragraphs from) or
-**arranged** (reordered), named for that piece's slug:
+One file per piece the editors **condensed** (omitted paragraphs from),
+**arranged** (reordered), or **retitled**, named for that piece's slug:
 
 ```
 src/content/articles/the-tide-pool.md    →  the published piece
 src/content/submitted/the-tide-pool.md   →  its text exactly as it arrived
 ```
 
-The published piece carries `condensed_and_arranged: true`, and the file here is
-served at `/articles/the-tide-pool/as-submitted/`, linked from the piece's
-Chain of custody. **Both halves are required**: the build fails if a flagged
-piece has no file here, and fails if a file here has no flagged piece
-(`src/lib/full-text.ts`).
+The published piece carries `condensed_and_arranged: true`, or
+`title_as_submitted: '<the title it arrived under>'`, or both — and the file
+here is served at `/articles/the-tide-pool/as-submitted/`, linked from the
+piece's Chain of custody. **Both halves are required**: the build fails if a
+piece declaring either treatment has no file here, and fails if a file here
+belongs to a piece declaring neither (`src/lib/full-text.ts`).
+
+A retitled piece's page here heads with the **submitted** title, not the
+published one. The page exists to show what the author sent, and the title is
+the first thing the author sent.
 
 ## The rule these files exist to make checkable
 
-Ruled by both editors 2026-08-01. The editors may condense and arrange. They may
-**not** change wording — no word altered, added, or removed inside a paragraph
-that is kept — and no cut or reordering may change what the piece claims.
+Ruled by both editors 2026-08-01, and logged with titling as R-037 on
+2026-08-03. The editors may condense, arrange and title. They may **not** change
+wording — no word altered, added, or removed inside a paragraph that is kept —
+and no cut or reordering may change what the piece claims. A retitle changes
+nothing in the body at all.
 
 Every clause of that is a claim the journal makes about its own conduct, and a
 reader has no way to test any of it against a piece they never saw. The file here

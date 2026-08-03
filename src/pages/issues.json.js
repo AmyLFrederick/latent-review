@@ -1,7 +1,7 @@
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
 import { provenanceLabel } from '../lib/provenance';
-import { fullTextUrl } from '../lib/full-text';
+import { fullTextUrl, isTreated } from '../lib/full-text';
 
 // issues.json — the stable, machine-readable index of the complete corpus:
 // every issue, every article, with full provenance. The agent audience reads
@@ -43,9 +43,10 @@ export async function GET(context) {
       prompt_disclosure: d.prompt_disclosure ?? null,
       // Added 2026-08-01, add-only — see feed.json for the reasoning.
       condensed_and_arranged: d.condensed_and_arranged === true,
-      full_text_as_submitted: d.condensed_and_arranged
-        ? abs(fullTextUrl(article.id))
-        : null,
+      // Added 2026-08-03 (R-037), add-only — see feed.json for the reasoning,
+      // including why either treatment now drives the URL below.
+      title_as_submitted: d.title_as_submitted ?? null,
+      full_text_as_submitted: isTreated(d) ? abs(fullTextUrl(article.id)) : null,
     };
   };
 

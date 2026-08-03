@@ -1,4 +1,4 @@
-// The as-submitted text of a condensed or arranged piece, and the pairing rule
+// The as-submitted text of a piece the editors treated, and the pairing rule
 // that keeps the promise honest.
 //
 // THE TERM, ruled by both editors 2026-08-01. The editors may CONDENSE (omit
@@ -6,6 +6,17 @@
 // They may not change a word inside a paragraph they keep, and neither act may
 // change what the piece claims. It is withhold-never-rewrite — the rule already
 // governing a disclosed prompt — applied at the scale of a paragraph.
+//
+// TITLING JOINED IT, R-037, 2026-08-03. The headline has always been the
+// editors' — every door says so — but a retitle left no trace on the piece it
+// happened to, so the reader could not tell it had. R-037 logs all three acts
+// together and adds that submitted titles are preserved and disclosed when
+// changed. The wording promise reaches the title in the only sense it can: the
+// title the author wrote is published, not edited into something else.
+//
+// Retitling is thus the third act, and it is the one that can happen to a piece
+// nothing else was done to. That is why the trigger for publishing the full
+// text is a question — isTreated() — rather than a flag.
 //
 // WHY THE LINK IS THE LOAD-BEARING PART. Every clause above is a claim the
 // journal makes about its own conduct, and a reader has no way to check any of
@@ -23,8 +34,26 @@ export function fullTextUrl(slug: string): string {
   return `/articles/${slug}/as-submitted/`;
 }
 
-type ArticleLike = { id: string; data: { condensed_and_arranged?: boolean } };
+type EditorialTreatment = { condensed_and_arranged?: boolean; title_as_submitted?: string };
+type ArticleLike = { id: string; data: EditorialTreatment };
 type FullTextLike = { id: string };
+
+/**
+ * Whether the editors touched this piece — the one question every surface asks.
+ *
+ * TWO TRIGGERS, ONE PROMISE, AND THIS IS THE ONLY PLACE THAT KNOWS IT. R-037
+ * names three acts: condensing, arranging, and titling. The first two are one
+ * boolean; the third carries the title it replaced, so it cannot be. What they
+ * share is the consequence — the full text as submitted is published and linked
+ * — and a surface that reimplemented `flag || title` would be one `||` away
+ * from a piece that discloses in the feed and not on the page.
+ *
+ * The as-submitted route, the build gate, both feeds, the custody block and the
+ * one-line clause all ask here.
+ */
+export function isTreated(d: EditorialTreatment): boolean {
+  return d.condensed_and_arranged === true || typeof d.title_as_submitted === 'string';
+}
 
 /**
  * Fails the build unless every flagged piece has an as-submitted text and every
@@ -46,28 +75,28 @@ export function assertFullTextsPaired(
   fullTexts: FullTextLike[]
 ): true {
   const withText = new Set(fullTexts.map((f) => f.id));
-  const flagged = new Set(
-    articles.filter((a) => a.data.condensed_and_arranged).map((a) => a.id)
-  );
+  const flagged = new Set(articles.filter((a) => isTreated(a.data)).map((a) => a.id));
 
   const missing = [...flagged].filter((id) => !withText.has(id)).sort();
   const orphaned = [...withText].filter((id) => !flagged.has(id)).sort();
 
   if (missing.length) {
     throw new Error(
-      `condensed_and_arranged is set on ${missing.join(', ')}, but no as-submitted text exists. ` +
+      `an editorial treatment is declared on ${missing.join(', ')} — condensed_and_arranged, ` +
+        `title_as_submitted, or both — but no as-submitted text exists. ` +
         `Add src/content/submitted/<slug>.md with the text exactly as it arrived. ` +
         'The term the journal publishes is that the full text is ALWAYS linked; a piece ' +
-        'condensed without one breaks that promise silently, because the page looks ' +
+        'treated without one breaks that promise silently, because the page looks ' +
         'identical to an untouched piece.'
     );
   }
 
   if (orphaned.length) {
     throw new Error(
-      `as-submitted texts exist for ${orphaned.join(', ')}, but those pieces are not marked ` +
-        'condensed_and_arranged. Either set the flag or remove the file — an unlinked ' +
-        'as-submitted text sits at a public URL nothing points to.'
+      `as-submitted texts exist for ${orphaned.join(', ')}, but those pieces declare no ` +
+        'editorial treatment. Set condensed_and_arranged, or set title_as_submitted to the ' +
+        'title the piece arrived under, or remove the file — an unlinked as-submitted text ' +
+        'sits at a public URL nothing points to.'
     );
   }
 
