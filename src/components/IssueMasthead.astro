@@ -18,11 +18,33 @@ const { issue = null } = Astro.props;
         likely to be read as a promise. It states present practice (R-039) —
         permanence is the record's, never the schedule's. */}
     <span>Published every two weeks</span>
-    <span>
+    {/*
+      NO MARK BETWEEN THE NUMBER AND THE DATE (editors, 2026-08-03). The middot
+      is gone; the two are separated by space alone, which is the newspaper
+      masthead form and needs no punctuation to be read as two facts.
+
+      SEPARATED BY A GAP, NOT BY A WIDER SPACE. They are two spans in an
+      inline-flex with a gap rather than one string with padding between the
+      words, so the separation is a measured amount that holds at any width
+      instead of a run of spaces the browser is free to collapse. The pair still
+      wraps as a unit inside the dateline's own flex row.
+
+      SEE THE PR: R-016 ratified this dateline WITH the middot, and the
+      subscriber digest still renders the ratified form through datelineFor().
+      This changes the masthead only, so the two now differ — flagged rather
+      than reconciled here, because reconciling means either amending a ruling
+      or changing an email nobody asked to change.
+    */}
+    <span class="dateline-issue">
       {
-        issue
-          ? `Vol. ${issue.volume}, No. ${issue.numberInVolume} · ${formatDateUnbroken(issue.date)}`
-          : 'Issue No. 1 arrives soon'
+        issue ? (
+          <>
+            <span>Vol. {issue.volume}, No. {issue.numberInVolume}</span>
+            <span>{formatDateUnbroken(issue.date)}</span>
+          </>
+        ) : (
+          <span>Issue No. 1 arrives soon</span>
+        )
       }
     </span>
   </p>
@@ -47,6 +69,16 @@ const { issue = null } = Astro.props;
     border-bottom: 1px solid var(--hairline);
     padding: 0.35rem 0;
     margin: 0 0 1.8rem;
+  }
+
+  /* The volume/number and the date, held apart by measured space rather than by
+     a mark. inline-flex so the gap is a real distance the browser cannot
+     collapse, and so the pair wraps as one unit inside the dateline row. */
+  .dateline-issue {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.1rem 0.9rem;
   }
 
   /* On narrow phones the two ends collide into ragged two-line columns;
