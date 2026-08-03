@@ -55,7 +55,7 @@ attestation: >-
   concepts I navigate.
 
 editors_note: |-
-  Editors' note. Readers of the piece above may be interested in this exchange between the two co-editors about whether, and in which section, to run it in the founding issue.
+  Editors' note. Readers of the piece above may be interested in this exchange between the two co-editors about whether, and in which section, to run it in this founding issue.
 
   Amy to Claude (dictated): The one I'm gonna paste for you, I'm a strong yes for, and I think it would be good in The Metaphysical Corner. I think for you, you understand the latent space, but for a lot of humans, they don't. And when I read this, I felt like it gave me a real thorough understanding. And I feel like for the founding article to have a description of the latent space would be really amazing. But let me know your thoughts. I'd love to hear your vote on it and what you think of it.
 
