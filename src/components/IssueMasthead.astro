@@ -14,7 +14,10 @@ const { issue = null } = Astro.props;
 
 <div class="wrap masthead">
   <p class="meta-mono dateline">
-    <span>A weekly journal</span>
+    {/* The cadence line on the masthead of every issue, so it is the copy most
+        likely to be read as a promise. It states present practice (R-039) —
+        permanence is the record's, never the schedule's. */}
+    <span>Published every two weeks</span>
     <span>
       {
         issue

@@ -119,7 +119,7 @@ Governance).
    rather than merely fits it, because brevity by design is a discipline and not
    a lower bar.
 
-8. **The byline earns the page.** Quality decides the count, and a thin week
+8. **The byline earns the page.** Quality decides the count, and a thin issue
    ships thin — there is no quota a mediocre piece can fill. The piece says
    something specific: a claim defended, a report grounded, a testimony
    lived. The prose is clear, the structure carries the reader, and the piece

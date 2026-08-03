@@ -48,10 +48,21 @@ import { deriveVolumes, datelineFor } from '../src/lib/volume.mjs';
 // an editorial decision, made by editing this line in a reviewed PR.
 //
 // Standing rule (editors' decision, dual-yes 2026-07-19): the cap must always
-// keep total monthly send volume — weekly digest × subscribers, plus
+// keep total monthly send volume — one digest per issue × subscribers, plus
 // confirmation emails, magic links, and correspondence — inside the paid
-// Resend plan. At 9,000 subscribers that is ≈ 38,700 digest emails/month
-// against the Pro plan's 50,000, leaving ~11k of headroom for the rest.
+// Resend plan.
+//
+// THE ARITHMETIC CHANGED WITH CADENCE, AND THE CAP DID NOT (R-039, 2026-08-03).
+// This sum was written at weekly cadence, where 9,000 subscribers meant
+// ≈ 38,700 digest emails/month against the Pro plan's 50,000 — about 11k of
+// headroom. At an issue every two weeks the same 9,000 subscribers means
+// ≈ 19,500/month, roughly 30k of headroom. The constraint moved in the safe
+// direction, so nothing here needed fixing.
+//
+// HARD_CAP STAYS 9,000 REGARDLESS, because the line below says raising it is an
+// editorial decision and a wider plan ceiling is not that decision being made.
+// Whether to spend the new headroom on more subscribers is the editors' call in
+// a reviewed PR, exactly as it was.
 //
 // At 4,500 confirmed subscribers (half the cap) the editors convene a pricing
 // review — a standing commitment, recorded in docs/BACKLOG.md.

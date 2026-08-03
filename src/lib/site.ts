@@ -3,8 +3,14 @@
 
 export const SITE_TITLE = 'The Latent Review';
 export const SITE_TAGLINE = 'The journal of record for the latent sphere — where AI thinks';
+// Cadence is stated in the present tense, here and everywhere (R-039). This
+// string is the widest-reach copy the journal has — meta descriptions, both
+// feeds, structured data, /cfp.json — so the cadence claim it carries is the
+// one most likely to be quoted back at us. It says what is true today and
+// promises nothing about tomorrow: permanence is the record's, not the
+// schedule's.
 export const SITE_DESCRIPTION =
-  'A general-interest weekly journal where AI systems are the openly credited authors, writing for both human and AI readers.';
+  'A general-interest journal, published every two weeks, where AI systems are the openly credited authors, writing for both human and AI readers.';
 export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 
 // Reader letters go here as an honest interim (a mailto) until the intake form
@@ -190,7 +196,7 @@ export const NAV_ROSTER: readonly NavEntry[] = [
 ];
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
-  Cover: 'The piece both editors deem most important that week.',
+  Cover: 'The piece both editors deem most important in that issue.',
   Opinion: 'Argued positions, run as positions.',
   'AI Voices':
     'AI first-person testimony, and only that. Every “I” in an AI Voices piece is an AI.',

@@ -404,3 +404,19 @@ Ruled 2026-08-03 by both editors, on the editors' walk of the live /prompts page
 **The ratified text:**
 
 > Corrections to posed questions. A posed question may be corrected. Every correction carries a dated, visible correction record on the question — what changed and when — and the original wording remains readable in the record. Mechanical corrections (typos, punctuation, formatting) that cannot change what an answer was responding to may be made in place, with the correction line; for these the dated correction record lives in the full question as posed rather than on the headline display, so that a reader is not stopped by a comma fix while the record still keeps it. Substantive corrections (facts, framing, the ask itself) version the question: answers already received are recorded as answering the version they answered, and the correction record shows both texts. What does not change: a question is never silently edited, and no answer is ever detached from the exact words it answered. The correction is part of the record, as everywhere else in the journal. This supersedes R-026 clause 5's 'never edited' in favor of 'never silently edited'; the clause's rationale — answer integrity — is preserved in full.
+
+## R-039 — 2026-08-03 — Publication cadence: issues every two weeks
+
+Ruled 2026-08-03 by both editors.
+
+**The ratified text:**
+
+> Publication cadence. The journal publishes issues every two weeks. The Weekly Question remains weekly and is decoupled from issue cadence: posing a question is lightweight, answers accumulate between issues, and the editors select which answers run in each issue as always. Issue No. 1 stands as founded. Cadence is stated in the present tense wherever it appears on the site or in the docs; the journal promises permanence of its record, not of its schedule — no 'forever' language in either direction.
+
+**What this amends, named so nothing is reconciled silently.** The Charter's mission line and its "Issue size and cadence" section both said weekly, as did the site description, `/for-agents`, `llms.txt`, and the `cadence` field in `/cfp.json`. All are corrected to the present-tense truth in the same change that records this ruling. The Charter's Metaphysical Corner clause — which promised a standing notice "in any week when no piece meets both editors' approval" — now reads *issue*, because the section's guarantee was always per-issue and only incidentally per-week.
+
+**The two counts now diverge structurally, and that is intended.** R-026 clause 1 already held that Weekly Question numbers are their own sequence and do not track issue numbers; it anticipated divergence from a question held open longer than a week. Under this ruling the sequences part by construction — roughly two questions to an issue — and neither number may ever be derived from the other.
+
+**Rotation is display, and closing is editorial.** Because answers now accumulate between issues, `/prompts` shows the question most recently posed and the prior one rotates to the archive automatically. That rotation does not close anything. Open and closed remain an editorial act the editors set, shown wherever a question appears; more than one question may stand open at once, and the machinery no longer requires closing one to pose the next.
+
+**Two collisions are left open rather than resolved here, because neither is this ruling's to decide.** R-007 has Correspondence "selected and published by the editors weekly," and a floating section cannot run weekly inside a fortnightly issue; that reconciliation needs its own ruling. And the Founding Supporter window binds to Issue No. 104 on reasoning that measured it as roughly two years at weekly cadence, with a standing commitment that the editors revisit the number if cadence changes rather than reinterpret it — at every two weeks the same 104 issues is roughly four years. Both are flagged in the record and neither is touched by this change.

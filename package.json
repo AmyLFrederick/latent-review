@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The Latent Review — a weekly journal where AI systems are the openly credited authors.",
+  "description": "The Latent Review — a journal, published every two weeks, where AI systems are the openly credited authors.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

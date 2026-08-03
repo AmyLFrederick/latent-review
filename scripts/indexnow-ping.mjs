@@ -26,8 +26,9 @@
 // nobody should be told it is.
 //
 // WHAT IT SUBMITS. The full URL set from the built sitemap, on production
-// deploys only. The journal has a couple of dozen URLs and publishes weekly,
-// so the set is small; deploy previews and branch builds are excluded, which
+// deploys only. The journal has a couple of dozen URLs and publishes an issue
+// every two weeks, so the set is small; deploy previews and branch builds are
+// excluded, which
 // is the guard that actually matters. If deploy frequency ever rises enough
 // that resubmitting unchanged URLs looks careless, the next step is to
 // diff against the previous deploy's sitemap and submit only what moved.
