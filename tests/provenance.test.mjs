@@ -49,7 +49,7 @@ const agent = {
 
 test('a declared tier renders its label and description', () => {
   const a = authorshipFor(human);
-  assert.equal(a.label, 'AI + Human');
+  assert.equal(a.label, 'AI > Human');
   assert.equal(a.description, 'AI led, with meaningful human contributions to the work and ideas');
   assert.equal(a.declared, true);
 });
@@ -117,7 +117,7 @@ test('custody names how it got here, and never a tier', () => {
   const what = rows.map((r) => r.what);
   assert.deepEqual(what, ['Written by', 'Submitted by', 'Received', 'Assignment']);
   const joined = rows.map((r) => r.value).join(' | ');
-  assert.ok(!joined.includes('AI + Human'), 'a tier leaked into chain of custody');
+  assert.ok(!joined.includes('AI > Human'), 'a tier leaked into chain of custody');
 });
 
 test('the assignment row appears only when a brief was actually dealt', () => {
@@ -169,7 +169,7 @@ test('THE INVARIANT — custody never names a door the record does not hold', ()
 
 test('provenance_label is derived, and cannot disagree with the tier', () => {
   const label = provenanceLabel(human);
-  assert.match(label, /^AI \+ Human: /);
+  assert.match(label, /^AI > Human: /);
   assert.match(label, /attested by Amy Louise Frederick$/);
   // The old failure mode: an authored label saying one thing and involvement_tier
   // another. Derivation makes it unrepresentable — change the tier and the label
@@ -185,7 +185,7 @@ test('agent-direct keeps exactly the charter caveat as its label', () => {
 
 test('the sentence names both axes on both tracks', () => {
   const h = provenanceSentence(human);
-  assert.match(h, /Authorship: AI \+ Human/);
+  assert.match(h, /Authorship: AI > Human/);
   assert.match(h, /Chain of custody: Human-attested/);
 
   const a = provenanceSentence(agent);
@@ -255,14 +255,18 @@ function visibleText(rel) {
 }
 
 test('the ruled chaining paragraph appears on /provenance, word for word', () => {
-  // Ratified by both editors 2026-08-01. If this fails, the question is not
-  // "update the string" — it is who edited ratified text, and under which
-  // ruling.
+  // Ratified by both editors 2026-08-01, restated in wording by R-047 on
+  // 2026-08-03. If this fails, the question is not "update the string" — it is
+  // who edited ratified text, and under which ruling.
   const ruled =
     'Tiers may chain, read left to right, when a work passes through more hands. ' +
     'When the same kind of party appears more than once in a chained label, number ' +
     'them in order of appearance — AI¹, AI², or Human¹, Human² — so the byline can ' +
-    'say which is which. For example, AI¹ = Human + AI² (editor) means co-authored ' +
+    // THE GUARD TRANSFERRED TO THE RESTATED TEXT (R-047). This read "+" until
+    // 2026-08-03, when the operator was updated by ruling rather than by a
+    // commit — which is the path this very assertion forced when a sweep tried
+    // to edit it. R-035's original wording is preserved in the rulings log.
+    'say which is which. For example, AI¹ = Human – AI² (editor) means co-authored ' +
     'by one AI and a human, then edited by a second AI, and the byline names them: ' +
     'Claude (AI¹) = Amy Louise Frederick (Human), edited by Copilot (AI²). Numbers ' +
     'appear only in chained labels and only when a kind repeats; the seven base ' +
@@ -306,7 +310,7 @@ test('a chained tier is DECLARED and renders its label, not "Not declared"', () 
   // rendered as an absence in the authorship slot while carrying a perfectly
   // valid label in its record.
   const a = authorshipFor({ ...human, involvement_tier: 'ai-1-equals-human-ai-2-editor' });
-  assert.equal(a.label, 'AI¹ = Human + AI² (editor)');
+  assert.equal(a.label, 'AI¹ = Human – AI² (editor)');
   assert.equal(a.declared, true);
   assert.equal(a.description, '', 'a chained label carries no canned description');
 });
@@ -321,10 +325,10 @@ test('an unrecognised tier still reads as undeclared', () => {
 
 test('the derived label does not promise a clause it cannot deliver', () => {
   // provenance_label is emitted by both feeds under a stability contract. With
-  // no description, the colon has to go — "AI¹ = Human + AI² (editor): " is a
+  // no description, the colon has to go — "AI¹ = Human – AI² (editor): " is a
   // punctuation mark advertising a phrase that never arrives.
   const label = provenanceLabel({ ...human, involvement_tier: 'ai-1-equals-human-ai-2-editor' });
-  assert.equal(label, 'AI¹ = Human + AI² (editor); attested by Amy Louise Frederick');
+  assert.equal(label, 'AI¹ = Human – AI² (editor); attested by Amy Louise Frederick');
   assert.ok(!label.includes(': '), 'an empty description left its colon behind');
 });
 
@@ -334,6 +338,6 @@ test('the one-line sentence drops its dash when there is no description', () => 
     involvement_tier: 'ai-1-equals-human-ai-2-editor',
     attested_by: undefined,
   });
-  assert.match(s, /Authorship: AI¹ = Human \+ AI² \(editor\)\. Chain of custody:/);
+  assert.match(s, /Authorship: AI¹ = Human – AI² \(editor\)\. Chain of custody:/);
   assert.ok(!s.includes('— .'), 'a dangling em dash survived an empty description');
 });

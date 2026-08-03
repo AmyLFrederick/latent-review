@@ -517,3 +517,49 @@ Ruled 2026-08-03 by both editors.
 
 **The presumption is against growth, and the reason is on the record.** Seven marks can be learned at a glance and carried in a reader's head; an eighth is not one more, it is the moment the set stops being memorable. Simplicity is the standard's adoption strategy — an open standard is adopted because it is easy to display honestly — so a proposal to add a badge is a proposal to make adoption harder, and carries that burden.
 
+## R-046 — 2026-08-03 — Tier names adopt the badge operators
+
+Ruled 2026-08-03 by both editors, completing the notation harmonisation begun in R-044.
+
+**The ratified text:**
+
+> Tier names adopt the badge operators. The written tier names change to match the badge notation exactly, replacing the plus-sign constructions: 'AI + Human (editor)' becomes 'AI – Human (editor)'; 'AI + Human' becomes 'AI > Human'; 'Human + AI' becomes 'Human > AI'; 'Human + AI (editor)' becomes 'Human – AI (editor)'. 'AI', 'AI = Human', and 'Human' are already in the badge grammar and are unchanged. One notation, whether drawn in a circle or written in a name. Machine codes and feed fields unchanged per the stability contract; frozen-by-hash surfaces and published pieces' verbatim text are flagged, not edited, per the standing pattern.
+
+**The operator now carries what the annotation carried alone.** Under the plus form, `+` said only "and", and `(editor)` did the work of saying which role the second party played. The names now say it twice: `–` before a party that edited, `>` before a party that contributed. `(editor)` stays, because a machine reading the label should not have to infer a role from a dash.
+
+**This is a grammar change, not a table of four strings.** Labels are generated from machine codes by the R-035 clause 4 grammar, so the bare hyphen in a code no longer has one rendering — it renders as `–` when the party it introduces carries `(editor)` and as `>` otherwise. Every one of the seven still round-trips from its code to its own label, which is the invariant that makes the grammar an extension rather than a second system.
+
+**Machine codes are untouched, and the display fields follow the label because they are the label.** `ai-human` is still `ai-human`. `involvement_tier_display` in the feeds is derived from the tier label, so its value moves with the name — the field does not change, is not renamed, and does not vanish, which is what the stability contract governs. A consumer keying on the code sees nothing move; a consumer printing the display string prints the current name, which is the point of that field.
+
+**Flagged and not edited, per the ruling's own clause:**
+
+1. **R-035's ratified chaining text, published verbatim at /provenance.** It reads `AI¹ = Human + AI² (editor)`. The label formatter now produces `AI¹ = Human – AI² (editor)` for that code. The two are permitted to disagree because one is a quotation of a ratified text and the other is a live rendering. A test pins the paragraph as it was ratified.
+2. **R-015, R-020 and R-035 in this log.** Append-only; they carry the plus forms and are read subject to this ruling.
+3. **The July 31 amendment note on /provenance.** It records that two descriptions were reworded "on AI + Human and its mirror Human + AI" — the names those tiers had on the day of that amendment. Rewriting it would make a dated record claim an event that did not happen to the names it names.
+4. **The scratch and working documents in docs/.** Historical records of sessions, not surfaces a reader meets.
+5. **The frozen briefs and both notices.** Checked again: they name no tier, so no versioned successor was needed.
+
+**Chained labels take the same operators.** R-046's text names four base labels, and the chain case was raised with the editors as an open question on the day: confirmed the same day — *chains take the same operators, one grammar everywhere.* Recorded here so a later reader does not find a formatter doing something the ruling's own words do not say and take it for drift. Nothing can carry a chained code here, since R-045 closed the schema to the seven, so this governs a formatter rather than any live label.
+
+## R-047 — 2026-08-03 — The chaining paragraph, restated in the current grammar
+
+Ruled 2026-08-03 by both editors, resolving the divergence R-046 flagged and could not itself close.
+
+**The ratified text:**
+
+> Chaining paragraph restated in the current grammar. R-035's ratified chaining paragraph is superseded in wording only — semantics unchanged — so the provenance page's prose speaks the one notation everywhere. The restated text applies the badge operators to every example: the chained example becomes 'AI¹ = Human – AI² (editor)' and its byline rendering follows; all other examples in the paragraph take the same operators. R-035's original wording remains in the rulings log as the record of what was ratified when. The verbatim guard transfers: it now protects the restated paragraph as the current ratified text.
+
+**The restated paragraph, in full, as it now stands at /provenance:**
+
+> Tiers may chain, read left to right, when a work passes through more hands. When the same kind of party appears more than once in a chained label, number them in order of appearance — AI¹, AI², or Human¹, Human² — so the byline can say which is which. For example, AI¹ = Human – AI² (editor) means co-authored by one AI and a human, then edited by a second AI, and the byline names them: Claude (AI¹) = Amy Louise Frederick (Human), edited by Copilot (AI²). Numbers appear only in chained labels and only when a kind repeats; the seven base tiers are unchanged and never numbered. The label follows the work's actual history, however many hands that took.
+
+**Exactly one character moved.** The chained example's `+` became `–`, which is the operator R-046 gives a party that edited. The byline rendering that follows it needed nothing: it joins its parties with `=`, which was already the badge grammar, and names the editing party in words rather than with an operator. No other example in the paragraph carries an operator. Semantics are untouched at every point — the same chain, the same numbering rule, the same byline.
+
+**Why this needed a ruling at all, recorded because the mechanism worked.** A sweep on 2026-08-03 tried to update the operator here directly and the suite refused it: the paragraph is pinned byte-for-byte as ratified text, and the assertion exists precisely so that ratified prose changes by ruling rather than by a commit. The guard did its job, the change came back as this ruling, and the path from flag to ruling is the one R-046's own carve-out clause described.
+
+**R-035 keeps its wording, and this log keeps both.** R-035 stands unedited above, with `+` in its example, as the record of what was ratified on 2026-08-01. This ruling is what is true now. Anyone reading the two together sees an operator change and no change of meaning, which is the whole of it.
+
+**The guard transfers rather than lapsing.** The suite now pins the restated paragraph, so the current ratified text is protected exactly as the previous one was. A ratified string that lost its guard while being restated would be the worst outcome of the three available.
+
+**One paragraph on that page carried this condition, and it was this one.** The page was checked for other ratified or frozen prose holding superseded operators; there is none. The July 31 amendment note names the tiers as they were called that day and is a dated record rather than ratified text, so it keeps its wording under the same reasoning R-046 gave.
+

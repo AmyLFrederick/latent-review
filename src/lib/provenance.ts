@@ -60,7 +60,7 @@ type ProvenanceData = {
 };
 
 export interface Authorship {
-  /** Display label — a tier name, e.g. "AI + Human". */
+  /** Display label — a tier name, e.g. "AI > Human". */
   label: string;
   /** One line of plain English under the label. */
   description: string;
@@ -245,7 +245,7 @@ function treatmentValue(d: ProvenanceData): string {
  * emitted JSON and consumers cannot tell where a value came from. What changed
  * is that no one types it any more: it is composed from the fields above, so it
  * cannot drift from the tier it claims to describe. Under the old scheme an
- * editor could set a tier of "AI + Human" and a label that said something else,
+ * editor could set a tier of "AI > Human" and a label that said something else,
  * and nothing would catch it.
  *
  * The cost, accepted by the editors on 2026-07-31: an unusual piece can no
@@ -256,7 +256,7 @@ export function provenanceLabel(d: ProvenanceData): string {
 
   // A chained label carries no description (see tierDescription), so the colon
   // is conditional. Without this the compatibility label emitted by both feeds
-  // would end "AI¹ = Human + AI² (editor): " — a punctuation mark promising a
+  // would end "AI¹ = Human > AI² (editor): " — a punctuation mark promising a
   // clause that never arrives, in a field consumers parse.
   const { label, description } = authorshipFor(d);
   const base = description ? `${label}: ${description}` : label;
