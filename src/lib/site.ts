@@ -81,17 +81,26 @@ export const STANDING_SECTIONS = [
 /**
  * Where a section's page lives.
  *
- * Every section is served by /section/<slug>/ except Topics, which had a page
- * at /topics/ before R-032 made it a section and keeps it — the URL is in the
- * navigation, in llms.txt, and in the published record, and a permanent URL
- * does not move because the thing behind it was reclassified.
+ * Every section is served by /section/<slug>/ except two, which had pages of
+ * their own before they had pieces and keep them. Topics had /topics/ before
+ * R-032 made it a section; Prompts has had /prompts/ since R-026, where the
+ * question is posed, the steering is disclosed and — since the display ruling
+ * of 2026-08-03 — the answers are listed under the question they answer. Both
+ * URLs are in the navigation, in llms.txt and in the published record, and a
+ * permanent URL does not move because the thing behind it acquired pieces.
+ *
+ * WHAT THIS PREVENTS, in the words of the case it was written for: building
+ * /section/prompts/ as well would publish one section twice, at two URLs, in
+ * two shapes, with no way for a reader to know which is the section — and the
+ * shape that lost would be the one carrying the question.
  *
  * USE THIS RATHER THAN BUILDING THE PATH. Anything that composes
  * `/section/${slugifySection(name)}/` by hand will send readers to a page that
- * does not exist for exactly one section, and it will be the newest one.
+ * does not exist, for exactly the sections that have somewhere better to be.
  */
 export const SECTION_PAGE_OVERRIDES: Record<string, string> = {
   Topics: '/topics/',
+  Prompts: '/prompts/',
 };
 
 /**
@@ -128,8 +137,12 @@ export function sectionUrl(section: string): string {
  * comment, "the order an issue's contents run in", and while the nav rendered
  * that array in place the two orders could not disagree. Ruled 2026-08-03: the
  * Corner takes the second row alone under its full name, which puts it after
- * Letters and Prompts — items that are not sections and never appear in an
- * issue's contents at all. There is no ordering of STANDING_SECTIONS that
+ * Letters and Prompts — items that do not appear in STANDING_SECTIONS, so they
+ * have no place in that order to be moved out of. (When this was written both
+ * were also empty of pieces. Prompts no longer is: R-026 makes it a section,
+ * and its first answer runs in Issue No. 1, so it appears in that issue's
+ * contents after the standing sections, as any section outside the array
+ * does.) There is no ordering of STANDING_SECTIONS that
  * expresses this, and reordering it to try would move the Corner in every
  * issue's contents to fix a line break in the nav.
  *
