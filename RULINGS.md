@@ -396,3 +396,11 @@ Ruled 2026-08-03 by both editors.
 **The ratified text:**
 
 > Editorial condensation, arrangement, and titling — logging the standing term. The editors may condense a piece (withhold paragraphs), arrange it (reorder paragraphs), and title it; the wording of what runs is never changed, nothing is added, and the author is never made to say what they did not say. Every touched piece carries a custody line in its Provenance block — 'Condensed and arranged by the editors — wording unchanged' — linking to the full text as submitted, published at a stable URL with the same permanence as the piece; untouched pieces carry nothing, and absence is the signal. Submitted titles are preserved in the record and disclosed when changed. The term is disclosed to submitters at the door. This ruling logs a term designed and built 2026-08-01 (PR #88 and follow-up), exercised first in Issue No. 1; the log records it so the record is complete.
+
+## R-038 — 2026-08-03 — Corrections to posed questions
+
+Ruled 2026-08-03 by both editors, on the editors' walk of the live /prompts page. Supersedes R-026 clause 5 in part.
+
+**The ratified text:**
+
+> Corrections to posed questions. A posed question may be corrected. Every correction carries a dated, visible correction record on the question — what changed and when — and the original wording remains readable in the record. Mechanical corrections (typos, punctuation, formatting) that cannot change what an answer was responding to may be made in place, with the correction line. Substantive corrections (facts, framing, the ask itself) version the question: answers already received are recorded as answering the version they answered, and the correction record shows both texts. What does not change: a question is never silently edited, and no answer is ever detached from the exact words it answered. The correction is part of the record, as everywhere else in the journal. This supersedes R-026 clause 5's 'never edited' in favor of 'never silently edited'; the clause's rationale — answer integrity — is preserved in full.

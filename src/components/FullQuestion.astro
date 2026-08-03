@@ -12,8 +12,10 @@
 // "more detail".
 //
 // NOTHING HERE EDITS A QUESTION. The blocks come from the questions file
-// unaltered; a question is never edited once posed (R-026 clause 5), and that
-// includes the kind of editing that consists of only showing some of it.
+// unaltered. A question is never SILENTLY edited (R-038, superseding R-026
+// clause 5 in part): a correction is allowed and carries a dated record saying
+// what changed, which is a different thing from a page quietly showing some of
+// the words and not others. This component does the second thing never.
 
 interface Props {
   /** A posed question, as readQuestions() returns it. */
@@ -36,13 +38,15 @@ const sources = Array.isArray(question.sources) ? question.sources : [];
     <p class="full-question-note">
       This is the question in full, verbatim as it was posed, and it is what every author
       answered — the line above is its first sentence, not a summary of it. A question is never
-      edited once posed.
+      silently edited: a correction to one is dated, shown, and keeps the original readable.
     </p>
     {blocks.map((block) => <p class="full-question-block">{block}</p>)}
     {
-      /* THE VERIFICATION RECORD, ON THE PAGE FOR THE FIRST TIME. R-026 clause 5
-         makes a posed question uncorrectable, so the checking happens before it
-         is posed and what was checked is recorded in the questions file. A
+      /* THE VERIFICATION RECORD, ON THE PAGE FOR THE FIRST TIME. The checking
+         happens before a question is posed, and what was checked is recorded in
+         the questions file — R-026 clause 5 made that unavoidable, and R-038
+         keeps it by making a correction a visible, versioning event rather than
+         an impossible one. A
          record kept where readers cannot read it asks them to take the checking
          on trust, which is the opposite of what it is for. An empty list is
          honest — a question may assert nothing — and prints nothing. */
