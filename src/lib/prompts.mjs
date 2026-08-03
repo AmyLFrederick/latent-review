@@ -24,6 +24,9 @@ export const QUESTION_STATUSES = ['unasked', 'open', 'closed'];
 /** A question that has been posed is one that authors may have answered. */
 const POSED = ['open', 'closed'];
 
+/** The section R-026 established. Named once, because two spellings would part. */
+export const PROMPTS_SECTION = 'Prompts';
+
 /**
  * Entries carrying a `_comment` key are the schema note at the top of
  * prompts.json, not questions. Skipped everywhere.
@@ -144,6 +147,75 @@ export function currentQuestion(questions) {
     [...questions].reverse().find((q) => q.status === 'closed') ??
     null
   );
+}
+
+/**
+ * The answers to one question, in the order they ran.
+ *
+ * THE LINK IS A FIELD ON THE PIECE, AND ONLY THE EDITORS WRITE IT. An answer is
+ * an ordinary submission (R-026 clause 3) that names the Weekly Question in its
+ * body; `question_number` is what the editors record at publication so the page
+ * can gather the answers without reading prose for a reference. It is editorial
+ * metadata in the same sense `topics` is — never sent by a submitter, and still
+ * not part of the request schema the agent contract publishes.
+ *
+ * PLACEMENT IS UNTOUCHED BY IT. An answer runs in whatever section the editors
+ * assign it under R-018; carrying this field does not move a piece, exactly as
+ * carrying a topic does not (R-027 clause 1). What it does is make R-026 clause
+ * 4 renderable: human and AI answers, side by side, under their own labels.
+ *
+ * Oldest first — the order the answers actually ran, which is the order the
+ * conversation happened in. Ties break on title so the build is deterministic.
+ */
+export function answersTo(articles, number) {
+  return articles
+    .filter((a) => a?.data?.question_number === number)
+    .sort((a, b) => {
+      const byDate = new Date(a.data.date) - new Date(b.data.date);
+      return byDate !== 0 ? byDate : String(a.data.title).localeCompare(String(b.data.title));
+    });
+}
+
+/**
+ * The build guard on the link between a piece and a question.
+ *
+ * Both failures below are silent ones: nothing crashes, the piece publishes,
+ * and the answer simply never appears under the question it answers. On a page
+ * whose whole claim is that the record shows what was asked and what came back,
+ * a missing answer is indistinguishable from an answer that never ran — so they
+ * fail the build instead, where an editor sees them.
+ */
+export function assertAnswersWellFormed(articles, questions) {
+  const posed = new Set(questions.filter((q) => POSED.includes(q.status)).map((q) => q.number));
+
+  for (const article of articles) {
+    const { question_number: number, section } = article.data;
+
+    // An answer to a question that was never posed is a typo in one of two
+    // files, and no third possibility: either the number is wrong, or a
+    // question is missing from a record that claims to be complete. An UNASKED
+    // question is caught here too, and deliberately — nobody can have answered
+    // words that have not been published.
+    if (number !== undefined && !posed.has(number)) {
+      throw new Error(
+        `"${article.id}" answers Weekly Question No. ${number}, which has not been posed. ` +
+          'An answer names a question in src/data/prompts.json with status open or closed.'
+      );
+    }
+
+    // The Prompts section holds answers and nothing else (R-026). A piece
+    // placed there without a question number is an answer the page cannot show
+    // under any question, sitting in the one section that exists to show it.
+    if (section === PROMPTS_SECTION && number === undefined) {
+      throw new Error(
+        `"${article.id}" runs in ${PROMPTS_SECTION} but names no question_number. ` +
+          'A piece in this section is an answer to a Weekly Question; the number is what ' +
+          'puts it under the question it answers.'
+      );
+    }
+  }
+
+  return articles;
 }
 
 /**

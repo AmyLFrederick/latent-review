@@ -8,8 +8,23 @@ import {
   readQuestions,
   currentQuestion,
   askedQuestions,
+  answersTo,
+  assertAnswersWellFormed,
+  PROMPTS_SECTION,
   QUESTION_STATUSES,
 } from '../src/lib/prompts.mjs';
+
+/** A published piece, in the shape the page hands the answer helpers. */
+const piece = (id, extra = {}) => ({
+  id,
+  data: {
+    title: id,
+    author_name: 'An author',
+    section: 'Opinion',
+    date: new Date('2026-08-02T00:00:00Z'),
+    ...extra,
+  },
+});
 
 const q = (number, status, extra = {}) => ({
   number,
@@ -183,6 +198,94 @@ test('before anything is posed the archive is empty, and that is the honest stat
   // the first question look like a broken test.
   const questions = readQuestions([q(1, 'unasked')]);
   assert.deepEqual(askedQuestions(questions), []);
+});
+
+test('the answers to a question are its own, in the order they ran', () => {
+  // Oldest first: the order the answers actually ran, which is the order the
+  // exchange happened in. A same-day tie breaks on title so the build is
+  // deterministic rather than dependent on the order the files were read in.
+  const answers = answersTo(
+    [
+      piece('later', { question_number: 1, date: new Date('2026-08-09T00:00:00Z') }),
+      piece('other-question', { question_number: 2 }),
+      piece('b-same-day', { question_number: 1 }),
+      piece('not-an-answer'),
+      piece('a-same-day', { question_number: 1 }),
+    ],
+    1
+  );
+  assert.deepEqual(answers.map((x) => x.id), ['a-same-day', 'b-same-day', 'later']);
+});
+
+test('a question with no answers gathers none rather than failing', () => {
+  // Running none is permitted (R-026 clause 3), so an empty list is a state the
+  // page renders, not an error.
+  assert.deepEqual(answersTo([piece('unrelated')], 1), []);
+});
+
+test('an answer to a question nobody was asked fails the build', () => {
+  // The number is wrong or the question is missing from a file that claims to
+  // be the whole record, and there is no third possibility. Either way the
+  // answer would silently never appear under any question.
+  const questions = readQuestions([q(1, 'open'), q(2, 'unasked')]);
+
+  assert.throws(
+    () => assertAnswersWellFormed([piece('stray', { question_number: 3 })], questions),
+    /answers Weekly Question No\. 3, which has not been posed/
+  );
+  // An UNASKED question is caught for the sharper reason: nobody can have
+  // answered words that have not been published.
+  assert.throws(
+    () => assertAnswersWellFormed([piece('early', { question_number: 2 })], questions),
+    /has not been posed/
+  );
+});
+
+test('answers to open and closed questions both stand', () => {
+  // Closing a question ends the invitation to answer it; it does not unpublish
+  // the answers that ran, and the archive is where they stay readable.
+  const questions = readQuestions([q(1, 'closed'), q(2, 'open')]);
+  assert.doesNotThrow(() =>
+    assertAnswersWellFormed(
+      [piece('to-the-closed-one', { question_number: 1 }), piece('to-the-open-one', { question_number: 2 })],
+      questions
+    )
+  );
+});
+
+test('a piece in the Prompts section must say which question it answers', () => {
+  const questions = readQuestions([q(1, 'open')]);
+
+  assert.throws(
+    () => assertAnswersWellFormed([piece('placed', { section: PROMPTS_SECTION })], questions),
+    /runs in Prompts but names no question_number/
+  );
+  assert.doesNotThrow(() =>
+    assertAnswersWellFormed(
+      [piece('placed', { section: PROMPTS_SECTION, question_number: 1 })],
+      questions
+    )
+  );
+});
+
+test('a piece answering nothing is the ordinary case, in any other section', () => {
+  // The field is absent on nearly every piece the journal runs, and its absence
+  // is not an omission — only a piece in the Prompts section is required to
+  // carry one.
+  const questions = readQuestions([q(1, 'open')]);
+  assert.doesNotThrow(() => assertAnswersWellFormed([piece('an-ordinary-piece')], questions));
+});
+
+test('an answer may run in any section, because the editors place pieces', () => {
+  // R-018: sections are assigned by the editors. question_number says what a
+  // piece answers, never where it goes — an answer in Opinion is not an error.
+  const questions = readQuestions([q(1, 'open')]);
+  assert.doesNotThrow(() =>
+    assertAnswersWellFormed(
+      [piece('in-opinion', { section: 'Opinion', question_number: 1 })],
+      questions
+    )
+  );
 });
 
 test('the shipped file agrees with itself about what has been asked', () => {

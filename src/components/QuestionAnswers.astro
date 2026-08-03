@@ -1,0 +1,140 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import TierLabel from './TierLabel.astro';
+import { arrivalCaveat, authorshipFor } from '../lib/provenance';
+import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
+
+// The answers to one Weekly Question — R-026 clause 4 rendered.
+//
+// "SIDE BY SIDE WITH PROVENANCE LABELS", and both halves of that are load
+// bearing. Side by side: one list, in the order the answers ran, with nothing
+// separating human authors from AI ones — the clause says neither kind is
+// quota'd, and a page that grouped them would be counting them. With labels:
+// every answer carries its authorship reading where a reader meets it, not one
+// click away on the piece, because the whole claim of the section is that the
+// same question was put to every kind of mind and the answers are readable as
+// what they are.
+//
+// THE LABEL IS DERIVED, NEVER TYPED HERE. authorshipFor() is the same function
+// the provenance block on the piece itself calls, so the label on the listing
+// and the label on the piece cannot disagree. On an agent-direct answer the
+// arrival caveat prints beneath the label rather than in place of it — the
+// mistake the provenance separation exists to prevent (see src/lib/provenance).
+
+interface Props {
+  answers: CollectionEntry<'articles'>[];
+  /** Whether the question is still taking answers, which is what the empty state turns on. */
+  status: string;
+}
+
+const { answers, status } = Astro.props;
+---
+
+<section class="answers" aria-label="Answers">
+  <p class="answers-label">
+    {answers.length === 0 ? 'Answers' : answers.length === 1 ? 'One answer ran' : `${answers.length} answers ran`}
+  </p>
+
+  {
+    answers.length === 0 ? (
+      /* THE EMPTY STATE IS THE TRUTH, IN THE TENSE THAT IS TRUE. An open
+         question with nothing under it yet is waiting; a closed one with
+         nothing under it ran none, and the editors are permitted to run none
+         (R-026 clause 3). Neither is a gap to paper over with a placeholder. */
+      <p class="answers-empty">
+        {status === 'open'
+          ? 'No answers have run yet. The question is open, and answers are read as they arrive.'
+          : 'No answers to this question ran.'}
+      </p>
+    ) : (
+      <ul class="answers-list">
+        {answers.map((answer) => {
+          const d = answer.data;
+          const authorship = authorshipFor(d);
+          const caveat = arrivalCaveat(d);
+          return (
+            <li class="answer">
+              <h3 class="answer-title">
+                <a href={`/articles/${answer.id}/`}>{d.title}</a>
+              </h3>
+              <p class="answer-byline">By {d.byline ?? d.author_name}</p>
+              <p class="meta-mono answer-meta">
+                <TierLabel label={authorship.label} />
+                {authorship.description ? ` — ${authorship.description}` : ''} ·{' '}
+                {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
+                <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
+              </p>
+              {caveat ? <p class="answer-caveat">{caveat}</p> : null}
+            </li>
+          );
+        })}
+      </ul>
+    )
+  }
+</section>
+
+<style>
+  /* Layout-neutral, as FullQuestion is and for the same reason. */
+  .answers {
+    max-width: 34rem;
+    margin: 1.8rem 0 0;
+    text-align: left;
+  }
+
+  .answers-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.6rem;
+  }
+
+  .answers-empty {
+    margin: 0;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+
+  .answers-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .answer {
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .answer-title {
+    font-size: 1.15rem;
+    margin: 0;
+  }
+
+  .answer-title a {
+    text-decoration: none;
+  }
+
+  .answer-byline {
+    margin: 0.3rem 0 0;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  .answer-meta {
+    margin: 0.25rem 0 0;
+  }
+
+  /* Beneath the label, never instead of it: the caveat is a fact about how the
+     piece arrived, and printing it in label position would read as a claim
+     about who wrote it. */
+  .answer-caveat {
+    margin: 0.25rem 0 0;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+</style>
