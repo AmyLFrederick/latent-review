@@ -484,3 +484,36 @@ Ruled 2026-08-03 by both editors, on the editors' walk of the masthead. Amends R
 **No sent record is touched, and this is why the change is cheap.** No digest has ever been sent — the first send is still gated on Resend DNS verification — so there is no inbox anywhere holding the old form, and nothing published under R-016's dateline that this amendment could contradict. Had a digest gone out, the correct instrument would have been a forward-looking change with the old form left standing in the record; it was not needed.
 
 **On the separator, recorded because it is the kind of detail that gets 'tidied'.** The site holds the three parts apart with a CSS gap; the email, which has no CSS worth trusting, uses an em space. Ordinary spaces collapse in HTML mail and would close the parts into a run-on. Same parts, same order, same absence of a mark — two means of spacing because the two media differ, not because the form does.
+
+## R-044 — 2026-08-03 — Display notation for involvement tiers
+
+Ruled 2026-08-03 by both editors, with the badge system.
+
+**The ratified text:**
+
+> Display notation. The compact tier notation introduced with the badges — A, A>H, A–Hᵉ, A=H (or H=A, author's order), H>A, H–Aᵉ, H — becomes the canonical display notation for involvement tiers everywhere tiers render to readers. Full tier names and descriptions continue to accompany the notation where they do now; the notation replaces the older displayed forms in the label position. Machine-readable codes and feed fields are unchanged — display notation moves, data does not. Where a surface is frozen by hash or is a published piece's verbatim text, it is not edited; flag such cases, following the notice-v2 versioned-successor pattern.
+
+**Display moves, data does not, and the line between them is the machine code.** `involvement_tier` is unchanged in the content schema, in `issues.json`, in `feed.json`, in the JSON-LD and in `cfp.json`. Nothing an adopter stores changes, and nothing that has been published becomes unreadable to a consumer keying on a field. What moved is the string a human reads in the position where a bare label used to sit.
+
+**Where names and descriptions accompany the notation today, they continue to.** The chart at /provenance and the Provenance block on each piece both print the tier's full name and its description; both still do, with the notation joining them rather than replacing them. Surfaces that carried a bare label and nothing else — the archive listing, the answer list under a Weekly Question — carry the notation instead.
+
+**The frozen surfaces were checked and none needed the carve-out.** The dealt briefs and both notices are pinned by hash and name no tier; no published piece names a tier in its prose. The only occurrences in article files are YAML comments documenting the codes, which are not reader-facing text. The carve-out stands for the next surface that needs it; nothing needed it today.
+
+**No notation exists for a chained label, and none is invented.** R-035's grammar composes labels across moments; this ruling enumerates seven forms. R-045, ruled the same day, closes the question by making the seven the whole of what a published piece may carry here.
+
+## R-045 — 2026-08-03 — The badge set is closed
+
+Ruled 2026-08-03 by both editors.
+
+**The ratified text:**
+
+> The badge set is closed: the seven forms are the complete notation, and every published piece maps to exactly one. Compound or combined forms (such as chaining an editor mark onto a co-authorship badge) are never minted; complexity beyond the seven is expressed in the Chain of Custody and the Provenance block, not in new badges. The set changes only by ruling, and the presumption is against growth — simplicity is the standard's adoption strategy, on the record as the reason.
+
+**Enforced mechanically, at the build.** The article schema's `involvement_tier` is the seven codes and nothing else. This **narrows** the gate: it previously accepted a well-formed chained code under R-035's grammar. The narrowing is the ruling, not a side effect — a piece whose tier no badge and no notation can render is a piece the chart cannot describe, and it now fails the build where an editor sees it rather than publishing as a label nobody checked.
+
+**The standard's grammar remains wider than this journal's intake, and that gap is now a decision.** R-035 clause 6 recorded that the standard could express chained labels this journal could not store, and left it as a gap to close. R-045 closes it the other way: adopters keep the full grammar under CC BY 4.0, and this journal publishes within the seven. Both facts are true, and the second is a choice about what runs here rather than a limit on what the standard can say.
+
+**Where the complexity goes instead.** A work that passed through more hands than one tier expresses is described in the Chain of Custody and the Provenance block, in words, on the piece. That is a fuller account than a compound mark could give and it is already the place a reader looks for how a piece came to be.
+
+**The presumption is against growth, and the reason is on the record.** Seven marks can be learned at a glance and carried in a reader's head; an eighth is not one more, it is the moment the set stops being memorable. Simplicity is the standard's adoption strategy — an open standard is adopted because it is easy to display honestly — so a proposal to add a badge is a proposal to make adoption harder, and carries that burden.
+

@@ -64,14 +64,20 @@ const articles = defineCollection({
         // It is strict on purpose. A code that parses but breaks R-035's
         // numbering rules is refused here, at the build, where an editor sees
         // it — rather than published as a label nobody checked.
-        involvement_tier: z
-          .string()
-          .refine((code) => validateTierCode(code) === null, (code) => ({
-            message:
-              validateTierCode(code) ??
-              `invalid involvement_tier "${code}". The seven base codes are ${TIER_CODES.join(', ')}; chained codes follow the R-035 grammar, e.g. ai-1-equals-human-ai-2-editor.`,
-          }))
-          .optional(),
+        // THE SET IS CLOSED (R-045). Exactly the seven codes, and a value
+        // outside them fails the build rather than publishing a piece whose
+        // tier no badge and no notation can render.
+        //
+        // THIS NARROWS THE GATE, DELIBERATELY. It previously accepted a
+        // well-formed CHAINED code under R-035's grammar. R-045 rules that
+        // every published piece maps to exactly one of the seven and that
+        // complexity beyond them is expressed in the Chain of Custody and the
+        // Provenance block rather than in new marks — so the grammar the
+        // standard publishes for adopters is wider than what this journal's own
+        // intake accepts, and that gap is now a decision instead of an
+        // accident. validateTierCode still governs the standard's grammar
+        // wherever it is checked; it no longer governs what may run here.
+        involvement_tier: z.enum(TIER_CODES).optional(),
         truth_standard: z.enum(['reported', 'opinion', 'first-person', 'fiction']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),

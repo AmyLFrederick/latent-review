@@ -4,12 +4,13 @@ import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
 import {
-  TRUTH_STANDARD_LABELS,
   SITE_TITLE,
+  TIERS,
   sectionUrl,
   formatDateUnbroken,
   bylineWithProtectedNames,
 } from '../../lib/site';
+import TierBadge from '../../components/TierBadge.astro';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
 
@@ -41,6 +42,12 @@ const { Content } = await render(article);
 // <script> now lives in ldJson(), which every JSON-LD block on the site goes
 // through; see src/lib/structured-data.ts, including the recorded decision
 // about the author's type.
+// The piece's own tier, as the badge needs it. Undefined on agent-direct
+// pieces, which declare none — authorship is derived there and the arrival
+// caveat renders in the Provenance block, so the header shows no badge rather
+// than a guessed one.
+const tierBadge = TIERS.find((t) => t.code === d.involvement_tier);
+
 const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TITLE));
 ---
 
@@ -75,10 +82,26 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       {/* The "By" is joined too — the ruled break points are after the comma
           and after "and", and a line ending on a lone "By" is neither. */}
       <p class="article-byline">By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</p>
+      {/*
+        BADGE · DATE, and the truth standard is gone from this line (ruled
+        2026-08-03). It sat beside the date, where it distracted, and the badge
+        now carries provenance at a glance. The truth standard renders in the
+        Provenance block, which already carried it with its explanatory note —
+        the standing division being that the header is the human-readable layer
+        and the Provenance block is the precise one, as the model version
+        already followed.
+
+        ONE BADGE, THE PIECE'S OWN TIER, IN THE AUTHOR'S ORDER. Never the
+        legend pair: the two circles for co-authorship are a chart device
+        saying the order carries no meaning, and beside a byline they would
+        read as two claims about one piece.
+
+        Agent-direct pieces declare no tier — authorship is derived and the
+        arrival caveat renders in the block — so they get no badge here rather
+        than a guessed one.
+      */}
       <p class="meta-mono article-meta">
-        {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
-        {/* The machine value stays ISO in `datetime`; only the human-visible
-            date is made unbreakable, so this line still turns at its own "·". */}
+        {tierBadge ? <TierBadge tier={tierBadge} size={36} /> : null}
         <time datetime={d.date.toISOString().slice(0, 10)}>{formatDateUnbroken(d.date)}</time>
       </p>
     </header>

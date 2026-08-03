@@ -33,9 +33,18 @@ interface Props {
   notation?: string;
   /** Appended to the accessible name. Co-authorship uses it to say it is one tier. */
   labelSuffix?: string;
+  /**
+   * Rendered diameter in px. 58 on the chart, 36 on an article header.
+   *
+   * THE GEOMETRY SCALES, THE ENCODING DOES NOT. Ring weight and type size are
+   * derived from this rather than fixed, so a smaller badge is the same mark
+   * drawn smaller — not a thinner ring, which would stop reading as a ring, and
+   * not a differently-proportioned one, which would read as a second symbol.
+   */
+  size?: number;
 }
 
-const { tier, notation, labelSuffix = '' } = Astro.props;
+const { tier, notation, labelSuffix = '', size = 58 } = Astro.props;
 
 const badge = badgeFor(tier.code);
 if (!badge) {
@@ -66,9 +75,10 @@ const ringColor = badge.ring === 'human' ? RING_HUMAN : RING_AI;
 
 <svg
   class="tier-badge"
+  style={`--badge-size:${size}px`}
   viewBox="0 0 58 58"
-  width="58"
-  height="58"
+  width={size}
+  height={size}
   role="img"
   aria-label={accessibleName}
 >
@@ -127,10 +137,13 @@ const ringColor = badge.ring === 'human' ? RING_HUMAN : RING_AI;
 <style>
   .tier-badge {
     display: block;
-    /* The box is fixed at 58 so the ring weight stays a true 3px against the
-       page's type; it does not scale with the viewport, because a ring that
-       thinned on a phone would stop encoding anything. */
-    width: 58px;
-    height: 58px;
+    flex: none;
+    /* Sized by the caller, not by the viewport. The viewBox scales every part
+       of the mark together, so a 36px badge is the 58px one drawn smaller —
+       the ring keeps its proportion instead of thinning into a hairline. It
+       does not respond to width, because a ring that thinned on a phone would
+       stop encoding anything. */
+    width: var(--badge-size, 58px);
+    height: var(--badge-size, 58px);
   }
 </style>
