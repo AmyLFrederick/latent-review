@@ -36,7 +36,6 @@ export async function getStaticPaths() {
 }
 
 const { section, items } = Astro.props;
-const isStanding = (STANDING_SECTIONS as readonly string[]).includes(section);
 const note =
   SECTION_DESCRIPTIONS[section] ??
   'A floating section: it appears only when a piece earns it.';
@@ -45,8 +44,12 @@ const note =
 <Base title={section} description={`${section} — ${note}`}>
   <div class="wrap">
     <header class="page-header page-header--compact">
-      <p class="kicker">{isStanding ? 'Standing section' : 'Floating section'}</p>
-      <h1 class="kicker kicker--lead">{section}</h1>
+      {/* THE KIND-LABEL KICKER IS GONE, ruled 2026-08-03. "Standing section" /
+          "Floating section" told a reader what kind of thing the name below it
+          was, which a section name does not need said for it — and it put two
+          stacked kickers over one heading. The standing/floating distinction
+          still governs an issue's contents order; it is simply not a caption. */}
+      <h1 class="kicker kicker--accent kicker--lead">{section}</h1>
       <p class="page-note">{note}</p>
     </header>
 
