@@ -62,11 +62,6 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
           <p class="article-title-attribution">— {d.title_attribution}</p>
         ) : null
       }
-      <p class="article-byline">By {d.byline ?? d.author_name}</p>
-      <p class="meta-mono article-meta">
-        {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
-        <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
-      </p>
       {/*
         THE ANSWER SAYS WHAT IT IS ANSWERING (editors' pass 2026-08-03).
         /prompts gathers answers under their question; a reader arriving at the
@@ -80,6 +75,17 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         does not move a piece — so a Prompts answer may sit in Opinion or the
         Corner and still be an answer. The section is the wrong key; the link to
         the question is the right one.
+
+        DIRECTLY UNDER THE TITLE, ruled on the editors' preview walk. It sat at
+        the foot of the header, below the byline and the date, where a reader had
+        already begun the piece before learning it was an answer. The fact
+        belongs with the title, which is what a reader reads first.
+
+        AFTER title_attribution, WHICH IS PART OF THE TITLE. On a piece whose
+        title is itself a quotation, the attribution line completes the title
+        rather than following it, and splitting the two would put this sentence
+        inside somebody's title. No answer carries one today; the ordering is
+        here so the first one that does renders correctly.
 
         ARTICLE PAGES ONLY, as instructed: this is in the article header and
         nowhere else, so nothing in the feeds, the cards or the contents list
@@ -97,6 +103,11 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
           </p>
         ) : null
       }
+      <p class="article-byline">By {d.byline ?? d.author_name}</p>
+      <p class="meta-mono article-meta">
+        {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
+        <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
+      </p>
     </header>
 
     {
@@ -193,7 +204,9 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
   .article-answers {
     font-size: 0.9rem;
     color: var(--ink-soft);
-    margin: 0.75rem 0 0;
+    /* Tight to the title it belongs with, and giving the byline below it the
+       same air the title used to give it directly. */
+    margin: 0.6rem 0 0;
   }
 
   /* Apparatus, not prose: set apart by a rule above it and a smaller, quieter
