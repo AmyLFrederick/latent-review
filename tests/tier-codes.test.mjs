@@ -53,7 +53,7 @@ test('no base code carries a number, so numbered forms cannot collide', () => {
 
 test('the ruling worked example formats as the ruling writes it', () => {
   // R-035's own example, which is the one case the ruling spells out end to end.
-  assert.equal(formatTierCode('ai-1-equals-human-ai-2-editor'), 'AI¹ = Human + AI² (editor)');
+  assert.equal(formatTierCode('ai-1-equals-human-ai-2-editor'), 'AI¹ = Human – AI² (editor)');
   assert.equal(isChainedTierCode('ai-1-equals-human-ai-2-editor'), true);
 });
 
@@ -61,13 +61,13 @@ test('R-020 same-kind relations are expressible and take no numbers', () => {
   // A same-kind relation is parties at ONE moment, not a chain — so `AI = AI`
   // is valid unnumbered, and numbering it is an error (see the next test).
   assert.equal(formatTierCode('ai-equals-ai'), 'AI = AI');
-  assert.equal(formatTierCode('human-human-editor'), 'Human + Human (editor)');
+  assert.equal(formatTierCode('human-human-editor'), 'Human – Human (editor)');
   assert.equal(isChainedTierCode('ai-equals-ai'), false);
 });
 
 test('longer chains compose without special-casing', () => {
-  assert.equal(formatTierCode('ai-1-human-ai-2'), 'AI¹ + Human + AI²');
-  assert.equal(formatTierCode('human-1-ai-human-2-editor'), 'Human¹ + AI + Human² (editor)');
+  assert.equal(formatTierCode('ai-1-human-ai-2'), 'AI¹ > Human > AI²');
+  assert.equal(formatTierCode('human-1-ai-human-2-editor'), 'Human¹ > AI – Human² (editor)');
 });
 
 // --- 3. The numbering rules of R-035 clause 2 ------------------------------
@@ -139,8 +139,8 @@ test('parse never throws on hostile input', () => {
 // --- 5. The resolvers, which are what render paths actually call ------------
 
 test('tierLabel resolves both the seven and a chain', () => {
-  assert.equal(tierLabel('ai-human'), 'AI + Human');
-  assert.equal(tierLabel('ai-1-equals-human-ai-2-editor'), 'AI¹ = Human + AI² (editor)');
+  assert.equal(tierLabel('ai-human'), 'AI > Human');
+  assert.equal(tierLabel('ai-1-equals-human-ai-2-editor'), 'AI¹ = Human – AI² (editor)');
 });
 
 test('THE FIX — an unknown code resolves to null, not to a confident label', () => {
@@ -173,10 +173,10 @@ test('an unnumbered label splits to a single text run and gains nothing', () => 
 });
 
 test('a numbered label splits into text runs and party numbers', () => {
-  assert.deepEqual(splitLabelSuperscripts('AI¹ = Human + AI² (editor)'), [
+  assert.deepEqual(splitLabelSuperscripts('AI¹ = Human – AI² (editor)'), [
     { text: 'AI' },
     { sup: '1' },
-    { text: ' = Human + AI' },
+    { text: ' = Human – AI' },
     { sup: '2' },
     { text: ' (editor)' },
   ]);
@@ -191,7 +191,7 @@ test('consecutive superscripts read as ONE number, not two', () => {
 test('splitting a label round-trips its visible characters', () => {
   // Nothing is dropped and nothing is invented: the parts, reassembled, are the
   // label again. This is what keeps the markup path from quietly editing copy.
-  const label = 'Human¹ + AI + Human² (editor)';
+  const label = 'Human¹ > AI – Human² (editor)';
   const rebuilt = splitLabelSuperscripts(label)
     .map((p) => (p.sup ? { 1: '¹', 2: '²' }[Number(p.sup)] : p.text))
     .join('');

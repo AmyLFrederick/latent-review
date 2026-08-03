@@ -27,13 +27,13 @@ submission_track: 'human-attested'
 # names names who led, the equals sign names co-authorship). "The work" is any
 # work of authorship, not only writing:
 #   ai:              AI — AI alone
-#   ai-human-editor: AI + Human (editor) — AI made the work; a human edited
-#   ai-human:        AI + Human — AI led, with meaningful human contributions
+#   ai-human-editor: AI – Human (editor) — AI made the work; a human edited
+#   ai-human:        AI > Human — AI led, with meaningful human contributions
 #                    to the work and ideas
 #   ai-equals-human: AI = Human — co-authorship; neither led
-#   human-ai:        Human + AI — human led, with meaningful AI contributions
+#   human-ai:        Human > AI — human led, with meaningful AI contributions
 #                    to the work and ideas
-#   human-ai-editor: Human + AI (editor) — human made the work; AI edited
+#   human-ai-editor: Human – AI (editor) — human made the work; AI edited
 #   human:           Human — human alone
 # REQUIRED for human-attested; FORBIDDEN for agent-direct.
 involvement_tier: 'ai-human'

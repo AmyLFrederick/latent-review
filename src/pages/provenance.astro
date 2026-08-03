@@ -132,8 +132,9 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
       <p>
         The spectrum runs {TIERS.map((t) => t.label).join(' · ')} — from fully AI to fully
         human, symmetric about the middle. The <strong>(editor)</strong> annotation names a
-        party whose role was editing only; the bare <strong>+</strong> form means the second
-        party contributed substantively; <strong>AI = Human</strong> is co-authorship — both
+        party whose role was editing only, and the <strong>–</strong> before it marks that
+        role in the operator itself; the <strong>&gt;</strong> form means the second party
+        contributed substantively; <strong>AI = Human</strong> is co-authorship — both
         contributed substantially and stand behind the whole, neither led. Equality is
         attested, not measured: the tier claims shared authorship, not a fifty-fifty
         accounting. One label, no footnotes, and a reader — human or machine — knows who led,
@@ -142,7 +143,7 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
       <p>
         The tiers above are the canonical common cases, not the whole grammar. Because the
         relations name roles rather than headcount, they compose among parties of the same
-        kind as well — <strong>AI = AI</strong>, <strong>Human + Human (editor)</strong> — and
+        kind as well — <strong>AI = AI</strong>, <strong>Human – Human (editor)</strong> — and
         any name may stand for more than one party. These fuller forms are available, never
         required: a work by several authors of one kind may simply carry the plain tier, and a
         finer relation is declared only when the authors want the record to carry it (R-020).
@@ -287,12 +288,13 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
       */}
       <p>
         When a label chains, its code chains with it, in the same grammar the seven already
-        use: <strong>+</strong> becomes a hyphen, <strong>=</strong> becomes{' '}
+        use: the bare operators <strong>&gt;</strong> and <strong>–</strong> become a hyphen,
+        <strong>=</strong> becomes{' '}
         <code>-equals-</code>, <strong>(editor)</strong> becomes a trailing{' '}
         <code>-editor</code>, and a numbered party carries its number as a suffix —{' '}
         <code>ai-1</code>, <code>ai-2</code>. So{' '}
         <strong>
-          AI<sup class="tier-num">1</sup> = Human + AI<sup class="tier-num">2</sup> (editor)
+          AI<sup class="tier-num">1</sup> = Human – AI<sup class="tier-num">2</sup> (editor)
         </strong>{' '}
         encodes as <code>ai-1-equals-human-ai-2-editor</code>. This is an addition and not a
         change: the seven codes above are untouched, remain valid, and never carry a number —
@@ -356,7 +358,7 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
 
       <h2>Displaying it</h2>
       <p>
-        The simplest form is a line beside the byline — <em>Provenance: AI + Human</em> —
+        The simplest form is a line beside the byline — <em>Provenance: AI &gt; Human</em> —
         linking here for the definitions. A small provenance badge for adopting publications
         and writers is being designed and will be published on this page.
       </p>

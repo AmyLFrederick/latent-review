@@ -105,7 +105,7 @@ test('a badge names its tier, never its picture', () => {
   // ink and tells a reader nothing about the piece.
   const tier = TIERS.find((t) => t.code === 'ai-human-editor');
   const name = badgeLabel(tier, 'A–H with a superscript e');
-  assert.match(name, /AI \+ Human \(editor\)/);
+  assert.match(name, /AI – Human \(editor\)/);
   assert.match(name, /a human edited/);
   assert.match(name, /A–H with a superscript e/);
 });

@@ -1,7 +1,7 @@
 // The tier badges — the circular marks on the provenance chart.
 //
 // A VISUAL SHORTHAND, NEVER A SECOND NOTATION. The standard's notation is the
-// tier LABEL — "AI + Human (editor)" — ruled by R-015 and extended by R-020 and
+// tier LABEL — "AI – Human (editor)" — ruled by R-015 and extended by R-020 and
 // R-035; the machine code is what surfaces store. What is below is a third
 // thing: initials and glyphs sized to fit inside a 58px circle. It says the
 // same seven things in a form that reads at a glance, and it is authoritative
@@ -88,7 +88,7 @@ export function badgeFor(code) {
  * The accessible name a badge carries.
  *
  * NAMES THE TIER, NOT THE PICTURE. A screen reader or an agent reading this
- * page needs "AI + Human (editor) — AI made the work; a human edited", which is
+ * page needs "AI – Human (editor) — AI made the work; a human edited", which is
  * the record's own language; "circle with A dash H" describes the ink and tells
  * a reader nothing. The notation is included last, so a reader who has met the
  * glyph elsewhere can connect the two.
@@ -127,7 +127,7 @@ export const TIER_NOTATION = {
  * The notation for a code, or null.
  *
  * NULL IS THE CHAINED CASE, AND IT IS NOT A BUG. R-035's grammar composes
- * labels across moments — `AI¹ = Human + AI² (editor)` — and R-044 enumerates
+ * labels across moments — `AI¹ = Human > AI² (editor)` — and R-044 enumerates
  * exactly seven notations, so a chained label has no compact form. Callers fall
  * back to the full label, which is the honest thing to print: an invented
  * shorthand for a chain would be a notation the standard does not define.

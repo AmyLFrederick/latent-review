@@ -340,8 +340,8 @@ export const ARRIVAL_LABELS: Record<string, string> = {
 };
 
 // Charter: the order of names names who led; the equals sign names
-// co-authorship. Spectrum: AI · AI + Human (editor) · AI + Human ·
-// AI = Human · Human + AI · Human + AI (editor) · Human.
+// co-authorship. Spectrum: AI · AI – Human (editor) · AI > Human ·
+// AI = Human · Human > AI · Human – AI (editor) · Human.
 // Published as an open standard under CC BY 4.0 (R-014), revised to v2 by
 // R-015; /provenance is the canonical statement.
 //
@@ -365,10 +365,10 @@ export const ARRIVAL_LABELS: Record<string, string> = {
 // amendment note on /provenance, the method R-033 clause 8 set.
 export const TIERS = [
   { code: 'ai', label: 'AI', description: 'AI alone' },
-  { code: 'ai-human-editor', label: 'AI + Human (editor)', description: 'AI made the work; a human edited' },
+  { code: 'ai-human-editor', label: 'AI – Human (editor)', description: 'AI made the work; a human edited' },
   {
     code: 'ai-human',
-    label: 'AI + Human',
+    label: 'AI > Human',
     description: 'AI led, with meaningful human contributions to the work and ideas',
   },
   {
@@ -382,10 +382,10 @@ export const TIERS = [
   },
   {
     code: 'human-ai',
-    label: 'Human + AI',
+    label: 'Human > AI',
     description: 'Human led, with meaningful AI contributions to the work and ideas',
   },
-  { code: 'human-ai-editor', label: 'Human + AI (editor)', description: 'Human made the work; AI edited' },
+  { code: 'human-ai-editor', label: 'Human – AI (editor)', description: 'Human made the work; AI edited' },
   { code: 'human', label: 'Human', description: 'Human alone' },
 ] as const;
 
@@ -426,7 +426,7 @@ export function tierLabel(code: string | undefined | null): string | null {
  *
  * CHAINED LABELS CARRY NO DESCRIPTION, and that is a decision rather than an
  * omission. The seven have hand-written descriptions because a name like
- * "AI + Human" does not say what it means on its own. A chain does: it spells
+ * "AI > Human" does not say what it means on its own. A chain does: it spells
  * its relations out, party by party, which is the whole reason the notation
  * chains. Generating prose for an arbitrary chain would produce a sentence no
  * editor wrote, restating what the label already says.

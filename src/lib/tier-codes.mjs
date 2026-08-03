@@ -8,16 +8,28 @@
 //
 // THE CENTRAL CLAIM, AND THE TEST THAT KEEPS IT HONEST. The seven base codes are
 // not special cases here — they are what this grammar produces when nothing
-// repeats. `ai-human-editor` parses to "AI + Human (editor)" by the same rules
-// that turn `ai-1-equals-human-ai-2-editor` into "AI¹ = Human + AI² (editor)".
+// repeats. `ai-human-editor` parses to "AI – Human (editor)" by the same rules
+// that turn `ai-1-equals-human-ai-2-editor` into "AI¹ = Human – AI² (editor)".
+//
+// THAT CHAINED FORM EXTENDS R-046 RATHER THAN QUOTING IT. The ruling names four
+// base labels; applying the same operator rule to a chain is what keeps ONE
+// grammar instead of two — but it means R-035's ratified example, which reads
+// "AI¹ = Human + AI² (editor)" and is published verbatim at /provenance, no
+// longer matches what this function produces. That text is flagged and not
+// edited, per R-046's own clause. Nothing can carry a chained code here since
+// R-045 closed the schema to the seven, so the divergence is between a
+// published example and a formatter, never between two live labels.
 // A test asserts that every one of the seven round-trips to exactly the label
 // TIERS already carries, which is what makes this add-only rather than a second
 // system standing beside the first.
 //
 // THE GRAMMAR, from R-035 clause 4:
-//   `+`        is a bare hyphen          ai-human          → AI + Human
-//   `=`        is `-equals-`             ai-equals-human   → AI = Human
-//   `(editor)` is a trailing `-editor`   ai-human-editor   → AI + Human (editor)
+//   the bare hyphen renders as the BADGE OPERATOR (R-046), and which one
+//   depends on the party it introduces:
+//     `>`      contributed             ai-human          → AI > Human
+//     `–`      edited                  ai-human-editor   → AI – Human (editor)
+//   `=`        is `-equals-`           ai-equals-human   → AI = Human
+//   `(editor)` is a trailing `-editor`, and now also selects the operator
 //   a numbered party suffixes its digit  ai-1, ai-2        → AI¹, AI²
 //
 // NO CODE IN THE SEVEN CONTAINS A DIGIT, which is what makes numbering safe to
@@ -132,7 +144,7 @@ export function parseTierCode(code) {
  * A CHAIN IS TWO OR MORE RELATIONS, and that reading is this module's, not a
  * phrase lifted from the ruling. R-035 describes chaining as a work passing
  * "through more hands", and one relation describes one passage; the ruling's own
- * worked example, AI¹ = Human + AI² (editor), is the two-relation case. If the
+ * worked example, AI¹ = Human – AI² (editor) in the operators R-046 gives it, is the two-relation case. If the
  * editors read it otherwise the constant below is where it changes.
  */
 const CHAIN_MIN_RELATIONS = 2;
@@ -198,7 +210,15 @@ export function formatTierCode(code) {
   const { parties, relations } = parsed;
   let out = '';
   parties.forEach((party, index) => {
-    if (index > 0) out += ` ${relations[index - 1]} `;
+    // R-046: the bare relation renders as the badge operator, and WHICH
+    // operator depends on the party it introduces. "–" when that party edited,
+    // ">" when it contributed — the same distinction the plus sign used to
+    // leave to the "(editor)" annotation alone, now carried by the operator
+    // itself. "=" is unchanged; it was already the badge grammar.
+    if (index > 0) {
+      const relation = relations[index - 1];
+      out += ` ${relation === '+' ? (party.editor ? '–' : '>') : relation} `;
+    }
     out += KINDS[party.kind];
     if (party.number !== null) out += SUPERSCRIPTS[party.number];
     if (party.editor) out += ' (editor)';
