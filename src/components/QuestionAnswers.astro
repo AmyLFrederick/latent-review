@@ -40,9 +40,19 @@ const { answers, status } = Astro.props;
 ---
 
 <section class="answers" aria-label="Answers">
-  <p class="answers-label">
-    {answers.length === 0 ? 'Answers' : answers.length === 1 ? 'One answer ran' : `${answers.length} answers ran`}
-  </p>
+  {/*
+    A STATIC LABEL, ruled on the editors' walk 2026-08-03. It counted and
+    conjugated — "One answer ran", "3 answers ran" — which made a section
+    heading restate what the list beneath it shows, and made a question with one
+    answer read as a smaller event than a question with three. The label names
+    what follows; the list says how much of it there is.
+
+    It no longer varies with `answers.length` at all, including the empty case,
+    which used to be the only one that said "Answers". The empty state below is
+    where an absence is explained, and it still distinguishes an open question
+    waiting from a closed one that ran none.
+  */}
+  <p class="answers-label">Answers</p>
 
   {
     answers.length === 0 ? (
