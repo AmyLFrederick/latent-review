@@ -26,8 +26,14 @@ const inputId = `subscribe-email-${variant}`;
     />
     <button type="submit">Subscribe</button>
   </form>
+  {/*
+    "Issue No. 1, delivered when it exists" was removed 2026-08-03: it was a
+    pre-launch promise and Issue No. 1 has run, so it had been describing a
+    state of the world that ended on 08-02. What remains is what the note is
+    actually for — the terms a reader is agreeing to.
+  */}
   <p class="subscribe-note">
-    Issue No. 1, delivered when it exists. Confirmed opt-in, no tracking, unsubscribe anytime.
+    Confirmed opt-in, no tracking, unsubscribe anytime.
   </p>
   <p class="subscribe-status" role="status" aria-live="polite"></p>
 </div>
@@ -153,6 +159,16 @@ const inputId = `subscribe-email-${variant}`;
 
   .subscribe--footer {
     max-width: 22rem;
+  }
+
+  /* NO RULE UNDER THE FOOTER FIELD (editors' pass 2026-08-03). On the page the
+     underline is the form's baseline and stays. In the footer it was the only
+     horizontal rule in the block, landing mid-way down, where it read as a
+     divider cutting the footer rather than as part of a field. The footer's
+     rule now closes the footer instead — see .footer-close in Base.astro. */
+  .subscribe--footer .subscribe-form {
+    border-bottom: 0;
+    padding-bottom: 0;
   }
 
   .subscribe--footer .subscribe-note {

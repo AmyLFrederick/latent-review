@@ -164,26 +164,38 @@ const currentIssue = await getCurrentIssue();
           </div>
         )
       }
-      <nav class="wrap" aria-label="Journal">
-        <ul>
-          {/* ONE LOOP OVER ONE ROSTER. Letters and Prompts used to be hand-written
-              after a loop over STANDING_SECTIONS, which worked only while every
-              section preceded them. The Corner now follows them (ruled 2026-08-03),
-              so the two kinds of entry interleave and the roster has to be a single
-              ordered list. It is NAV_ROSTER in src/lib/site.ts, which is also where
-              the reasoning for the order lives.
+      {/* ONE ROSTER, RENDERED AS TWO ROWS. NAV_ROSTER in src/lib/site.ts is a
+          single ordered list and remains the only place the order is decided;
+          this partitions it at the entry marked startsSecondRow.
 
-              Sections resolve through sectionNavHref, so a direct-open section still
-              opens this issue's piece; Topics still resolves to /topics/, the URL it
-              kept when R-032 made it a section. */}
-          {NAV_ROSTER.map((entry) => (
-            <li class={entry.ownRow ? 'nav-own-row' : undefined}>
-              <a href={entry.section ? sectionNavHref(entry.section, currentIssue) : entry.href}>
-                {entry.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+          TWO <ul>s RATHER THAN A FORCED WRAP. The rows used to be one list with
+          a full-width item, which made the break a property of CSS: at a width
+          the layout did not anticipate, the rows reflow and the arrangement the
+          editors approved is not the one a reader sees. Two lists make the
+          break structural, and it holds at every width — which is what "show us
+          on preview" is worth only if the preview is what ships.
+
+          Sections resolve through sectionNavHref, so a direct-open section still
+          opens this issue's piece; Topics still resolves to /topics/, the URL it
+          kept when R-032 made it a section. */}
+      <nav class="wrap nav-rows" aria-label="Journal">
+        {[
+          NAV_ROSTER.slice(
+            0,
+            NAV_ROSTER.findIndex((e) => e.startsSecondRow)
+          ),
+          NAV_ROSTER.slice(NAV_ROSTER.findIndex((e) => e.startsSecondRow)),
+        ].map((row) => (
+          <ul>
+            {row.map((entry) => (
+              <li>
+                <a href={entry.section ? sectionNavHref(entry.section, currentIssue) : entry.href}>
+                  {entry.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ))}
       </nav>
     </header>
 
@@ -240,10 +252,20 @@ const currentIssue = await getCurrentIssue();
             The governance row's Provenance link is the standard and keeps the
             word; this link is the repository and now says so. Nothing about
             what the link points at has changed. */}
+        {/*
+          TWO LINES, SPLIT BY WHAT THE LINKS ARE (editors' pass 2026-08-03). The
+          first is what a machine reader SUBSCRIBES to — the feeds and the map
+          of the site. The second is what it goes to in order to check us:
+          the sitemap and the repository. They are separate `<p>`s rather than a
+          `<br>` so the split holds as a structure rather than as a line break
+          that reflows away on a wide screen.
+        */}
         <p class="meta-mono footer-machine">
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
-          <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
-          <a href={REPO_URL}>source code</a>
+          <a href="/llms.txt">llms.txt</a>
+        </p>
+        <p class="meta-mono footer-machine footer-machine--second">
+          <a href="/sitemap-index.xml">sitemap</a> · <a href={REPO_URL}>source code</a>
         </p>
         {/*
           THE FOOTER LINK GOES TO THE PAGE, NOT TO A SECTION OF ANOTHER PAGE. It used to
@@ -254,6 +276,16 @@ const currentIssue = await getCurrentIssue();
         <p class="footer-support">
           <a href="/supporters/">Support the journal</a>
         </p>
+        {/*
+          THE DIVIDER CLOSES THE FOOTER RATHER THAN INTERRUPTING IT (editors'
+          pass 2026-08-03). The only rule in this footer used to be the one
+          under the subscribe field, which fell in the middle of the block and
+          read as a divider slicing the footer in half. The field keeps its
+          underline on the page variant, where it is the form's own baseline;
+          in the footer it is gone, and the rule that remains is this one — at
+          the very end, under Support the journal, closing the page.
+        */}
+        <hr class="single-rule footer-close" />
       </div>
     </footer>
   </body>
@@ -316,21 +348,24 @@ const currentIssue = await getCurrentIssue();
        must wrap on a phone, the lines should still breathe. Nothing here touches
        the roster's membership, which is ruled (R-026 c6, R-027 c3, R-032 c7). */
     gap: 0.4rem clamp(0.75rem, 2.4vw, 1.6rem);
+  }
+
+  /* THE TWO ROWS ARE STRUCTURAL (editors' pass 2026-08-03). The rules live on
+     the nav rather than on each <ul>, so the two lists read as one bordered
+     block with a break inside it rather than as two stacked bars. */
+  .nav-rows {
     border-top: 1px solid var(--hairline);
     border-bottom: 1px solid var(--hairline);
   }
 
-  /* THE SECOND ROW, TAKEN DELIBERATELY (ruled 2026-08-03). A full-width flex
-     item forces the wrap rather than waiting for one: the break happens at every
-     width, on a phone and on a desk, so the layout is a decision the reader can
-     see rather than an artifact of their window. The longest name in the roster
-     gets the widest berth — the opposite of the abbreviation it used to get.
+  /* The rows sit tight to each other: the padding above belongs to the block,
+     not to each line, or the break would open a gap that reads as a divider. */
+  .nav-rows ul + ul {
+    padding-top: 0;
+  }
 
-     Centred by text-align, not by the ul's justify-content, which centres the
-     row's items as a group and has nothing to do once the row holds one. */
-  nav li.nav-own-row {
-    flex-basis: 100%;
-    text-align: center;
+  .nav-rows ul:first-child {
+    padding-bottom: 0.25rem;
   }
 
   nav a {
@@ -377,6 +412,20 @@ const currentIssue = await getCurrentIssue();
     margin-top: 1.4rem;
   }
 
+  /* The second machine line sits under the first as a continuation, not as a
+     new group — so it takes the leading between lines, never the 1.4rem that
+     separates the footer's blocks from each other. */
+  .footer-machine--second {
+    margin-top: 0.3rem;
+  }
+
+  /* The blank line before Support the journal (editors' pass 2026-08-03): the
+     link is the last thing the footer asks of a reader, and it reads as an ask
+     rather than as another row of links when it has air above it. */
+  .footer-close {
+    margin-top: 2.2rem;
+  }
+
   /* Human governance links — relocated from the top nav. Kept in the human
      voice (letterspaced small caps, not the monospace of the machine row) so
      the two link rows stay visually distinct. */
@@ -409,7 +458,9 @@ const currentIssue = await getCurrentIssue();
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-top: 1.7rem;
+    /* Stepped up from 1.7rem to 2.6rem — the blank line the editors asked for
+       before Support the journal. */
+    margin-top: 2.6rem;
   }
 
   .footer-support a {

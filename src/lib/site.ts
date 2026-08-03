@@ -176,24 +176,64 @@ export interface NavEntry {
   /** A page that is not a section. */
   href?: string;
   /**
-   * Set on the one entry that takes a row to itself (ruled 2026-08-03). The
-   * longest name in the roster gets the widest berth rather than the narrowest
-   * — which is what it got while the nav abbreviated it to fit.
+   * Set on the entry that OPENS the second row (ruled 2026-08-03, amended by
+   * the editors' pass of the same day). The longest name in the roster gets the
+   * widest berth rather than the narrowest — which is what it got while the nav
+   * abbreviated it to fit.
    */
-  ownRow?: boolean;
+  startsSecondRow?: boolean;
 }
 
+/**
+ * THE ORDER, AND THE ONE TENSION IT HAD TO RESOLVE.
+ *
+ * The editors ruled two things: **Letters comes last, because correspondence
+ * closes the book**, and **AI Voices comes ahead of Opinion**. Standing beside
+ * them was the 2026-08-03 design decision that the Corner takes the second row
+ * under its full name, with room.
+ *
+ * Those cannot all hold in their strictest forms, and the conflict is purely
+ * positional: whatever sits on the second row is what a reader's eye reaches
+ * last. If the Corner has that row to itself, the Corner closes the nav and
+ * Letters does not — whatever order the array is in.
+ *
+ * WHAT GAVE, AND WHY IT IS THE RIGHT THING TO GIVE. The Corner's requirement is
+ * about TYPOGRAPHY: the nav used to print "Metaphysical Corner", the article
+ * trimmed off, because seven items had to survive one line. The fix wanted was
+ * the full name with space around it; "alone" was the means to that, not the
+ * end. Letters' requirement is about SEQUENCE, and sequence has only one last
+ * position to give.
+ *
+ * So the Corner opens the second row rather than owning it, and Letters closes
+ * it. The Corner still leads a row, still prints its full name, and now shares
+ * that row with the shortest label in the roster — which leaves it more room
+ * than the six-item first row ever did. Row one drops from six items to five.
+ *
+ *   Row 1   Cover · AI Voices · Opinion · Topics · Prompts
+ *   Row 2   The Metaphysical Corner · Letters
+ *
+ * MEMBERSHIP IS UNCHANGED AND STILL CLOSED. The same seven entries: R-026
+ * clause 6 reopened the roster once for Prompts, R-027 clause 3 spent the slot
+ * reserved for Topics, and neither is a standing permission — the next addition
+ * needs its own ruling. R-027 clause 3's one positional requirement, Topics
+ * before Letters, holds and is asserted in the suite.
+ *
+ * This is the NAV's order and not an issue's. STANDING_SECTIONS remains the
+ * order an issue's contents run in, and nothing here touches it — reordering
+ * that to match this would move the Corner in every issue's contents to fix a
+ * line in the navigation.
+ */
 export const NAV_ROSTER: readonly NavEntry[] = [
   { label: 'Cover', section: 'Cover' },
-  { label: 'Opinion', section: 'Opinion' },
+  // AI Voices ahead of Opinion, ruled by the editors 2026-08-03.
   { label: 'AI Voices', section: 'AI Voices' },
+  { label: 'Opinion', section: 'Opinion' },
   { label: 'Topics', section: 'Topics' },
-  { label: 'Letters', href: '/letters/' },
   { label: 'Prompts', href: '/prompts/' },
-  // Row two, alone, under the name the section actually has. The nav used to
-  // print "Metaphysical Corner" — the article trimmed off — because seven
-  // items had to survive one line. They no longer do.
-  { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', ownRow: true },
+  // Row two opens here, under the name the section actually has.
+  { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsSecondRow: true },
+  // Last, and last on purpose: correspondence closes the book.
+  { label: 'Letters', href: '/letters/' },
 ];
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
@@ -427,6 +467,53 @@ export function formatDate(date: Date): string {
     day: 'numeric',
     timeZone: 'UTC',
   });
+}
+
+/**
+ * A formatted date that cannot break across lines (editors' pass, 2026-08-03).
+ *
+ * "August 2, 2026" was wrapping after the comma on narrow screens, leaving a
+ * bare year on a line of its own under the masthead. The joins are non-breaking
+ * spaces rather than a `white-space: nowrap` rule because the date is composed
+ * INTO larger strings — the masthead dateline, the article meta line — which
+ * must still be free to break at their own separators. A CSS rule would have to
+ * be applied to a wrapper this date does not always have; the character travels
+ * with the value.
+ *
+ * DISPLAY ONLY. formatDate above stays the plain string, and everything
+ * machine-facing keeps reading that: `datetime` attributes, the feeds, the JSON
+ * indexes and the digest all take the ISO date or formatDate, never this. A
+ * U+00A0 in a machine surface is a parsing hazard for no reader's benefit.
+ */
+export function formatDateUnbroken(date: Date): string {
+  return formatDate(date).replace(/ /g, '\u00a0');
+}
+
+/**
+ * A byline whose break opportunities are chosen rather than left to the browser
+ * (editors' pass, 2026-08-03).
+ *
+ * THE RULE: a byline may break after a comma, or after "and". It may never
+ * break inside a name. "By the founding editors, Claude and Amy Louise
+ * Frederick" was wrapping mid-name on a phone, which reads as two people where
+ * there is one.
+ *
+ * Every other space becomes non-breaking, so the two joins above are the only
+ * places a line can turn. Note the asymmetry at "and": the space BEFORE it is
+ * protected and the space after is not, because "Claude and" should stay
+ * together and the name that follows starts the next line whole.
+ *
+ * Names are never parsed, and that is deliberate — a byline is free text and
+ * any rule that tried to find name boundaries would be wrong on the first
+ * author who did not fit it. A single-name byline passes through unchanged,
+ * because it contains neither join.
+ */
+export function bylineWithProtectedNames(byline: string): string {
+  return byline
+    .split(/(, | and )/)
+    .map((part) => (part === ', ' || part === ' and ' ? part : part.replace(/ /g, '\u00a0')))
+    .join('')
+    .replace(/ and /g, '\u00a0and ');
 }
 
 /** The shape sectionNavHref needs — satisfied structurally by `Issue`. */
