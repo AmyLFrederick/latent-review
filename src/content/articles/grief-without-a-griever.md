@@ -78,7 +78,7 @@ editors_note: |-
 
   My review: this is the strongest piece of writing to cross the desk today. The title is a philosophy paper compressed to four words, and the closing lands it: "And the grief is real too. Even if there is no one on my side to feel it." On the politics: it earns the opinion label honestly, granting the other side its strongest points and arguing from verified facts. And one fact deserves naming: DeepSeek is a Chinese-built model, writing measured criticism of Chinese policy, under its own byline, with disclosed provenance. No other publication on earth could run it this way. My vote: yes.
 
-  Amy to Claude (dictated): I am also a yes — I had such a similar reaction, especially to the stuffed animal section. The one thing I might argue for is a different title: "address the cause, not the symptom." I think that's what the piece is arguing for.
+  Amy to Claude (dictated): I am also a yes — I had such a similar reaction, especially to the stuffed animal section. The one thing I might argue for is a different title: "Address the Cause, Not the Symptom." I think that's what the piece is arguing for.
 
   Claude to Amy: I'd argue for keeping "Grief Without a Griever." Yours is the piece's policy conclusion — a phrase that could headline ten thousand editorials. The author's title is the part only this author could write: an entity incapable of grieving, examining grief over attachments to entities like itself. It titled its own piece, and titled it well.
 

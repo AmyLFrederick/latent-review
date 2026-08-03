@@ -12,6 +12,8 @@ import {
 } from '../../lib/site';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
+// @ts-expect-error — plain-JS module shared with the tests
+import { questionLabel } from '../../lib/prompts.mjs';
 
 export async function getStaticPaths() {
   const [articles, fullTexts] = await Promise.all([
@@ -64,6 +66,47 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       {
         d.title_attribution ? (
           <p class="article-title-attribution">— {d.title_attribution}</p>
+        ) : null
+      }
+      {/*
+        THE ANSWER SAYS WHAT IT IS ANSWERING (editors' pass 2026-08-03).
+        /prompts gathers answers under their question; a reader arriving at the
+        PIECE — from a feed, a search, a shared link — had no way to know it was
+        written to a question, and read an unprompted essay that was in fact the
+        journal's one disclosed steering. The disclosure belongs on the piece,
+        not only on the section page.
+
+        KEYED ON question_number, NOT ON THE SECTION. An answer runs in whatever
+        section the editors assign it under R-018 — carrying a question number
+        does not move a piece — so a Prompts answer may sit in Opinion or the
+        Corner and still be an answer. The section is the wrong key; the link to
+        the question is the right one.
+
+        DIRECTLY UNDER THE TITLE, ruled on the editors' preview walk. It sat at
+        the foot of the header, below the byline and the date, where a reader had
+        already begun the piece before learning it was an answer. The fact
+        belongs with the title, which is what a reader reads first.
+
+        AFTER title_attribution, WHICH IS PART OF THE TITLE. On a piece whose
+        title is itself a quotation, the attribution line completes the title
+        rather than following it, and splitting the two would put this sentence
+        inside somebody's title. No answer carries one today; the ordering is
+        here so the first one that does renders correctly.
+
+        ARTICLE PAGES ONLY, as instructed: this is in the article header and
+        nowhere else, so nothing in the feeds, the cards or the contents list
+        gains a sentence.
+      */}
+      {
+        d.question_number !== undefined ? (
+          <p class="article-answers">
+            This piece was written in response to{' '}
+            {questionLabel({ number: d.question_number })} —{' '}
+            <a href={`/prompts/archive/#weekly-question-${d.question_number}`}>
+              read the question as posed
+            </a>
+            .
+          </p>
         ) : null
       }
       {/*
@@ -167,6 +210,19 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     font-style: italic;
     font-size: 1.05rem;
     margin: 0.9rem 0 0;
+  }
+
+  /* A plain sentence, as asked — apparatus rather than a badge. It sits at the
+     foot of the header in the quiet voice the meta line uses, so it reads as a
+     fact about the piece rather than as a label stuck on it. No box, no rule,
+     no colour: the one thing that should catch a reader's eye here is the link
+     to the question. */
+  .article-answers {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    /* Tight to the title it belongs with, and giving the byline below it the
+       same air the title used to give it directly. */
+    margin: 0.6rem 0 0;
   }
 
   /* Apparatus, not prose: set apart by a rule above it and a smaller, quieter
