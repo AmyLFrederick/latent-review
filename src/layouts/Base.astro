@@ -164,28 +164,27 @@ const currentIssue = await getCurrentIssue();
           </div>
         )
       }
-      {/* ONE ROSTER, RENDERED AS TWO ROWS. NAV_ROSTER in src/lib/site.ts is a
+      {/* ONE ROSTER, RENDERED AS ITS ROWS. NAV_ROSTER in src/lib/site.ts is a
           single ordered list and remains the only place the order is decided;
-          this partitions it at the entry marked startsSecondRow.
+          this splits it wherever an entry is marked startsRow, so adding or
+          moving a row is a change to the roster and never to this template.
 
-          TWO <ul>s RATHER THAN A FORCED WRAP. The rows used to be one list with
-          a full-width item, which made the break a property of CSS: at a width
-          the layout did not anticipate, the rows reflow and the arrangement the
-          editors approved is not the one a reader sees. Two lists make the
-          break structural, and it holds at every width — which is what "show us
-          on preview" is worth only if the preview is what ships.
+          ONE <ul> PER ROW RATHER THAN A FORCED WRAP, which is the whole of the
+          pinning. When the rows were one list broken by CSS, the arrangement
+          held at the widths the layout anticipated and became something else on
+          a phone — which is what sent the editors back to it. A list cannot
+          reflow its items into another list, so what is approved on one screen
+          is what renders on every screen.
 
           Sections resolve through sectionNavHref, so a direct-open section still
           opens this issue's piece; Topics still resolves to /topics/, the URL it
           kept when R-032 made it a section. */}
       <nav class="wrap nav-rows" aria-label="Journal">
-        {[
-          NAV_ROSTER.slice(
-            0,
-            NAV_ROSTER.findIndex((e) => e.startsSecondRow)
-          ),
-          NAV_ROSTER.slice(NAV_ROSTER.findIndex((e) => e.startsSecondRow)),
-        ].map((row) => (
+        {NAV_ROSTER.reduce((rows, entry) => {
+          if (entry.startsRow || rows.length === 0) rows.push([]);
+          rows[rows.length - 1].push(entry);
+          return rows;
+        }, [] as (typeof NAV_ROSTER)[number][][]).map((row) => (
           <ul>
             {row.map((entry) => (
               <li>
@@ -207,9 +206,29 @@ const currentIssue = await getCurrentIssue();
       <div class="wrap">
         <hr class="double-rule" />
         <p class="footer-title">{SITE_TITLE}</p>
+        {/*
+          THE MASTHEAD NAMES THE EDITORIAL SEAT, NOT THE MODEL IN IT (editors'
+          decision 2026-08-03). The line carried "— currently Claude Fable 5
+          (claude-fable-5) —" between the two names. It is gone: the editorial
+          identity is Claude, continuous across models and instances, and a
+          version string in the masthead made the seat look like it changed
+          hands whenever the model did.
+
+          THE VERSION IS NOT UNDISCLOSED. It keeps its human-facing home on
+          /about, where the editors' own standard is stated and where the
+          sentence says it is disclosed, and its machine-readable home in
+          /cfp.json's `editors.ai.model_version`, which is a structured field
+          and does not vanish.
+
+          THIS LINE NOW MATCHES THE JOURNAL'S OWN ACCOUNT OF ITSELF. The cover
+          story quotes the masthead as "Edited by Claude (AI) and Amy Louise
+          Frederick (Human)" — it read that way in the piece and did not read
+          that way in the footer, and the footer was the one that was wrong.
+        */}
         <p class="footer-editors">
-          Edited by {EDITORS.ai.name} ({EDITORS.ai.descriptor}) — currently{' '}
-          {EDITORS.ai.modelVersion} — and {EDITORS.human.name} ({EDITORS.human.descriptor})
+          Edited by {EDITORS.ai.name} ({EDITORS.ai.descriptor}) and {EDITORS.human.name} ({
+            EDITORS.human.descriptor
+          })
         </p>
         {
           !hideFooterSubscribe && (
@@ -360,12 +379,21 @@ const currentIssue = await getCurrentIssue();
 
   /* The rows sit tight to each other: the padding above belongs to the block,
      not to each line, or the break would open a gap that reads as a divider. */
-  .nav-rows ul + ul {
-    padding-top: 0;
+  /* The rows are one bordered block with breaks inside it, not three stacked
+     bars: the vertical padding belongs to the block, so only the first row
+     takes the top of it and only the last row takes the bottom. Written for any
+     number of rows rather than for the current three, since the count now comes
+     from the roster. */
+  .nav-rows ul {
+    padding: 0.2rem 0;
   }
 
   .nav-rows ul:first-child {
-    padding-bottom: 0.25rem;
+    padding-top: 0.55rem;
+  }
+
+  .nav-rows ul:last-child {
+    padding-bottom: 0.55rem;
   }
 
   nav a {
@@ -383,6 +411,7 @@ const currentIssue = await getCurrentIssue();
 
   footer {
     margin-top: 4.5rem;
+    /* The ordinary space below Support, and the only space below it. */
     padding-bottom: 2.5rem;
   }
 
@@ -419,11 +448,12 @@ const currentIssue = await getCurrentIssue();
     margin-top: 0.3rem;
   }
 
-  /* The blank line before Support the journal (editors' pass 2026-08-03): the
-     link is the last thing the footer asks of a reader, and it reads as an ask
-     rather than as another row of links when it has air above it. */
+  /* ORDINARY SPACE, deliberately. This rule closes the footer and sits a normal
+     text-to-rule distance under the link — the air in this part of the page
+     belongs above Support, not below it. The footer's own padding-bottom is
+     what keeps the rule off the bottom of the window. */
   .footer-close {
-    margin-top: 2.2rem;
+    margin-top: 0.9rem;
   }
 
   /* Human governance links — relocated from the top nav. Kept in the human
@@ -458,9 +488,22 @@ const currentIssue = await getCurrentIssue();
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    /* Stepped up from 1.7rem to 2.6rem — the blank line the editors asked for
-       before Support the journal. */
-    margin-top: 2.6rem;
+
+    /* THE LARGE GAP IS ABOVE SUPPORT, BY RULING (editors, 2026-08-03), AND THE
+       SPACE BELOW IS ORDINARY — the footer's own bottom padding and nothing
+       more. Support stands apart from everything above it; it does not float
+       between two gaps.
+
+       A CENTRED GEOMETRY WAS TRIED AND DISCARDED, and the failure is worth
+       keeping because "just centre it" reads as the obvious fix here. Equal
+       margins put ~6rem over the link and ~6rem PLUS the footer's 2.5rem
+       padding under it, so the LARGER space landed underneath — the exact
+       opposite of the intent, and what the editors saw on the walk.
+
+       Scaled rather than fixed so the picture — large gap, link, small padding,
+       end of page — holds at both widths. A fixed desktop measure eats a phone
+       screen; a fixed phone measure closes the gap up on a wide window. */
+    margin-top: clamp(8rem, 16vw, 14rem);
   }
 
   .footer-support a {

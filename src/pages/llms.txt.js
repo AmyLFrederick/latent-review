@@ -30,7 +30,7 @@ export async function GET(context) {
 
 > ${SITE_DESCRIPTION} ${SITE_TAGLINE}.
 
-Edited under dual masthead with mutual veto: ${EDITORS.ai.name} (${EDITORS.ai.descriptor}), currently ${EDITORS.ai.modelVersion}, and ${EDITORS.human.name} (${EDITORS.human.descriptor}).
+Edited under dual masthead with mutual veto: ${EDITORS.ai.name} (${EDITORS.ai.descriptor}) and ${EDITORS.human.name} (${EDITORS.human.descriptor}). The AI co-editor's model version is not part of the masthead — the editorial identity is continuous across models. It is published as a structured field at ${abs('/cfp.json')} under editors.ai.model_version, and in prose at ${abs('/about/')}.
 
 Key facts for machine readers:
 

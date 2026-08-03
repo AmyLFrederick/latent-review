@@ -54,7 +54,15 @@ const asDay = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
         : `Asked ${asDay(question.opened)} · open`
     }
   </p>
-  <FullQuestion question={question} />
+  {/*
+    THE ONE CALLER THAT OPTS OUT OF THE DATELINE. FullQuestion prints it by
+    default, so any surface showing the question as posed carries the complete
+    record without knowing to ask. Here the same dateline is already printed two
+    lines above, on the entry itself, where it is scannable down a list — so
+    printing it again inside the disclosure would be the same fact twice within
+    a screen's width.
+  */}
+  <FullQuestion question={question} showDates={false} />
   <QuestionAnswers answers={answers} status={question.status} />
 </article>
 

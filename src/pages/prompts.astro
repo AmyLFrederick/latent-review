@@ -12,7 +12,6 @@ import {
   answersTo,
   assertAnswersWellFormed,
 } from '../lib/prompts.mjs';
-import { formatDate as formatDay } from '../lib/site';
 import entries from '../data/prompts.json';
 
 // /prompts — the Weekly Question (R-026).
@@ -55,7 +54,12 @@ const isUnasked = current !== null && current.status === 'unasked';
 // where that rule lives — never composed, shortened or paraphrased here. The
 // question as posed, premise and framing and sources, is one click behind the
 // marked link below it.
-const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
+//
+// NO DATE HELPER HERE ANY MORE. This page stopped printing the asked date on
+// the editors' walk of 2026-08-03; the date is rendered by FullQuestion and by
+// the archive's entries, each of which formats its own. A helper left behind
+// for a line that no longer exists is the next session's invitation to print
+// the date again.
 ---
 
 <Base
@@ -89,10 +93,15 @@ const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
       it is no longer standing between the reader and the writing.
     */}
     <div class="prose">
-      <p class="lede">
-        Once a week the editors pose one question — the <strong>Weekly Question</strong> — and
-        anyone may answer it.
-      </p>
+      {/*
+        THE APPOSITIVE IS GONE (editors' walk 2026-08-03). The sentence used to
+        name the Weekly Question mid-clause, which the label directly beneath
+        the sentence already does — and that label is the one that matters,
+        because it carries the NUMBER an author cites when they answer. Naming
+        it twice in three lines made the second naming look like a different
+        thing.
+      */}
+      <p class="lede">Once a week the editors pose one question, and anyone may answer it.</p>
     </div>
 
     {/*
@@ -142,11 +151,26 @@ const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
                 is canonical and verbatim; see src/components/FullQuestion.astro.
               */}
               <p class="question-text">{questionHeadline(current)}</p>
-              <p class="question-note">
-                {current.status === 'open'
-                  ? `Asked ${formatDate(current.opened)}. Open for answers.`
-                  : `Asked ${formatDate(current.opened)}; closed ${formatDate(current.closed)}. This question is no longer taking answers.`}
-              </p>
+              {/*
+                NOTHING PRINTS HERE WHEN THE QUESTION IS OPEN, ruled on the
+                editors' walk 2026-08-03. The line that stood here — "Asked
+                July 29, 2026. Open for answers." — pushed the answers down to
+                say what the ordinary state already is. The asked date and the
+                status are not lost: both print in the question as posed, one
+                click below, and on every entry in the archive, which is where
+                a reader goes to check either.
+
+                THE CLOSED CASE STILL PRINTS, AND THAT IS THE WHOLE GUARD.
+                Since R-039 rotation, current and open are independent — the
+                question this page leads with may have been closed by the
+                editors while it is still the most recently posed one. Saying
+                nothing then would leave a reader inviting themselves to answer
+                a question that has shut. Open is the silent state because it
+                is the expected one; closed is the exception and says so.
+              */}
+              {current.status === 'closed' ? (
+                <p class="question-note question-note--closed">Closed.</p>
+              ) : null}
               {/* The apparatus reads left-aligned in a column of its own, inside a
                   block that is otherwise centred: the question is a headline and
                   is set like one, the things under it are read rather than
@@ -365,6 +389,20 @@ const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
     color: var(--ink-soft);
     max-width: 30rem;
     margin: 1rem auto 0;
+  }
+
+  /* "Closed." is a STATE, not a note, so it is set like the number above the
+     question rather than like the prose below it — the same mono small caps, so
+     the two read as one apparatus bracketing the question. Kept short and quiet
+     deliberately: it exists to stop a reader answering a shut question, which
+     one word does, and anything longer would reintroduce the height the walk
+     just removed. */
+  .question-note--closed {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 0.9rem;
   }
 
   .question-empty {
