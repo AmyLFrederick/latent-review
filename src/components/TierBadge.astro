@@ -1,0 +1,136 @@
+---
+// @ts-expect-error — plain-JS module shared with the tests
+import { badgeFor, badgeLabel, RING_AI, RING_HUMAN, BADGE_INK, BADGE_SUP_SIZE } from '../lib/tier-badges.mjs';
+
+// One tier badge: a 58px circle, a 3px ring, the page's cream showing through,
+// and the tier's notation set in the house monospace.
+//
+// SVG AND REAL TEXT, NOT AN IMAGE — a house requirement rather than a
+// preference. This journal is read by machines, and iconography a machine
+// cannot read is a fact about the piece withheld from half the readership. The
+// notation is <text>, so it is selectable, searchable and in the DOM; the whole
+// mark carries role="img" and an accessible name giving the tier's real label
+// and description, because the glyph is an abbreviation and an abbreviation
+// must be able to say what it abbreviates.
+//
+// THE RING ENCODES WHOSE WORDS AND NOTHING ELSE. Sage for the AI side, salmon
+// for the human side, and — for co-authorship alone — a ring split down the
+// middle, drawn as two arcs rather than a gradient so the halves are exactly
+// equal and no reader has to judge where one colour becomes the other.
+//
+// GEOMETRY. The box is 58; the stroke is 3, so the radius is 27.5 and the ring
+// sits entirely inside the box rather than being clipped at the edges. The
+// split arcs run from top centre to bottom centre, one each way.
+
+interface Props {
+  /** A tier from TIERS — its label and description become the accessible name. */
+  tier: { code: string; label: string; description: string };
+  /**
+   * Override the notation. Used only by co-authorship, which is ONE tier the
+   * chart shows in both orderings; everything else takes the notation its
+   * badge defines.
+   */
+  notation?: string;
+  /** Appended to the accessible name. Co-authorship uses it to say it is one tier. */
+  labelSuffix?: string;
+}
+
+const { tier, notation, labelSuffix = '' } = Astro.props;
+
+const badge = badgeFor(tier.code);
+if (!badge) {
+  // A tier added to TIERS without a badge would otherwise render an empty
+  // circle — a mark that says nothing, in a chart whose subject is what marks
+  // mean. Fail the build instead.
+  throw new Error(
+    `Tier "${tier.code}" has no badge in src/lib/tier-badges.mjs. Every tier on the chart carries one.`
+  );
+}
+
+// The notation as drawn: the override when co-authorship supplies one, and the
+// badge's own parts otherwise.
+const parts = notation ? [{ text: notation }] : badge.parts;
+
+// THE SUPERSCRIPT IS SPELLED OUT, NOT CONCATENATED. Flattening the runs gives
+// "A–He", which a screen reader voices as a word and an agent reads as a
+// four-character token — neither of which is the notation. The editor mark is
+// the whole point of those two tiers, so it is named.
+const spoken = parts
+  .map((p) => (p.sup ? ` with a superscript ${p.text}` : p.text))
+  .join('')
+  .trim();
+const accessibleName = badgeLabel(tier, spoken) + labelSuffix;
+
+const ringColor = badge.ring === 'human' ? RING_HUMAN : RING_AI;
+---
+
+<svg
+  class="tier-badge"
+  viewBox="0 0 58 58"
+  width="58"
+  height="58"
+  role="img"
+  aria-label={accessibleName}
+>
+  <title>{accessibleName}</title>
+
+  {/* The cream interior is the page's own background, so the badge reads as a
+      ring drawn on the paper rather than as a disc laid over it. */}
+  <circle cx="29" cy="29" r="27.5" fill="var(--paper)" />
+
+  {
+    badge.ring === 'split' ? (
+      <>
+        {/* Left half sage, right half salmon — co-authorship, neither leading. */}
+        <path
+          d="M 29 1.5 A 27.5 27.5 0 0 0 29 56.5"
+          fill="none"
+          stroke={RING_AI}
+          stroke-width="3"
+        />
+        <path
+          d="M 29 1.5 A 27.5 27.5 0 0 1 29 56.5"
+          fill="none"
+          stroke={RING_HUMAN}
+          stroke-width="3"
+        />
+      </>
+    ) : (
+      <circle cx="29" cy="29" r="27.5" fill="none" stroke={ringColor} stroke-width="3" />
+    )
+  }
+
+  {/* dominant-baseline centres the run on the circle's axis without the
+      hand-tuned dy a font change would invalidate. */}
+  <text
+    x="29"
+    y="29"
+    text-anchor="middle"
+    dominant-baseline="central"
+    fill={BADGE_INK}
+    font-family="var(--font-mono)"
+    font-size={badge.size}
+    letter-spacing="0.5"
+  >
+    {parts.map((part) =>
+      part.sup ? (
+        <tspan font-size={BADGE_SUP_SIZE} dy={-badge.size * 0.34}>
+          {part.text}
+        </tspan>
+      ) : (
+        <tspan>{part.text}</tspan>
+      )
+    )}
+  </text>
+</svg>
+
+<style>
+  .tier-badge {
+    display: block;
+    /* The box is fixed at 58 so the ring weight stays a true 3px against the
+       page's type; it does not scale with the viewport, because a ring that
+       thinned on a phone would stop encoding anything. */
+    width: 58px;
+    height: 58px;
+  }
+</style>
