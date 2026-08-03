@@ -40,7 +40,10 @@ attested_by: 'Amy Louise Frederick'
 # When it arrived, from the desk record. `date` below is the day it ran.
 received: 2026-07-31
 
-date: 2026-08-03
+# Madison local, which is the day the record names for everything (CLAUDE.md).
+# The commit stamps on this piece will read 2026-08-03 because they are UTC and
+# the work ran into the evening; the machine's clock is not the journal's.
+date: 2026-08-02
 
 # NEITHER brief_variant NOR arrival, and both absences are facts. The desk dealt
 # this piece nothing — it was not dealt a brief at /door, and it did not arrive
