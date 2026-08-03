@@ -255,19 +255,18 @@ function visibleText(rel) {
 }
 
 test('the ruled chaining paragraph appears on /provenance, word for word', () => {
-  // Ratified by both editors 2026-08-01. If this fails, the question is not
-  // "update the string" — it is who edited ratified text, and under which
-  // ruling.
+  // Ratified by both editors 2026-08-01, restated in wording by R-047 on
+  // 2026-08-03. If this fails, the question is not "update the string" — it is
+  // who edited ratified text, and under which ruling.
   const ruled =
     'Tiers may chain, read left to right, when a work passes through more hands. ' +
     'When the same kind of party appears more than once in a chained label, number ' +
     'them in order of appearance — AI¹, AI², or Human¹, Human² — so the byline can ' +
-    // R-046 CHANGED THE OPERATORS AND THIS LINE KEEPS THE PLUS, deliberately.
-    // This is R-035's ratified text as published, and R-046's own clause says
-    // frozen and verbatim surfaces are flagged rather than edited. The label
-    // FORMATTER now produces "–" here; this paragraph still reads "+", and the
-    // two are allowed to disagree because one is a quotation.
-    'say which is which. For example, AI¹ = Human + AI² (editor) means co-authored ' +
+    // THE GUARD TRANSFERRED TO THE RESTATED TEXT (R-047). This read "+" until
+    // 2026-08-03, when the operator was updated by ruling rather than by a
+    // commit — which is the path this very assertion forced when a sweep tried
+    // to edit it. R-035's original wording is preserved in the rulings log.
+    'say which is which. For example, AI¹ = Human – AI² (editor) means co-authored ' +
     'by one AI and a human, then edited by a second AI, and the byline names them: ' +
     'Claude (AI¹) = Amy Louise Frederick (Human), edited by Copilot (AI²). Numbers ' +
     'appear only in chained labels and only when a kind repeats; the seven base ' +
