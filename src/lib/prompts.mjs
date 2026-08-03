@@ -2,14 +2,29 @@
 //
 // Plain JS, not TypeScript, so the tests can import it directly — the same
 // arrangement as src/lib/supporters.mjs and src/lib/volume.mjs. The rules here
-// are editorial commitments made in R-026 and amended by R-038, several of
-// which bind hard once a question is posed, so they are tested rather than
-// trusted.
+// are editorial commitments made in R-026 and amended by R-038 and R-039,
+// several of which bind hard once a question is posed, so they are tested
+// rather than trusted.
 //
 // THIS IS SITE-PAGE LOGIC, NEVER THE RECORD. Closing a question ends the
 // invitation to answer it; it does not unsay the question or remove it from
 // the file. Nothing here deletes, and a future session should not "tidy" the
 // archive by dropping old questions.
+//
+// THE TWO THINGS THIS FILE KEEPS APART, because collapsing them is the easy
+// mistake and R-039 turns on the distinction:
+//
+//   CURRENT is a position — the question most recently posed, the one /prompts
+//   leads with. It is derived, it moves on its own the moment a new question is
+//   added, and no editor sets it.
+//
+//   OPEN is an editorial act — whether answers are still invited. Editors set
+//   it, it is shown wherever the question appears, and nothing derives it.
+//
+// A question can be open and not current: that is the ordinary state of the
+// week after a new question posts, and it is the state rotation exists to
+// make possible. Nothing here may write `status` and nothing may infer one of
+// these two from the other.
 
 /**
  * The three statuses, in the order a question passes through them.
@@ -140,17 +155,22 @@ export function readQuestions(entries) {
     }
   });
 
-  // ONE QUESTION IS OPEN AT A TIME. The section poses one question a week and
-  // may hold one open longer; it never runs two at once. Two open questions
-  // would make "the Weekly Question" ambiguous on the page and in every answer
-  // that names it.
-  const open = questions.filter((q) => q.status === 'open');
-  if (open.length > 1) {
-    throw new Error(
-      `Only one Weekly Question is open at a time; found ${open.length} ` +
-        `(numbers ${open.map((q) => q.number).join(', ')}).`
-    );
-  }
+  // MORE THAN ONE QUESTION MAY BE OPEN, AND THE GUARD THAT FORBADE IT IS GONE
+  // (R-039, 2026-08-03). It used to throw on a second open question, reasoning
+  // that two would make "the Weekly Question" ambiguous. That reasoning was
+  // sound and its conclusion is now the wrong trade: with issues every two
+  // weeks and questions posed weekly, answers accumulate between issues, and a
+  // build that refused a second open question would have forced the editors to
+  // CLOSE one in order to POSE the next. Closing is an editorial act about
+  // whether answers are still invited. Nothing mechanical may perform it as a
+  // side effect of the calendar.
+  //
+  // THE AMBIGUITY IT WORRIED ABOUT IS REAL AND IS ANSWERED ELSEWHERE. Authors
+  // are asked to name the question by NUMBER rather than by the phrase "the
+  // Weekly Question" (/prompts and /for-agents), and questionLabel renders that
+  // number everywhere a question appears. What was a build guard is now a
+  // naming discipline, which is where it belonged: the file was never the thing
+  // that made an answer ambiguous.
 
   // An unasked question is the NEXT one, so there is at most one and it is the
   // highest number. An unasked question below a posed one would mean the
@@ -173,23 +193,61 @@ export function readQuestions(entries) {
 }
 
 /**
- * The question the page leads with.
+ * The question the page leads with: THE ONE MOST RECENTLY POSED.
  *
- * The open one if there is one; otherwise the unasked one, which is the launch
- * state and is shown as unasked rather than hidden; otherwise the most recent
- * closed one, so a week between questions still shows what was last asked
- * rather than an empty page.
+ * ROTATION LIVES IN THIS FUNCTION, AND IT IS THE WHOLE MECHANISM (R-039). When
+ * the editors pose a new question, it becomes the highest posed number and the
+ * page leads with it; the one before it stops being current and is read in the
+ * archive from then on. No field is set to make that happen and no editor
+ * performs it — rotation is what "most recently posed" means when a question is
+ * added, which is why it cannot fall out of step with the file.
  *
- * Returns null only for a file with no questions in it at all, which the page
- * treats as its own state rather than crashing.
+ * ROTATION IS DISPLAY, AND IT CLOSES NOTHING. A question that rotates off this
+ * page keeps whatever status the editors gave it. If it is open it is still
+ * open, still taking answers, and still says so wherever it appears — it is
+ * simply no longer the one the section page leads with. Open and closed are an
+ * editorial act; being current is a position in a sequence. A future session
+ * changing this must not collapse the two: setting `closed` here, or reading
+ * "not current" as "closed" anywhere downstream, would make the machinery
+ * perform an editorial judgment the editors never made.
+ *
+ * SELECTED BY NUMBER, NOT BY DATE. Numbers are contiguous and settled at the
+ * moment of posing, so the highest posed number is the latest question by
+ * construction. Two questions may honestly share an `opened` date — nothing
+ * stops the editors posing two in a day — and a date comparison would then pick
+ * between them arbitrarily.
+ *
+ * The unasked one is the fallback, because it is the launch state and is shown
+ * as unasked rather than hidden. Returns null only for a file with no questions
+ * in it at all, which the page treats as its own state rather than crashing.
  */
 export function currentQuestion(questions) {
+  const posed = questions.filter((q) => POSED.includes(q.status));
   return (
-    questions.find((q) => q.status === 'open') ??
+    posed.reduce((latest, q) => (latest === null || q.number > latest.number ? q : latest), null) ??
     questions.find((q) => q.status === 'unasked') ??
-    [...questions].reverse().find((q) => q.status === 'closed') ??
     null
   );
+}
+
+/**
+ * The other questions still taking answers — open, but no longer current.
+ *
+ * WHY THE PAGE NEEDS THIS. Rotation moves a question off /prompts without
+ * closing it, so the section page can be leading with question N while N-1 is
+ * open and answerable. A reader who is told only about the current question
+ * would reasonably conclude the others are finished, and would be wrong. The
+ * page says so and links to the archive; this is the count behind that
+ * sentence.
+ *
+ * Newest first, matching the archive's order. Empty in the ordinary case, where
+ * the current question is the only open one — and the page says nothing at all
+ * then, rather than saying "no others", which is noise.
+ */
+export function otherOpenQuestions(questions, current) {
+  return questions
+    .filter((q) => q.status === 'open' && q.number !== current?.number)
+    .sort((a, b) => b.number - a.number);
 }
 
 /**

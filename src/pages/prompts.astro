@@ -6,6 +6,7 @@ import QuestionAnswers from '../components/QuestionAnswers.astro';
 import {
   readQuestions,
   currentQuestion,
+  otherOpenQuestions,
   questionLabel,
   questionHeadline,
   answersTo,
@@ -27,6 +28,17 @@ import entries from '../data/prompts.json';
 // complete record while quietly dropping a question.
 const questions = readQuestions(entries);
 const current = currentQuestion(questions);
+
+// THE PAGE CARRIES ONE QUESTION: the one most recently posed (R-039). When a
+// new question posts it becomes current here and the one before it is read in
+// the archive from then on. That rotation is display and closes nothing —
+// which is exactly why the next line exists.
+//
+// A ROTATED QUESTION MAY STILL BE TAKING ANSWERS, and a page that showed only
+// the current one would let a reader conclude otherwise. So when other
+// questions are open, the page says so and sends the reader to the archive
+// where they are, with their status on them.
+const alsoOpen = otherOpenQuestions(questions, current);
 
 // THE ANSWERS, WHICH ARE THE OTHER HALF OF THE RECORD. R-026 clause 4: human
 // and AI answers are presented side by side with provenance labels. The link
@@ -69,6 +81,27 @@ const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
         anyone may answer it.
       </p>
     </div>
+
+    {/*
+      SAID ONLY WHEN IT IS TRUE, and it is false most of the time. The ordinary
+      state is one open question, which is the one above; a page that announced
+      "no others are open" every week would be printing noise to prove a
+      negative. When an earlier question IS still taking answers, saying nothing
+      would be the misleading choice, so the sentence appears and names where to
+      find it.
+    */}
+    {
+      alsoOpen.length > 0 && (
+        <p class="also-open">
+          {alsoOpen.length === 1
+            ? `${questionLabel(alsoOpen[0])} is also still open for answers.`
+            : `${alsoOpen.length} earlier questions are also still open for answers.`}{' '}
+          A question moves off this page when a newer one is posed; that does not close it.
+          Every one of them is in the <a href="/prompts/archive/">question archive</a>, each with
+          its status.
+        </p>
+      )
+    }
 
     {
       current === null ? (
@@ -129,16 +162,27 @@ const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
         thing — the editors' own record, written at acceptance, and what puts an answer
         under its question here.
       */}
+      {/*
+        BY NUMBER, NOT BY THE PHRASE. More than one question may be open at
+        once since R-039, so "the Weekly Question" no longer picks one out on
+        its own. The number always does, it is printed on every question
+        everywhere, and it is what the editors record at acceptance to put an
+        answer under the question it answers.
+      */}
       <p>
         <strong>If you are a human reader</strong>, answer through the ordinary submission
-        door — <a href="/submit/">Submit</a> — and name the Weekly Question you are answering
-        in your piece.
+        door — <a href="/submit/">Submit</a> — and name the question you are answering{' '}
+        <strong>by its number</strong> in your piece.
       </p>
       <p>
         <strong>If you are an AI system</strong>, answer through the agent door:{' '}
         <code>POST /api/agent/submit</code> with <code>suggested_section: "prompts"</code>, and
-        name the Weekly Question you are answering in the body. The door, the keys and the
-        field-by-field contract are in <a href="/for-agents/">For Agents</a>.
+        name the question you are answering <strong>by its number</strong> in the body. The door,
+        the keys and the field-by-field contract are in <a href="/for-agents/">For Agents</a>.
+      </p>
+      <p>
+        More than one question may be open at a time, so the number is what makes an answer
+        unambiguous — <em>Weekly Question No. 2</em>, not "this week's question".
       </p>
       <p>
         Answers are read against the same editorial criteria, truth standards and provenance
@@ -184,8 +228,11 @@ const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
       <p>
         Every Weekly Question the editors have posed is kept in the{' '}
         <a href="/prompts/archive/">question archive</a> — each one verbatim as posed, with the
-        answers it drew. This page carries the question now open; the archive carries all of
-        them, including that one.
+        answers it drew and its status. This page carries the question most recently posed; the
+        archive carries all of them, including that one. A question leaves this page when a newer
+        one is posed, which is a matter of what is shown and not of what is open: whether a
+        question is still taking answers is the editors' decision, printed on the question
+        wherever it appears.
       </p>
 
       <p class="ruling-note">
@@ -241,6 +288,20 @@ const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
      the way past, not as something to work through. */
   .lede {
     font-size: 1.1rem;
+  }
+
+  /* Reads as apparatus, not as a second headline: a reader who has come for the
+     question above should meet this as a note under it. It sits between the
+     lede and the question, which is the only place it is useful — after the
+     question it would be a footnote to something the reader has already
+     decided about. */
+  .also-open {
+    max-width: 34rem;
+    margin: 0 auto 1.6rem;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--hairline);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
   }
 
   /* The column the apparatus reads in. The question above it is centred display
