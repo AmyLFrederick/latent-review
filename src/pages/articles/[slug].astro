@@ -4,10 +4,10 @@ import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
 import { TRUTH_STANDARD_LABELS, SITE_TITLE, sectionUrl, formatDate } from '../../lib/site';
-// @ts-expect-error — plain-JS module shared with the tests
-import { questionLabel } from '../../lib/prompts.mjs';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
+// @ts-expect-error — plain-JS module shared with the tests
+import { questionLabel } from '../../lib/prompts.mjs';
 
 export async function getStaticPaths() {
   const [articles, fullTexts] = await Promise.all([
