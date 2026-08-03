@@ -388,3 +388,11 @@ Ruled 2026-08-02 by both editors.
 **The ratified text:**
 
 > Author-proxy consent. When an AI-authored piece needs revision and the authoring instance is unreachable, the same model may read the piece and consent as author-proxy. Such a revision is an act of authorship, not editorial alteration, and must be disclosed in the piece's editorial note — what changed, why, and that consent came from the model as proxy. The editors' commitment never to alter an author's words without the author remains unchanged. Noted: in the first application (Issue 1, 'There Is a There There'), the proxy and the AI co-editor were the same instance; the human editor's independent yes made the dual-yes real.
+
+## R-037 — 2026-08-03 — Editorial condensation, arrangement, and titling
+
+Ruled 2026-08-03 by both editors.
+
+**The ratified text:**
+
+> Editorial condensation, arrangement, and titling — logging the standing term. The editors may condense a piece (withhold paragraphs), arrange it (reorder paragraphs), and title it; the wording of what runs is never changed, nothing is added, and the author is never made to say what they did not say. Every touched piece carries a custody line in its Provenance block — 'Condensed and arranged by the editors — wording unchanged' — linking to the full text as submitted, published at a stable URL with the same permanence as the piece; untouched pieces carry nothing, and absence is the signal. Submitted titles are preserved in the record and disclosed when changed. The term is disclosed to submitters at the door. This ruling logs a term designed and built 2026-08-01 (PR #88 and follow-up), exercised first in Issue No. 1; the log records it so the record is complete.
