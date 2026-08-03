@@ -82,7 +82,19 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
       <table class="stackable">
         <thead>
           <tr>
-            <th><span class="sr-only">Badge</span></th>
+            {/*
+              THE BADGE COLUMN IS LABELLED LIKE ITS NEIGHBOURS (editors,
+              2026-08-03). It carried a screen-reader-only "Badge" — the column
+              was announced but not printed, which left the one column a sighted
+              reader could not name.
+
+              NO STYLING OF ITS OWN, deliberately. `.prose th` already sets the
+              case, size, weight and letterspacing for every header in this
+              table, so plain text here is identical to TIER and INVOLVEMENT by
+              construction rather than by a matching rule that could drift from
+              them.
+            */}
+            <th>Badge</th>
             <th>Tier</th>
             <th>Involvement</th>
           </tr>
