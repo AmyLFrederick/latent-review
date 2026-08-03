@@ -439,11 +439,15 @@ const currentIssue = await getCurrentIssue();
     margin-top: 0.3rem;
   }
 
-  /* The blank line before Support the journal (editors' pass 2026-08-03): the
-     link is the last thing the footer asks of a reader, and it reads as an ask
-     rather than as another row of links when it has air above it. */
+  /* THE AIR BELONGS ABOVE SUPPORT, NOT BELOW IT (editors' read of the preview,
+     2026-08-03). The gap that separates Support from the link rows is the one
+     doing the work, and it lives on .footer-support. This rule only closes the
+     footer, so it sits close under the link rather than being spaced off it —
+     2.2rem was reading as a second gap and made Support look like it floated
+     between two blocks instead of ending the column. The footer's own
+     padding-bottom still keeps the rule off the bottom of the window. */
   .footer-close {
-    margin-top: 2.2rem;
+    margin-top: 1rem;
   }
 
   /* Human governance links — relocated from the top nav. Kept in the human
