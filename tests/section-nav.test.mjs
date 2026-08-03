@@ -83,7 +83,7 @@ test('the roster holds every standing section plus Letters and Prompts, and noth
   assert.deepEqual([...sections].sort(), [...STANDING_SECTIONS].sort());
 
   const pages = NAV_ROSTER.filter((e) => !e.section).map((e) => e.label);
-  assert.deepEqual(pages, ['Letters', 'Prompts']);
+  assert.deepEqual([...pages].sort(), ['Letters', 'Prompts']);
 });
 
 test('Topics still comes before Letters — the one position R-027 clause 3 fixes', () => {
@@ -91,11 +91,44 @@ test('Topics still comes before Letters — the one position R-027 clause 3 fixe
   assert.ok(labels.indexOf('Topics') < labels.indexOf('Letters'));
 });
 
-test('the Corner is last, alone on its row, under its full name', () => {
-  const last = NAV_ROSTER[NAV_ROSTER.length - 1];
-  assert.equal(last.label, 'The Metaphysical Corner');
-  assert.equal(last.ownRow, true);
-  assert.equal(NAV_ROSTER.filter((e) => e.ownRow).length, 1);
+test('Letters is last — correspondence closes the book', () => {
+  // Ruled by the editors 2026-08-03. This is the position the whole
+  // arrangement was reorganised around, so it is asserted rather than left to
+  // the array's shape.
+  assert.equal(NAV_ROSTER[NAV_ROSTER.length - 1].label, 'Letters');
+});
+
+test('AI Voices comes ahead of Opinion', () => {
+  const labels = NAV_ROSTER.map((e) => e.label);
+  assert.ok(labels.indexOf('AI Voices') < labels.indexOf('Opinion'));
+});
+
+test('the Corner opens the second row, under its full name', () => {
+  // AMENDED FROM "last, alone on its row" (2026-08-03, same day). Letters had
+  // to close the nav, and whatever holds the second row is what a reader
+  // reaches last — so the Corner could not both have that row to itself and
+  // let Letters be last.
+  //
+  // What the Corner actually needed was TYPOGRAPHIC: its full name with room,
+  // instead of the "Metaphysical Corner" the nav printed when seven items had
+  // to survive one line. It still opens a row, still prints in full, and now
+  // shares that row with the shortest label in the roster.
+  const opener = NAV_ROSTER.find((e) => e.startsSecondRow);
+  assert.equal(opener.label, 'The Metaphysical Corner');
+  assert.equal(
+    NAV_ROSTER.filter((e) => e.startsSecondRow).length,
+    1,
+    'exactly one entry opens the second row, or the partition is ambiguous'
+  );
+
+  // The second row is the opener and everything after it: the Corner, then
+  // Letters. Five entries stay on the first row, one fewer than before.
+  const at = NAV_ROSTER.findIndex((e) => e.startsSecondRow);
+  assert.deepEqual(NAV_ROSTER.slice(at).map((e) => e.label), [
+    'The Metaphysical Corner',
+    'Letters',
+  ]);
+  assert.equal(at, 5, 'the first row holds five entries');
 });
 
 test('nothing in the roster is abbreviated: a section prints the name it has', () => {
@@ -109,7 +142,8 @@ test('nothing in the roster is abbreviated: a section prints the name it has', (
 
 test('the display order does not disturb the order an issue runs in', () => {
   // The whole reason the roster is its own list. STANDING_SECTIONS is also the
-  // contents order, and the Corner sits fourth in it while sitting last here.
+  // contents order, and the editors' 2026-08-03 nav pass moved AI Voices ahead
+  // of Opinion in the NAV without touching the order an issue runs in.
   assert.deepEqual(
     [...STANDING_SECTIONS],
     ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner', 'Topics']
