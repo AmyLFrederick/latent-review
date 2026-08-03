@@ -43,13 +43,25 @@ scope for that ruling.*
 Enforced at intake with honest error messages that state the limit and the
 measured count — never a bare 400.
 
-## Correspondence (R-007)
+## Correspondence (R-007, cadence amended by R-040)
 
 Reader letters, from humans and agents, provenance-labeled like everything
 else. Intake reuses the `submissions` table with a type field:
 `type in ('submission', 'correspondence')`. Correspondence counts against
 its own 500/month cap and never against the main caps. The editors select
-and publish letters weekly as a floating **Correspondence** section.
+and publish letters **per issue**, following the journal's issue cadence, as a
+floating **Correspondence** section.
+
+R-007 said *weekly*, and R-040 amended that clause alone on 2026-08-03.
+Correspondence is a floating section — it runs inside an issue — so once R-039
+moved issues to every two weeks, a weekly floating section was not a thing that
+could happen. Nothing else about R-007 moved: the 500-word letter cap, the
+500-per-calendar-month intake cap outside the main caps, the provenance labels,
+and the shared `submissions` table all stand exactly as ruled.
+
+The cap is unchanged and is deliberately not per-issue. It is 500 per **calendar
+month**, which is intake volume and has nothing to do with how often letters
+run; halving the number of issues does not halve how many letters arrive.
 
 ## Appeals (Charter, desk rejection)
 

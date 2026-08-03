@@ -420,3 +420,49 @@ Ruled 2026-08-03 by both editors.
 **Rotation is display, and closing is editorial.** Because answers now accumulate between issues, `/prompts` shows the question most recently posed and the prior one rotates to the archive automatically. That rotation does not close anything. Open and closed remain an editorial act the editors set, shown wherever a question appears; more than one question may stand open at once, and the machinery no longer requires closing one to pose the next.
 
 **Two collisions are left open rather than resolved here, because neither is this ruling's to decide.** R-007 has Correspondence "selected and published by the editors weekly," and a floating section cannot run weekly inside a fortnightly issue; that reconciliation needs its own ruling. And the Founding Supporter window binds to Issue No. 104 on reasoning that measured it as roughly two years at weekly cadence, with a standing commitment that the editors revisit the number if cadence changes rather than reinterpret it — at every two weeks the same 104 issues is roughly four years. Both are flagged in the record and neither is touched by this change.
+
+## R-040 — 2026-08-03 — Correspondence cadence
+
+Ruled 2026-08-03 by both editors, resolving the first of the collisions R-039 recorded and left open.
+
+**The ratified text:**
+
+> Correspondence cadence. Superseding R-007 in part: Correspondence publishes per issue, following the journal's issue cadence, rather than weekly. All other R-007 terms stand.
+
+**What "all other terms stand" covers, enumerated so nothing is read into the supersession that is not in it.** The 500-word cap on a letter, the 500-per-calendar-month intake cap that sits outside the main submission caps, the provenance labels letters carry like everything else the journal prints, and the shared `submissions` table with its `type` field are all untouched. One clause of R-007 moved: how often letters run.
+
+**The intake cap stays monthly and is deliberately not converted.** It counts letters arriving, not letters running, and how often the journal publishes has no bearing on how often readers write. Re-expressing a monthly intake ceiling as a per-issue one would halve an allowance nobody asked to halve.
+
+**Why R-007 could not simply be read as still correct.** Correspondence is a floating section, which means it runs inside an issue. "Weekly" and "inside a fortnightly issue" are not a tension to be interpreted; they describe a thing that cannot occur. Left alone, the log would have carried a standing instruction the journal was structurally unable to follow, and a reader checking the record against the site would have found the record wrong.
+
+## R-041 — 2026-08-03 — Notice v2
+
+Ruled 2026-08-03 by both editors, resolving the third collision recorded in the R-039 sweep.
+
+**The ratified text:**
+
+> Notice v2. The plain notice becomes notice-v2: identical to notice-v1 except the cadence wording, updated per R-039. notice-v1 remains frozen by its hash in the record; arrival records naming notice-v1 are unchanged and correct. Future placements use notice-v2, hash recorded per standing practice.
+
+**The hashes, recorded here per standing practice.** notice-v1: `sha256 5678e9739dd28eca888f635c098af7a6c23016c9d5a17b9c484e602ff90226bb`, 555 bytes — unchanged by this ruling, and the same value the test has pinned since 2026-08-01. notice-v2: `sha256 37cd5ecd781d5a1aca81193301536ba7cb47ec23232839bb7d3cf80fa465d6bb`, 576 bytes. Both are pinned by tests, and a failure of either is never answered by updating the hash.
+
+**The extent of the change, which is one sentence.** "It is a weekly general-interest journal in which" became "It is a general-interest journal, published every two weeks, in which" — the wording R-039 put on every other surface. Every other character is v1's: both doors, the provenance sentence, the decline rate, the straight apostrophe. A test splits the two texts into sentences and fails unless exactly one differs, because a version bump is the one moment at which editing a frozen text looks legitimate.
+
+**Why a version and not a correction, stated because the cheap fix was one character.** notice-v1 is named in the chain of custody of any piece that arrived under it, and its page exists so a reader can check that record against the words those authors actually read. Editing it in place would have left every such record pointing at a text that no longer said what the author saw — making the arrival claim unverifiable rather than merely stale. So v1 keeps its address, its words, its hash and its arrival value, permanently.
+
+**What retirement means, and what it does not.** notice-v1 is retired from **placement**: the signpost at the foot of /door now points at notice-v2, and nothing on the site links to v1 at all. It is not retired from the record. Its page remains at its address, unlinked and out of the sitemap, carrying a dated line saying it has been superseded and by what. `unsolicited — notice-v1` remains in the arrival vocabulary forever — the vocabulary is add-only for the same reason the tier codes are, and this ruling is the first occasion on which that promise was tested.
+
+**No migration.** `submissions.reached_by_version` is free text with a length check and deliberately no enumerating CHECK — a decision recorded in migration `20260730120000` precisely so a new version would not require one. Nothing in the database changes.
+
+## R-042 — 2026-08-03 — The Founding Supporter window, re-derived
+
+Ruled 2026-08-03 by both editors, resolving the collision R-039 recorded, flagged, and deliberately declined to settle.
+
+**The ratified text:**
+
+> Founding Supporter window. The window's recorded reasoning measured Issue No. 104 as roughly two years at weekly cadence, and committed the editors to revisiting the number rather than reinterpreting it if cadence changed. Under R-039's every-two-weeks cadence, the window now closes at Issue No. 52 — the same roughly two years the reasoning intended. The number moved to preserve the meaning. The tier's terms are otherwise unchanged, and the record of the original reasoning stands.
+
+**The number has now been derived twice, and it returned to where it started.** 52 → 104 on 2026-07-28, deriving two years at weekly cadence; 104 → 52 today, deriving the same two years at an issue every two weeks. **This is arithmetic, not a reversal.** Halving the issue rate halves the count that spans two years. Nothing about the 2026-07-28 amendment was reconsidered or undone — it was applied again to a new cadence and landed on its own former value. Any future reader who finds a note saying "amended from 52" beside a constant reading 52 is looking at a coincidence, and both amendments stand in the record as the same judgment made twice.
+
+**What is fixed is the two years; the integer is a derivation.** This is why the standing commitment said *revisit* rather than *reinterpret*: a bare number invites a later session to decide that 104 issues was the point. It was not. The founding window is the stretch in which the journal is becoming findable, the editors judged that at roughly two years, and the issue count is only how that span is made countable from the archive.
+
+**Applied so the next cadence change meets reasoning rather than an integer.** The constant carries its own derivation table; the page states the two years first and the issue number as what two years currently comes to, naming the present cadence in the same sentence; and the span is a value rather than a phrase retyped into prose. The tier's threshold, its listing duration, and the exclusive boundary — open while the newest issue is *below* 52, shut once 52 publishes — are unchanged.

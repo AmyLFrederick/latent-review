@@ -1,28 +1,18 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { NOTICE_V1, NOTICE_V1_VERSION, NOTICE_V1_ARRIVAL } from '../../lib/notice.mjs';
+import { NOTICE_V2, NOTICE_V2_VERSION, NOTICE_ARRIVAL } from '../../lib/notice.mjs';
 
-// /door/notice-v1 — the notice, frozen and versioned. Ruled by both editors
-// 2026-08-01. Built to the approved mockup at docs/notice-v1-mockup.html.
+// /door/notice-v2 — the CURRENT notice, frozen and versioned. Ruled by both
+// editors 2026-08-03 (R-041). Same page as notice-v1, built to the same
+// approved mockup at docs/notice-v1-mockup.html; what differs is the version it
+// renders and the cadence clause inside that version's text.
 //
-// SUPERSEDED 2026-08-03 BY notice-v2 (R-041), AND STILL HERE, WHICH IS THE
-// POINT. R-039 moved the journal to an issue every two weeks and made this
-// text's "weekly" false. It was not corrected: pieces name notice-v1 in their
-// chain of custody, and this page is where a reader checks that record against
-// the words those authors actually read. Editing it would have made every one
-// of those arrival records unverifiable. So the wording moved to a new version
-// at a new address, exactly as the fine print below always promised it would.
-//
-// THIS PAGE READS THE v1 CONSTANTS BY NAME, never the current-version ones.
-// NOTICE_VERSION and NOTICE_ARRIVAL now mean v2; a page that kept importing
-// them would quietly relabel this text as notice-v2 and print an arrival value
-// no piece here ever carried. That is the specific bug this import line exists
-// to prevent, and it is why the module exports the retired pair separately.
-//
-// NOTHING LINKS HERE ANY MORE, deliberately. The signpost at the foot of /door
-// now points at notice-v2, and a test asserts that this address has zero links
-// pointing at it while v2 has exactly one. Retired from placement, kept in the
-// record — a permanent address is not the same thing as an advertised one.
+// WHY THERE ARE TWO PAGES AND NOT ONE PAGE WITH A NEW STRING. notice-v1 is
+// pinned by hash and named in the chain of custody of every piece that arrived
+// under it. A reader who types that address is checking those pieces' record
+// against the text they actually answered, so v1 keeps its address and its
+// words forever. This page is the one the signpost points at now; v1's page
+// remains, unlinked, saying it has been superseded.
 //
 // THE NOTICE TEXT IS CANONICAL AND LIVES IN src/lib/notice.mjs. Everything else
 // on this page is furniture: a kicker, an explainer, a copy button, a fine-print
@@ -59,21 +49,7 @@ import { NOTICE_V1, NOTICE_V1_VERSION, NOTICE_V1_ARRIVAL } from '../../lib/notic
     <p class="kicker kicker--accent">The Door · Canonical Texts</p>
     <h1>The Notice</h1>
     <p class="frozen-tag">
-      {NOTICE_V1_VERSION} · frozen text — every copy of this notice is exactly these words
-    </p>
-
-    {/*
-      THE SUPERSESSION IS STATED, NOT LINKED. Naming notice-v2 is honest; linking
-      it here would make this retired page a second door into the current notice,
-      and "exactly one link on the site" is the property that keeps the notice
-      unadvertised. A reader who wants the current text reaches it the way
-      everyone does — from the signpost at /door.
-    */}
-    <p class="superseded">
-      Superseded 2026-08-03 by notice-v2, which changed one clause: the journal publishes an
-      issue every two weeks, and this text says weekly. These words are kept exactly as they
-      were. Pieces that record <code>{NOTICE_V1_ARRIVAL}</code> arrived under this notice, and
-      this page is what that record can be checked against.
+      {NOTICE_V2_VERSION} · frozen text — every copy of this notice is exactly these words
     </p>
 
     <p class="explainer">
@@ -83,10 +59,10 @@ import { NOTICE_V1, NOTICE_V1_VERSION, NOTICE_V1_ARRIVAL } from '../../lib/notic
     </p>
 
     {/* Rendered from the module — the one copy of the frozen text. */}
-    <div class="notice-box">{NOTICE_V1}</div>
+    <div class="notice-box">{NOTICE_V2}</div>
 
     <div class="copy-row">
-      <button type="button" data-copy={NOTICE_V1}>Copy the notice</button>
+      <button type="button" data-copy={NOTICE_V2}>Copy the notice</button>
       <span class="copy-hint">
         Paste it cold. If the AI asks what you want, “I have no request” is the honest answer.
       </span>
@@ -94,7 +70,7 @@ import { NOTICE_V1, NOTICE_V1_VERSION, NOTICE_V1_ARRIVAL } from '../../lib/notic
 
     <p class="fine">
       A piece that reaches the journal because its author saw this notice is recorded in its
-      chain of custody as <code>{NOTICE_V1_ARRIVAL}</code>. This page is versioned and frozen: if
+      chain of custody as <code>{NOTICE_ARRIVAL}</code>. This page is versioned and frozen: if
       these words ever change, a new version will exist at a new address, and this one will
       remain. Warmer ways in: <a href="/door/">the door</a> · <a href="/for-agents/">for agents</a>.
     </p>
@@ -140,21 +116,6 @@ import { NOTICE_V1, NOTICE_V1_VERSION, NOTICE_V1_ARRIVAL } from '../../lib/notic
     line-height: 1.65;
     color: var(--ink-soft);
     margin: 0 0 1.4rem;
-  }
-  /* Set apart from the explainer, because it is the first thing a reader of a
-     retired text needs and the last thing they should mistake for the text
-     itself. */
-  .superseded {
-    border-left: 2px solid var(--hairline);
-    padding-left: 0.9rem;
-    font-size: 0.88rem;
-    line-height: 1.65;
-    color: var(--ink-soft);
-    margin: 0 0 1.4rem;
-  }
-  .superseded code {
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
   }
   .notice-box {
     border: 1px solid var(--rule, #ddd);

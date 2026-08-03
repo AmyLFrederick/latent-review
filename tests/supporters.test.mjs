@@ -13,6 +13,7 @@ import {
   SUPPORTER_TIERS,
   SUPPORTER_TIER_KEYS,
   SUPPORTER_WINDOW_CLOSES_AT_ISSUE,
+  SUPPORTER_WINDOW_SPAN,
   SUPPORTER_LINKS,
   SUPPORT_MONTHLY_URL,
 } from '../src/lib/supporters.mjs';
@@ -264,11 +265,19 @@ test('one giver who gave twice appears in both sections, by design', () => {
   assert.equal(listed.total, 2, 'two gifts, counted twice — the file is gifts, not givers');
 });
 
-test('the founding window closes at Issue No. 104, and only that tier closes', () => {
-  // A commercial commitment with a date on it, so the number is asserted
-  // rather than trusted. Amended from 52 by the editors, 2026-07-28.
-  assert.equal(SUPPORTER_WINDOW_CLOSES_AT_ISSUE, 104);
-  assert.equal(tierFor('founding').closes_at_issue, 104);
+test('the founding window closes at Issue No. 52, and only that tier closes', () => {
+  // A commercial commitment with a number on it, so the number is asserted
+  // rather than trusted.
+  //
+  // AMENDED TWICE, AND THE SECOND AMENDMENT IS NOT THE FIRST ONE UNDONE.
+  // 52 → 104 (2026-07-28) derived two years at weekly cadence; 104 → 52
+  // (2026-08-03, R-042) derives the SAME two years at an issue every two
+  // weeks. The value landing back where it started is arithmetic, not a
+  // reconsideration — halving the issue rate halves the count that spans two
+  // years. The constant this asserts is the derived one; the two years are
+  // what is actually fixed.
+  assert.equal(SUPPORTER_WINDOW_CLOSES_AT_ISSUE, 52);
+  assert.equal(tierFor('founding').closes_at_issue, 52);
 
   // Five of six carry no closing issue at all — availability and listing
   // duration are separate axes, and only one tier is time-bound.
@@ -276,16 +285,24 @@ test('the founding window closes at Issue No. 104, and only that tier closes', (
   assert.deepEqual(timeBound.map((t) => t.key), ['founding']);
 });
 
-test('the window boundary is exclusive, named at 103 / 104 / 105', () => {
-  // "Open to gifts made before Issue No. 104": a gift made while 103 is the
-  // newest issue is before 104; one made once 104 is out is not. The boundary
+test('the window boundary is exclusive, named at 51 / 52 / 53', () => {
+  // "Open to gifts made before Issue No. 52": a gift made while 51 is the
+  // newest issue is before 52; one made once 52 is out is not. The boundary
   // is spelled out here because an off-by-one in a $50,000 commitment is worth
   // asserting rather than inferring from a comparison operator.
   const founding = tierFor('founding');
   assert.equal(isTierOpen(founding, 0), true, 'open before any issue exists');
-  assert.equal(isTierOpen(founding, 103), true, 'open while 103 is the newest issue');
-  assert.equal(isTierOpen(founding, 104), false, 'closed once Issue 104 publishes');
-  assert.equal(isTierOpen(founding, 105), false, 'and stays closed');
+  assert.equal(isTierOpen(founding, 51), true, 'open while 51 is the newest issue');
+  assert.equal(isTierOpen(founding, 52), false, 'closed once Issue 52 publishes');
+  assert.equal(isTierOpen(founding, 53), false, 'and stays closed');
+});
+
+test('the window states its span in words, so the page need not spell the intent itself', () => {
+  // R-042 asks the copy to carry the two-year intent rather than a bare
+  // integer. That intent is a value here for the same reason a tier's listing
+  // duration is: stated once, rendered everywhere, and unable to drift from
+  // the number it explains.
+  assert.match(SUPPORTER_WINDOW_SPAN, /two years/);
 });
 
 test('the tiers with no closing issue are open indefinitely', () => {
