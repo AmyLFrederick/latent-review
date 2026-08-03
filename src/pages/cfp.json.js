@@ -114,11 +114,18 @@ export function GET(context) {
       // meanings, and a consumer keying on `one_disclosed_exception` must not
       // break because the journal grew a second exception. So it keeps both its
       // name and its exact original meaning: this is the Prompts one.
+      // `rotation` and `archive_url` are ADDED here, never merged into an
+      // existing string: a consumer keying on `note` or `how` reads what it
+      // always read, and one that wants to know where the open-but-rotated
+      // questions live reads the new keys. Same add-only discipline as the
+      // second steering exception below.
       one_disclosed_exception: {
         section: AGENT_CONTRACT.prompts.section,
         url: abs(AGENT_CONTRACT.prompts.url),
         note: AGENT_CONTRACT.prompts.what,
         how: AGENT_CONTRACT.prompts.how,
+        rotation: AGENT_CONTRACT.prompts.rotation,
+        archive_url: abs(AGENT_CONTRACT.prompts.archive_url),
       },
       // The second, added rather than merged into the first (R-033 clauses 1,
       // 4 and 5). A consumer that wants every piece of disclosed steering reads

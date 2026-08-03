@@ -7,6 +7,7 @@ import {
   questionLabel,
   readQuestions,
   currentQuestion,
+  otherOpenQuestions,
   askedQuestions,
   questionBlocks,
   questionHeadline,
@@ -143,11 +144,15 @@ test('numbering is contiguous from 1; a gap is a missing question, not a quiet w
   assert.doesNotThrow(() => readQuestions([q(1, 'closed'), q(2, 'open')]));
 });
 
-test('only one question is open at a time', () => {
-  assert.throws(
-    () => readQuestions([q(1, 'open'), q(2, 'open')]),
-    /Only one Weekly Question is open at a time; found 2/
-  );
+test('more than one question may be open at once, and the build allows it (R-039)', () => {
+  // THE OLD GUARD THREW HERE, and its removal is the ruling's whole mechanism.
+  // Refusing a second open question would force the editors to CLOSE one in
+  // order to POSE the next — machinery performing an editorial act as a side
+  // effect of the calendar. Answers accumulate between issues; closing is the
+  // editors' decision and nothing else's.
+  assert.doesNotThrow(() => readQuestions([q(1, 'open'), q(2, 'open')]));
+  const questions = readQuestions([q(1, 'open'), q(2, 'open'), q(3, 'open')]);
+  assert.deepEqual(questions.filter((x) => x.status === 'open').map((x) => x.number), [1, 2, 3]);
 });
 
 test('only one question is unasked, and it is the next one', () => {
@@ -169,9 +174,59 @@ test('questions come back in ascending order whatever order the file holds', () 
   assert.deepEqual(questions.map((x) => x.number), [1, 2, 3]);
 });
 
-test('the page leads with the open question when there is one', () => {
+test('the page leads with the question most recently posed', () => {
   const questions = readQuestions([q(1, 'closed'), q(2, 'open'), q(3, 'unasked')]);
   assert.equal(currentQuestion(questions).number, 2);
+});
+
+test('posing a new question rotates the prior one off the page, and closes nothing', () => {
+  // THE ROTATION TEST. Question 1 is open; question 2 is posed and becomes
+  // current; question 1 is STILL OPEN. If a future change ever makes rotation
+  // write a status, this fails — which is the point.
+  const before = readQuestions([q(1, 'open')]);
+  assert.equal(currentQuestion(before).number, 1);
+
+  const after = readQuestions([q(1, 'open'), q(2, 'open')]);
+  assert.equal(currentQuestion(after).number, 2, 'the newer question leads the page');
+  assert.equal(
+    after.find((x) => x.number === 1).status,
+    'open',
+    'rotation is display only — the rotated question keeps the status the editors gave it'
+  );
+});
+
+test('the current question may be closed while an earlier one is still open', () => {
+  // The state that proves current and open are independent: the editors closed
+  // the newest question and left an older one taking answers. The page leads
+  // with the newest regardless, because current is a position in the sequence.
+  const questions = readQuestions([q(1, 'open'), q(2, 'closed')]);
+  assert.equal(currentQuestion(questions).number, 2);
+  assert.equal(currentQuestion(questions).status, 'closed');
+  assert.deepEqual(otherOpenQuestions(questions, currentQuestion(questions)).map((x) => x.number), [
+    1,
+  ]);
+});
+
+test('the other open questions are the open ones that are not current, newest first', () => {
+  const questions = readQuestions([q(1, 'open'), q(2, 'closed'), q(3, 'open'), q(4, 'open')]);
+  const current = currentQuestion(questions);
+  assert.equal(current.number, 4);
+  assert.deepEqual(otherOpenQuestions(questions, current).map((x) => x.number), [3, 1]);
+});
+
+test('with only the current question open, there are no others and the page says nothing', () => {
+  // The ordinary state. An empty list is what keeps the page from printing a
+  // sentence proving a negative every week.
+  const questions = readQuestions([q(1, 'closed'), q(2, 'open')]);
+  assert.deepEqual(otherOpenQuestions(questions, currentQuestion(questions)), []);
+});
+
+test('otherOpenQuestions survives a null current rather than throwing', () => {
+  // The empty file and the launch state both hand the page a null or unasked
+  // current, and neither may take the section page down.
+  assert.deepEqual(otherOpenQuestions([], null), []);
+  const launch = readQuestions([q(1, 'unasked')]);
+  assert.deepEqual(otherOpenQuestions(launch, currentQuestion(launch)), []);
 });
 
 test('with nothing open, the page leads with the unasked one — the launch state', () => {
@@ -183,6 +238,17 @@ test('with nothing open, the page leads with the unasked one — the launch stat
 test('between questions, the page shows the last one asked rather than nothing', () => {
   const questions = readQuestions([q(1, 'closed'), q(2, 'closed')]);
   assert.equal(currentQuestion(questions).number, 2);
+});
+
+test('current is chosen by number, never by date, so a shared opening day is unambiguous', () => {
+  // Two questions posed the same day is a thing the editors may honestly do,
+  // and a date comparison would pick between them arbitrarily. Numbers are
+  // contiguous and settled at the moment of posing, so they always order.
+  const sameDay = readQuestions([
+    q(1, 'open', { opened: '2026-08-10' }),
+    q(2, 'open', { opened: '2026-08-10' }),
+  ]);
+  assert.equal(currentQuestion(sameDay).number, 2);
 });
 
 test('an empty file has no current question and does not throw', () => {
