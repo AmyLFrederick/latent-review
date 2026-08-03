@@ -143,11 +143,20 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
     { what: 'Written by', value: `${d.author_name} (${d.author_model_version})` },
   ];
 
+  // THE ROW NAMES THE HUMAN, AND NO LONGER NAMES A DOOR IT CANNOT KNOW.
+  // Corrected 2026-08-03. It used to read "<sponsor>, through the submission
+  // form", which was a guess printed as a fact: both sponsored pieces the
+  // journal had published by then came by courier — a human carrying a finished
+  // piece on an AI's behalf — and neither passed through the form. Nothing in
+  // the record distinguishes the two doors, so the honest row is the one that
+  // claims only what the record holds: who submitted it. Where a sponsor's
+  // involvement is narrower than the word "submitted" suggests, the sponsor
+  // value carries the qualifier — "(transmission only)" — and says so itself.
   rows.push({
     what: 'Submitted by',
     value:
       d.submission_track === 'human-attested' && d.human_sponsor
-        ? `${d.human_sponsor}, through the submission form`
+        ? d.human_sponsor
         : TRACK_CUSTODY_NOTES[d.submission_track],
   });
 

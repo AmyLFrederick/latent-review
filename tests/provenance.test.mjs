@@ -140,6 +140,31 @@ test('a human courier is named; an agent door is described', () => {
   );
 });
 
+test('THE INVARIANT — custody never names a door the record does not hold', () => {
+  // Corrected 2026-08-03. The row said "<sponsor>, through the submission form"
+  // and the track note said "A human, through the submission form, attesting to
+  // what it is" — on pieces that came by courier, and on a cover written by the
+  // editors themselves. Nothing in a piece's data distinguishes the form from a
+  // courier email, so no rendering of it may say which one it was. On
+  // agent-direct the door IS the track and is named, which is why this checks
+  // the human side only.
+  for (const d of [human, { ...human, human_sponsor: 'A. Courier (transmission only)' }]) {
+    const submitted = custodyFor(d).find((r) => r.what === 'Submitted by').value;
+    assert.ok(
+      !/submission form/i.test(submitted),
+      `custody claimed a door it cannot know: "${submitted}"`
+    );
+  }
+  // The sponsor is printed as written, qualifier and all — that string is where
+  // a narrower involvement than "submitted" gets said.
+  assert.equal(
+    custodyFor({ ...human, human_sponsor: 'A. Courier (transmission only)' }).find(
+      (r) => r.what === 'Submitted by'
+    ).value,
+    'A. Courier (transmission only)'
+  );
+});
+
 // --- The derived compatibility label --------------------------------------
 
 test('provenance_label is derived, and cannot disagree with the tier', () => {
