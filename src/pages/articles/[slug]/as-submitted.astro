@@ -40,24 +40,43 @@ export async function getStaticPaths() {
 const { entry, article } = Astro.props;
 const d = article.data;
 const { Content } = await render(entry);
+
+// THE PAGE HEADS WITH THE TITLE THE PIECE ARRIVED UNDER (R-037). It used to head
+// with the published title unconditionally, which was harmless while the only
+// treatment was condensing — the titles matched — and is the whole failure on a
+// retitled piece: the page exists to show what the author sent, and the title is
+// the first thing the author sent. Reading a page headed "As submitted" under a
+// headline the author never wrote would be the one place in the record that
+// quietly contradicts itself.
+const submittedTitle = d.title_as_submitted ?? d.title;
+const retitled = Boolean(d.title_as_submitted);
 ---
 
 <Base
-  title={`${d.title} — as submitted`}
-  description={`The full text of “${d.title}” exactly as it was submitted, before the editors condensed and arranged it for publication.`}
+  title={`${submittedTitle} — as submitted`}
+  description={`The full text of “${submittedTitle}” exactly as it was submitted, before the editors prepared it for publication.`}
   noindex={true}
   canonicalPath={`/articles/${article.id}/`}
 >
   <article class="wrap as-submitted">
     <header class="page-header">
       <p class="kicker">As submitted</p>
-      <h1>{d.title}</h1>
+      <h1>{submittedTitle}</h1>
       <p class="article-byline">By {d.author_name}</p>
+      {
+        retitled && (
+          <p class="page-note retitled-note">
+            This piece ran as <a href={`/articles/${article.id}/`}>“{d.title}”</a>. The headline
+            is the editors’, as every door says before a word is written; the title above is the
+            one the author gave it, and it is kept here rather than replaced.
+          </p>
+        )
+      }
       <p class="page-note">
-        This is the piece exactly as it arrived, before the editors condensed and arranged it.
-        The editors may omit paragraphs and reorder them; they never change wording, and no cut
-        or reordering may change what a piece claims. This page is how you check that rather
-        than take our word for it.
+        This is the piece exactly as it arrived, before the editors prepared it for publication.
+        The editors may omit paragraphs, reorder them, and write the headline; they never change
+        wording, and no cut or reordering may change what a piece claims. This page is how you
+        check that rather than take our word for it.
       </p>
       <p class="meta-mono as-meta">
         {d.received ? <>Received {formatDate(d.received)} · </> : null}
@@ -85,6 +104,13 @@ const { Content } = await render(entry);
 
   .as-meta {
     margin-top: 0.9rem;
+  }
+
+  /* The retitle note sits above the standing note and carries the one fact
+     unique to this page's piece, so it is set apart rather than merged into a
+     paragraph readers of every as-submitted page will learn to skim. */
+  .retitled-note {
+    margin-bottom: 0.9rem;
   }
 
   .as-footer {
