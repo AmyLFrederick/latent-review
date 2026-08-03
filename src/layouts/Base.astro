@@ -404,6 +404,14 @@ const currentIssue = await getCurrentIssue();
   footer {
     margin-top: 4.5rem;
     padding-bottom: 2.5rem;
+
+    /* THE SUPPORT ZONE — one measure, used above and below the link, which is
+       what makes it centred rather than merely spaced. Declared on the footer
+       because the two margins that consume it sit on different elements
+       (.footer-support and .footer-close) and a value defined on either would
+       not reach the other. Change it here and both sides move together; change
+       one margin alone and the centring is gone. */
+    --support-zone: clamp(3rem, 11vw, 6rem);
   }
 
   footer p {
@@ -439,15 +447,13 @@ const currentIssue = await getCurrentIssue();
     margin-top: 0.3rem;
   }
 
-  /* THE AIR BELONGS ABOVE SUPPORT, NOT BELOW IT (editors' read of the preview,
-     2026-08-03). The gap that separates Support from the link rows is the one
-     doing the work, and it lives on .footer-support. This rule only closes the
-     footer, so it sits close under the link rather than being spaced off it —
-     2.2rem was reading as a second gap and made Support look like it floated
-     between two blocks instead of ending the column. The footer's own
-     padding-bottom still keeps the rule off the bottom of the window. */
+  /* THE LOWER HALF OF THE SUPPORT ZONE. This rule closes the footer, and the
+     space above it is the same measure as the space above the link — that
+     equality is what centres Support between the links and the bottom line.
+     Reads the same custom property deliberately: two hand-tuned numbers would
+     agree on the day they were written and drift on any day after. */
   .footer-close {
-    margin-top: 1rem;
+    margin-top: var(--support-zone);
   }
 
   /* Human governance links — relocated from the top nav. Kept in the human
@@ -482,32 +488,25 @@ const currentIssue = await getCurrentIssue();
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    /* SUPPORT IS ITS OWN BLOCK, NOT THE TAIL OF THE LINKS (editors' walk
-       2026-08-03). 1.7rem became 2.6rem on the first pass and the section still
-       read as clutter against the rows above it, so this is the measure rather
-       than another increment.
 
-       THE NUMBER IS CHOSEN AGAINST THE FOOTER'S OWN RHYTHM. Every other block
-       in this footer is separated by 1.4rem; at 2.6rem, Support sat at not
-       quite twice a normal gap, which the eye reads as a slightly loose row in
-       the same group rather than as a break.
+    /* SUPPORT IS VERTICALLY CENTRED IN ITS OWN ZONE — respecced by the editors
+       2026-08-03 after walking both widths, replacing a one-sided 20rem gap.
 
-       DOUBLED TWICE ON THE EDITORS' READS OF THE PREVIEW: 2.6 → 5 → 10 → 20rem.
-       That is roughly FOURTEEN times the footer's block gap, and it is meant to
-       be conspicuous — the gap is the only thing doing this job, since the
-       footer's one rule sits below the link rather than above it, so it has to
-       be unmistakable rather than merely generous. Measured from the sitemap /
-       source code line, which is the last row above it.
+       THE GEOMETRY IS THE POINT, NOT THE NUMBER. Equal space above and below:
+       above, to the sitemap / source-code line; below, to the rule that closes
+       the footer. Both sides read from --support-zone on the footer, so they
+       cannot drift apart — the link floats in a band of its own rather than
+       hanging under the links above it.
 
-       IT IS A LOT OF EMPTY SCREEN, and that is the instruction rather than an
-       accident: anyone tempted to trim it back toward a "reasonable" value
-       should get a ruling first.
+       WHAT A FUTURE SESSION MUST PRESERVE: the two measures stay EQUAL. Tuning
+       the size is ordinary work; making one side larger than the other is not,
+       because it turns a centred element back into a spaced one and undoes what
+       was reviewed. If the zone needs to change, change --support-zone.
 
-       WHITESPACE AND NOT A RULE, deliberately. The footer's one horizontal rule
-       was moved BELOW this link earlier today to stop a divider cutting the
-       block; adding one above it now would undo that decision from the other
-       side and put Support back between two lines. */
-    margin-top: 20rem;
+       It scales with the viewport so the centring survives a phone, where a
+       fixed desktop measure would eat most of a screen, and a wide window,
+       where a fixed phone measure would close the band up. */
+    margin-top: var(--support-zone);
   }
 
   .footer-support a {

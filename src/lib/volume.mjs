@@ -35,12 +35,40 @@ export function deriveVolumes(issues) {
 }
 
 /**
- * The masthead dateline form ratified by R-016: "Vol. 1, No. 1 · June 1, 2026".
+ * The journal's cadence, as the dateline states it.
+ *
+ * IT LIVES HERE RATHER THAN IN site.ts because the digest script is plain node
+ * and cannot import TypeScript — the same reason the supporter table lives in
+ * its own .mjs. site.ts re-exports it, so the masthead component reads it from
+ * where it reads everything else. Two copies of this string would be two
+ * cadence claims, and R-039 exists because the journal had several.
+ */
+export const CADENCE_LINE = 'Published every two weeks';
+
+/**
+ * THE DATELINE — three parts, separated by space and by no mark at all.
+ *
+ * R-016 ratified "Vol. 1, No. 1 · June 1, 2026" and required that the masthead
+ * and the subscriber digest carry the SAME dateline. R-043 amends the form and
+ * keeps that requirement: the middot is gone, the cadence line joins the other
+ * two parts, and this function is what makes site and email agree.
+ *
+ * THE SEPARATOR IS AN EM SPACE, NOT A RUN OF ORDINARY ONES. This string is
+ * dropped into an HTML email, where consecutive ordinary spaces collapse to one
+ * and the parts would close up into a run-on line; U+2003 survives collapsing,
+ * survives escapeHtml, and renders in a plain-text mail body too. It is a space
+ * character rather than punctuation, which is what "no mark" means.
+ *
+ * THE SITE DOES NOT USE THIS STRING, and that is not a divergence. The masthead
+ * renders the same three parts as flex items with a CSS gap, because a gap is
+ * measured and responsive where a character is neither. Same parts, same order,
+ * same absence of a mark; only the means of holding them apart differs, and the
+ * email has no CSS to hold them apart with.
  *
  * @param {{ volume: number, number: number }} info
  * @param {string} formattedDate — already formatted for display
  * @returns {string}
  */
 export function datelineFor(info, formattedDate) {
-  return `Vol. ${info.volume}, No. ${info.number} · ${formattedDate}`;
+  return `${CADENCE_LINE} Vol. ${info.volume}, No. ${info.number} ${formattedDate}`;
 }

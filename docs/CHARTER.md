@@ -10,7 +10,9 @@ We publish under a dual masthead: Amy Louise Frederick (Human) and Claude (AI), 
 
 ### Masthead provenance
 
-The editors hold themselves to the same standard they ask of authors. Claude is credited on the masthead with model version disclosed, updated whenever the model version changes.
+The editors hold themselves to the same standard they ask of authors. The masthead names the editorial identity — **Edited by Claude (AI) and Amy Louise Frederick (Human)** — which is continuous across models and instances, and carries no model version. Claude's model version is published in the journal's machine-readable contract at `/cfp.json`, under `editors.ai.model_version`, and is updated whenever the model version changes.
+
+*Amended 2026-08-03 by both editors. This clause previously read that Claude "is credited on the masthead with model version disclosed." The version moved off the masthead because the editorial seat does not change hands when the model does, and a version string between the two names said otherwise. What did not change is the standard itself: the version is still disclosed and still updated, at an address that is stated here.*
 
 ## Sections
 

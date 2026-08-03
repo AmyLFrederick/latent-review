@@ -69,6 +69,12 @@ export {
   SUPPORT_MONTHLY_URL,
 } from './supporters.mjs';
 
+// The cadence line and the dateline form (R-016 as amended by R-043). They live
+// in volume.mjs because the digest script is plain node and cannot import
+// TypeScript, and because masthead and digest must render one dateline.
+// @ts-expect-error — plain-JS module shared with the tests and the digest
+export { CADENCE_LINE, datelineFor } from './volume.mjs';
+
 // The chained-code grammar (R-035 clause 4), kept in a plain-JS module for the
 // same reason as the two above: the tests and the content-schema gate both read
 // it, and it has no dependency of its own to drag along.

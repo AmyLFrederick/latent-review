@@ -466,3 +466,21 @@ Ruled 2026-08-03 by both editors, resolving the collision R-039 recorded, flagge
 **What is fixed is the two years; the integer is a derivation.** This is why the standing commitment said *revisit* rather than *reinterpret*: a bare number invites a later session to decide that 104 issues was the point. It was not. The founding window is the stretch in which the journal is becoming findable, the editors judged that at roughly two years, and the issue count is only how that span is made countable from the archive.
 
 **Applied so the next cadence change meets reasoning rather than an integer.** The constant carries its own derivation table; the page states the two years first and the issue number as what two years currently comes to, naming the present cadence in the same sentence; and the span is a value rather than a phrase retyped into prose. The tier's threshold, its listing duration, and the exclusive boundary — open while the newest issue is *below* 52, shut once 52 publishes — are unchanged.
+
+## R-043 — 2026-08-03 — The dateline form, amending R-016
+
+Ruled 2026-08-03 by both editors, on the editors' walk of the masthead. Amends R-016; R-016 stands unedited in this log and is read subject to this one.
+
+**The ratified form.** The dateline is three parts, in this order, separated by space and by no mark at all:
+
+> Published every two weeks   Vol. 1, No. 1   August 2, 2026
+
+**What is amended, and what is preserved.** R-016 gave the form as "Vol. 1, No. 1 · [issue date]" and required that the masthead and the subscriber digest carry the **same** dateline. The form changes; the requirement does not, and it is the reason this ruling exists rather than a masthead tweak. Both surfaces compose the dateline from one function, so they cannot disagree — which is what R-016 was protecting when it named them together.
+
+**Everything else in R-016 is untouched.** Arabic numerals only, never Roman. Volume 1 is 2026, each volume beginning January 1 with numbering restarting at 1. The citation form *The Latent Review*, Vol. 2, No. 14 (2027) — which keeps its comma and is not a dateline. Volume and number remain display derivations, never stored facts, and `/issue/N` still counts globally forever. The 2026-07-20 implementation note on `number_in_volume` stands.
+
+**The cadence line joins the dateline rather than sitting beside it.** R-039 put "Published every two weeks" on the masthead; it has been rendering in the dateline's own row since. This ruling recognises what was already true on the page and makes the digest carry it too, so a reader meets the same three facts in the email as on the site.
+
+**No sent record is touched, and this is why the change is cheap.** No digest has ever been sent — the first send is still gated on Resend DNS verification — so there is no inbox anywhere holding the old form, and nothing published under R-016's dateline that this amendment could contradict. Had a digest gone out, the correct instrument would have been a forward-looking change with the old form left standing in the record; it was not needed.
+
+**On the separator, recorded because it is the kind of detail that gets 'tidied'.** The site holds the three parts apart with a CSS gap; the email, which has no CSS worth trusting, uses an em space. Ordinary spaces collapse in HTML mail and would close the parts into a run-on. Same parts, same order, same absence of a mark — two means of spacing because the two media differ, not because the form does.

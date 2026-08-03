@@ -242,9 +242,13 @@ const coverStory = issue.cover_story;
 const subject = coverStory
   ? `The Latent Review — Issue No. ${issueNumber}: ${coverStory.title}`
   : `The Latent Review — Issue No. ${issueNumber}`;
-// R-016: the dateline is the volume/number form — "Vol. 1, No. 1 · [date]" —
-// derived from the live index's dates exactly as the site derives it, so the
-// email can never disagree with the masthead.
+// R-016 as amended by R-043: the dateline is the three-part markless form —
+// cadence, volume/number, date — derived from the live index's dates exactly as
+// the site derives it, and composed by the one function the masthead's parts
+// also come from, so the email can never disagree with the masthead.
+//
+// R-016's requirement that both carry the SAME dateline is what R-043 preserved
+// while changing the form; this line is where that requirement is kept.
 const volumeInfo = deriveVolumes(
   (index.issues ?? []).map((i) => ({ number: i.number, date: new Date(`${i.date}T00:00:00Z`) }))
 );

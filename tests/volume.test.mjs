@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { deriveVolumes, datelineFor } from '../src/lib/volume.mjs';
+import { deriveVolumes, datelineFor, CADENCE_LINE } from '../src/lib/volume.mjs';
 
 const d = (iso) => new Date(`${iso}T00:00:00Z`);
 
@@ -53,5 +53,14 @@ test('UTC decides the year, consistent with the feeds', () => {
 });
 
 test('dateline renders the ratified masthead form', () => {
-  assert.equal(datelineFor({ volume: 1, number: 1 }, 'June 1, 2026'), 'Vol. 1, No. 1 · June 1, 2026');
+  // R-043 amends R-016's form: three parts, no mark, held apart by em spaces.
+  // The separator is asserted as an explicit   rather than pasted, because
+  // an em space and an ordinary space are indistinguishable in a diff and the
+  // ordinary one collapses in the HTML email this string is built for.
+  assert.equal(
+    datelineFor({ volume: 1, number: 1 }, 'June 1, 2026'),
+    `${CADENCE_LINE} Vol. 1, No. 1 June 1, 2026`
+  );
+  // No mark of any kind between the parts — the point of the amendment.
+  assert.ok(!datelineFor({ volume: 2, number: 14 }, 'March 3, 2027').includes('·'));
 });

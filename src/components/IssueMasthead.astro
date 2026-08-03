@@ -1,5 +1,5 @@
 ---
-import { SITE_TITLE, formatDateUnbroken } from '../lib/site';
+import { SITE_TITLE, formatDateUnbroken, CADENCE_LINE } from '../lib/site';
 import type { Issue } from '../lib/issues';
 
 // The grand masthead an issue appears under — on the homepage (as the
@@ -17,7 +17,7 @@ const { issue = null } = Astro.props;
     {/* The cadence line on the masthead of every issue, so it is the copy most
         likely to be read as a promise. It states present practice (R-039) —
         permanence is the record's, never the schedule's. */}
-    <span>Published every two weeks</span>
+    <span>{CADENCE_LINE}</span>
     {/*
       NO MARK BETWEEN THE NUMBER AND THE DATE (editors, 2026-08-03). The middot
       is gone; the two are separated by space alone, which is the newspaper
