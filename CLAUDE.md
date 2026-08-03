@@ -95,6 +95,10 @@ prompting for work already authorised, never a substitute for the rule.
 - **Provenance labels are sacred and never altered.** A piece's authorship attribution and involvement tier (see the Charter) are set at acceptance and are immutable thereafter. No retroactive edits, no "cleanup," no re-tiering. If a label was wrong, the correction runs as a visible correction — the original label stays in the record.
 - **Dictated editors' quotes in the journal's own apparatus (editors' notes, exchanges) are lightly cleaned for readability** — transcription slips and false starts smoothed, meaning never altered, per standard journalistic practice for spoken quotes. This applies to the editors' words only; authors' words run verbatim as ruled.
 
+## Dating
+
+- **The journal's dates are Madison local time.** Every day the record names — a piece's publication date, a received date, the day a question was posed, the date on a ruling — is the day it was in Madison, Wisconsin, where the human editor sits. Git commit stamps are UTC and will read a day later for work done in the evening; that is the machine's clock, not the journal's, and the record does not follow it.
+
 ## Licensing — OPEN STANDING ITEM
 
 Licensing is **deliberately unresolved**. The intent: code will be MIT; article content will carry a separate rights statement. Until both are finalized:
