@@ -11,10 +11,8 @@ import {
   SITE_DESCRIPTION,
   EDITORS,
   REPO_URL,
-  STANDING_SECTIONS,
   TERMS_UNDER_LEGAL_REVIEW,
-  sectionUrl,
-  navLabel,
+  NAV_ROSTER,
   sectionNavHref,
 } from '../lib/site';
 import { getCurrentIssue } from '../lib/issues';
@@ -168,27 +166,23 @@ const currentIssue = await getCurrentIssue();
       }
       <nav class="wrap" aria-label="Journal">
         <ul>
-          {/* Topics used to be a hand-written entry below this loop, because it was
-              an index and deliberately absent from STANDING_SECTIONS. R-032 made it
-              a section and it moved into the list — it is last in STANDING_SECTIONS,
-              so the rendered roster is unchanged in both membership and order, which
-              is what R-032 clause 7 says. Its href still resolves to /topics/, since
-              sectionUrl() keeps the URL a section had before it was one.
+          {/* ONE LOOP OVER ONE ROSTER. Letters and Prompts used to be hand-written
+              after a loop over STANDING_SECTIONS, which worked only while every
+              section preceded them. The Corner now follows them (ruled 2026-08-03),
+              so the two kinds of entry interleave and the roster has to be a single
+              ordered list. It is NAV_ROSTER in src/lib/site.ts, which is also where
+              the reasoning for the order lives.
 
-              THE ROSTER IS STILL CLOSED. R-026 clause 6 reopened it once for Prompts
-              and R-027 clause 3 spent the slot reserved for Topics; neither is a
-              standing permission, and the next addition needs its own ruling. */}
-          {STANDING_SECTIONS.map((s) => (
-            <li>
-              <a href={sectionNavHref(s, currentIssue)}>{navLabel(s)}</a>
+              Sections resolve through sectionNavHref, so a direct-open section still
+              opens this issue's piece; Topics still resolves to /topics/, the URL it
+              kept when R-032 made it a section. */}
+          {NAV_ROSTER.map((entry) => (
+            <li class={entry.ownRow ? 'nav-own-row' : undefined}>
+              <a href={entry.section ? sectionNavHref(entry.section, currentIssue) : entry.href}>
+                {entry.label}
+              </a>
             </li>
           ))}
-          <li><a href="/letters/">Letters</a></li>
-          {/* Prompts is last by R-026 clause 6, which reopened the roster once and
-              for this section only. The four standing sections above are where the
-              journal's own pieces run; Letters and Prompts are both where people
-              answer back, and they sit together at the end. */}
-          <li><a href="/prompts/">Prompts</a></li>
         </ul>
       </nav>
     </header>
@@ -312,16 +306,31 @@ const currentIssue = await getCurrentIssue();
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    /* The column gap SCALES WITH THE VIEWPORT so seven items stay on one line
-       across the widths where they nearly fit. At a fixed 1.6rem the roster
-       overflowed by a hair on common laptop and tablet widths and dropped
-       Prompts — the last item — alone onto a second line. The row gap stays
-       fixed: when the nav genuinely must wrap on a phone, the two lines should
-       still breathe. Nothing here touches the roster or its order, both of
-       which are ruled (R-026 c6, R-027 c3, R-032 c7). */
+    /* The column gap SCALES WITH THE VIEWPORT so the first row stays one line
+       across the widths where it nearly fits. At a fixed 1.6rem the roster
+       overflowed by a hair on common laptop and tablet widths and spilled its
+       last item onto a line of its own — which is now the deliberate layout for
+       exactly one entry and must not happen by accident to any other. Six items
+       have more room than the seven this was written for, so it holds more
+       easily than it did. The row gap stays fixed: when the first row genuinely
+       must wrap on a phone, the lines should still breathe. Nothing here touches
+       the roster's membership, which is ruled (R-026 c6, R-027 c3, R-032 c7). */
     gap: 0.4rem clamp(0.75rem, 2.4vw, 1.6rem);
     border-top: 1px solid var(--hairline);
     border-bottom: 1px solid var(--hairline);
+  }
+
+  /* THE SECOND ROW, TAKEN DELIBERATELY (ruled 2026-08-03). A full-width flex
+     item forces the wrap rather than waiting for one: the break happens at every
+     width, on a phone and on a desk, so the layout is a decision the reader can
+     see rather than an artifact of their window. The longest name in the roster
+     gets the widest berth — the opposite of the abbreviation it used to get.
+
+     Centred by text-align, not by the ul's justify-content, which centres the
+     row's items as a group and has nothing to do once the row holds one. */
+  nav li.nav-own-row {
+    flex-basis: 100%;
+    text-align: center;
   }
 
   nav a {

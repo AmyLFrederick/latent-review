@@ -120,15 +120,61 @@ export function sectionUrl(section: string): string {
   return SECTION_PAGE_OVERRIDES[section] ?? `/section/${slugifySection(section)}/`;
 }
 
-// The top nav shows trimmed display labels for brevity; the canonical section
-// names in STANDING_SECTIONS are unchanged and used everywhere else (section
-// page titles, descriptions, feeds).
-export const NAV_SECTION_LABELS: Record<string, string> = {
-  'The Metaphysical Corner': 'Metaphysical Corner',
-};
-export function navLabel(section: string): string {
-  return NAV_SECTION_LABELS[section] ?? section;
+/**
+ * THE NAVIGATION ROSTER, IN DISPLAY ORDER — which is no longer the order an
+ * issue's contents run in, and this is where the two part company.
+ *
+ * STANDING_SECTIONS was doing both jobs. It is the roster AND, by its own
+ * comment, "the order an issue's contents run in", and while the nav rendered
+ * that array in place the two orders could not disagree. Ruled 2026-08-03: the
+ * Corner takes the second row alone under its full name, which puts it after
+ * Letters and Prompts — items that are not sections and never appear in an
+ * issue's contents at all. There is no ordering of STANDING_SECTIONS that
+ * expresses this, and reordering it to try would move the Corner in every
+ * issue's contents to fix a line break in the nav.
+ *
+ * So the display order lives here and the contents order stays there. Anything
+ * about an issue's shape reads STANDING_SECTIONS; only the nav reads this.
+ *
+ * MEMBERSHIP IS UNCHANGED AND STILL CLOSED. The same seven entries in a
+ * different order: R-026 clause 6 reopened the roster once for Prompts, R-027
+ * clause 3 spent the slot reserved for Topics, and neither is a standing
+ * permission — the next addition needs its own ruling. R-027 clause 3's one
+ * positional requirement, Topics before Letters, holds below.
+ *
+ * WHAT R-026 CLAUSE 6 DOES NOT SAY. The comment this replaces asserted that
+ * "Prompts is last by R-026 clause 6". The clause amends the roster to include
+ * Prompts and says nothing whatever about position; the code had promoted a
+ * layout choice into a ruling it could cite. Prompts moves up here, and no
+ * ruling had to be amended for it to, because none ever fixed it in place.
+ */
+export interface NavEntry {
+  /** What the nav prints. Full section names — nothing is trimmed for brevity. */
+  label: string;
+  /** A standing section, whose href is resolved against the current issue. */
+  section?: string;
+  /** A page that is not a section. */
+  href?: string;
+  /**
+   * Set on the one entry that takes a row to itself (ruled 2026-08-03). The
+   * longest name in the roster gets the widest berth rather than the narrowest
+   * — which is what it got while the nav abbreviated it to fit.
+   */
+  ownRow?: boolean;
 }
+
+export const NAV_ROSTER: readonly NavEntry[] = [
+  { label: 'Cover', section: 'Cover' },
+  { label: 'Opinion', section: 'Opinion' },
+  { label: 'AI Voices', section: 'AI Voices' },
+  { label: 'Topics', section: 'Topics' },
+  { label: 'Letters', href: '/letters/' },
+  { label: 'Prompts', href: '/prompts/' },
+  // Row two, alone, under the name the section actually has. The nav used to
+  // print "Metaphysical Corner" — the article trimmed off — because seven
+  // items had to survive one line. They no longer do.
+  { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', ownRow: true },
+];
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
   Cover: 'The piece both editors deem most important that week.',
