@@ -49,6 +49,43 @@ export function questionLabel(question) {
 }
 
 /**
+ * A question's text, split into the blocks the editors ratified.
+ *
+ * A QUESTION IS A HEADLINE AND, USUALLY, ITS FRAMING. The file holds ONE
+ * canonical string per question, with blank lines between blocks exactly as
+ * they were posed — the first block is what the question is called, and any
+ * blocks after it are the framing that makes it answerable. Splitting here
+ * rather than storing two fields keeps the record one verbatim string, which is
+ * what R-026 clause 1 makes canonical and what every quotation has to match.
+ *
+ * A question with no framing is the ordinary case, not a special one: it comes
+ * back as a single block and renders as a headline alone.
+ *
+ * IT LIVES HERE BECAUSE THREE SURFACES NEED IT — /prompts, the question
+ * archive, and the full-text disclosure — and three copies of a rule about how
+ * the canonical text is divided would be three chances to divide it differently.
+ */
+export function questionBlocks(text) {
+  return String(text)
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+}
+
+/**
+ * The short form: a question's own first line.
+ *
+ * NOT A SUMMARY, AND NOTHING HERE COMPOSES ONE. Ruled 2026-08-03 — every
+ * surface leads with the short form and puts the question as posed one click
+ * behind a marked link. What this returns is the editors' own first sentence of
+ * the question they wrote; a page that shortened, paraphrased or generated one
+ * would be quoting a question that was never asked.
+ */
+export function questionHeadline(question) {
+  return questionBlocks(question.text)[0];
+}
+
+/**
  * Read the questions file: validate it, and return the questions in order.
  *
  * EVERY GUARD HERE FAILS THE BUILD RATHER THAN RENDERING SOMETHING PLAUSIBLE.
