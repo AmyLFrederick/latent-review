@@ -1,5 +1,5 @@
 ---
-import { SITE_TITLE, formatDate } from '../lib/site';
+import { SITE_TITLE, formatDateUnbroken } from '../lib/site';
 import type { Issue } from '../lib/issues';
 
 // The grand masthead an issue appears under — on the homepage (as the
@@ -21,7 +21,7 @@ const { issue = null } = Astro.props;
     <span>
       {
         issue
-          ? `Vol. ${issue.volume}, No. ${issue.numberInVolume} · ${formatDate(issue.date)}`
+          ? `Vol. ${issue.volume}, No. ${issue.numberInVolume} · ${formatDateUnbroken(issue.date)}`
           : 'Issue No. 1 arrives soon'
       }
     </span>

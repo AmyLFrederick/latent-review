@@ -31,14 +31,22 @@ const { cover, sections } = issue;
 // the day they appear in their section's place, not at the top.
 const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => group.items)];
 
-// THE LEAD STYLING KEYS OFF THE COVER EXISTING, NOT OFF BEING FIRST, and that
-// distinction is the whole of its correctness. An issue is allowed to have no
-// Cover piece — `cover` is optional on the Issue type, and issues.ts fails a
-// build with more than one Cover but not with none — in which case the first
-// line is simply the first piece of the first section. Styling that as the lead
-// would tell a reader an ordinary piece is the week's cover: a false claim about
-// the issue, made in CSS.
-const hasLead = Boolean(cover);
+// THE ENTRIES ARE ALL ONE SIZE, ruled by the editors 2026-08-03. The cover
+// entry was set a step larger than the rest; it is not any more, and the
+// enlargement is gone rather than reduced.
+//
+// This is the second half of the 2026-08-02 ruling arriving. That one deleted a
+// full-height feature block and said THE COVER'S PROMINENCE IS BEING FIRST —
+// then kept a size step as a hedge against readers not perceiving position. The
+// editors have now looked at it and taken the hedge away: being first is the
+// prominence, and a list that means it does not also whisper it in type.
+//
+// The lead machinery went with the styling rather than being left dormant. It
+// keyed off the cover EXISTING rather than off being first — an issue may have
+// no Cover piece, and styling the first line as a lead would have told a reader
+// an ordinary piece was the cover. That reasoning is recorded here because it is
+// the trap anyone re-adding a lead style would fall into; it is no longer
+// load-bearing, because nothing is styled as a lead.
 ---
 
 <div class="wrap">
@@ -49,8 +57,8 @@ const hasLead = Boolean(cover);
           In this issue
         </h2>
         <ol class="contents-list">
-          {contents.map((article, index) => (
-            <li class:list={['contents-item', hasLead && index === 0 && 'contents-item--lead']}>
+          {contents.map((article) => (
+            <li class="contents-item">
               <a class="contents-title" href={`/articles/${article.id}/`}>
                 {article.data.title}
               </a>
@@ -100,19 +108,8 @@ const hasLead = Boolean(cover);
     margin: 0.3rem 0 0;
   }
 
-  /* ONE STEP UP, AND ONLY ONE. With the feature block gone, the cover's being
-     the cover is carried entirely by position — which a reader scanning a column
-     of similar lines does not perceive. The step is SIZE ALONE: no rule, no
-     colour, no kicker, nothing that would quietly rebuild a feature block out of
-     smaller parts. It should read as the cover at a glance and as the same kind
-     of thing on a second look. Deleting these two rules returns the list to
-     uniform, which is the other way the editors asked to see. */
-  .contents-item--lead {
-    padding-top: 1.1rem;
-    padding-bottom: 1.1rem;
-  }
-
-  .contents-item--lead .contents-title {
-    font-size: clamp(1.45rem, 3.6vw, 1.72rem);
-  }
+  /* The lead rules that stood here are deleted, not commented out — the
+     editors chose uniform on 2026-08-03, and a disabled style is an invitation
+     to switch it back on without a ruling. Every entry is .contents-item and
+     every title is one size. */
 </style>

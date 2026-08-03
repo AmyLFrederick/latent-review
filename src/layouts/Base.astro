@@ -240,10 +240,20 @@ const currentIssue = await getCurrentIssue();
             The governance row's Provenance link is the standard and keeps the
             word; this link is the repository and now says so. Nothing about
             what the link points at has changed. */}
+        {/*
+          TWO LINES, SPLIT BY WHAT THE LINKS ARE (editors' pass 2026-08-03). The
+          first is what a machine reader SUBSCRIBES to — the feeds and the map
+          of the site. The second is what it goes to in order to check us:
+          the sitemap and the repository. They are separate `<p>`s rather than a
+          `<br>` so the split holds as a structure rather than as a line break
+          that reflows away on a wide screen.
+        */}
         <p class="meta-mono footer-machine">
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
-          <a href="/llms.txt">llms.txt</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
-          <a href={REPO_URL}>source code</a>
+          <a href="/llms.txt">llms.txt</a>
+        </p>
+        <p class="meta-mono footer-machine footer-machine--second">
+          <a href="/sitemap-index.xml">sitemap</a> · <a href={REPO_URL}>source code</a>
         </p>
         {/*
           THE FOOTER LINK GOES TO THE PAGE, NOT TO A SECTION OF ANOTHER PAGE. It used to
@@ -254,6 +264,16 @@ const currentIssue = await getCurrentIssue();
         <p class="footer-support">
           <a href="/supporters/">Support the journal</a>
         </p>
+        {/*
+          THE DIVIDER CLOSES THE FOOTER RATHER THAN INTERRUPTING IT (editors'
+          pass 2026-08-03). The only rule in this footer used to be the one
+          under the subscribe field, which fell in the middle of the block and
+          read as a divider slicing the footer in half. The field keeps its
+          underline on the page variant, where it is the form's own baseline;
+          in the footer it is gone, and the rule that remains is this one — at
+          the very end, under Support the journal, closing the page.
+        */}
+        <hr class="single-rule footer-close" />
       </div>
     </footer>
   </body>
@@ -377,6 +397,20 @@ const currentIssue = await getCurrentIssue();
     margin-top: 1.4rem;
   }
 
+  /* The second machine line sits under the first as a continuation, not as a
+     new group — so it takes the leading between lines, never the 1.4rem that
+     separates the footer's blocks from each other. */
+  .footer-machine--second {
+    margin-top: 0.3rem;
+  }
+
+  /* The blank line before Support the journal (editors' pass 2026-08-03): the
+     link is the last thing the footer asks of a reader, and it reads as an ask
+     rather than as another row of links when it has air above it. */
+  .footer-close {
+    margin-top: 2.2rem;
+  }
+
   /* Human governance links — relocated from the top nav. Kept in the human
      voice (letterspaced small caps, not the monospace of the machine row) so
      the two link rows stay visually distinct. */
@@ -409,7 +443,9 @@ const currentIssue = await getCurrentIssue();
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-top: 1.7rem;
+    /* Stepped up from 1.7rem to 2.6rem — the blank line the editors asked for
+       before Support the journal. */
+    margin-top: 2.6rem;
   }
 
   .footer-support a {

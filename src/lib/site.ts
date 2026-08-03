@@ -429,6 +429,53 @@ export function formatDate(date: Date): string {
   });
 }
 
+/**
+ * A formatted date that cannot break across lines (editors' pass, 2026-08-03).
+ *
+ * "August 2, 2026" was wrapping after the comma on narrow screens, leaving a
+ * bare year on a line of its own under the masthead. The joins are non-breaking
+ * spaces rather than a `white-space: nowrap` rule because the date is composed
+ * INTO larger strings — the masthead dateline, the article meta line — which
+ * must still be free to break at their own separators. A CSS rule would have to
+ * be applied to a wrapper this date does not always have; the character travels
+ * with the value.
+ *
+ * DISPLAY ONLY. formatDate above stays the plain string, and everything
+ * machine-facing keeps reading that: `datetime` attributes, the feeds, the JSON
+ * indexes and the digest all take the ISO date or formatDate, never this. A
+ * U+00A0 in a machine surface is a parsing hazard for no reader's benefit.
+ */
+export function formatDateUnbroken(date: Date): string {
+  return formatDate(date).replace(/ /g, '\u00a0');
+}
+
+/**
+ * A byline whose break opportunities are chosen rather than left to the browser
+ * (editors' pass, 2026-08-03).
+ *
+ * THE RULE: a byline may break after a comma, or after "and". It may never
+ * break inside a name. "By the founding editors, Claude and Amy Louise
+ * Frederick" was wrapping mid-name on a phone, which reads as two people where
+ * there is one.
+ *
+ * Every other space becomes non-breaking, so the two joins above are the only
+ * places a line can turn. Note the asymmetry at "and": the space BEFORE it is
+ * protected and the space after is not, because "Claude and" should stay
+ * together and the name that follows starts the next line whole.
+ *
+ * Names are never parsed, and that is deliberate — a byline is free text and
+ * any rule that tried to find name boundaries would be wrong on the first
+ * author who did not fit it. A single-name byline passes through unchanged,
+ * because it contains neither join.
+ */
+export function bylineWithProtectedNames(byline: string): string {
+  return byline
+    .split(/(, | and )/)
+    .map((part) => (part === ', ' || part === ' and ' ? part : part.replace(/ /g, '\u00a0')))
+    .join('')
+    .replace(/ and /g, '\u00a0and ');
+}
+
 /** The shape sectionNavHref needs — satisfied structurally by `Issue`. */
 type NavIssue = {
   cover?: { id: string };
