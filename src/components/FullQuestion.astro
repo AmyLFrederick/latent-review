@@ -1,4 +1,5 @@
 ---
+import { formatDate } from '../lib/site';
 // @ts-expect-error — plain-JS module shared with the tests
 import { questionBlocks } from '../lib/prompts.mjs';
 
@@ -22,10 +23,26 @@ import { questionBlocks } from '../lib/prompts.mjs';
 
 interface Props {
   /** A posed question, as readQuestions() returns it. */
-  question: { text: string; sources?: string[] };
+  question: {
+    text: string;
+    sources?: string[];
+    opened?: string | null;
+    closed?: string | null;
+    status?: string;
+  };
+  /**
+   * Whether to print the question's dateline inside the disclosure.
+   *
+   * DEFAULTS TO TRUE, so a surface that renders the question as posed gets the
+   * complete record without having to know to ask for it. The archive is the
+   * one caller that opts out, because it prints the same dateline on the entry
+   * two lines above this. A duplicate is visible and mildly untidy; an omission
+   * is invisible, which is why the default errs toward printing.
+   */
+  showDates?: boolean;
 }
 
-const { question } = Astro.props;
+const { question, showDates = true } = Astro.props;
 
 // The same split /prompts and the archive lead with, from the one module that
 // owns it — a second implementation here could divide the canonical text
@@ -33,11 +50,36 @@ const { question } = Astro.props;
 const blocks = questionBlocks(question.text);
 
 const sources = Array.isArray(question.sources) ? question.sources : [];
+
+// THE DATELINE, restored here on the editors' walk of 2026-08-03 after the
+// section page stopped printing it above the question. This is where a reader
+// checks when a question was asked and whether it is still taking answers, so
+// the canonical view of the question carries it and is self-contained.
+//
+// IT COSTS NO HEIGHT ON THE PAGE. This is a <details>, collapsed until a reader
+// opens it, which is the whole reason the line could come back after being
+// removed for pushing the answers down.
+//
+// Madison local days, like every date the record names (CLAUDE.md). A bare
+// YYYY-MM-DD is read back as UTC midnight, which returns the day it was written
+// as — the parse is not what decides the day, the editor is.
+//
+// Guarded on `opened` rather than on status: an unasked question has no opening
+// date and nothing true to say here, and a caller that hands one over should
+// get silence rather than "Asked null".
+const asDay = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
+const dateline =
+  showDates && question.opened
+    ? question.closed
+      ? `Asked ${asDay(question.opened)} · closed ${asDay(question.closed)}`
+      : `Asked ${asDay(question.opened)} · ${question.status ?? 'open'}`
+    : null;
 ---
 
 <details class="full-question">
   <summary>Read the full question as posed</summary>
   <div class="full-question-body">
+    {dateline ? <p class="full-question-dateline">{dateline}</p> : null}
     <p class="full-question-note">
       This is the question in full, verbatim as it was posed, and it is what every author
       answered — the line above is its first sentence, not a summary of it. A question is never
@@ -94,6 +136,18 @@ const sources = Array.isArray(question.sources) ? question.sources : [];
   .full-question-body {
     font-size: 0.95rem;
     line-height: 1.6;
+  }
+
+  /* Set like the apparatus it is, and first inside the disclosure — a reader
+     opening this is checking the record, and when it was asked and whether it
+     is open are the two questions they most often came with. */
+  .full-question-dateline {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.8rem;
   }
 
   .full-question-note {
