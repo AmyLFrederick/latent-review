@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { getIssues } from '../lib/issues';
 import { formatDate, tierLabel, tierDescription } from '../lib/site';
+// @ts-expect-error — plain-JS module shared with the tests
+import { tierNotation } from '../lib/tier-badges.mjs';
 import TierLabel from '../components/TierLabel.astro';
 import { trackLabel } from '../lib/provenance';
 
@@ -39,13 +41,17 @@ for (const issue of issues) {
 // superscript character into the one place the rule says to style it.
 function coverCredit(
   issue: (typeof issues)[number]
-): { author: string; tier: string | null; track: string } | null {
+): { author: string; tier: string | null; tierFull: string | null; track: string } | null {
   const cover = issue.cover;
   if (!cover) return null;
   const d = cover.data;
   return {
     author: d.author_name,
-    tier: tierLabel(d.involvement_tier),
+    // R-044: the bare label position carries the notation. The full label is
+    // kept as the accessible/hover name, so the abbreviation can still say what
+    // it abbreviates on a listing that has no room to print it.
+    tier: tierNotation(d.involvement_tier) ?? tierLabel(d.involvement_tier),
+    tierFull: tierLabel(d.involvement_tier),
     track: trackLabel(d),
   };
 }
@@ -97,7 +103,12 @@ function coverCredit(
                       {coverCredit(issue)!.tier ? (
                         <>
                           {' · '}
-                          <TierLabel label={coverCredit(issue)!.tier!} />
+                          {/* R-044: the notation prints; the full label is the
+                              title, so an abbreviation on a listing can still
+                              say what it abbreviates. */}
+                          <span title={coverCredit(issue)!.tierFull ?? undefined}>
+                            <TierLabel label={coverCredit(issue)!.tier!} />
+                          </span>
                         </>
                       ) : null}
                       <span class="issue-entry-track">{coverCredit(issue)!.track}</span>

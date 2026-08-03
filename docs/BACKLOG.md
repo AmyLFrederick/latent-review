@@ -3,8 +3,14 @@
 Deferred work, recorded so it isn't re-litigated from scratch. Items leave
 this list by becoming a PR.
 
-- **Tier badges beyond the chart — DOCKETED 2026-08-03, editors to rule after
-  seeing the chart live.** The circular tier badges ship on `/provenance`'s tier
+- **Tier badges on listings and in the Provenance block — STILL DOCKETED
+  2026-08-03.** Article headers were adopted (Option 1: one badge, the piece's
+  own tier, in the header metadata line). **Listings and the Provenance-block
+  placement were explicitly NOT adopted** and stay here. The reasoning below was
+  written before the article decision and still applies to the two remaining
+  placements.
+
+- **[SUPERSEDED IN PART — article headers are now built] Tier badges beyond the chart.** The circular tier badges ship on `/provenance`'s tier
   chart only; whether they also appear on **article pages, cards, or listings**
   is a separate editorial decision the editors reserved. Nothing else renders
   `TierBadge` today, and nothing should until they rule.

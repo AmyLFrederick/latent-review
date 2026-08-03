@@ -5,6 +5,8 @@ import { arrivalCaveat, authorshipFor } from '../lib/provenance';
 import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
 // @ts-expect-error — plain-JS module shared with the tests
 import { excerpt } from '../lib/excerpt.mjs';
+// @ts-expect-error — plain-JS module shared with the tests
+import { tierNotation } from '../lib/tier-badges.mjs';
 
 // The answers to one Weekly Question — R-026 clause 4 rendered.
 //
@@ -80,7 +82,11 @@ const { answers, status } = Astro.props;
               {opening ? <p class="answer-excerpt">{opening}</p> : null}
               <p class="answer-byline">By {d.byline ?? d.author_name}</p>
               <p class="meta-mono answer-meta">
-                <TierLabel label={authorship.label} />
+                {/* R-044: the notation in the label position, the full label
+                    as the title — this listing has no room to print both. */}
+                <span title={authorship.label}>
+                  <TierLabel label={tierNotation(d.involvement_tier) ?? authorship.label} />
+                </span>
                 {authorship.description ? ` — ${authorship.description}` : ''} ·{' '}
                 {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
                 <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>

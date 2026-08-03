@@ -21,6 +21,8 @@ import {
   RING_AI,
   RING_HUMAN,
   BADGE_SUP_SIZE,
+  TIER_NOTATION,
+  tierNotation,
 } from '../src/lib/tier-badges.mjs';
 import { TIERS, TIER_CODES } from '../src/lib/site.ts';
 
@@ -125,4 +127,63 @@ test('the badge renders as SVG with real text, not as an image', () => {
 test('the ring colours are the ratified ones', () => {
   assert.equal(RING_AI, '#7d9153');
   assert.equal(RING_HUMAN, '#efa48f');
+});
+
+// --- R-045: the set is closed -------------------------------------------
+
+test('the set is exactly seven, and the schema refuses anything else', () => {
+  // THE MECHANICAL ENFORCEMENT R-045 ASKED FOR. The article schema's
+  // involvement_tier is z.enum(TIER_CODES) — the seven and nothing else — so a
+  // piece carrying a tier no badge and no notation can render fails the BUILD,
+  // where an editor sees it, rather than publishing as a label nobody checked.
+  //
+  // THIS NARROWED THE GATE. It previously accepted a well-formed chained code
+  // under R-035's grammar; the assertion below is what stops a future session
+  // widening it back on the reasonable-sounding ground that the standard can
+  // express more than the seven. It can. This journal publishes seven.
+  assert.equal(TIER_CODES.length, 7, 'the closed set has changed size without a ruling');
+  assert.equal(Object.keys(TIER_NOTATION).length, 7);
+  assert.deepEqual(Object.keys(TIER_NOTATION).sort(), [...TIER_CODES].sort());
+
+  const schema = readFileSync(repoPath('src/content.config.ts'), 'utf8');
+  assert.match(
+    schema,
+    /involvement_tier: z\.enum\(TIER_CODES\)/,
+    'the tier gate no longer closes the set at the seven codes'
+  );
+});
+
+test('no compound or combined notation is ever minted', () => {
+  // R-045: complexity beyond the seven goes in the Chain of Custody and the
+  // Provenance block, not into new marks. A notation carrying BOTH a relation
+  // and an editor mark on the same side — or two relations — would be the
+  // compound form the ruling forbids.
+  for (const [code, notation] of Object.entries(TIER_NOTATION)) {
+    const relations = (notation.match(/[>=]/g) ?? []).length;
+    assert.ok(relations <= 1, `${code} carries ${relations} relations; the seven carry at most one`);
+    const editorMarks = (notation.match(/ᵉ/g) ?? []).length;
+    assert.ok(editorMarks <= 1, `${code} carries more than one editor mark`);
+    assert.ok(
+      !(notation.includes('=') && notation.includes('ᵉ')),
+      `${code} chains an editor mark onto co-authorship — the ruling's named example of what is never minted`
+    );
+  }
+});
+
+test('a chained code has no notation, and does not silently get one', () => {
+  // R-044 enumerates seven forms; R-035's grammar composes more. The fallback
+  // is the full label, which is honest — an invented shorthand for a chain
+  // would be a notation the standard does not define.
+  assert.equal(tierNotation('ai-1-equals-human-ai-2-editor'), null);
+  assert.equal(tierNotation('not-a-code'), null);
+});
+
+test('the notation matches the badge each tier draws', () => {
+  // The two representations of one tier, which must not drift: the badge's
+  // parts flattened are the notation, with the superscript realised as the
+  // character the string form uses.
+  for (const [code, badge] of Object.entries(TIER_BADGES)) {
+    const flat = badge.parts.map((p) => (p.sup ? 'ᵉ' : p.text)).join('');
+    assert.equal(flat, TIER_NOTATION[code], `${code}'s badge and notation disagree`);
+  }
 });

@@ -7,6 +7,8 @@ import {
 } from '../lib/site';
 import { arrivalCaveat, authorshipFor, custodyFor } from '../lib/provenance';
 import TierLabel from './TierLabel.astro';
+// @ts-expect-error — plain-JS module shared with the tests
+import { tierNotation } from '../lib/tier-badges.mjs';
 
 // ONE PROVENANCE BLOCK, TWO LABELLED SECTIONS. Built to the editors' approved
 // mockup (docs/provenance-block-mockup.html), 2026-07-31.
@@ -50,7 +52,25 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
 
   <section class="prov-section" aria-label="Authorship">
     <p class="prov-label">Authorship</p>
-    <p class="tier-name"><TierLabel label={authorship.label} /></p>
+    {/*
+      NOTATION IN THE LABEL POSITION, NAME AND DESCRIPTION BENEATH IT (R-044).
+      The block used to lead with the full label; it now leads with the compact
+      form and keeps the full name, because this is one of the surfaces where
+      the name already accompanied the tier and the ruling keeps those.
+
+      A CHAINED LABEL HAS NO NOTATION and falls back to the full label alone.
+      Nothing can carry one today — R-045 closed the schema to the seven — so
+      this is the honest branch rather than a live one: an invented shorthand
+      for a chain would be a notation the standard does not define.
+    */}
+    <p class="tier-name">
+      {tierNotation(d.involvement_tier) ?? <TierLabel label={authorship.label} />}
+    </p>
+    {
+      tierNotation(d.involvement_tier) ? (
+        <p class="tier-full"><TierLabel label={authorship.label} /></p>
+      ) : null
+    }
     {
       /* A chained label carries no description and renders none — an empty
          paragraph would open a gap under the label that reads as a missing
@@ -152,6 +172,14 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
 </aside>
 
 <style>
+  /* The full name under the notation: present, quieter than the mark above it,
+     and the thing a reader who does not know the notation reads instead. */
+  .tier-full {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin: 0.15rem 0 0;
+  }
+
   .provenance {
     font-family: var(--font-mono);
     border-top: 3px solid var(--rule);

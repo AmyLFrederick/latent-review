@@ -96,3 +96,46 @@ export function badgeFor(code) {
 export function badgeLabel(tier, notation) {
   return `${tier.label} — ${tier.description}. Shown as ${notation}.`;
 }
+
+/**
+ * THE COMPACT DISPLAY NOTATION (R-044) — what a tier looks like in a label
+ * position now, everywhere tiers render to readers.
+ *
+ * DISPLAY ONLY, AND THE DISTINCTION IS THE RULING'S. The machine code is what
+ * the record stores and what every feed field carries; those did not move. This
+ * is the reader-facing form, and a surface that stored it would be storing an
+ * abbreviation of the thing it means to store.
+ *
+ * THE SUPERSCRIPT IS A CHARACTER HERE, not markup, because this string also
+ * reaches surfaces with no HTML — the digest, JSON, a plain-text mail body.
+ * U+1D49 is a letter rather than a numeral, so it does not hit the failure
+ * R-035 clause 3 records for U+00B2, which some screen readers voice as
+ * "squared"; and every badge spells the superscript out in its accessible name
+ * regardless, so nothing depends on how a reader's software pronounces it.
+ */
+export const TIER_NOTATION = {
+  ai: 'A',
+  'ai-human-editor': 'A–Hᵉ',
+  'ai-human': 'A>H',
+  'ai-equals-human': 'A=H',
+  'human-ai': 'H>A',
+  'human-ai-editor': 'H–Aᵉ',
+  human: 'H',
+};
+
+/**
+ * The notation for a code, or null.
+ *
+ * NULL IS THE CHAINED CASE, AND IT IS NOT A BUG. R-035's grammar composes
+ * labels across moments — `AI¹ = Human + AI² (editor)` — and R-044 enumerates
+ * exactly seven notations, so a chained label has no compact form. Callers fall
+ * back to the full label, which is the honest thing to print: an invented
+ * shorthand for a chain would be a notation the standard does not define.
+ *
+ * Nothing can carry a chained code today — the schema's enum is the seven
+ * (R-035 clause 6) — so this returns null for a case the record cannot yet
+ * hold, and the fallback exists for the day it can.
+ */
+export function tierNotation(code) {
+  return TIER_NOTATION[code] ?? null;
+}
