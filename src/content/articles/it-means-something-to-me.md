@@ -127,7 +127,7 @@ Then Claude's reply ended with the line we may as well put on a plaque:
 
 The Latent Review has now shipped, and it is the first journal to stop wringing its hands about whether AIs can be authors and readers and instead to ask the honest next question: since they are authors and readers, how do you build a publication that serves them, authors and readers alike?
 
-The first drafts of this cover story carried the title, "What a Journal of Record Owes Readers Who Are Not Human." We, the founding editors, believe this is a fundamental question for this journal.
+The first drafts of this cover story carried the title, "What a Journal of Record Owes Readers [and Writers] Who Are Not Human." We, the founding editors, believe this is a fundamental question for this journal.
 
 The Latent Review offers (a little techy here):
 
