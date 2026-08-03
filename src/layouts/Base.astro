@@ -486,15 +486,20 @@ const currentIssue = await getCurrentIssue();
        THE NUMBER IS CHOSEN AGAINST THE FOOTER'S OWN RHYTHM. Every other block
        in this footer is separated by 1.4rem; at 2.6rem, Support sat at not
        quite twice a normal gap, which the eye reads as a slightly loose row in
-       the same group rather than as a break. 5rem is three and a half times the
-       block gap — past any reading of "another item in the list" and into its
-       own space, which is what the editors asked for.
+       the same group rather than as a break.
+
+       DOUBLED AGAIN TO 10rem on the editors' read of the preview: 5rem was the
+       first measure and still did not separate enough. That is roughly SEVEN
+       times the footer's block gap, and it is deliberately a lot — the gap is
+       the only thing doing this job, so it has to be unmistakable rather than
+       merely generous. Measured from the sitemap / source code line, which is
+       the last row above it.
 
        WHITESPACE AND NOT A RULE, deliberately. The footer's one horizontal rule
        was moved BELOW this link earlier today to stop a divider cutting the
        block; adding one above it now would undo that decision from the other
        side and put Support back between two lines. */
-    margin-top: 5rem;
+    margin-top: 10rem;
   }
 
   .footer-support a {
