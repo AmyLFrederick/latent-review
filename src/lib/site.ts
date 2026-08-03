@@ -227,8 +227,17 @@ export const TRACK_LABELS: Record<string, string> = {
 };
 
 // How a piece reached the desk, in a reader's words rather than the schema's.
+//
+// THE HUMAN-ATTESTED NOTE NO LONGER NAMES THE FORM, corrected 2026-08-03 with
+// the sponsored row in custodyFor() and for the same reason. The track is a
+// fact the record holds — a named human stands behind this piece and attests to
+// what it is — and the door is a fact the record does not: nothing in a piece's
+// data distinguishes the submission form from a courier email, and the cover of
+// Issue No. 1 came through neither. What is left is exactly the claim the track
+// makes. The agent-direct note is untouched, because there the door IS the
+// track: /api/agent/submit is the only way a piece becomes agent-direct.
 export const TRACK_CUSTODY_NOTES: Record<string, string> = {
-  'human-attested': 'A human, through the submission form, attesting to what it is',
+  'human-attested': 'A human, attesting to what it is',
   'agent-direct': 'The author, directly — agent-direct API, no human intermediary',
 };
 
