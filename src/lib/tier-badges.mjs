@@ -20,6 +20,37 @@
 export const RING_AI = '#7d9153'; // sage green
 export const RING_HUMAN = '#efa48f'; // salmon pink
 
+/**
+ * THE SPLIT RING MIRRORS THE NOTATION — the colour on the left matches the
+ * letter on the left (editors, 2026-08-03).
+ *
+ *   A=H   sage left, salmon right
+ *   H=A   salmon left, sage right
+ *
+ * WHY IT IS DERIVED AND NOT DECLARED. Co-authorship is the one tier whose
+ * notation an author may order either way, and the ring is the same statement
+ * drawn instead of written. If the halves were fixed while the letters moved,
+ * the badge would say one thing in ink and the other in colour, and a reader
+ * who trusted the ring would read the author's order backwards.
+ *
+ * IT IS A SPEC, NOT A CHART DETAIL. Any surface that renders a split badge
+ * inherits this by calling the function rather than by remembering the rule —
+ * which is the point of it living here, since the two orderings appear on the
+ * chart today and could appear anywhere a co-authored piece is marked.
+ */
+export function splitRingSides(notation) {
+  // The first letter names the party on the left. Anything unrecognised falls
+  // back to the canonical A=H orientation rather than throwing: the caller has
+  // already drawn a circle by this point, and a half-coloured ring is worse
+  // than one oriented the ordinary way.
+  const lead = String(notation ?? '').trim().charAt(0).toUpperCase();
+  const humanLeads = lead === 'H';
+  return {
+    left: humanLeads ? RING_HUMAN : RING_AI,
+    right: humanLeads ? RING_AI : RING_HUMAN,
+  };
+}
+
 /** Notation ink — dark olive-green, as ratified with the mockup. */
 export const BADGE_INK = '#3f4a33';
 
@@ -66,10 +97,15 @@ export const BADGE_SUP_SIZE = 13;
  * said once rather than inferred at a call site.
  *
  * The chart displays `A=H` and `H=A` side by side because the order of names
- * around `=` carries no meaning — `+` is the relation whose order names who
+ * around `=` carries no meaning — the relational operators are what name who
  * led, and co-authorship is the tier where nobody did. Showing both makes the
  * absence of significance visible, where showing one silently suggests a
  * precedence the standard does not assert.
+ *
+ * EACH ORDERING CARRIES ITS OWN RING ORIENTATION (see splitRingSides): the two
+ * badges are mirror images, not the same badge printed twice. That is what
+ * makes the pair legible as one tier written two ways rather than as two
+ * different marks.
  *
  * THERE IS STILL EXACTLY ONE CO-AUTHORSHIP TIER AND ONE CODE. `ai-equals-human`
  * is what the record stores for both orderings; `human-equals-ai` is not a

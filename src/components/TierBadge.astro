@@ -1,6 +1,6 @@
 ---
 // @ts-expect-error — plain-JS module shared with the tests
-import { badgeFor, badgeLabel, RING_AI, RING_HUMAN, BADGE_INK, BADGE_SUP_SIZE } from '../lib/tier-badges.mjs';
+import { badgeFor, badgeLabel, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_SUP_SIZE } from '../lib/tier-badges.mjs';
 
 // One tier badge: a 58px circle, a 3px ring, the page's cream showing through,
 // and the tier's notation set in the house monospace.
@@ -71,6 +71,11 @@ const spoken = parts
 const accessibleName = badgeLabel(tier, spoken) + labelSuffix;
 
 const ringColor = badge.ring === 'human' ? RING_HUMAN : RING_AI;
+
+// The split ring mirrors the notation it encircles — the colour on the left
+// matches the letter on the left. Derived from the rendered notation, so the
+// two co-authorship orderings come out as mirror images of each other.
+const split = splitRingSides(spoken);
 ---
 
 <svg
@@ -91,17 +96,18 @@ const ringColor = badge.ring === 'human' ? RING_HUMAN : RING_AI;
   {
     badge.ring === 'split' ? (
       <>
-        {/* Left half sage, right half salmon — co-authorship, neither leading. */}
+        {/* Co-authorship, neither leading — and the halves follow the letters,
+            so A=H reads sage-then-salmon and H=A reads salmon-then-sage. */}
         <path
           d="M 29 1.5 A 27.5 27.5 0 0 0 29 56.5"
           fill="none"
-          stroke={RING_AI}
+          stroke={split.left}
           stroke-width="3"
         />
         <path
           d="M 29 1.5 A 27.5 27.5 0 0 1 29 56.5"
           fill="none"
-          stroke={RING_HUMAN}
+          stroke={split.right}
           stroke-width="3"
         />
       </>

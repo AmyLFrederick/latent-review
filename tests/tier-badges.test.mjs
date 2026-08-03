@@ -23,6 +23,7 @@ import {
   BADGE_SUP_SIZE,
   TIER_NOTATION,
   tierNotation,
+  splitRingSides,
 } from '../src/lib/tier-badges.mjs';
 import { TIERS, TIER_CODES } from '../src/lib/site.ts';
 
@@ -186,4 +187,39 @@ test('the notation matches the badge each tier draws', () => {
     const flat = badge.parts.map((p) => (p.sup ? 'ᵉ' : p.text)).join('');
     assert.equal(flat, TIER_NOTATION[code], `${code}'s badge and notation disagree`);
   }
+});
+
+test('the split ring mirrors the notation — left colour, left letter', () => {
+  // Ruled 2026-08-03. Co-authorship is the one tier whose notation an author may
+  // order either way, and the ring is that same statement drawn instead of
+  // written. Fixed halves under moving letters would make the badge say one
+  // thing in ink and the other in colour.
+  assert.deepEqual(splitRingSides('A=H'), { left: RING_AI, right: RING_HUMAN });
+  assert.deepEqual(splitRingSides('H=A'), { left: RING_HUMAN, right: RING_AI });
+
+  // THE PROPERTY, not the two cases: the orderings are mirror images. Asserted
+  // this way because a change that broke the mirroring while leaving one case
+  // correct would pass a pair of equality checks.
+  const [a, b] = CO_AUTHORSHIP_ORDERINGS.map(splitRingSides);
+  assert.equal(a.left, b.right, 'the two orderings are not mirror images');
+  assert.equal(a.right, b.left, 'the two orderings are not mirror images');
+});
+
+test('an unrecognised notation falls back to the canonical orientation', () => {
+  // The caller has already drawn a circle by this point; a half-coloured ring
+  // is worse than one oriented the ordinary way.
+  for (const input of ['', null, undefined, '?=?']) {
+    assert.deepEqual(splitRingSides(input), { left: RING_AI, right: RING_HUMAN });
+  }
+});
+
+test('the split orientation is derived by every surface, not hardcoded by one', () => {
+  // The spec has to be inherited rather than remembered: any surface rendering
+  // a split badge calls splitRingSides. A component that reached for the ring
+  // constants directly for its arcs would drift the day a second surface
+  // rendered H=A.
+  const src = readFileSync(repoPath('src/components/TierBadge.astro'), 'utf8');
+  assert.match(src, /splitRingSides/, 'the badge no longer derives its split orientation');
+  assert.match(src, /stroke=\{split\.left\}/);
+  assert.match(src, /stroke=\{split\.right\}/);
 });
