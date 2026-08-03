@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import QuestionEntry from '../../components/QuestionEntry.astro';
+import {
+  readQuestions,
+  askedQuestions,
+  answersTo,
+  assertAnswersWellFormed,
+} from '../../lib/prompts.mjs';
+import entries from '../../data/prompts.json';
+
+// /prompts/archive — every Weekly Question ever posed, with its answers.
+//
+// WHY IT LEFT /prompts, ruled 2026-08-03 on the editors' walk. The archive sat
+// at the foot of the section page and grew by one question a week, each with
+// its full text and its answers under it. That page's job is the shortest path
+// from arriving to reading: the question now open, and the writing it drew.
+// A complete record of every question ever asked is a different job, and a
+// growing one — so it has a page, and /prompts links to it.
+//
+// NOTHING WAS DROPPED IN THE MOVE, and that is the load-bearing part. This page
+// carries EVERY posed question, each with its canonical text in full and every
+// answer it drew, under the same display rules as the current question. The
+// archive is where a closed question lives; if it were abridged here it would
+// be abridged everywhere, and the journal would have quietly stopped being able
+// to show what it asked.
+const questions = readQuestions(entries);
+const asked = askedQuestions(questions);
+
+// Same guard as /prompts, because this page gathers answers the same way and a
+// build that fails on one page must not pass on the other.
+const articles = assertAnswersWellFormed(await getCollection('articles'), questions);
+---
+
+<Base
+  title="Every question asked"
+  description="The complete record of the Weekly Question: every question the editors have posed, in full and verbatim as posed, with the answers each one drew."
+>
+  <div class="wrap">
+    <header class="page-header page-header--compact">
+      <p class="kicker">Prompts</p>
+      <h1>Every question asked</h1>
+      <p class="page-note">
+        The complete record: every Weekly Question the editors have posed, each one verbatim as
+        posed, with the answers it drew. The question now open is{' '}
+        <a href="/prompts/">on the section page</a>, and it is here too, because it has been
+        asked.
+      </p>
+    </header>
+
+    {
+      asked.length > 0 ? (
+        <div class="entries">
+          {asked.map((question) => (
+            <QuestionEntry question={question} answers={answersTo(articles, question.number)} />
+          ))}
+        </div>
+      ) : (
+        /* The archive is empty exactly once in the journal's life, and saying
+           so plainly beats an empty page that looks broken. */
+        <p class="entries-empty">
+          Nothing has been asked yet, so there is nothing here. Every question the editors pose
+          is recorded on this page afterwards, with the date it was asked and the answers it
+          drew.
+        </p>
+      )
+    }
+
+    <p class="ruling-note">
+      The section is set by <a href="/rulings/">R-026</a>; corrections to a posed question are
+      set by <a href="/rulings/">R-038</a>. A posed question is never silently edited — a
+      correction carries a dated record of what changed, the original stays readable, and a
+      correction to the facts or the ask versions the question, so no answer is ever detached
+      from the words it answered.
+    </p>
+  </div>
+</Base>
+
+<style>
+  .entries {
+    margin: 2rem 0 0;
+  }
+
+  .entries-empty {
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-soft);
+    padding: 2rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .ruling-note {
+    margin: 2.5rem 0 0;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+</style>

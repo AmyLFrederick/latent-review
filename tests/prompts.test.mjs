@@ -8,6 +8,8 @@ import {
   readQuestions,
   currentQuestion,
   askedQuestions,
+  questionBlocks,
+  questionHeadline,
   answersTo,
   assertAnswersWellFormed,
   PROMPTS_SECTION,
@@ -72,10 +74,11 @@ test('the shipped file validates, and every entry in it is well-formed', () => {
       assert.equal(q.opened, null, 'an unasked question has no opening date');
     } else {
       // Posed: the words exist, the date exists, and the verification record
-      // exists -- all three settled before posing, because none can be fixed
-      // afterwards (R-026 clause 5).
+      // exists -- all three settled before posing. R-038 allows a correction
+      // afterwards, and makes it a dated, visible, versioning event; none of
+      // the three may simply be missing at the moment of posing.
       assert.ok(q.text.length > 0, `Question ${q.number} is ${q.status} with no text`);
-      assert.match(q.opened, /^\d{4}-\d{2}-\d{2}$/, `Question ${q.number} needs a UTC date`);
+      assert.match(q.opened, /^\d{4}-\d{2}-\d{2}$/, `Question ${q.number} needs a dated day`);
       assert.ok(Array.isArray(q.sources), `Question ${q.number} needs its sources array`);
     }
 
@@ -110,8 +113,10 @@ test('an unrecognised status fails the build rather than rendering', () => {
 });
 
 test('a posed question must carry its verification record', () => {
-  // R-026 clause 5: a posed question can never be corrected, so the checking
-  // happens before. An empty array is valid -- a question may assert nothing.
+  // The checking happens before a question is posed (R-026 clause 5, as amended
+  // by R-038: a correction is possible now, and is a visible event that splits
+  // the question into versions). An empty array is valid -- a question may
+  // assert nothing.
   const noSources = q(1, 'open');
   delete noSources.sources;
   assert.throws(() => readQuestions([noSources]), /carries no sources array/);
@@ -198,6 +203,34 @@ test('before anything is posed the archive is empty, and that is the honest stat
   // the first question look like a broken test.
   const questions = readQuestions([q(1, 'unasked')]);
   assert.deepEqual(askedQuestions(questions), []);
+});
+
+test('a question splits into the blocks it was posed in, and nothing composes one', () => {
+  // The headline is the question's OWN first line. Ruled 2026-08-03: every
+  // surface leads with the short form, so the one thing that must never happen
+  // is a page generating a short form of its own.
+  const q1 = { text: 'Short one?\n\nThe framing.\n\nThe ask.' };
+  assert.deepEqual(questionBlocks(q1.text), ['Short one?', 'The framing.', 'The ask.']);
+  assert.equal(questionHeadline(q1), 'Short one?');
+
+  // A question with no framing is the ordinary case, not a special one.
+  const q2 = { text: 'All of it, in one line?' };
+  assert.deepEqual(questionBlocks(q2.text), ['All of it, in one line?']);
+  assert.equal(questionHeadline(q2), 'All of it, in one line?');
+
+  // Whitespace between blocks is formatting, not text: ragged blank lines and
+  // trailing spaces in a hand-edited file must not become empty paragraphs.
+  assert.deepEqual(questionBlocks('  A?  \n   \n\n  B.  \n'), ['A?', 'B.']);
+});
+
+test('the shipped question leads with its own first line', () => {
+  // An invariant rather than a fixture: whatever question is current, the
+  // headline the page prints is the file's first block, character for
+  // character. A paraphrase would be a question nobody was asked.
+  const questions = readQuestions(JSON.parse(readFileSync('src/data/prompts.json', 'utf8')));
+  for (const q of questions.filter((x) => x.status !== 'unasked')) {
+    assert.ok(q.text.startsWith(questionHeadline(q)), `Question ${q.number}'s headline is not its own opening`);
+  }
 });
 
 test('the answers to a question are its own, in the order they ran', () => {

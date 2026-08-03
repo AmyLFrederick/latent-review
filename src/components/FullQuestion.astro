@@ -1,4 +1,7 @@
 ---
+// @ts-expect-error — plain-JS module shared with the tests
+import { questionBlocks } from '../lib/prompts.mjs';
+
 // The question as posed — the canonical text, one click from the headline.
 //
 // WHY THIS IS A DISCLOSURE AND NOT A CUT. Ruled 2026-08-03: /prompts leads each
@@ -24,10 +27,10 @@ interface Props {
 
 const { question } = Astro.props;
 
-const blocks = String(question.text)
-  .split(/\n\s*\n/)
-  .map((block) => block.trim())
-  .filter(Boolean);
+// The same split /prompts and the archive lead with, from the one module that
+// owns it — a second implementation here could divide the canonical text
+// differently from the surface that shows the headline.
+const blocks = questionBlocks(question.text);
 
 const sources = Array.isArray(question.sources) ? question.sources : [];
 ---

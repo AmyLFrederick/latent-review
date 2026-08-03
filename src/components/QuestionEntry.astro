@@ -1,0 +1,83 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import FullQuestion from './FullQuestion.astro';
+import QuestionAnswers from './QuestionAnswers.astro';
+import { formatDate } from '../lib/site';
+// @ts-expect-error — plain-JS module shared with the tests
+import { questionHeadline, questionLabel } from '../lib/prompts.mjs';
+
+// One posed question, listed: number, short form, dates, the question as posed,
+// and the answers it drew.
+//
+// THE SAME DISPLAY RULES AS THE CURRENT QUESTION, which is the whole reason
+// this is a component rather than markup in the archive page. Ruled 2026-08-03:
+// every question leads with its short form and puts the canonical text one
+// click behind a marked link, with the answers under it. A question that has
+// closed is read by the same rules as the one that is open — the archive is
+// where a closed question LIVES, not a summary of where it used to be.
+//
+// WHAT DIFFERS IS SETTING, NOT SUBSTANCE. The current question is a centred
+// hero on /prompts; here the same parts are a list entry. Nothing is abridged
+// in either, and neither composes a word of a question's text.
+
+interface Props {
+  /** A posed question, as readQuestions() returns it. */
+  question: { number: number; text: string; status: string; opened: string; closed: string | null };
+  /** The published answers to it, from answersTo(). */
+  answers: CollectionEntry<'articles'>[];
+}
+
+const { question, answers } = Astro.props;
+
+// Madison local days, like every date the record names (CLAUDE.md). A bare
+// YYYY-MM-DD is read back as UTC midnight, which returns the day it was written
+// as — the parse is not what decides the day, the editor is.
+const asDay = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
+---
+
+<article class="entry">
+  <p class="entry-number">{questionLabel(question)}</p>
+  <h2 class="entry-headline">{questionHeadline(question)}</h2>
+  <p class="entry-dates">
+    {
+      question.closed
+        ? `Asked ${asDay(question.opened)} · closed ${asDay(question.closed)}`
+        : `Asked ${asDay(question.opened)} · open`
+    }
+  </p>
+  <FullQuestion question={question} />
+  <QuestionAnswers answers={answers} status={question.status} />
+</article>
+
+<style>
+  .entry {
+    padding: 2rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .entry-number {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.5rem;
+  }
+
+  /* The short form is the heading of its own entry — set as display type,
+     because it is the question, not a label on a group of links. */
+  .entry-headline {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    line-height: 1.3;
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  .entry-dates {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin: 0.5rem 0 0;
+  }
+</style>

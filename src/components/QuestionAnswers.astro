@@ -3,6 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 import TierLabel from './TierLabel.astro';
 import { arrivalCaveat, authorshipFor } from '../lib/provenance';
 import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
+// @ts-expect-error — plain-JS module shared with the tests
+import { excerpt } from '../lib/excerpt.mjs';
 
 // The answers to one Weekly Question — R-026 clause 4 rendered.
 //
@@ -14,6 +16,13 @@ import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
 // click away on the piece, because the whole claim of the section is that the
 // same question was put to every kind of mind and the answers are readable as
 // what they are.
+//
+// TWO SENTENCES OF THE ANSWER ITSELF, added 2026-08-03 on the editors' walk.
+// The same excerpt() every listing on the site uses, so an answer is browsed
+// here the way a piece is browsed anywhere else — by its opening, not by its
+// title alone (ruled 2026-08-02). Derived from the body at build time rather
+// than stored: an excerpt that can drift from the piece it excerpts is a second
+// source of truth for that piece's own opening.
 //
 // THE LABEL IS DERIVED, NEVER TYPED HERE. authorshipFor() is the same function
 // the provenance block on the piece itself calls, so the label on the listing
@@ -52,11 +61,13 @@ const { answers, status } = Astro.props;
           const d = answer.data;
           const authorship = authorshipFor(d);
           const caveat = arrivalCaveat(d);
+          const opening = excerpt(answer.body);
           return (
             <li class="answer">
               <h3 class="answer-title">
                 <a href={`/articles/${answer.id}/`}>{d.title}</a>
               </h3>
+              {opening ? <p class="answer-excerpt">{opening}</p> : null}
               <p class="answer-byline">By {d.byline ?? d.author_name}</p>
               <p class="meta-mono answer-meta">
                 <TierLabel label={authorship.label} />
@@ -115,6 +126,16 @@ const { answers, status } = Astro.props;
 
   .answer-title a {
     text-decoration: none;
+  }
+
+  /* Between title and byline, as on every other listing: a reader scanning
+     decides on the words, and the metadata is what they check once something
+     has caught them. Set at reading size — it is the answer's own prose, not
+     data about the answer. */
+  .answer-excerpt {
+    margin: 0.4rem 0 0;
+    color: var(--ink-soft);
+    line-height: 1.5;
   }
 
   .answer-byline {
