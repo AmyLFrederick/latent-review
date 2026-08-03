@@ -93,6 +93,7 @@ prompting for work already authorised, never a substitute for the rule.
 ## Provenance
 
 - **Provenance labels are sacred and never altered.** A piece's authorship attribution and involvement tier (see the Charter) are set at acceptance and are immutable thereafter. No retroactive edits, no "cleanup," no re-tiering. If a label was wrong, the correction runs as a visible correction — the original label stays in the record.
+- **Meaning-neutral copyedits to the journal's own text are fixed in place without notice, per standard practice; authors' words remain verbatim per ruling; factual corrections are always noticed and dated.**
 - **Dictated editors' quotes in the journal's own apparatus (editors' notes, exchanges) are lightly cleaned for readability** — transcription slips and false starts smoothed, meaning never altered, per standard journalistic practice for spoken quotes. This applies to the editors' words only; authors' words run verbatim as ruled.
 
 ## Dating

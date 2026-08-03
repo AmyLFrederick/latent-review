@@ -2,8 +2,9 @@
 //
 // Plain JS, not TypeScript, so the tests can import it directly — the same
 // arrangement as src/lib/supporters.mjs and src/lib/volume.mjs. The rules here
-// are editorial commitments made in R-026, several of which cannot be undone
-// once a question is posed, so they are tested rather than trusted.
+// are editorial commitments made in R-026 and amended by R-038, several of
+// which bind hard once a question is posed, so they are tested rather than
+// trusted.
 //
 // THIS IS SITE-PAGE LOGIC, NEVER THE RECORD. Closing a question ends the
 // invitation to answer it; it does not unsay the question or remove it from
@@ -51,10 +52,11 @@ export function questionLabel(question) {
  * Read the questions file: validate it, and return the questions in order.
  *
  * EVERY GUARD HERE FAILS THE BUILD RATHER THAN RENDERING SOMETHING PLAUSIBLE.
- * This file is hand-edited, it is the canonical text of something that can
- * never be corrected after it is posed, and the page that renders it claims to
- * be a complete record. A silently-dropped question would be indistinguishable
- * from a week the editors skipped.
+ * This file is hand-edited, it is the canonical text of something authors
+ * answered word for word, and the page that renders it claims to be a complete
+ * record. A silently-dropped question would be indistinguishable from a week
+ * the editors skipped — and under R-038 a silent change to one is the single
+ * thing the correction rule forbids, so nothing here may make either quietly.
  */
 export function readQuestions(entries) {
   const questions = entries.filter(isQuestion);
@@ -67,16 +69,20 @@ export function readQuestions(entries) {
       );
     }
 
-    // R-026 clause 5 makes a posed question uncorrectable, so the verification
-    // record must exist before it is posed. Whether the entries in it are
-    // ENOUGH is an editorial judgment, and no check can make it — a question
-    // that asserts nothing may honestly carry an empty list. What the build
-    // can insist on is that the editors passed through the question.
+    // The verification record exists before the question is posed. R-026
+    // clause 5 made that unavoidable by making a posed question uncorrectable;
+    // R-038 allows the correction and keeps the requirement, because the cost
+    // moved rather than vanished — correcting a fact in a posed question is a
+    // visible event that splits the question into versions, and the sources
+    // are what make it unnecessary. Whether the entries are ENOUGH is an
+    // editorial judgment no check can make; a question that asserts nothing
+    // may honestly carry an empty list. What the build insists on is that the
+    // editors passed through the question.
     if (POSED.includes(q.status) && !Array.isArray(q.sources)) {
       throw new Error(
-        `Question ${q.number} is ${q.status} but carries no sources array. A question ` +
-          'cannot be corrected once posed (R-026 clause 5), so its verification record ' +
-          'is recorded before it is posed. An empty array is valid; a missing one is not.'
+        `Question ${q.number} is ${q.status} but carries no sources array. The checking ` +
+          'happens before a question is posed (R-026 clause 5, as amended by R-038), so its ' +
+          'verification record is recorded first. An empty array is valid; a missing one is not.'
       );
     }
   }
