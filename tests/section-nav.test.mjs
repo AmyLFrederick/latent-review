@@ -27,8 +27,11 @@ test('a direct-open section with a piece opens that piece, not a list of one', (
 });
 
 test('a direct-open section with NO piece falls back to its listing', () => {
-  // Issue 1's actual state: the Corner ran nothing, and the reader must still
-  // land somewhere real — the section page and its empty state.
+  // The fixture above gives the Corner nothing, and the reader must still land
+  // somewhere real — the section page and its empty state. Deliberately stated
+  // about the fixture rather than about a particular issue: this described
+  // Issue 1 until the Corner had a piece, and a test comment that names the
+  // current issue starts lying the week the issue changes.
   assert.equal(
     sectionNavHref('The Metaphysical Corner', issue),
     '/section/the-metaphysical-corner/'
