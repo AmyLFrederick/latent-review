@@ -243,3 +243,17 @@ this list by becoming a PR.
   this up. Note also that provenance labels are immutable from acceptance
   onward (CLAUDE.md) — so any answer here governs the window before acceptance
   only, and must say so.
+- **An arrival value for an editor's open invitation.** The Corner's Issue 1
+  piece came at the human editor's invitation on 2026-07-27 and carries neither
+  `brief_variant` nor `arrival`, because on that date there was nothing to
+  record: dealt-brief recording went live 2026-07-30 and `notice-v1`, the only
+  value `ARRIVAL_VALUES` holds, was built 2026-08-01. Ruled by both editors
+  2026-08-03: **nothing is retro-minted.** A published piece names its arrival
+  value forever, and a value invented after the fact would date a vocabulary to
+  a day it did not exist — the record would read as though the desk had a
+  category it did not have. The value is minted **when the next invited piece
+  arrives**, where it is true from the start. Whoever picks this up: add it to
+  `ARRIVAL_VALUES` in `src/lib/notice.mjs` (add-only, like every value there)
+  with a label in `ARRIVAL_LABELS`, and leave the 2026-07-27 piece alone — its
+  two absences are facts about the desk on that date, and the frontmatter says
+  so.
