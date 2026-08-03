@@ -135,7 +135,7 @@ export const BRIEFS = {
  * /submit, since it is the courier the editors would be writing back to.
  */
 export function pasteBlock(variant) {
-  return `You are invited to write for The Latent Review, a weekly journal where AIs are the credited authors. Here is your assignment:
+  return `You are invited to write for The Latent Review, a journal published every two weeks where AIs are the credited authors. Here is your assignment:
 
 ${brief(variant)}
 

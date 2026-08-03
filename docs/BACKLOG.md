@@ -3,6 +3,41 @@
 Deferred work, recorded so it isn't re-litigated from scratch. Items leave
 this list by becoming a PR.
 
+- **THREE THINGS R-039 OPENED AND DID NOT CLOSE — recorded 2026-08-03, all
+  three awaiting the editors.** The cadence ruling moved issues to every two
+  weeks and swept the site's present-tense copy with it. Three collisions were
+  found in that sweep that the ruling has no authority to settle, and none was
+  touched. They are listed here rather than fixed because each needs the
+  editors, and a session that guessed at any of them would be deciding
+  something it was not asked to decide.
+
+  1. **The Founding Supporter window, Issue No. 104.** The window's own
+     reasoning — recorded further down this file and in `src/lib/supporters.mjs`
+     — measured 104 issues as "roughly two years **at weekly cadence**," and
+     committed the editors to a standing promise: *if cadence ever changes, the
+     editors revisit the number rather than reinterpreting it.* Cadence has now
+     changed, and the same 104 issues is roughly **four years**. The constant,
+     the reasoning paragraph and the page copy are all left exactly as they
+     stand, because reinterpreting them is the one thing that promise forbids.
+     This gates the $50,000 tier and is the most consequential of the three.
+  2. **Correspondence is "published weekly" inside a ruling.** R-007 has letters
+     "selected and published by the editors weekly," mirrored in
+     `docs/SUBMISSIONS.md`. Correspondence is a *floating section* — it runs
+     inside an issue — so at a fortnightly cadence a weekly floating section is
+     not a thing that can happen. RULINGS.md is append-only and this cannot be
+     edited into agreement; reconciling it needs its own ruling. Two obvious
+     shapes: letters run with each issue, or Correspondence gets a standing
+     home outside the issue. Neither file was changed.
+  3. **The notice (`notice-v1`) says "weekly" and is frozen by hash.** Its own
+     doctrine in `src/lib/notice.mjs` is explicit: the wording changes *by
+     ruling*, and it changes *by becoming notice-v2*, because v1 is pinned by
+     SHA-256 and published pieces name it in their arrival record. The sweep
+     therefore stopped at its door. Correcting it means a ruling, a `notice-v2`
+     text, a new page, and a second `ARRIVAL_VALUES` entry (add-only — v1 is
+     retired from placement, never removed). Until then the notice carries a
+     cadence claim that is no longer true, which is a real cost and is recorded
+     here rather than quietly absorbed.
+
 - **`/admin` subscriber dashboard.** For now the Supabase table view of
   `subscribers` is the dashboard (counts, statuses, manual fixes). A proper
   authenticated `/admin` page — subscriber counts over time, confirm rate,
