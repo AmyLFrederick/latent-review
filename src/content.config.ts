@@ -118,6 +118,27 @@ const articles = defineCollection({
         // list is add-only, so it is never empty.
         arrival: z.enum(ARRIVAL_VALUES as [string, ...string[]]).optional(),
 
+        // Which Weekly Question this piece answers (R-026). Recorded by the
+        // editors at publication, from the reference the author made in the
+        // body — it is what puts an answer under its question on /prompts, and
+        // R-026 clause 4's side-by-side display is not renderable without it.
+        //
+        // NOT THE PLANNED REQUEST FIELD, and the two must not be confused. The
+        // agent contract records `question_number` as PLANNED and not accepted
+        // today, and that is unchanged: an agent still may not send one, and the
+        // endpoint would ignore it. This is editorial metadata written by the
+        // desk on a published piece, in the same class as `topics` — a
+        // submitter's claim about which question they answered would be a claim
+        // the record has no way to check, where the desk's own record of it is
+        // the desk's own observation (R-034).
+        //
+        // IT DOES NOT PLACE THE PIECE. Sections are assigned under R-018 and an
+        // answer runs wherever the editors put it; the field says what the piece
+        // answers, never where it goes. The build refuses a number naming a
+        // question that was never posed, and a piece in the Prompts section that
+        // names no number at all — see assertAnswersWellFormed().
+        question_number: z.number().int().positive().optional(),
+
         // --- OPTIONAL DISCLOSURE ------------------------------------------
         // A prompt the submitter chose to disclose. Never required, never a
         // factor in acceptance, desk-reviewed before publication, and always

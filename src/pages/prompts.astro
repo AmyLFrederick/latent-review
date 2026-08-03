@@ -1,6 +1,17 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { readQuestions, currentQuestion, askedQuestions, questionLabel } from '../lib/prompts.mjs';
+import FullQuestion from '../components/FullQuestion.astro';
+import QuestionAnswers from '../components/QuestionAnswers.astro';
+import {
+  readQuestions,
+  currentQuestion,
+  askedQuestions,
+  questionLabel,
+  answersTo,
+  assertAnswersWellFormed,
+} from '../lib/prompts.mjs';
+import { formatDate as formatDay } from '../lib/site';
 import entries from '../data/prompts.json';
 
 // /prompts — the Weekly Question (R-026).
@@ -17,6 +28,13 @@ import entries from '../data/prompts.json';
 const questions = readQuestions(entries);
 const current = currentQuestion(questions);
 const asked = askedQuestions(questions);
+
+// THE ANSWERS, WHICH ARE THE OTHER HALF OF THE RECORD. R-026 clause 4: human
+// and AI answers are presented side by side with provenance labels. The link
+// from a piece to a question is `question_number`, written by the editors at
+// publication; assertAnswersWellFormed fails the build on a number that names
+// no posed question, and on a piece in the Prompts section that names none.
+const articles = assertAnswersWellFormed(await getCollection('articles'), questions);
 
 // The unasked launch state is a state, not an absence to paper over: the
 // question is numbered and the page says it has not been asked yet.
@@ -38,13 +56,15 @@ const questionBlocks = (text) =>
     .map((block) => block.trim())
     .filter(Boolean);
 
-const formatDate = (iso) =>
-  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  });
+// THE HEADLINE IS THE FIRST BLOCK, AND IT IS NOT A SUMMARY OF THE QUESTION.
+// Ruled 2026-08-03: each question leads with its short form, and the question
+// as posed — premise, framing, sources — stays canonical, verbatim and one
+// click away. The two are not in tension, because the headline is the editors'
+// own first line of the question they wrote, not a paraphrase produced here.
+// Nothing on this page ever composes, shortens or rewrites a question's text.
+const questionHeadline = (question) => questionBlocks(question.text)[0];
+
+const formatDate = (iso) => formatDay(new Date(`${iso}T00:00:00Z`));
 ---
 
 <Base
@@ -100,17 +120,30 @@ const formatDate = (iso) =>
             </>
           ) : (
             <>
-              <p class="question-text">{questionBlocks(current.text)[0]}</p>
-              {questionBlocks(current.text)
-                .slice(1)
-                .map((block) => (
-                  <p class="question-framing">{block}</p>
-                ))}
+              {/*
+                THE SHORT FORM LEADS, THE FULL TEXT IS ONE CLICK BEHIND IT, AND
+                THE ANSWERS COME NEXT (ruled 2026-08-03). The framing used to
+                print here in full, which put a paragraph of premise between the
+                question and anything a reader came for. What is behind the link
+                is canonical and verbatim; see src/components/FullQuestion.astro.
+              */}
+              <p class="question-text">{questionHeadline(current)}</p>
               <p class="question-note">
                 {current.status === 'open'
                   ? `Asked ${formatDate(current.opened)}. Open for answers.`
                   : `Asked ${formatDate(current.opened)}; closed ${formatDate(current.closed)}. This question is no longer taking answers.`}
               </p>
+              {/* The apparatus reads left-aligned in a column of its own, inside a
+                  block that is otherwise centred: the question is a headline and
+                  is set like one, the things under it are read rather than
+                  scanned. */}
+              <div class="question-apparatus">
+                <FullQuestion question={current} />
+                <QuestionAnswers
+                  answers={answersTo(articles, current.number)}
+                  status={current.status}
+                />
+              </div>
             </>
           )}
         </section>
@@ -150,17 +183,19 @@ const formatDate = (iso) =>
             {asked.map((q) => (
               <li>
                 <p class="asked-number">{questionLabel(q)}</p>
-                {/* The archive carries every block, not the headline alone: this
-                    is the only place a closed question is readable in full, and
-                    a record that abridges what was asked is not a record. */}
-                {questionBlocks(q.text).map((block, i) => (
-                  <p class={i === 0 ? 'asked-text' : 'asked-framing'}>{block}</p>
-                ))}
+                {/* The same shape as the question above, for the same reason: the
+                    headline leads and the canonical text is one click behind it.
+                    Every block is still here, unabridged — a record that abridges
+                    what was asked is not a record — and now the answers are too.
+                    For a closed question this is the only place either lives. */}
+                <p class="asked-text">{questionHeadline(q)}</p>
                 <p class="asked-dates">
                   {q.closed
                     ? `Asked ${formatDate(q.opened)} · closed ${formatDate(q.closed)}`
                     : `Asked ${formatDate(q.opened)} · open`}
                 </p>
+                <FullQuestion question={q} />
+                <QuestionAnswers answers={answersTo(articles, q.number)} status={q.status} />
               </li>
             ))}
           </ul>
@@ -219,15 +254,13 @@ const formatDate = (iso) =>
     margin: 0;
   }
 
-  /* The framing reads at prose scale and left-aligned, because it is prose: a
-     paragraph of context set in display type and centered is a wall, not a
-     question. The headline above it stays the loudest thing on the page. */
-  .question-framing {
-    text-align: left;
+  /* The column the apparatus reads in. The question above it is centred display
+     type; the full text and the answers are prose, and prose set centred is a
+     wall rather than something anybody reads. */
+  .question-apparatus {
     max-width: 34rem;
-    margin: 1.2rem auto 0;
-    font-size: 1rem;
-    line-height: 1.6;
+    margin: 0 auto;
+    text-align: left;
   }
 
   .question-note {
@@ -267,12 +300,6 @@ const formatDate = (iso) =>
   .asked-text {
     margin: 0.35rem 0;
     font-weight: 600;
-  }
-
-  .asked-framing {
-    margin: 0.35rem 0;
-    font-size: 0.95rem;
-    color: var(--ink-soft);
   }
 
   .ruling-note {
