@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import { TIERS, SITE_TITLE } from '../lib/site';
+import TierBadge from '../components/TierBadge.astro';
+// @ts-expect-error — plain-JS module shared with the tests
+import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.mjs';
 
 // R-014: this page is the canonical statement of the involvement-tier
 // system as an open standard. R-015 revised the standard to v2. The tier
@@ -59,9 +62,27 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         only wrong move is picking one that isn't true.
       </p>
 
+      {/*
+        THE BADGE COLUMN, added 2026-08-03 on the editors' spec. The chart gains
+        a mark per tier and loses nothing: the tier's name and its description
+        are still the row, still rendered from TIERS, still the authoritative
+        text. The badge is an abbreviation of the row it sits beside.
+
+        THE ORDER IS THE CHART'S EXISTING ONE, which is R-015's spectrum and is
+        unchanged by this pass — the rows still come straight from TIERS in
+        TIERS' order. See the PR: the spec's parenthetical about where the
+        edited tiers sit describes a different order from the one the chart has
+        had since R-015, and reordering a ratified spectrum is not a display
+        change.
+
+        CO-AUTHORSHIP TAKES TWO BADGES IN ONE ROW — one tier, both orderings,
+        because the order of names around "=" carries no meaning. One row,
+        because there is one tier and one code.
+      */}
       <table class="stackable">
         <thead>
           <tr>
+            <th><span class="sr-only">Badge</span></th>
             <th>Tier</th>
             <th>Involvement</th>
           </tr>
@@ -69,6 +90,21 @@ import { TIERS, SITE_TITLE } from '../lib/site';
         <tbody>
           {TIERS.map((tier) => (
             <tr>
+              <td class="tier-badge-cell">
+                {tier.code === CO_AUTHORSHIP_CODE ? (
+                  <span class="tier-badge-pair">
+                    {CO_AUTHORSHIP_ORDERINGS.map((notation) => (
+                      <TierBadge
+                        tier={tier}
+                        notation={notation}
+                        labelSuffix=" One tier, shown in both orderings; the order of names carries no meaning here."
+                      />
+                    ))}
+                  </span>
+                ) : (
+                  <TierBadge tier={tier} />
+                )}
+              </td>
               <td class="tier-name"><strong>{tier.label}</strong></td>
               <td>{tier.description}</td>
             </tr>
@@ -382,6 +418,23 @@ import { TIERS, SITE_TITLE } from '../lib/site';
 </Base>
 
 <style>
+  /* The badge column: as narrow as a 58px mark plus breathing room, so the
+     tier name still starts near the left edge and the chart still reads as a
+     table of words with marks beside them. */
+  .tier-badge-cell {
+    width: 1%;
+    white-space: nowrap;
+    padding-right: 1rem;
+    vertical-align: middle;
+  }
+
+  /* Co-authorship's two badges sit side by side and wrap together on a narrow
+     screen rather than splitting across the row. */
+  .tier-badge-pair {
+    display: inline-flex;
+    gap: 0.5rem;
+  }
+
   /* This page had no scoped styles: it rendered entirely through global .prose.
      These are additions for the guide half only — the standard's own sections
      keep the shared typography they always had. */

@@ -3,6 +3,22 @@
 Deferred work, recorded so it isn't re-litigated from scratch. Items leave
 this list by becoming a PR.
 
+- **Tier badges beyond the chart — DOCKETED 2026-08-03, editors to rule after
+  seeing the chart live.** The circular tier badges ship on `/provenance`'s tier
+  chart only; whether they also appear on **article pages, cards, or listings**
+  is a separate editorial decision the editors reserved. Nothing else renders
+  `TierBadge` today, and nothing should until they rule.
+
+  What the decision will have to weigh, recorded now so it isn't rediscovered:
+  a badge on a piece is a *claim about that piece* in a place a reader meets the
+  piece, where the chart's badge is a legend entry. The provenance block already
+  states the tier in words there, so a badge would be a second rendering of the
+  same fact — fine, but it makes the badge load-bearing rather than decorative,
+  and an abbreviation that becomes load-bearing needs its own ruling about what
+  happens when it disagrees with the words beside it. Also: co-authorship prints
+  TWO badges on the chart, which works as a legend and does not work beside a
+  byline, so the piece-level treatment of that tier is its own question.
+
 - **THE FOUR THINGS R-039 OPENED — ALL FOUR NOW CLOSED, 2026-08-03.** The
   cadence ruling moved issues to every two weeks and swept the site's copy with
   it. Four collisions surfaced that R-039 had no authority to settle; each was
