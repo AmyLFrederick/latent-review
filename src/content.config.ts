@@ -268,6 +268,41 @@ const articles = defineCollection({
         // may have either, both, or neither.
         editors_note: z.string().min(1).optional(),
 
+        /**
+         * A SIGNED PERSONAL NOTE from one editor, appended below the joint
+         * apparatus (R-052, 2026-08-04).
+         *
+         * IT IS A THIRD FIELD AND NOT A LONGER `editors_note`, because the two
+         * differ in the one way the ruling turns on: this one is SIGNED. An
+         * editors' note speaks for the desk, unsigned and jointly issued; this
+         * speaks for a person, over their name, and is therefore a piece of
+         * work with a making of its own.
+         *
+         * WHICH IS WHY THE TIER AND THE SIGNATURE ARE BOTH REQUIRED HERE.
+         * "Signed personal notes carry the badge of their own making, adjacent
+         * to the signature" is a rule with two halves, and a note that could be
+         * authored without either half would be a rule the record does not
+         * enforce. There is no shape of this object that publishes a signature
+         * with no mark, or a mark with nothing to sit beside.
+         *
+         * THE TIER IS THE NOTE'S OWN AND IS ROUTINELY NOT THE PIECE'S. The
+         * cover story is AI = Human; the note appended to it is Human – AI
+         * (editor). Both are true, about different work.
+         *
+         * The body is apparatus in a frontmatter string, split on blank lines
+         * at render time rather than run through the body renderer — see
+         * src/lib/note-badge.mjs. The signature is its own field so that
+         * "adjacent to the signature" is structural rather than a guess about
+         * which paragraph is the last one.
+         */
+        personal_note: z
+          .object({
+            tier: z.enum(TIER_CODES),
+            body: z.string().min(1),
+            signature: z.string().min(1),
+          })
+          .optional(),
+
         // NOTE: `provenance_label` is deliberately absent. It is no longer
         // authored — it is derived at build time by provenanceLabel() in
         // src/lib/provenance.ts and still emitted under the same key by

@@ -134,6 +134,22 @@ export const BADGE_SIZE_CHART = 72.5;
 export const BADGE_SIZE_ARTICLE = 35;
 
 /**
+ * THE SIGNED-NOTE PLACEMENT (R-052, 2026-08-04) — the mark beside the signature
+ * on a signed personal note in a piece's apparatus.
+ *
+ * DERIVED FROM THE BYLINE'S, NOT PICKED. Apparatus is set at 0.92rem against the
+ * byline's 1.05rem, and the badge holds the same relation to the words it sits
+ * beside in both places: 35 × (0.92 / 1.05) ≈ 30. A mark that kept the byline's
+ * size in a quieter voice would be the loudest thing in the note, and the note
+ * is apparatus.
+ *
+ * IT IS A THIRD PLACEMENT AND NOT A THIRD MARK. Same ring, same notation, same
+ * geometry, same proportions — only the diameter differs, which is what the
+ * component's scaling contract already guarantees.
+ */
+export const BADGE_SIZE_NOTE = 30;
+
+/**
  * The badge for each tier, keyed by the tier code the record actually stores.
  *
  * `ring`: 'ai' | 'human' | 'split'. A split ring is half green, half salmon, and
@@ -245,6 +261,7 @@ export function toAiForm(notation) {
 export const AI_FORM_SCALE = 1.25;
 export const BADGE_SIZE_CHART_AI = BADGE_SIZE_CHART * AI_FORM_SCALE;
 export const BADGE_SIZE_ARTICLE_AI = BADGE_SIZE_ARTICLE * AI_FORM_SCALE;
+export const BADGE_SIZE_NOTE_AI = BADGE_SIZE_NOTE * AI_FORM_SCALE;
 
 /**
  * The seven AI-form badges, derived from the seven letter-form ones.
@@ -295,6 +312,19 @@ export function badgeChartSize(style = HOUSE_BADGE_FORM) {
 export function badgeArticleSize(style = HOUSE_BADGE_FORM) {
   assertStyle(style);
   return style === 'ai' ? BADGE_SIZE_ARTICLE_AI : BADGE_SIZE_ARTICLE;
+}
+
+/**
+ * The signed-note placement's rendered diameter for a style (R-052).
+ *
+ * A FUNCTION FOR THE REASON THE OTHER TWO ARE. A placement asks for its size by
+ * placement and lets the form supply the number, so a later amendment to the
+ * house form moves every mark on the site together — which is the whole of what
+ * HOUSE_BADGE_FORM is for.
+ */
+export function badgeNoteSize(style = HOUSE_BADGE_FORM) {
+  assertStyle(style);
+  return style === 'ai' ? BADGE_SIZE_NOTE_AI : BADGE_SIZE_NOTE;
 }
 
 /**
@@ -399,12 +429,13 @@ export const TIER_NOTATION = {
  * use — so the string form and the drawn form of a tier can never disagree
  * about what the AI side is called.
  *
- * NOTHING ON THIS SITE PRINTS THESE TODAY. R-050's own clause keeps the
- * journal's pages in the letter form, and the surfaces that set a compact
- * notation — the archive, the Provenance block, the answers under a Weekly
- * Question — take the letter form by default. This exists because the standard
- * has two styles and a module that could only spell one of them would be
- * publishing half a standard.
+ * THIS IS WHAT THE SITE PRINTS TODAY, as of the R-050 amendment of 2026-08-04.
+ * The journal exercised the ruling's own clause and took the AI form as its
+ * house form, so every surface that sets a compact notation — the archive, the
+ * Provenance block, the answers under a Weekly Question — reads this table
+ * through HOUSE_BADGE_FORM. (This note said the opposite until 2026-08-04, and
+ * was true when written: the amendment moved the default and left the comment
+ * behind.) The letter form remains canonical, licensed, and one argument away.
  */
 export const TIER_NOTATION_AI = Object.fromEntries(
   Object.entries(TIER_NOTATION).map(([code, notation]) => [code, toAiForm(notation)])
