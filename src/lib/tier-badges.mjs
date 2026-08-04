@@ -15,6 +15,17 @@
 // is .mjs and cannot import TypeScript, and a badge whose ring colour or
 // notation drifted from the tier it marks is exactly the failure worth testing
 // for.
+//
+// TWO STYLES, ONE STANDARD (R-050, 2026-08-04). The marks have two equally
+// canonical display styles: the LETTER FORM, which writes the AI side as `A`,
+// and the AI FORM, which writes it as `AI`. They are the same seven marks —
+// same colours, same ring rule, same geometry, same superscript, same machine
+// codes — differing in one token and nothing else.
+//
+// THE AI FORM IS DERIVED, NOT DECLARED, and that is the whole of how "identical
+// except the token" is kept true. A second hand-written table would be seven
+// more chances to disagree with the first; the tables below are one table and a
+// substitution, so a change to a ring or a size reaches both forms or neither.
 
 /**
  * The ring encodes whose words, and only that.
@@ -145,6 +156,112 @@ export const TIER_BADGES = {
 /** The superscript's size. Proportionally large, and never below a legibility floor. */
 export const BADGE_SUP_SIZE = 13;
 
+// --- The AI form (R-050, 2026-08-04) ---------------------------------------
+
+/**
+ * The two styles, named. Both are canonical; neither is a fallback for the
+ * other. `letter` is the form this journal's own pages set, by the ruling's own
+ * clause — which is a house choice, not a ranking of the two.
+ */
+export const BADGE_STYLES = ['letter', 'ai'];
+export const BADGE_STYLE_NAMES = { letter: 'letter form', ai: 'AI form' };
+
+/**
+ * THE TOKEN, AND THE ONLY DIFFERENCE BETWEEN THE FORMS. The AI side is written
+ * `AI`; the human side is untouched, in both forms, in every tier.
+ *
+ * THE LOOKAHEAD MAKES IT IDEMPOTENT. `A` in a letter-form notation is always
+ * the AI party — the alphabet of the seven is A, H, and the operators — so a
+ * bare replace would be correct on any string this is meant to receive. It is
+ * written to survive being applied twice anyway, because the failure of a
+ * double application is silent: `AII>H` is a token nobody would look at twice
+ * in a diff, and the badge that carried it would still draw.
+ */
+export const AI_FORM_TOKEN = 'AI';
+export function toAiForm(notation) {
+  return String(notation ?? '').replace(/A(?!I)/g, AI_FORM_TOKEN);
+}
+
+/**
+ * THE CIRCLE GROWS; THE TYPE DOES NOT. The AI form's circle is a quarter larger
+ * than the letter form's at every placement, and its notation is set a quarter
+ * smaller in the box's own units — which are the two halves of one statement,
+ * not two decisions.
+ *
+ * The AI side gains a character: `A>H` becomes `AI>H`, a third wider. Growing
+ * the whole mark by a quarter would not seat that — a scale moves the letters
+ * and the ring together, so the token would occupy exactly the proportion of
+ * the ring it occupied before, only larger, and `AI–H` with its superscript
+ * would still crowd the arc it crowded at the smaller size. What seats a wider
+ * token is room around it. So the notation is divided by the scale and the
+ * rendered diameter is multiplied by it, and the two cancel: THE LETTERS COME
+ * OUT AT EXACTLY THE SAME SIZE ON THE PAGE IN BOTH FORMS, inside a circle a
+ * quarter bigger. The suite asserts that cancellation rather than the two
+ * numbers, because it is the property the editors asked for — "circles larger
+ * to seat the wider token" — and either number alone can drift out of it.
+ *
+ * WHAT THIS IS NOT: a redraw. BADGE_BOX does not move, the ring keeps its
+ * weight in box units, the superscript keeps its offset. The AI form is the
+ * same composition with one more glyph in it, magnified a quarter.
+ */
+export const AI_FORM_SCALE = 1.25;
+export const BADGE_SIZE_CHART_AI = BADGE_SIZE_CHART * AI_FORM_SCALE;
+export const BADGE_SIZE_ARTICLE_AI = BADGE_SIZE_ARTICLE * AI_FORM_SCALE;
+
+/**
+ * The seven AI-form badges, derived from the seven letter-form ones.
+ *
+ * `ring` is carried across untouched — the ring encodes whose words, and whose
+ * words did not change because the token did. The superscript run is left
+ * alone: it is the editor mark, not a party, and it holds no `A` to replace.
+ */
+export const TIER_BADGES_AI = Object.fromEntries(
+  Object.entries(TIER_BADGES).map(([code, badge]) => [
+    code,
+    {
+      ...badge,
+      size: badge.size / AI_FORM_SCALE,
+      parts: badge.parts.map((part) =>
+        part.sup ? { ...part } : { ...part, text: toAiForm(part.text) }
+      ),
+    },
+  ])
+);
+
+/** The superscript, divided by the same scale, so it lands at the same size too. */
+export const BADGE_SUP_SIZE_AI = BADGE_SUP_SIZE / AI_FORM_SCALE;
+
+const BADGE_TABLES = { letter: TIER_BADGES, ai: TIER_BADGES_AI };
+
+/** The superscript size for a style. */
+export function badgeSupSize(style = 'letter') {
+  assertStyle(style);
+  return style === 'ai' ? BADGE_SUP_SIZE_AI : BADGE_SUP_SIZE;
+}
+
+/** The chart's rendered diameter for a style. */
+export function badgeChartSize(style = 'letter') {
+  assertStyle(style);
+  return style === 'ai' ? BADGE_SIZE_CHART_AI : BADGE_SIZE_CHART;
+}
+
+/**
+ * AN UNKNOWN STYLE THROWS, where an unknown CODE returns undefined. The
+ * asymmetry is deliberate: a caller passing a code it got from the record may
+ * legitimately be holding one this module has no badge for, and the component
+ * turns that into a build error with the tier named. A caller passing a style
+ * has typed one of two words, and a typo there would otherwise render the
+ * letter form silently in a column headed as the AI one — a mark that says the
+ * wrong thing while looking entirely correct.
+ */
+function assertStyle(style) {
+  if (!BADGE_STYLES.includes(style)) {
+    throw new Error(
+      `Unknown badge style "${style}". The standard has two: ${BADGE_STYLES.join(', ')}.`
+    );
+  }
+}
+
 /**
  * CO-AUTHORSHIP IS ONE TIER SHOWN TWICE, and this constant is where that is
  * said once rather than inferred at a call site.
@@ -164,13 +281,26 @@ export const BADGE_SUP_SIZE = 13;
  * is what the record stores for both orderings; `human-equals-ai` is not a
  * code, has never been a code, and must not become one because a chart printed
  * two circles. The accessible name on each badge says so in words.
+ *
+ * BOTH ORDERINGS EXIST IN BOTH STYLES, and the AI form's pair is derived from
+ * the letter form's rather than written out — so co-authorship cannot end up
+ * with three orderings, or with one style showing a pair and the other a
+ * single. There is still one tier and one code behind all four circles.
  */
 export const CO_AUTHORSHIP_CODE = 'ai-equals-human';
 export const CO_AUTHORSHIP_ORDERINGS = ['A=H', 'H=A'];
+export const CO_AUTHORSHIP_ORDERINGS_AI = CO_AUTHORSHIP_ORDERINGS.map(toAiForm);
 
-/** The badge for a tier code, or undefined — never a silent default. */
-export function badgeFor(code) {
-  return TIER_BADGES[code];
+/** The orderings for a style. */
+export function coAuthorshipOrderings(style = 'letter') {
+  assertStyle(style);
+  return style === 'ai' ? CO_AUTHORSHIP_ORDERINGS_AI : CO_AUTHORSHIP_ORDERINGS;
+}
+
+/** The badge for a tier code in a style, or undefined — never a silent default. */
+export function badgeFor(code, style = 'letter') {
+  assertStyle(style);
+  return BADGE_TABLES[style][code];
 }
 
 /**
@@ -213,6 +343,24 @@ export const TIER_NOTATION = {
 };
 
 /**
+ * The same seven in the AI form, derived by the same substitution the badges
+ * use — so the string form and the drawn form of a tier can never disagree
+ * about what the AI side is called.
+ *
+ * NOTHING ON THIS SITE PRINTS THESE TODAY. R-050's own clause keeps the
+ * journal's pages in the letter form, and the surfaces that set a compact
+ * notation — the archive, the Provenance block, the answers under a Weekly
+ * Question — take the letter form by default. This exists because the standard
+ * has two styles and a module that could only spell one of them would be
+ * publishing half a standard.
+ */
+export const TIER_NOTATION_AI = Object.fromEntries(
+  Object.entries(TIER_NOTATION).map(([code, notation]) => [code, toAiForm(notation)])
+);
+
+const NOTATION_TABLES = { letter: TIER_NOTATION, ai: TIER_NOTATION_AI };
+
+/**
  * The notation for a code, or null.
  *
  * NULL IS THE CHAINED CASE, AND IT IS NOT A BUG. R-035's grammar composes
@@ -225,6 +373,7 @@ export const TIER_NOTATION = {
  * (R-035 clause 6) — so this returns null for a case the record cannot yet
  * hold, and the fallback exists for the day it can.
  */
-export function tierNotation(code) {
-  return TIER_NOTATION[code] ?? null;
+export function tierNotation(code, style = 'letter') {
+  assertStyle(style);
+  return NOTATION_TABLES[style][code] ?? null;
 }
