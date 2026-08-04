@@ -29,43 +29,44 @@
      visibly the same statement. A test asserts the two stay equal, because two
      literals in two languages is exactly the pair that drifts.
 
-     RECALIBRATED TO THE FRAMES. The first pass took the ring's #7d9153, a muted
-     sage; the editors walked it against the eyeglasses the colour comes from
-     and found it too dull and too blue. It is now #8ca054 — hue 79.4° → 75.8°
-     (a touch toward yellow), saturation 27% → 31%, lightness 45% → 48%. A
-     fresh apple-olive rather than a sage.
+     MATCHED TO THE FRAMES, AND SETTLED. The first pass took the badge ring's
+     own #7d9153, a muted sage. Three walks against the eyeglasses the colour
+     comes from moved it through an apple-olive and an olive-avocado before the
+     human editor held the frames to a swatch chart and read the match off it:
+     #4b8e4d.
 
-     THERE ARE STILL THREE STOPS OF THAT ONE GREEN, AND THE REASON IS CONTRAST.
-     Brighter costs contrast against a light ground: #8ca054 measures 2.63:1
-     here, where the sage measured 3.16:1 and the oxblood it all replaces
-     measured 8.5:1. Adopting it for type would cost every kicker and every
-     section name its legibility, so type takes a darker stop of the SAME green
-     — same hue, same saturation, lower lightness, which is what makes the three
+     IT IS A TRUE GREEN, NOT AN OLIVE, and that is the substance of the ruling
+     rather than a detail of it. Hue 79.4° → 121.8° — every earlier candidate
+     was a yellow-green within a few degrees of the last, and the answer turned
+     out to be a different family altogether. Saturation is essentially where it
+     started at 31%, lightness at 43%.
+
+     THERE ARE THREE STOPS OF THAT ONE GREEN, AND THE REASON IS CONTRAST. At
+     3.63:1 the colour clears the 3:1 a rule or a ring needs and does not clear
+     the 4.5:1 that type needs, so type takes a darker stop of the SAME green —
+     same hue, same saturation, lower lightness, which is what makes the three
      read as one colour used three ways rather than as three greens.
 
-       --accent-bright  #8ca054   2.63:1   the colour itself. NON-TEXT ONLY:
+       --accent-bright  #4b8e4d   3.63:1   the colour itself. NON-TEXT ONLY:
                                            the badge rings, and rules whose
                                            meaning is carried by the words
                                            beside them.
-       --accent         #606d39   5.11:1   all type. Clears 4.5:1 at the
+       --accent         #3e743f   5.07:1   all type. Clears 4.5:1 at the
                                            12.75px kicker and at the 19.5px
                                            floor of the section-name clamp,
                                            neither of which is large text.
-       --accent-deep    #4b562d   7.17:1   a filled button's hover; cream on
+       --accent-deep    #305b32   7.17:1   a filled button's hover; cream on
                                            it clears 7:1.
 
-     FLAGGED, AND IT IS THE ONE JUDGMENT CALL THIS RECALIBRATION FORCES: at
-     2.63:1 the colour itself no longer clears 3:1, the threshold WCAG sets for
-     a graphical object that a reader must perceive to understand the content.
-     Nothing here is such an object — every badge ring's meaning is also written
-     out in its accessible name and printed beside it on the chart, and the
-     three left-hand rules that take it are decoration next to text that says
-     the same thing. So this is legible-as-decoration, deliberately, rather than
-     a threshold quietly missed. If the editors would rather the borders read
-     harder, they move to --accent and the ring alone keeps the bright stop. */
-  --accent: #606d39;
-  --accent-bright: #8ca054;
-  --accent-deep: #4b562d;
+     NO FLAG IS OPEN ON THIS PALETTE, which was not true of the two candidates
+     before it. The apple-olive measured 2.63:1 and so sat under the threshold
+     WCAG sets for a graphical object a reader must perceive to understand the
+     content; that was recorded as a deliberate decision rather than an
+     oversight, and it is now moot. This green is the most legible of every
+     candidate walked, and nothing was traded to get there. */
+  --accent: #3e743f;
+  --accent-bright: #4b8e4d;
+  --accent-deep: #305b32;
 
   --hairline: #e0d8c6;
   --rule: #2a251c;

@@ -91,10 +91,25 @@ const { issue = null } = Astro.props;
     }
   }
 
+  /* THE WORDMARK IS THE JOURNAL'S GREEN (editors, 2026-08-04) — the last piece
+     of the identity, so the name, the navigation, the section headings and the
+     provenance marks all speak one colour.
+
+     IT TAKES THE COLOUR ITSELF, NOT THE TEXT STOP, and the size is why. This
+     clamp floors at 44px and ceilings at 71px, so the wordmark is large text by
+     any measure; large text answers to 3:1, which #4b8e4d clears at 3.63:1 with
+     room. Nothing here is a close call — the compact wordmark on interior pages
+     is the tighter of the two at 27px, and that clears the 24px large-text
+     threshold as well.
+
+     The <a> inside inherits this, and the global a:hover takes it to the darker
+     stop — a hover that reads as the same colour pressed rather than as a
+     different one. */
   .masthead-title {
     font-size: clamp(2.6rem, 8vw, 4.2rem);
     font-weight: 600;
     letter-spacing: 0.01em;
+    color: var(--accent-bright);
   }
 
   .masthead-title a {

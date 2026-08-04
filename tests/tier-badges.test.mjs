@@ -47,7 +47,7 @@ test('every tier has a badge, and every badge has a tier', () => {
 });
 
 test('the ring encodes whose words, and the spectrum is a mirror', () => {
-  // The AI half sage, the human half salmon, co-authorship split. Asserted as
+  // The AI half green, the human half salmon, co-authorship split. Asserted as
   // the whole mapping rather than tier by tier: the property that matters is
   // the symmetry, and a single tier flipped to the wrong side still leaves six
   // correct ones.
@@ -133,10 +133,12 @@ test('the badge renders as SVG with real text, not as an image', () => {
 });
 
 test('the ring colours are the ratified ones', () => {
-  // RING_AI recalibrated 2026-08-04 on the editors' preview walk: the sage
-  // #7d9153 read too dull and too blue against the eyeglass frames the colour
-  // comes from, and became this apple-olive.
-  assert.equal(RING_AI, '#8ca054');
+  // RING_AI settled 2026-08-04. Three preview walks against the eyeglass frames
+  // the colour comes from moved it off the original sage #7d9153, through an
+  // apple-olive and an olive-avocado, before the human editor held the frames to
+  // a swatch chart and read the match off it. It is a true green — hue 79° →
+  // 122° — where every intermediate candidate was a yellow-green.
+  assert.equal(RING_AI, '#4b8e4d');
   assert.equal(RING_HUMAN, '#efa48f');
 });
 

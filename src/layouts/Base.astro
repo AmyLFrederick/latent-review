@@ -315,12 +315,19 @@ const currentIssue = await getCurrentIssue();
     padding-top: 1.5rem;
   }
 
+  /* The interior pages' wordmark, in the journal's green like the grand one on
+     the front page (editors, 2026-08-04). At 1.6rem — 27px against a 17px root
+     — it is over the 24px large-text threshold, so it answers to 3:1 and
+     #4b8e4d clears that at 3.63:1. This is the smaller of the two mastheads and
+     therefore the one that decides whether the colour itself can carry the
+     wordmark at all; it can. */
   .masthead-compact-title {
     font-family: var(--font-display);
     font-size: 1.6rem;
     font-weight: 600;
     text-align: center;
     margin: 0.9rem 0 0;
+    color: var(--accent-bright);
   }
 
   .masthead-compact-title a {
@@ -396,17 +403,35 @@ const currentIssue = await getCurrentIssue();
     padding-bottom: 0.55rem;
   }
 
+  /* THE SECTION LABELS TAKE THE JOURNAL'S GREEN (editors, 2026-08-04),
+     completing the identity with the wordmark above them.
+
+     THEY TAKE THE DARKER STOP, AND IT IS NOT A CLOSE CALL. These are 0.72rem —
+     12.24px against a 17px root — uppercase at weight 600, which is ordinary
+     text by every measure WCAG uses: nothing near the 24px large-text
+     threshold, and 600 is not the bold that would lower it to 18.66px. So they
+     answer to 4.5:1, and the colour itself measures 3.63:1. The gap is wide
+     rather than marginal, which is why this needs no judgment: the bright stop
+     would fail the smallest persistent type on the site, on every page.
+     --accent is that same green darkened to 5.07:1.
+
+     THE HOVER GOES DEEPER RATHER THAN BRIGHTER. The links used to sit in
+     ink-soft and light up to the accent on hover; now that they rest in the
+     accent, the hover has to move somewhere, and --accent-deep keeps it inside
+     the one colour. Brightening to --accent-bright would have been the other
+     option and is wrong here twice: it would drop a hovered label to 3.63:1,
+     and it would make the hover state the least legible of the two. */
   nav a {
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--ink-soft);
+    color: var(--accent);
   }
 
   nav a:hover {
-    color: var(--accent);
+    color: var(--accent-deep);
   }
 
   footer {

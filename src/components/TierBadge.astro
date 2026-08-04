@@ -14,7 +14,7 @@ import { badgeFor, badgeLabel, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, B
 // and description, because the glyph is an abbreviation and an abbreviation
 // must be able to say what it abbreviates.
 //
-// THE RING ENCODES WHOSE WORDS AND NOTHING ELSE. Sage for the AI side, salmon
+// THE RING ENCODES WHOSE WORDS AND NOTHING ELSE. Green for the AI side, salmon
 // for the human side, and — for co-authorship alone — a ring split down the
 // middle, drawn as two arcs rather than a gradient so the halves are exactly
 // equal and no reader has to judge where one colour becomes the other.
@@ -137,7 +137,7 @@ const split = splitRingSides(spoken);
     badge.ring === 'split' ? (
       <>
         {/* Co-authorship, neither leading — and the halves follow the letters,
-            so A=H reads sage-then-salmon and H=A reads salmon-then-sage. */}
+            so A=H reads green-then-salmon and H=A reads salmon-then-green. */}
         <path
           d="M 29 1.5 A 27.5 27.5 0 0 0 29 56.5"
           fill="none"

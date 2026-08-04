@@ -27,21 +27,26 @@
  * a JS module, so the suite asserts the two are equal instead; two hex values in
  * two languages is exactly the pair that drifts.
  *
- * RECALIBRATED TO THE FRAMES. It was #7d9153, a muted sage. The editors walked
- * it against the eyeglasses the colour comes from and found it too dull and too
- * blue: hue 79.4° → 75.8°, saturation 27% → 31%, lightness 45% → 48%. A fresh
- * apple-olive. The type stops in global.css were re-derived from this hue in the
- * same pass rather than left where the sage put them.
+ * MATCHED TO THE FRAMES, AND SETTLED (editors, 2026-08-04). It was #7d9153, a
+ * muted sage picked to sit beside the salmon. Three walks against the eyeglasses
+ * the colour comes from moved it through an apple-olive and an olive-avocado
+ * before the human editor held the frames to a swatch chart and read the match
+ * off it: #4b8e4d.
+ *
+ * IT IS A TRUE GREEN, NOT AN OLIVE, and that is the substance of the ruling
+ * rather than a detail of it. Hue 79.4° → 121.8° — the earlier candidates were
+ * all yellow-greens a few degrees apart, and the answer was a different family.
+ * Saturation is essentially unchanged at 31%, lightness at 43%.
  */
-export const RING_AI = '#8ca054'; // apple-olive — and the site's accent
+export const RING_AI = '#4b8e4d'; // the journal's green — and the site's accent
 export const RING_HUMAN = '#efa48f'; // salmon pink
 
 /**
  * THE SPLIT RING MIRRORS THE NOTATION — the colour on the left matches the
  * letter on the left (editors, 2026-08-03).
  *
- *   A=H   sage left, salmon right
- *   H=A   salmon left, sage right
+ *   A=H   green left, salmon right
+ *   H=A   salmon left, green right
  *
  * WHY IT IS DERIVED AND NOT DECLARED. Co-authorship is the one tier whose
  * notation an author may order either way, and the ring is the same statement
@@ -105,7 +110,7 @@ export const BADGE_SIZE_ARTICLE = 35;
 /**
  * The badge for each tier, keyed by the tier code the record actually stores.
  *
- * `ring`: 'ai' | 'human' | 'split'. A split ring is half sage, half salmon, and
+ * `ring`: 'ai' | 'human' | 'split'. A split ring is half green, half salmon, and
  * belongs to co-authorship alone — where neither party led, so neither colour
  * may take the whole circle.
  *

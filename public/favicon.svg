@@ -4,11 +4,11 @@
        DARKER stop of the house green, not the ring green — a favicon renders at
        16px, which is the smallest type the journal sets anywhere. -->
   <rect width="64" height="64" fill="#faf3ef"/>
-  <g stroke="#606d39" fill="none">
+  <g stroke="#3e743f" fill="none">
     <path d="M6 9h52" stroke-width="3"/>
     <path d="M6 14h52" stroke-width="1.5"/>
     <path d="M6 50h52" stroke-width="1.5"/>
     <path d="M6 55h52" stroke-width="3"/>
   </g>
-  <text x="32" y="42" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="600" fill="#606d39">LR</text>
+  <text x="32" y="42" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="600" fill="#3e743f">LR</text>
 </svg>
