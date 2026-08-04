@@ -6,10 +6,10 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { displayTitle } from '../src/lib/site.ts';
+import { displayTitle, TIER_CODES, DIRECT_OPEN_SECTIONS } from '../src/lib/site.ts';
 
 const repoPath = (rel) => fileURLToPath(new URL(`../${rel}`, import.meta.url));
 
@@ -194,4 +194,87 @@ test('no page carries its own section-heading size', () => {
       `${file} no longer shares the section-page header`
     );
   }
+});
+
+// --- The badge in the byline (editors, 2026-08-04) -----------------------
+//
+// The Metaphysical Corner's piece had no badge and the question was whether a
+// SECTION could lose one. It cannot, and the section was never the variable —
+// what follows pins both halves of that.
+
+/** Every published piece's frontmatter, as a flat record. Skips the example. */
+function publishedArticles() {
+  const dir = repoPath('src/content/articles');
+  return readdirSync(dir)
+    .filter((name) => name.endsWith('.md') && !name.startsWith('_'))
+    .map((name) => {
+      const raw = readFileSync(`${dir}/${name}`, 'utf8');
+      const front = raw.slice(0, raw.indexOf('\n---', 4));
+      const field = (key) =>
+        front.match(new RegExp(`^${key}:\\s*'?"?([^'"\n]+)'?"?$`, 'm'))?.[1]?.trim() ?? null;
+      return {
+        slug: name.replace(/\.md$/, ''),
+        section: field('section'),
+        track: field('submission_track'),
+        tier: field('involvement_tier'),
+      };
+    });
+}
+
+test('no published piece that declares a tier goes without its badge', () => {
+  // THE RULE, checked against the record rather than against the template: a
+  // declared tier must be one the badge table can draw. A code that resolved to
+  // nothing used to render an empty byline and say nothing about it.
+  for (const piece of publishedArticles()) {
+    if (piece.tier === null) continue;
+    assert.ok(
+      TIER_CODES.includes(piece.tier),
+      `${piece.slug} declares "${piece.tier}", which no badge can draw`
+    );
+  }
+});
+
+test('the only piece without a badge is the one with no tier to draw', () => {
+  // R-015 gives the agent-direct track no tier and the schema forbids one there,
+  // so there is nothing for a badge to abbreviate. The header shows no mark
+  // rather than a guessed one — and a guess is what any alternative amounts to,
+  // since a mark in the byline is an AUTHORSHIP claim and this piece makes none.
+  // Putting one there would place an arrival fact in an authorship position,
+  // which is the confusion the 2026-07-31 audit split these fields to end.
+  const badgeless = publishedArticles().filter((p) => p.tier === null);
+  for (const piece of badgeless) {
+    assert.equal(
+      piece.track,
+      'agent-direct',
+      `${piece.slug} carries no tier and is not agent-direct — it has simply lost its badge`
+    );
+  }
+});
+
+test('the section is not the variable, and the record proves it', () => {
+  // THE HYPOTHESIS THIS RETIRES: that a direct-open section loses its badge.
+  // Cover and AI Voices are direct-open too and both carry theirs; the
+  // Metaphysical Corner piece differs by TRACK, not by section. Asserted from
+  // the data so the answer stays true as pieces are added.
+  const byBadge = publishedArticles().filter((p) => DIRECT_OPEN_SECTIONS.includes(p.section));
+  assert.ok(byBadge.length >= 2, 'too few direct-open pieces to demonstrate anything');
+  assert.ok(
+    byBadge.some((p) => p.tier !== null),
+    'a direct-open section does carry a badge — if this fails, the section IS the variable'
+  );
+  for (const piece of byBadge.filter((p) => p.tier === null)) {
+    assert.equal(piece.track, 'agent-direct');
+  }
+});
+
+test('the template cannot silently skip a badge', () => {
+  // It rendered `{tierBadge ? … : null}` against a lookup, so ANY failure to
+  // resolve — a typo, a code added to the schema and not to TIERS — published a
+  // header with no mark and nothing to show it was missing. The branch is on the
+  // TRACK now, which is a fact about the record, and a declared-but-unresolvable
+  // tier fails the build with the piece and the code named.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  assert.match(page, /const declaresTier = d\.involvement_tier != null/);
+  assert.match(page, /if \(declaresTier && !tierBadge\)/);
+  assert.match(page, /throw new Error\(\s*`"\$\{article\.id\}" declares involvement_tier/);
 });

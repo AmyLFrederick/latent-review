@@ -630,3 +630,17 @@ Ruled 2026-08-04 by both editors, as an urgent addition while the standard is ci
 **The journal's own pages are unchanged, by the ruling's own clause.** Every article header still sets the letter form; the compact notation on the archive, the Provenance block and the answers list is still the letter form. The AI form is published, licensed and available, and this journal does not yet set it. The suite pins that too, so a later session that gives an article header the AI form has to face the ruling rather than a lint rule.
 
 **Nothing in the record moved.** No tier code, no machine surface, no permalink, no published date, no provenance label, no tier name. Both styles sit over one set of seven codes, which is the sentence the stability contract cares about.
+
+### Amended 2026-08-04 — the journal adopts the AI form
+
+**The amendment:**
+
+> The journal's own pages use the AI form. R-050's clause reserving that choice to the editors is exercised: every surface where The Latent Review displays a tier — the badge in an article byline, and the compact notation on the archive, in the Provenance block and under a Weekly Question — sets the AI form, at the AI form's sizing. The chart at /provenance continues to show both columns, because it teaches the standard rather than following the house.
+
+**One constant, and every default reads it.** `HOUSE_BADGE_FORM` in `src/lib/tier-badges.mjs` is the whole of the change: the badge component, the badge tables, the co-authorship orderings, the placement sizes and the compact notation all default to it. A house form the editors can change is one that changes everywhere in a single edit, and a surface added next month takes it without anyone remembering to.
+
+**It reaches the compact notation, and it had to.** The badge and the string are two renderings of one tier and they meet on a single page — the mark opens an article's byline, and the Provenance block a screen below carries the notation. Moving one without the other would have a piece calling itself `AI>H` at the top of the page and `A>H` further down. The instruction was the badges; the page would have contradicted itself if it stopped there, so it did not.
+
+**The chart is the exception and names its forms explicitly.** Both columns stand, headed *Badge I* and *Badge II*, and neither takes the house default — a page teaching two styles cannot be a page that quietly prints one. The lead-in paragraph now says the journal sets the AI form; it is the same sentence with one word moved, and it still says the choice is a house choice and not a ranking.
+
+**Nothing in the record moved.** No tier code, no machine surface, no feed field, no permalink, no provenance label. Both styles still sit over one set of seven codes; this ruling says only which of the two The Latent Review prints.

@@ -12,7 +12,7 @@ import {
 } from '../../lib/site';
 import TierBadge from '../../components/TierBadge.astro';
 // @ts-expect-error — plain-JS module shared with the tests
-import { BADGE_SIZE_ARTICLE } from '../../lib/tier-badges.mjs';
+import { badgeArticleSize } from '../../lib/tier-badges.mjs';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -46,11 +46,36 @@ const { Content } = await render(article);
 // <script> now lives in ldJson(), which every JSON-LD block on the site goes
 // through; see src/lib/structured-data.ts, including the recorded decision
 // about the author's type.
-// The piece's own tier, as the badge needs it. Undefined on agent-direct
-// pieces, which declare none — authorship is derived there and the arrival
-// caveat renders in the Provenance block, so the header shows no badge rather
-// than a guessed one.
-const tierBadge = TIERS.find((t) => t.code === d.involvement_tier);
+// The piece's own tier, as the badge needs it.
+//
+// NO SECTION CAN LACK A BADGE, and this is where that is enforced (editors,
+// 2026-08-04). The header used to render `{tierBadge ? … : null}`, which is a
+// silent skip: a piece whose tier failed to resolve for ANY reason — a code the
+// table has not got, a typo in frontmatter, a tier added to the schema and not
+// to TIERS — published with no mark and nothing to show anyone it was missing.
+// The template is now incapable of that. A piece that DECLARES a tier and
+// cannot resolve it fails the build, with the slug and the code named.
+//
+// EXACTLY ONE CASE LEGITIMATELY CARRIES NO BADGE, and it is not a section:
+// agent-direct pieces declare no tier at all. R-015 gives that track no tier and
+// the article schema forbids `involvement_tier` on it, so there is nothing for a
+// badge to abbreviate — authorship is derived, and the arrival caveat renders in
+// the Provenance block where it belongs. The header shows no badge rather than a
+// guessed one, and a guessed one is what any alternative amounts to: a mark in
+// the byline is an authorship claim, and putting one on a piece that makes none
+// would place an arrival fact in an authorship position, which is precisely the
+// confusion the 2026-07-31 audit split these fields to end.
+//
+// So the branch below is on the TRACK, which is a fact about the record, and no
+// longer on whether a lookup happened to succeed.
+const declaresTier = d.involvement_tier != null;
+const tierBadge = declaresTier ? TIERS.find((t) => t.code === d.involvement_tier) : null;
+if (declaresTier && !tierBadge) {
+  throw new Error(
+    `"${article.id}" declares involvement_tier "${d.involvement_tier}", which is not in TIERS — ` +
+      `its header would publish with no badge. Every piece that declares a tier carries its mark.`
+  );
+}
 
 // THE JSON-LD TAKES THE RECORDED TITLE, and the tab below takes the displayed
 // one (editors, 2026-08-03). The line between them is the line displayTitle
@@ -146,7 +171,7 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         the comma and after "and", and a line ending on a lone "By" is neither.
       */}
       <p class="article-byline">
-        {tierBadge ? <TierBadge tier={tierBadge} size={BADGE_SIZE_ARTICLE} /> : null}
+        {tierBadge ? <TierBadge tier={tierBadge} size={badgeArticleSize()} /> : null}
         <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
       </p>
     </header>

@@ -19,7 +19,9 @@
 //      to seat the wider token" means and is asserted as the cancellation.
 //   8. Two styles are two spellings of seven badges, never fourteen badges —
 //      one set of machine codes underneath, R-045 still closed.
-//   9. This journal's own pages stay in the letter form, per the ruling.
+//   9. This journal's own pages follow ONE house form — the AI form since the
+//      2026-08-04 amendment — and the chart at /provenance does not, because it
+//      teaches both. The surfaces follow the constant rather than naming a form.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -38,6 +40,8 @@ import {
   BADGE_INK,
   BADGE_BOX,
   BADGE_RING_STROKE,
+  HOUSE_BADGE_FORM,
+  badgeArticleSize,
   BADGE_SCALE_2026_08_04,
   BADGE_SIZE_CHART,
   BADGE_SIZE_ARTICLE,
@@ -290,7 +294,15 @@ test('the placements are named, never typed in at the call site', () => {
   // next time the editors resize the mark — which is exactly what "at every
   // placement" was written to prevent.
   const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
-  assert.match(page, /<TierBadge tier=\{tierBadge\} size=\{BADGE_SIZE_ARTICLE\} \/>/);
+  // It asked for BADGE_SIZE_ARTICLE by name until 2026-08-04, which was right
+  // while the house form was the letter form and became a badge a quarter too
+  // small the moment it was not. A placement now asks by PLACEMENT and lets the
+  // form supply the number.
+  assert.match(page, /<TierBadge tier=\{tierBadge\} size=\{badgeArticleSize\(\)\} \/>/);
+  assert.ok(
+    !/BADGE_SIZE_ARTICLE\b/.test(page),
+    'the byline names one form’s article size instead of asking for the placement’s'
+  );
 
   const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
   assert.ok(
@@ -641,12 +653,17 @@ test('an unknown style throws rather than drawing the wrong form silently', () =
     assert.throws(() => coAuthorshipOrderings(bad), /Unknown badge style/);
     assert.throws(() => tierNotation('ai', bad), /Unknown badge style/);
   }
-  // Called with no style at all, every one of them is the letter form.
-  assert.equal(badgeFor('ai'), TIER_BADGES.ai);
-  assert.equal(badgeSupSize(), BADGE_SUP_SIZE);
-  assert.equal(badgeChartSize(), BADGE_SIZE_CHART);
-  assert.equal(tierNotation('ai'), 'A');
-  assert.deepEqual(coAuthorshipOrderings(), CO_AUTHORSHIP_ORDERINGS);
+  // Called with no style at all, every one of them is the HOUSE form — which is
+  // the AI form since 2026-08-04, and which each of these follows rather than
+  // restates. That is the property worth pinning: omitting the argument must
+  // give whatever the editors have set, so a later amendment moves all of them
+  // at once and none of them is left behind holding a word.
+  assert.equal(badgeFor('ai'), badgeFor('ai', HOUSE_BADGE_FORM));
+  assert.equal(badgeSupSize(), badgeSupSize(HOUSE_BADGE_FORM));
+  assert.equal(badgeChartSize(), badgeChartSize(HOUSE_BADGE_FORM));
+  assert.equal(badgeArticleSize(), badgeArticleSize(HOUSE_BADGE_FORM));
+  assert.equal(tierNotation('ai'), tierNotation('ai', HOUSE_BADGE_FORM));
+  assert.deepEqual(coAuthorshipOrderings(), coAuthorshipOrderings(HOUSE_BADGE_FORM));
 });
 
 test('the circle grows a quarter and the type does not', () => {
@@ -815,17 +832,50 @@ test('the page grants both styles under the one licence, and still counts seven'
   assert.match(chart, /adopters may display either, or both/);
 });
 
-test("this journal's own pages stay in the letter form", () => {
-  // R-050's own clause. The article header is the only other placement, and it
-  // names no form — so it takes the default, and the default is the letter
-  // form. A `form="ai"` appearing here would be a house change that the ruling
-  // reserves to the editors.
-  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
-  assert.match(page, /<TierBadge tier=\{tierBadge\} size=\{BADGE_SIZE_ARTICLE\} \/>/);
-  assert.ok(!/form=/.test(page), 'the article header has taken a badge form');
+test("this journal's own pages set the house form, and the chart does not", () => {
+  // AMENDED 2026-08-04. R-050 reserved this choice to the editors and they have
+  // exercised it: the house form is the AI form. What is asserted is that the
+  // surfaces FOLLOW the constant rather than that they say "ai" — a house form
+  // written out at six call sites is six places to forget.
+  assert.equal(HOUSE_BADGE_FORM, 'ai');
+  assert.ok(BADGE_STYLES.includes(HOUSE_BADGE_FORM), 'the house form is not one of the styles');
 
+  // The article byline is the journal's one badge placement. It names no form,
+  // so it takes the house default — which is what makes an amendment reach it.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  assert.ok(
+    !/form=/.test(page),
+    'the article header pins a badge form instead of following the house one'
+  );
+
+  // The compact-notation surfaces do the same. They are the string rendering of
+  // the same tier the badge draws, and an article page carries BOTH — the mark
+  // in the byline and the notation in the Provenance block a screen below. A
+  // surface that pinned a form here would have one piece calling itself two
+  // things on one page.
+  for (const surface of [
+    'src/pages/archive.astro',
+    'src/components/ProvenanceBlock.astro',
+    'src/components/QuestionAnswers.astro',
+  ]) {
+    const src = readFileSync(repoPath(surface), 'utf8');
+    assert.match(src, /tierNotation\(/, `${surface} no longer renders a tier notation`);
+    assert.ok(
+      !/tierNotation\([^)]*,\s*['"]/.test(src),
+      `${surface} pins a notation form instead of following the house one`
+    );
+  }
+
+  // AND THE CHART IS THE EXCEPTION. It teaches both styles, so it names them —
+  // a page showing two columns must not be a page that quietly prints one.
   const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  assert.match(chart, /form=\{column\.form\}/);
+  assert.ok(
+    !/HOUSE_BADGE_FORM/.test(chart),
+    'the chart has started following the house form instead of naming both'
+  );
   assert.match(chart, /house choice and not a ranking/);
+  assert.match(chart, /This journal sets the AI\s+form on its own pages/);
 });
 
 test('the chart may leave the text measure but may never scroll the page', () => {
