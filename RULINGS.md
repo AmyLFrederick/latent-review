@@ -688,3 +688,25 @@ Ruled 2026-08-04 by both editors, on appending a signed personal note from the h
 **The note runs verbatim.** No house-style pass was made, by the editors' instruction. The standing rule that dictated editors' quotes are lightly cleaned for readability governs transcription of speech; this is written text, given as written, and the badge on it says who edited it and who did not.
 
 **Nothing in the record moved.** No tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece. The cover story's own `involvement_tier` is untouched, and every consumer keying on it sees exactly what it saw; the note is a new optional field that did not exist before and could not have been relied on.
+
+## R-053 — 2026-08-04 — An issue is dated when it opened
+
+Ruled 2026-08-04 by both editors, after a piece staged into a published issue re-dated the issue.
+
+**The ratified text:**
+
+> An issue's date is the date it opened — the day it launched — and never the date of its most recent piece. Pieces added during an issue's window carry their own publication dates. An issue that spans a year boundary takes its volume from the year it opened. Issue No. 1 launched on August 2, 2026, and its dateline stands at August 2 regardless of what is added to it afterwards.
+
+**The case that found it.** Every piece in an issue had shared one publication date, so the question had never been asked. "Porous Enough to Admit the Sky" was staged into Issue No. 1 on August 4, two days after the issue launched on August 2, and the issue's date was derived as the newest of its pieces' dates — so adding a piece to the founding issue silently moved the founding issue's date. The masthead dateline, `/archive`, `/issue/1` and `issues.json` all read August 4. Nothing was wrong with the piece; the derivation was answering a question nobody had put to it.
+
+**An issue is a window, not an instant.** R-039 set the cadence at two weeks and already treats an issue as a span — answers accumulate between issues, and the editors select which run in each. A journal that publishes on a two-week cadence and never adds to an issue after it opens is a print journal with a website. This one is not, and the dating should say which kind it is.
+
+**So the two dates are different facts and both are kept.** The issue's date says when it went out. A piece's date says when that piece was published. Under the old derivation the second silently overwrote the first, which cost a real fact — the day the founding issue appeared — to record a fact that was already on the piece. A reader who wants to know when a piece ran reads the piece; the issue's date has only one thing it can honestly say.
+
+**A date is a fact about the past, and adding to an issue is not time travel.** This is the same principle the journal already applies to provenance labels and to the append-only record: what happened on a day is not revised by what happens later. An issue that launched on August 2 launched on August 2, and no piece added afterwards can make that untrue.
+
+**The volume follows the year the issue opened.** Volume and within-volume number are derived from the issue's date (R-016), so this ruling decides which year an issue spanning a December–January boundary belongs to: the year it **opened**, not the year it closed. That is the same rule stated once, and it is the more defensible answer — an issue belongs to the year it appeared in, and a volume that gained an issue because that issue's last piece slipped past New Year would be counting by the wrong event. Neither R-016's numbering nor its restart-each-January rule changes; only the date they read is now stable.
+
+**Issue No. 1 stands at August 2, and this is what R-039 meant by "stands as founded."** Its dateline is August 2 on the masthead, in the archive, at `/issue/1` and in `issues.json`, and it stays there however many pieces are added to it inside its window.
+
+**Nothing in the record moved.** No piece's publication date, no permalink, no provenance label, no tier, no issue number, no volume or within-volume number. The founding issue's displayed date is the date it launched with, which is where it began; what changed is that adding to an issue can no longer move it.
