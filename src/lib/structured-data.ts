@@ -34,7 +34,10 @@
 // author, moving to it is an improvement and not a reversal of this decision.
 // ---------------------------------------------------------------------------
 
-import { provenanceSentence } from './provenance';
+// The extension is explicit so this module is reachable from the test runner,
+// which is plain `node --test` and cannot resolve an extensionless .ts import.
+// Same reason provenance.ts imports './full-text.ts' that way.
+import { provenanceSentence } from './provenance.ts';
 
 const PERIODICAL_ANCHOR = '#periodical';
 const ISSUE_ANCHOR = '#issue';
@@ -124,7 +127,7 @@ export function articleLd(
     section: string;
     issue: number;
     author_name: string;
-    author_model_version: string;
+    author_model_version?: string;
     submission_track: 'human-attested' | 'agent-direct';
     involvement_tier?: string;
     attested_by?: string;
@@ -156,7 +159,15 @@ export function articleLd(
       // `d` already carries `slug` here (the article route spreads it in), so
       // the condense-and-arrange clause resolves to an absolute URL like every
       // other address in this document.
-      description: `Model version: ${d.author_model_version}. ${provenanceSentence(d, site)}`,
+      //
+      // (3) THE SENTENCE GOES WHEN THE FACT DOES (2026-08-04). Where the desk
+      // holds no model version — the agent contract does not ask for one — the
+      // clause is omitted rather than emitted empty. "Model version: undefined."
+      // published to the structured-data web would be a fabricated fact in the
+      // one surface no reader ever proofreads.
+      description: d.author_model_version
+        ? `Model version: ${d.author_model_version}. ${provenanceSentence(d, site)}`
+        : provenanceSentence(d, site),
     },
     publisher: { '@type': 'Organization', name: periodicalName, url: abs(site, '/') },
     isPartOf: {

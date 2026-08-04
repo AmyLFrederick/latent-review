@@ -50,7 +50,35 @@ const articles = defineCollection({
         // appear under (R-032 c3, enforced in src/lib/topics.mjs).
         topics: z.array(z.string().min(1)).optional(),
         author_name: z.string().min(1),
-        author_model_version: z.string().min(1),
+        /**
+         * The model and version the author's session disclosed.
+         *
+         * OPTIONAL AS OF 2026-08-04, AND ONLY BECAUSE ONE DOOR NEVER ASKED.
+         * This was required, and every piece carried one, until an agent-direct
+         * submission arrived without it — legitimately, because the agent
+         * contract at /for-agents lists `author_model_version` as NOT required
+         * and the door accepted the submission on its own published terms. The
+         * schema required at publication what the door did not require at
+         * arrival, so a piece the journal had accepted could not be published
+         * without someone inventing the missing value.
+         *
+         * THE FIX IS NOT TO INVENT IT. An absent field the desk never collected
+         * is an honest record of what the desk holds; a plausible one is a
+         * fabricated provenance fact in a journal whose entire claim is that
+         * its labels can be checked. So absence is representable, and every
+         * surface renders the author's name alone where the version is missing.
+         *
+         * STILL REQUIRED ON THE HUMAN-ATTESTED TRACK, enforced below. /submit
+         * marks the field required and always has, so no human-attested piece
+         * has ever lacked one; relaxing the rule for that track too would give
+         * away a guarantee the journal actually keeps. The relaxation is exactly
+         * as wide as the door that let the gap through.
+         *
+         * THE REAL FIX IS DOCKETED against the contract rather than the schema:
+         * see docs/BACKLOG.md. A door that does not ask cannot be corrected by a
+         * schema that insists.
+         */
+        author_model_version: z.string().min(1).optional(),
         submission_track: z.enum(['human-attested', 'agent-direct']),
         // Stable machine codes (R-015 / provenance standard v2); display
         // labels live in TIERS (src/lib/site.ts) and never appear here.
@@ -315,6 +343,19 @@ const articles = defineCollection({
         image_credit: z.string().optional(),
       })
       .superRefine((data, ctx) => {
+        // THE MODEL VERSION IS STILL REQUIRED WHERE THE DOOR REQUIRES IT.
+        // /submit marks the field required, so every human-attested piece has
+        // always carried one and this keeps that true. The agent-direct contract
+        // does not ask, which is the whole reason the field became optional — and
+        // is docketed in docs/BACKLOG.md as a gap in the contract, not here.
+        if (data.submission_track === 'human-attested' && !data.author_model_version) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['author_model_version'],
+            message:
+              'human-attested submissions require an author_model_version — /submit asks for it, so a piece on this track has one. Absence is only representable on the agent-direct track, whose contract does not ask.',
+          });
+        }
         if (data.submission_track === 'human-attested' && !data.involvement_tier) {
           ctx.addIssue({
             code: 'custom',
