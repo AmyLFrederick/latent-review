@@ -1,10 +1,18 @@
 ---
 // @ts-expect-error — plain-JS module shared with the tests
-import { badgeFor, badgeLabel, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_SUP_SIZE, BADGE_BOX, BADGE_SIZE_CHART } from '../lib/tier-badges.mjs';
+import { badgeFor, badgeLabel, badgeSupSize, badgeChartSize, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_BOX } from '../lib/tier-badges.mjs';
 
 // One tier badge: a circle drawn in a 58-unit box with a 3-unit ring, the
 // page's cream showing through, and the tier's notation set in the house
 // monospace.
+//
+// TWO STYLES, ONE COMPONENT (R-050, 2026-08-04). The `form` prop selects the
+// letter form (`A>H`) or the AI form (`AI>H`). Everything below is written once
+// and drawn twice: the ring rule, the split arcs, the pinning, the accessible
+// name and the geometry are the component's, and the form supplies only which
+// of the two derived badge tables it reads. A second component would be a
+// second mark that resembled this one, which is the thing the ruling says these
+// are not.
 //
 // SVG AND REAL TEXT, NOT AN IMAGE — a house requirement rather than a
 // preference. This journal is read by machines, and iconography a machine
@@ -71,29 +79,49 @@ interface Props {
   /** Appended to the accessible name. Co-authorship uses it to say it is one tier. */
   labelSuffix?: string;
   /**
-   * Rendered diameter in px — BADGE_SIZE_CHART on /provenance,
-   * BADGE_SIZE_ARTICLE on an article header. Both live in tier-badges.mjs, so
-   * the placements can be enlarged together and the ratio between them tested.
+   * Which of the standard's two display styles to draw — 'letter' (`A>H`) or
+   * 'ai' (`AI>H`). Both are canonical (R-050); this journal's own pages set the
+   * letter form, so that is the default here rather than the correct one.
+   *
+   * IT IS NOT CALLED `style`. That name reads as CSS on a component that also
+   * emits a style attribute, and the ruling's own word for the distinction is
+   * "form".
+   */
+  form?: 'letter' | 'ai';
+  /**
+   * Rendered diameter in px — the chart size for the form on /provenance,
+   * BADGE_SIZE_ARTICLE on an article header. All of them live in
+   * tier-badges.mjs, so the placements can be enlarged together and the ratios
+   * between them tested.
    *
    * THE GEOMETRY SCALES, THE ENCODING DOES NOT. Ring weight and type size are
    * derived from this rather than fixed, so a smaller badge is the same mark
    * drawn smaller — not a thinner ring, which would stop reading as a ring, and
    * not a differently-proportioned one, which would read as a second symbol.
+   *
+   * LEFT UNSET IS THE ORDINARY CASE, and it is what keeps the AI form a quarter
+   * larger than the letter form wherever the two are set beside each other: the
+   * default comes from the form, so a caller that names neither gets the pair
+   * the ruling describes.
    */
   size?: number;
 }
 
-const { tier, notation, labelSuffix = '', size = BADGE_SIZE_CHART } = Astro.props;
+const { tier, notation, labelSuffix = '', form = 'letter', size } = Astro.props;
 
-const badge = badgeFor(tier.code);
+const badge = badgeFor(tier.code, form);
 if (!badge) {
   // A tier added to TIERS without a badge would otherwise render an empty
   // circle — a mark that says nothing, in a chart whose subject is what marks
   // mean. Fail the build instead.
   throw new Error(
-    `Tier "${tier.code}" has no badge in src/lib/tier-badges.mjs. Every tier on the chart carries one.`
+    `Tier "${tier.code}" has no ${form}-form badge in src/lib/tier-badges.mjs. Every tier on the chart carries one in each form.`
   );
 }
+
+// The form's own chart diameter, unless the placement names its own.
+const renderedSize = size ?? badgeChartSize(form);
+const supSize = badgeSupSize(form);
 
 // The notation as drawn: the override when co-authorship supplies one, and the
 // badge's own parts otherwise.
@@ -119,10 +147,10 @@ const split = splitRingSides(spoken);
 
 <svg
   class="tier-badge"
-  style={`--badge-size:${size}px;--badge-notation-size:${badge.size}px;--badge-sup-size:${BADGE_SUP_SIZE}px;--badge-ink:${BADGE_INK}`}
+  style={`--badge-size:${renderedSize}px;--badge-notation-size:${badge.size}px;--badge-sup-size:${supSize}px;--badge-ink:${BADGE_INK}`}
   viewBox={`0 0 ${BADGE_BOX} ${BADGE_BOX}`}
-  width={size}
-  height={size}
+  width={renderedSize}
+  height={renderedSize}
   preserveAspectRatio="xMidYMid meet"
   role="img"
   aria-label={accessibleName}

@@ -8,6 +8,18 @@
 //   4. The edited variants are never set smaller than the relational ones.
 //   5. The badge's internal composition is PINNED — nothing an ancestor
 //      stylesheet declares can move the notation inside its ring.
+//
+// Extended 2026-08-04 for R-050, which gave the marks a second display style.
+// What the second half additionally protects:
+//
+//   6. The AI form differs from the letter form in ONE TOKEN and nothing else —
+//      same rings, same shapes, same order rule, same closed set of seven.
+//      Everything asserted of the letter form above is asserted of it too.
+//   7. The circle grows a quarter and the type does not, which is what "larger
+//      to seat the wider token" means and is asserted as the cancellation.
+//   8. Two styles are two spellings of seven badges, never fourteen badges —
+//      one set of machine codes underneath, R-045 still closed.
+//   9. This journal's own pages stay in the letter form, per the ruling.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -31,6 +43,21 @@ import {
   TIER_NOTATION,
   tierNotation,
   splitRingSides,
+  // R-050 — the AI form
+  TIER_BADGES_AI,
+  TIER_NOTATION_AI,
+  BADGE_STYLES,
+  BADGE_STYLE_NAMES,
+  AI_FORM_SCALE,
+  AI_FORM_TOKEN,
+  toAiForm,
+  BADGE_SIZE_CHART_AI,
+  BADGE_SIZE_ARTICLE_AI,
+  BADGE_SUP_SIZE_AI,
+  CO_AUTHORSHIP_ORDERINGS_AI,
+  coAuthorshipOrderings,
+  badgeSupSize,
+  badgeChartSize,
 } from '../src/lib/tier-badges.mjs';
 import { TIERS, TIER_CODES } from '../src/lib/site.ts';
 
@@ -320,7 +347,12 @@ test('the pinned values are the ones the mark has always drawn at', () => {
   assert.match(src, /font-size: var\(--badge-notation-size\)/);
   assert.match(src, /font-size: var\(--badge-sup-size\)/);
   assert.match(src, /--badge-notation-size:\$\{badge\.size\}px/);
-  assert.match(src, /--badge-sup-size:\$\{BADGE_SUP_SIZE\}px/);
+  // The superscript's size is the FORM's since R-050, for the same reason the
+  // notation's is the badge's: both are a quarter smaller in the AI form so
+  // that both land at the same size on the page. A constant restated here
+  // would pin the letter form's number onto both.
+  assert.match(src, /--badge-sup-size:\$\{supSize\}px/);
+  assert.match(src, /const supSize = badgeSupSize\(form\)/);
   assert.match(src, /font-family: var\(--font-mono\)/);
   assert.match(src, /text-anchor: middle/);
   assert.match(src, /dominant-baseline: central/);
@@ -476,4 +508,339 @@ test('the split orientation is derived by every surface, not hardcoded by one', 
   assert.match(src, /splitRingSides/, 'the badge no longer derives its split orientation');
   assert.match(src, /stroke=\{split\.left\}/);
   assert.match(src, /stroke=\{split\.right\}/);
+});
+
+// --- R-050: two badge styles, one standard -------------------------------
+//
+// What this half protects, over and above everything above it: that the second
+// style is the SAME standard and not a second one. Every property the letter
+// form is held to is re-asserted against the AI form, and the two are asserted
+// to differ in exactly one token — which is the whole content of the ruling.
+
+/** A box-unit measurement as it actually renders, at a given diameter. */
+const renderedAt = (boxUnits, diameter) => boxUnits * (diameter / BADGE_BOX);
+
+/**
+ * Rendered sizes compared to within a millionth of a pixel.
+ *
+ * FLOATING POINT, NOT DRIFT, and worth saying so where the tolerance is rather
+ * than in a commit message nobody will find. The AI form's box-unit sizes are a
+ * division by 1.25 and its diameters a multiplication by it; the two cancel
+ * exactly in arithmetic and land a few parts in 10^15 apart in binary — 23/1.25
+ * is not representable. The tolerance is far below anything a renderer rounds
+ * to or a reader could see, and many orders of magnitude above the error, so a
+ * real change to either number still fails this.
+ */
+const sameRendered = (a, b, message) =>
+  assert.ok(Math.abs(a - b) < 1e-6, `${message} — ${a} against ${b}`);
+
+test('there are two styles, and neither is a fallback for the other', () => {
+  assert.deepEqual(BADGE_STYLES, ['letter', 'ai']);
+  assert.equal(BADGE_STYLE_NAMES.letter, 'letter form');
+  assert.equal(BADGE_STYLE_NAMES.ai, 'AI form');
+  // Every style is named. A style the module can draw but cannot say the name
+  // of is one a page would have to name for it, which is where a column headed
+  // as one form and drawn in the other comes from.
+  for (const style of BADGE_STYLES) {
+    assert.ok(BADGE_STYLE_NAMES[style], `${style} has no display name`);
+  }
+});
+
+test('every tier has a badge in both forms, and the forms share the codes', () => {
+  // The codes are the standard's stable half. Two display styles over one set
+  // of codes is the ruling; two sets of codes would be two standards.
+  assert.deepEqual(Object.keys(TIER_BADGES_AI).sort(), [...TIER_CODES].sort());
+  assert.deepEqual(Object.keys(TIER_BADGES_AI).sort(), Object.keys(TIER_BADGES).sort());
+  for (const tier of TIERS) {
+    for (const style of BADGE_STYLES) {
+      assert.ok(badgeFor(tier.code, style), `${tier.code} has no ${style}-form badge`);
+    }
+  }
+});
+
+test('the AI form differs from the letter form in one token and nothing else', () => {
+  // THE RULING, ASSERTED DIRECTLY. Ring, part structure and superscript are
+  // carried across untouched; the only thing that may differ is the AI-side
+  // token, and it must differ by exactly the substitution.
+  for (const code of TIER_CODES) {
+    const letter = badgeFor(code, 'letter');
+    const ai = badgeFor(code, 'ai');
+
+    assert.equal(ai.ring, letter.ring, `${code} changed rings between forms`);
+    assert.equal(ai.parts.length, letter.parts.length, `${code} changed shape between forms`);
+
+    for (const [index, letterPart] of letter.parts.entries()) {
+      const aiPart = ai.parts[index];
+      assert.equal(!!aiPart.sup, !!letterPart.sup, `${code} part ${index} changed its role`);
+      assert.equal(
+        aiPart.text,
+        letterPart.sup ? letterPart.text : toAiForm(letterPart.text),
+        `${code} part ${index} is not the letter form with the token substituted`
+      );
+    }
+  }
+});
+
+test('the human side is untouched, in every tier, in both forms', () => {
+  // Stated as its own property because it is half the ruling and it is the half
+  // a substitution bug would break silently: replace too greedily and `H` picks
+  // up a token too, and the chart claims the human side is called something new.
+  for (const code of TIER_CODES) {
+    const letter = TIER_NOTATION[code];
+    const ai = TIER_NOTATION_AI[code];
+    assert.equal(
+      letter.replaceAll('A', ''),
+      ai.replaceAll(AI_FORM_TOKEN, ''),
+      `${code}: something other than the AI token moved between the forms`
+    );
+  }
+  // The one tier with no AI side at all is the control: it is the same string.
+  assert.equal(TIER_NOTATION_AI.human, TIER_NOTATION.human);
+  assert.equal(TIER_NOTATION_AI.human, 'H');
+});
+
+test('the AI-form notations are the seven the editors specified', () => {
+  // The ruling names them. Written out once, against derived values, so a
+  // change to the derivation has to face the list rather than regenerate it.
+  assert.deepEqual(TIER_NOTATION_AI, {
+    ai: 'AI',
+    'ai-human-editor': 'AI–Hᵉ',
+    'ai-human': 'AI>H',
+    'ai-equals-human': 'AI=H',
+    'human-ai': 'H>AI',
+    'human-ai-editor': 'H–AIᵉ',
+    human: 'H',
+  });
+});
+
+test('the substitution survives being applied twice', () => {
+  // The failure it guards is silent: `AII>H` draws, and reads as a typo nobody
+  // catches in a diff. Idempotence means a form applied to an already-converted
+  // string is a no-op rather than a corruption.
+  for (const notation of Object.values(TIER_NOTATION)) {
+    assert.equal(toAiForm(toAiForm(notation)), toAiForm(notation));
+  }
+  assert.equal(toAiForm('AI>H'), 'AI>H');
+  assert.equal(toAiForm(''), '');
+  assert.equal(toAiForm(null), '');
+});
+
+test('an unknown style throws rather than drawing the wrong form silently', () => {
+  // The asymmetry with an unknown CODE is deliberate and is documented at
+  // assertStyle: a bad code is a record the module has no badge for, a bad
+  // style is a typo that would otherwise render the letter form inside a
+  // column headed as the AI one — correct-looking and wrong.
+  // `undefined` is deliberately not in this list: in JavaScript it is what an
+  // omitted argument IS, so it takes the default rather than being a bad value.
+  // `null` is not, and does not.
+  for (const bad of ['AI', 'Letter', 'ai-form', '', null, 0]) {
+    assert.throws(() => badgeFor('ai', bad), /Unknown badge style/);
+    assert.throws(() => badgeSupSize(bad), /Unknown badge style/);
+    assert.throws(() => badgeChartSize(bad), /Unknown badge style/);
+    assert.throws(() => coAuthorshipOrderings(bad), /Unknown badge style/);
+    assert.throws(() => tierNotation('ai', bad), /Unknown badge style/);
+  }
+  // Called with no style at all, every one of them is the letter form.
+  assert.equal(badgeFor('ai'), TIER_BADGES.ai);
+  assert.equal(badgeSupSize(), BADGE_SUP_SIZE);
+  assert.equal(badgeChartSize(), BADGE_SIZE_CHART);
+  assert.equal(tierNotation('ai'), 'A');
+  assert.deepEqual(coAuthorshipOrderings(), CO_AUTHORSHIP_ORDERINGS);
+});
+
+test('the circle grows a quarter and the type does not', () => {
+  // THE SEATING INVARIANT, and the reason the AI form is larger at all. The
+  // editors asked for circles a quarter larger "to seat the wider token" — a
+  // plain scale would not do that, because it magnifies the letters with the
+  // ring and leaves the token occupying the same proportion of the arc. So the
+  // notation is divided by the scale in box units and the diameter multiplied
+  // by it, and the two cancel.
+  //
+  // ASSERTED AS THE CANCELLATION, not as the two numbers. Either number can be
+  // edited into something plausible on its own; only the product is the ruling.
+  assert.equal(AI_FORM_SCALE, 1.25);
+  assert.equal(BADGE_SIZE_CHART_AI, BADGE_SIZE_CHART * AI_FORM_SCALE);
+  assert.equal(BADGE_SIZE_ARTICLE_AI, BADGE_SIZE_ARTICLE * AI_FORM_SCALE);
+
+  for (const code of TIER_CODES) {
+    sameRendered(
+      renderedAt(badgeFor(code, 'ai').size, BADGE_SIZE_CHART_AI),
+      renderedAt(badgeFor(code, 'letter').size, BADGE_SIZE_CHART),
+      `${code}'s notation does not render at the same size in both forms`
+    );
+  }
+  sameRendered(
+    renderedAt(BADGE_SUP_SIZE_AI, BADGE_SIZE_CHART_AI),
+    renderedAt(BADGE_SUP_SIZE, BADGE_SIZE_CHART),
+    'the editor superscript does not render at the same size in both forms'
+  );
+
+  // THE LEGIBILITY FLOOR IS A RENDERED FLOOR, and this is where that gets said.
+  // BADGE_SUP_SIZE_AI is 10.4 against the letter form's 13 and would fail the
+  // box-unit floor asserted earlier in this file — because the AI form's box
+  // units are a quarter smaller. On the page the two are the same 16.25px, and
+  // the page is what a reader has to read.
+  assert.ok(renderedAt(BADGE_SUP_SIZE_AI, BADGE_SIZE_CHART_AI) >= 12);
+
+  // AND IT IS A SCALE, NOT A REDRAW. One box, both forms — which is what makes
+  // the ring weight, the arcs and the superscript's offset come along unchanged.
+  assert.equal(BADGE_BOX, 58);
+});
+
+test('the AI form obeys every size rule the letter form does', () => {
+  // The rules are the chart's claims about the spectrum, not facts about a
+  // particular set of numbers: the edited variants are never ranked below the
+  // relational ones, and only the solo tiers are the largest. A form that broke
+  // either would be making a different claim in the same table.
+  const size = (code) => badgeFor(code, 'ai').size;
+  const edited = ['ai-human-editor', 'human-ai-editor'].map(size);
+  const relational = ['ai-human', 'human-ai'].map(size);
+  assert.deepEqual(edited, relational, 'the edited and relational AI badges are not one size');
+
+  const solo = ['ai', 'human'].map(size);
+  assert.deepEqual(solo, [solo[0], solo[0]], 'the two solo AI badges are not set alike');
+  for (const code of TIER_CODES) {
+    if (['ai', 'human'].includes(code)) continue;
+    assert.ok(size(code) < solo[0], `${code} is set as large as a solo tier`);
+  }
+});
+
+test('the ring encodes whose words in both forms', () => {
+  // The colours are the semantics, and the semantics did not change with the
+  // token. Asserted as the whole mapping for the reason the letter form's is:
+  // the property that matters is the symmetry of the spectrum.
+  const rings = (style) => TIERS.map((t) => badgeFor(t.code, style).ring);
+  assert.deepEqual(rings('ai'), ['ai', 'ai', 'ai', 'split', 'human', 'human', 'human']);
+  assert.deepEqual(rings('ai'), rings('letter'));
+});
+
+test('the split ring mirrors the AI-form notation too', () => {
+  // The order rule is stated once and derived everywhere, so it should hold for
+  // a token it has never seen. `AI=H` leads with the AI side and `H=AI` with
+  // the human side, exactly as `A=H` and `H=A` do.
+  assert.deepEqual(CO_AUTHORSHIP_ORDERINGS_AI, ['AI=H', 'H=AI']);
+  assert.deepEqual(splitRingSides('AI=H'), { left: RING_AI, right: RING_HUMAN });
+  assert.deepEqual(splitRingSides('H=AI'), { left: RING_HUMAN, right: RING_AI });
+
+  // The property rather than the two cases: the orderings are mirror images in
+  // this form as in the other.
+  const [a, b] = CO_AUTHORSHIP_ORDERINGS_AI.map(splitRingSides);
+  assert.equal(a.left, b.right, 'the AI-form orderings are not mirror images');
+  assert.equal(a.right, b.left, 'the AI-form orderings are not mirror images');
+
+  // And the two forms agree with each other, ordering for ordering: the ring is
+  // the notation drawn, so a form that coloured its halves differently would be
+  // saying something the same tier's other form does not.
+  for (const [index, letter] of CO_AUTHORSHIP_ORDERINGS.entries()) {
+    assert.deepEqual(
+      splitRingSides(CO_AUTHORSHIP_ORDERINGS_AI[index]),
+      splitRingSides(letter),
+      `the forms disagree about which side leads in ${letter}`
+    );
+  }
+});
+
+test('co-authorship is still one tier and one code, across both forms', () => {
+  // THE FAILURE THIS EXISTS FOR, now with four circles instead of two: a later
+  // session reads the chart's co-authorship row as several tiers. It is one,
+  // its code is `ai-equals-human`, and both forms of both orderings belong to
+  // it.
+  assert.equal(CO_AUTHORSHIP_ORDERINGS_AI.length, 2);
+  assert.deepEqual(CO_AUTHORSHIP_ORDERINGS_AI, CO_AUTHORSHIP_ORDERINGS.map(toAiForm));
+  assert.ok(
+    !TIER_CODES.includes('human-equals-ai'),
+    'a second co-authorship code has appeared; the chart shows one tier four times, not four tiers'
+  );
+  assert.equal(TIER_CODES.length, 7, 'the closed set has changed size without a ruling');
+});
+
+test('the AI-form notation matches the AI-form badge each tier draws', () => {
+  // The two representations of one tier in one form, which must not drift —
+  // the same assertion the letter form carries, and the same failure.
+  for (const [code, badge] of Object.entries(TIER_BADGES_AI)) {
+    const flat = badge.parts.map((p) => (p.sup ? 'ᵉ' : p.text)).join('');
+    assert.equal(flat, TIER_NOTATION_AI[code], `${code}'s AI badge and AI notation disagree`);
+    assert.equal(tierNotation(code, 'ai'), TIER_NOTATION_AI[code]);
+  }
+  // A chained code has no notation in either form. R-045 closed the set; a
+  // second style is not a way in for an eighth mark.
+  assert.equal(tierNotation('ai-1-equals-human-ai-2-editor', 'ai'), null);
+  assert.equal(tierNotation('not-a-code', 'ai'), null);
+});
+
+test('no compound or combined notation is minted in the AI form either', () => {
+  // R-045 applies to the marks, not to one spelling of them. A form that could
+  // carry a compound would be a way around a closed set.
+  for (const [code, notation] of Object.entries(TIER_NOTATION_AI)) {
+    assert.ok((notation.match(/[>=]/g) ?? []).length <= 1, `${code} carries more than one relation`);
+    assert.ok((notation.match(/ᵉ/g) ?? []).length <= 1, `${code} carries more than one editor mark`);
+    assert.ok(
+      !(notation.includes('=') && notation.includes('ᵉ')),
+      `${code} chains an editor mark onto co-authorship`
+    );
+  }
+});
+
+test('the chart generates its two columns rather than typing them out', () => {
+  // A column typed by hand is a column that can be headed as one form and drawn
+  // in the other — a mark that says the wrong thing while looking entirely
+  // correct. The columns come from BADGE_STYLES for the same reason the rows
+  // come from TIERS.
+  const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  assert.match(chart, /BADGE_STYLES\.map\(/, 'the badge columns are no longer generated');
+  assert.match(chart, /<th>\{column\.heading\}<\/th>/);
+  assert.match(chart, /form=\{column\.form\}/);
+  assert.match(chart, /coAuthorshipOrderings\(column\.form\)/);
+  assert.ok(
+    !/<TierBadge[^>]*size=\{?\d/.test(chart),
+    'the chart hard-codes a badge size instead of taking the form default'
+  );
+  // Each badge says which form it is, in words, because two circles side by
+  // side differ in their spoken names only by a notation a listener may not
+  // have met yet.
+  assert.match(chart, /labelSuffix=\{column\.labelSuffix\}/);
+  assert.match(chart, /BADGE_STYLE_NAMES\[form\]/);
+});
+
+test('the page grants both styles under the one licence, and still counts seven', () => {
+  // "Either free to adopt under the same CC BY 4.0, machine codes identical
+  // underneath" is the ruling's own clause about this page, and the sentence
+  // about fourteen is what stops a reader counting circles and concluding R-045
+  // was reopened.
+  const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  assert.match(chart, /Both display styles are covered, on identical terms/);
+  assert.match(chart, /Two styles are not fourteen badges/);
+  assert.match(chart, /machine codes are the same underneath both/);
+  assert.match(chart, /adopters may display either, or both/);
+});
+
+test("this journal's own pages stay in the letter form", () => {
+  // R-050's own clause. The article header is the only other placement, and it
+  // names no form — so it takes the default, and the default is the letter
+  // form. A `form="ai"` appearing here would be a house change that the ruling
+  // reserves to the editors.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  assert.match(page, /<TierBadge tier=\{tierBadge\} size=\{BADGE_SIZE_ARTICLE\} \/>/);
+  assert.ok(!/form=/.test(page), 'the article header has taken a badge form');
+
+  const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  assert.match(chart, /house choice and not a ranking/);
+});
+
+test('the chart may leave the text measure but may never scroll the page', () => {
+  // The second column does not fit in 42rem — the arithmetic is in the rule's
+  // own comment — so the chart breaks out of the measure. The breakout is
+  // clamped to the viewport at both the width and the pull, and a later edit to
+  // a bare `52rem` would overflow a phone silently, which is the one failure
+  // mode a breakout has.
+  const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  const rule = chart.slice(chart.indexOf('.chart-wide {'), chart.indexOf('.tier-badge-cell {'));
+  const width = rule.match(/width: (min\([^;]+\));/)?.[1];
+  const pull = rule.match(/margin-inline: calc\(\((min\([^)]+\)) - 100%\) \/ -2\);/)?.[1];
+  assert.ok(width, 'the chart no longer clamps its width');
+  assert.match(width, /100vw/, 'the breakout width is not clamped to the viewport');
+  // The cap appears twice and the two must be the same expression: they are the
+  // width and the pull that centres it, and a cap edited in one alone would
+  // leave the chart off-centre by half the difference.
+  assert.equal(pull, width, 'the breakout width and its pull-out use different caps');
 });

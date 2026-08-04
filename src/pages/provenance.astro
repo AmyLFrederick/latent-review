@@ -3,12 +3,41 @@ import Base from '../layouts/Base.astro';
 import { TIERS, SITE_TITLE } from '../lib/site';
 import TierBadge from '../components/TierBadge.astro';
 // @ts-expect-error — plain-JS module shared with the tests
-import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.mjs';
+import { CO_AUTHORSHIP_CODE, coAuthorshipOrderings, BADGE_STYLES, BADGE_STYLE_NAMES } from '../lib/tier-badges.mjs';
 
 // R-014: this page is the canonical statement of the involvement-tier
 // system as an open standard. R-015 revised the standard to v2. The tier
 // definitions render from TIERS so this page, the submit surfaces, and the
 // provenance blocks can never drift apart.
+
+// THE TWO BADGE COLUMNS (R-050, 2026-08-04). The chart shows every tier in both
+// of the standard's display styles, side by side, one column each.
+//
+// GENERATED FROM BADGE_STYLES RATHER THAN WRITTEN OUT, for the reason the rows
+// are generated from TIERS: a column typed by hand is a column that can be
+// headed as one form and drawn in the other, and a chart that mislabels a mark
+// is worse than a chart with one fewer column. The headings are the editors' —
+// "Badge I" and "Badge II" — and the ordinal is the COLUMN'S, not the badge's:
+// there are seven badges, each drawn two ways.
+//
+// EACH BADGE NAMES ITS OWN FORM TO A SCREEN READER. Two circles sitting side by
+// side differ visibly and, in their accessible names, only in a notation a
+// listener may not have met yet; the suffix says which form in words. It is
+// derived from the style's own name so the column and the spoken name cannot
+// disagree.
+
+// Numerals rather than a count, and one spare: the standard has two styles and
+// gains a third only by ruling, but a heading reading "Badge undefined" is a
+// worse way to find that out than a heading reading "Badge 3".
+const columnNumerals = ['I', 'II'];
+const badgeColumns = BADGE_STYLES.map((form, index) => {
+  const name = BADGE_STYLE_NAMES[form];
+  return {
+    form,
+    heading: `Badge ${columnNumerals[index] ?? index + 1}`,
+    labelSuffix: ` ${name.charAt(0).toUpperCase()}${name.slice(1)} — one of the standard's two styles.`,
+  };
+});
 ---
 
 <Base
@@ -75,54 +104,76 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
         had since R-015, and reordering a ratified spectrum is not a display
         change.
 
-        CO-AUTHORSHIP TAKES TWO BADGES IN ONE ROW — one tier, both orderings,
-        because the order of names around "=" carries no meaning. One row,
-        because there is one tier and one code.
+        CO-AUTHORSHIP TAKES TWO BADGES IN ONE ROW PER COLUMN — one tier, both
+        orderings, because the order of names around "=" carries no meaning. One
+        row, because there is one tier and one code.
       */}
-      <table class="stackable">
-        <thead>
-          <tr>
-            {/*
-              THE BADGE COLUMN IS LABELLED LIKE ITS NEIGHBOURS (editors,
-              2026-08-03). It carried a screen-reader-only "Badge" — the column
-              was announced but not printed, which left the one column a sighted
-              reader could not name.
-
-              NO STYLING OF ITS OWN, deliberately. `.prose th` already sets the
-              case, size, weight and letterspacing for every header in this
-              table, so plain text here is identical to TIER and INVOLVEMENT by
-              construction rather than by a matching rule that could drift from
-              them.
-            */}
-            <th>Badge</th>
-            <th>Tier</th>
-            <th>Involvement</th>
-          </tr>
-        </thead>
-        <tbody>
-          {TIERS.map((tier) => (
+      <p>
+        Each tier has one badge, and the badge has two styles. <strong>Badge I</strong> is the
+        letter form, which writes the AI side as <strong>A</strong>. <strong>Badge II</strong>{' '}
+        is the AI form, which writes it as <strong>AI</strong>. Everything else about them is
+        the same — the same colours, the same rings, the same seven tiers, the same machine
+        codes underneath — and adopters may display either, or both. This journal sets the
+        letter form on its own pages, which is a house choice and not a ranking.
+      </p>
+      {/*
+        THE CHART LEAVES THE TEXT MEASURE, and the second badge column is why.
+        See .chart-wide in this page's stylesheet for the arithmetic; the short
+        of it is that two badge columns plus a rigid tier name do not fit in
+        42rem, and the thing to give is the measure rather than the chart.
+      */}
+      <div class="chart-wide">
+        <table class="stackable">
+          <thead>
             <tr>
-              <td class="tier-badge-cell">
-                {tier.code === CO_AUTHORSHIP_CODE ? (
-                  <span class="tier-badge-pair">
-                    {CO_AUTHORSHIP_ORDERINGS.map((notation) => (
-                      <TierBadge
-                        tier={tier}
-                        notation={notation}
-                        labelSuffix=" One tier, shown in both orderings; the order of names carries no meaning here."
-                      />
-                    ))}
-                  </span>
-                ) : (
-                  <TierBadge tier={tier} />
-                )}
-              </td>
-              <td class="tier-name"><strong>{tier.label}</strong></td>
-              <td>{tier.description}</td>
+              {/*
+                THE BADGE COLUMNS ARE LABELLED LIKE THEIR NEIGHBOURS (editors,
+                2026-08-03, adapted to the pair 2026-08-04). The column carried a
+                screen-reader-only "Badge" — announced but not printed, which
+                left the one column a sighted reader could not name. There are
+                two now, and both are printed.
+
+                NO STYLING OF THEIR OWN, deliberately. `.prose th` already sets
+                the case, size, weight and letterspacing for every header in this
+                table, so plain text here is identical to TIER and INVOLVEMENT by
+                construction rather than by a matching rule that could drift from
+                them.
+              */}
+              {badgeColumns.map((column) => (
+                <th>{column.heading}</th>
+              ))}
+              <th>Tier</th>
+              <th>Involvement</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {TIERS.map((tier) => (
+              <tr>
+                {badgeColumns.map((column) => (
+                  <td class="tier-badge-cell">
+                    {tier.code === CO_AUTHORSHIP_CODE ? (
+                      <span class="tier-badge-pair">
+                        {coAuthorshipOrderings(column.form).map((notation) => (
+                          <TierBadge
+                            tier={tier}
+                            form={column.form}
+                            notation={notation}
+                            labelSuffix={`${column.labelSuffix} One tier, shown in both orderings; the order of names carries no meaning here.`}
+                          />
+                        ))}
+                      </span>
+                    ) : (
+                      <TierBadge tier={tier} form={column.form} labelSuffix={column.labelSuffix} />
+                    )}
+                  </td>
+                ))}
+                <td class="tier-name"><strong>{tier.label}</strong></td>
+                <td>{tier.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {/*
         ONE NOTE, NOT TWO. The rewording and the generalization were decided in
         the same session and shipped in the same change, so they are recorded as
@@ -355,6 +406,24 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
         no eighth badge appears without a decision on this journal's public record.
       </p>
       {/*
+        BOTH STYLES, ONE GRANT (R-050). Placed here rather than beside the chart
+        for the reason the paragraph above it was: a reader deciding what they
+        are allowed to use is reading this section, and should not have to hold
+        two sections in their head to answer one question.
+
+        THE SENTENCE ABOUT FOURTEEN IS THE LOAD-BEARING ONE. R-045 closes the set
+        at seven, and a chart that prints fourteen circles is exactly the way a
+        later reader concludes the set grew. It did not: seven badges, each of
+        which may be drawn either way.
+      */}
+      <p>
+        <strong>Both display styles are covered, on identical terms.</strong> The letter form
+        and the AI form are one standard and one grant — an adopter may use either, or both,
+        with the same attribution. Two styles are not fourteen badges: there are seven, each of
+        which may be drawn either way, and the machine codes are the same underneath both. If
+        you display one style, nothing obliges you to display the other.
+      </p>
+      {/*
         THE STANDARD CREDITS ITSELF IN ITS OWN GRAMMAR. The equals sign is the
         chart's co-authorship tier, not punctuation and not a stand-in for "and":
         it says the two parties contributed substantially and neither led, which
@@ -459,11 +528,43 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
 </Base>
 
 <style>
-  /* The badge column: as narrow as the mark plus breathing room, so the tier
-     name still starts near the left edge and the chart still reads as a table
-     of words with marks beside them. The mark is 72.5px since 2026-08-03, and
-     co-authorship's pair is twice that plus a gap — which is why the stacking
-     breakpoint below moved out with it. */
+  /* THE CHART LEAVES THE TEXT MEASURE (R-050, 2026-08-04), and it is the only
+     thing on this page that does.
+
+     THE ARITHMETIC, because a breakout is the kind of rule that gets deleted by
+     someone who reads it as decoration. At 0.95rem the chart's rigid content is:
+     co-authorship's letter pair, two 72.5px marks and a gap, 153px, plus 28px of
+     padding; its AI pair, two 90.625px marks and a gap, 189px, plus 28px; and
+     the tier name, which is nowrap by the rule below, about 169px. That is 567px
+     before a single word of the description column. The prose measure is 42rem
+     and gives 632px of content, which would leave the description 65px — about
+     seven characters, running every tier to ten lines.
+
+     So one of the four columns had to give, and the measure is the right one:
+     the rigid widths are all ruled — the badge sizes by R-049 and R-050, the
+     unbroken tier name by the rule below — and a text measure is a preference
+     about reading comfort that a table full of marks is not bound by. The chart
+     is the one element on the page that is not prose.
+
+     IT CANNOT SCROLL THE PAGE SIDEWAYS. The width is the smaller of 52rem and
+     the viewport less its gutters, and the pull-out is derived from the same
+     min() — so on any viewport narrower than the cap the rule degrades to
+     centring the chart in the measure it already had, and the negative margin
+     reaches exactly zero rather than going past it. */
+     THE CAP IS WRITTEN THE SAME WAY TWICE, and it has to be: the width and the
+     pull are two halves of one number, and a cap edited in one of them would
+     centre the chart somewhere other than where it sits. The suite asserts the
+     two expressions match. */
+  .chart-wide {
+    width: min(52rem, 100vw - 2.5rem);
+    margin-inline: calc((min(52rem, 100vw - 2.5rem) - 100%) / -2);
+  }
+
+  /* The badge columns: each as narrow as its mark plus breathing room, so the
+     tier name still starts near the left edge and the chart still reads as a
+     table of words with marks beside them. The letter mark is 72.5px and the AI
+     mark 90.625px since 2026-08-04, and co-authorship's pair is twice the mark
+     plus a gap — which is why the stacking breakpoint below moved out with it. */
   .tier-badge-cell {
     width: 1%;
     white-space: nowrap;
@@ -555,8 +656,16 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
      30rem that left the tier name and the description sharing what was left of
      a phone's measure. The badges are the reason the number moved, so the
      number moves with them rather than the chart being allowed to crush its own
-     text. */
-  @media (max-width: 30rem) {
+     text.
+
+     MOVED 30rem → 44rem ON 2026-08-04, for the same reason at a larger size: a
+     whole second badge column arrived. The rigid content is now 567px (the
+     arithmetic is at .chart-wide above), and the threshold both previous moves
+     were set at is about 90–100px of description before the table stops being
+     readable as one. 567 + 100 = 667px of table, which the breakout gives at a
+     viewport of about 44rem. The number is derived from the same rule as the two
+     before it, not chosen. */
+  @media (max-width: 44rem) {
     .stackable,
     .stackable tbody,
     .stackable tr,
@@ -584,6 +693,22 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
     .stackable td.tier-name,
     .stackable td.machine-code {
       margin-bottom: 0.15rem;
+    }
+
+    /* THE TWO FORMS STAY SIDE BY SIDE EVEN WHEN THE TABLE STOPS BEING A TABLE.
+       Stacked, every other cell becomes a block; these two do not, because the
+       whole claim of the pair is that it is one tier drawn two ways, and a
+       reader who has to scroll from the first to the second is comparing a mark
+       with a memory of a mark.
+
+       inline-block rather than a flex row, so it degrades the honest way: the
+       two sit on one line where the line holds them, and the AI form drops
+       below the letter form where it does not — which on a 320px screen is
+       co-authorship's four circles and nothing else. */
+    .stackable td.tier-badge-cell {
+      display: inline-block;
+      margin-right: 0.6rem;
+      margin-bottom: 0.2rem;
     }
   }
 
