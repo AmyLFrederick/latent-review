@@ -95,21 +95,27 @@ const { issue = null } = Astro.props;
      of the identity, so the name, the navigation, the section headings and the
      provenance marks all speak one colour.
 
-     IT TAKES THE COLOUR ITSELF, NOT THE TEXT STOP, and the size is why. This
-     clamp floors at 44px and ceilings at 71px, so the wordmark is large text by
-     any measure; large text answers to 3:1, which #4b8e4d clears at 3.63:1 with
-     room. Nothing here is a close call — the compact wordmark on interior pages
-     is the tighter of the two at 27px, and that clears the 24px large-text
-     threshold as well.
+     IT TAKES THE DEEPER STOP — the one the COVER kicker wears — rather than the
+     bright, swapped in on the editors' walk of 2026-08-05. That is a decision
+     about weight and not about legibility: at 44px to 71px this is large text
+     and either stop clears its threshold comfortably, so the choice was free
+     and the editors made it on how the name should sit. The name reads as
+     printed rather than lit, and the bright stop went to Support in the footer
+     in the same trade.
 
-     The <a> inside inherits this, and the global a:hover takes it to the darker
-     stop — a hover that reads as the same colour pressed rather than as a
-     different one. */
+     THE HOVER HAD TO MOVE WITH IT. The <a> inherits this colour, and the global
+     a:hover takes a link to --accent — which the wordmark now already is, so
+     hovering the name did nothing at all. It goes a stop deeper instead, which
+     keeps the feedback inside the one colour. */
   .masthead-title {
     font-size: clamp(2.6rem, 8vw, 4.2rem);
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: var(--accent-bright);
+    color: var(--accent);
+  }
+
+  .masthead-title a:hover {
+    color: var(--accent-deep);
   }
 
   .masthead-title a {
