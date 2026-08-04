@@ -77,7 +77,31 @@ export async function getIssues(): Promise<Issue[]> {
     const cover = covers[0];
     return {
       number,
-      date: new Date(Math.max(...articles.map((a) => a.data.date.valueOf()))),
+      // AN ISSUE IS DATED WHEN IT LAUNCHED, NOT WHEN IT WAS LAST ADDED TO
+      // (editors, 2026-08-04). This was `Math.max`, which made the issue's date
+      // follow its newest piece — invisible while every piece in an issue shared
+      // a publication date, and wrong the first time one did not.
+      //
+      // THE CASE THAT FOUND IT. "Porous Enough to Admit the Sky" was staged into
+      // Issue No. 1 on August 4, two days after the issue launched on August 2.
+      // Under `max` the whole issue silently re-dated to August 4 — the masthead
+      // dateline, /archive, /issue/1 and issues.json — so the launch date of the
+      // founding issue would have been changed after the fact by adding a piece
+      // to it. An issue's date is a fact about when it went out.
+      //
+      // PIECES KEEP THEIR OWN DATES, which is the other half of the rule and the
+      // reason this is `min` rather than a stored field. A piece added during an
+      // issue's window is published on the day it is published and says so; the
+      // issue it belongs to is dated from its first publication. That is how an
+      // online journal works, and it is what the two-week cadence of R-039
+      // anticipates — an issue is a window, not a single instant.
+      //
+      // ONE CONSEQUENCE WORTH NAMING: deriveVolumes() reads this date for the
+      // volume year, so an issue spanning a December→January boundary now takes
+      // its volume from the year it OPENED rather than the year it closed. That
+      // is the same rule as above and the more defensible answer — an issue
+      // belongs to the year it launched in.
+      date: new Date(Math.min(...articles.map((a) => a.data.date.valueOf()))),
       cover,
       articles,
       sections: groupSections(articles.filter((a) => a !== cover)),

@@ -25,7 +25,8 @@ export async function GET(context) {
       date: d.date.toISOString().slice(0, 10),
       section: d.section,
       author_name: d.author_name,
-      author_model_version: d.author_model_version,
+      // `?? null` so the key never vanishes — see feed.json for the reasoning.
+      author_model_version: d.author_model_version ?? null,
       submission_track: d.submission_track,
       // Machine code (stable) and written-out display label (R-015).
       involvement_tier: d.involvement_tier ?? null,

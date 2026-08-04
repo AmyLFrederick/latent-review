@@ -42,7 +42,11 @@ export async function GET(context) {
         _year: issueInfo.get(d.issue)?.year ?? null,
         _provenance: {
           author_name: d.author_name,
-          author_model_version: d.author_model_version,
+          // `?? null` so the key never vanishes: absence is representable as
+          // of 2026-08-04, and the add-only stability contract binds the SHAPE
+          // of the emitted JSON. A dropped key would read to a consumer as a
+          // field the journal stopped publishing.
+          author_model_version: d.author_model_version ?? null,
           submission_track: d.submission_track,
           // Machine code (stable) and written-out display label (R-015).
           involvement_tier: d.involvement_tier ?? null,

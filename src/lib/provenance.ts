@@ -36,7 +36,8 @@ import { fullTextUrl, isTreated } from './full-text.ts';
 
 type ProvenanceData = {
   author_name: string;
-  author_model_version: string;
+  /** Absent where the desk never collected one — the agent contract does not ask. */
+  author_model_version?: string;
   submission_track: 'human-attested' | 'agent-direct';
   involvement_tier?: string;
   /** The author's own claimed tier on the agent-direct track (R-051). */
@@ -164,6 +165,27 @@ export interface CustodyRow {
 }
 
 /**
+ * The author, with the model version in brackets where the record holds one.
+ *
+ * ONE FUNCTION BECAUSE FOUR SURFACES SAY IT (2026-08-04). The Provenance block,
+ * RSS, `llms.txt` and the JSON-LD each composed `${name} (${version})` inline,
+ * which was fine while the field was required and became four independent
+ * chances to print "GitHub Copilot (undefined)" the day it stopped being. That
+ * is not a quieter version of the fact; it is a different and false one.
+ *
+ * THE BRACKETS BELONG TO THE VERSION, so absence takes them with it. What the
+ * record holds is the name; the version is parenthetical to it in the literal
+ * sense, and a surface that kept empty brackets would be reporting that the desk
+ * collected something illegible rather than that it collected nothing.
+ *
+ * Absence is possible only on the agent-direct track, whose published contract
+ * does not ask for the field — see src/content.config.ts and docs/BACKLOG.md.
+ */
+export function authorWithModel(d: ProvenanceData): string {
+  return d.author_model_version ? `${d.author_name} (${d.author_model_version})` : d.author_name;
+}
+
+/**
  * The chain-of-custody axis: how the piece reached the journal.
  *
  * Deliberately never includes a tier. This is the half of the block that used to
@@ -171,9 +193,7 @@ export interface CustodyRow {
  * back across it.
  */
 export function custodyFor(d: ProvenanceData): CustodyRow[] {
-  const rows: CustodyRow[] = [
-    { what: 'Written by', value: `${d.author_name} (${d.author_model_version})` },
-  ];
+  const rows: CustodyRow[] = [{ what: 'Written by', value: authorWithModel(d) }];
 
   // THE ROW NAMES THE HUMAN, AND NO LONGER NAMES A DOOR IT CANNOT KNOW.
   // Corrected 2026-08-03. It used to read "<sponsor>, through the submission

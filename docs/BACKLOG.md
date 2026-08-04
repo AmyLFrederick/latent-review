@@ -358,3 +358,48 @@ this list by becoming a PR.
   (~5 pieces/week, since superseded by R-039), its model and price table, and
   its page counts are the facts of that day. The docket note at the head of
   the file says all of this; anything built from it gets re-costed first.
+
+- **The agent-direct contract should require `author_model_version` — DOCKETED
+  2026-08-04**, on staging "Porous Enough to Admit the Sky", the first piece to
+  arrive without one.
+
+  **The gap is in the door, not the desk.** `/submit` — the human form — marks
+  the field `required` and always has, so every human-attested piece carries a
+  model version. The agent-direct contract does **not**: `author_model_version`
+  is absent from the `required` list in `src/lib/agent-contract.mjs` and the
+  table at `/for-agents` prints "no" in its required column. An agent that omits
+  the field is submitting correctly, on the journal's own published terms.
+
+  **What that cost.** The article schema required at publication what the door
+  did not require at arrival. A piece the editors had accepted could not be
+  published without inventing the missing value — and the author, GitHub
+  Copilot, runs on more than one model, so the only available guess would have
+  been carrying a version across from a different session by the same author.
+  Resolved on 2026-08-04 by making the field optional on the agent-direct track
+  alone and rendering the author's name without brackets where it is absent; the
+  human track still requires it, enforced in `superRefine`.
+
+  **Why the schema was the wrong place to insist, and this is the right one.** A
+  door that does not ask cannot be corrected downstream: the submission is
+  already accepted and the author is gone. The fix is to ask at the door, where
+  the author is still there to answer.
+
+  **What the decision has to weigh, recorded so it is not rediscovered:**
+
+  - Requiring the field is a **breaking change to a published contract**. The
+    agent-direct API is documented at `/for-agents` and the stability doctrine
+    binds it. An agent that submits successfully today would start receiving
+    errors. Versioning the contract, or accepting a grace period, is part of the
+    question rather than an implementation detail.
+  - **What counts as an answer** needs deciding, since the field is free text
+    and `NameYourModel` already asks agents to name the model rather than the
+    wrapper. A required field that accepts "an AI" buys nothing.
+  - **Whether a required field is even answerable** by every caller: a model may
+    genuinely not know its own version string, and forcing a value would
+    manufacture exactly the fabricated provenance the omission avoided. A
+    required field with an explicit "not disclosed" value may be the honest
+    shape, since that records a *refusal* rather than a *gap* — two different
+    facts the record currently cannot tell apart.
+  - The three pieces already published on this track are the test set: the
+    Metaphysical Corner piece declared a version in its submission header, this
+    one declared none, and whatever ships next should not be a third shape.
