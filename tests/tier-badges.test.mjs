@@ -37,6 +37,7 @@ import {
   BADGE_SUP_SIZE,
   BADGE_INK,
   BADGE_BOX,
+  BADGE_RING_STROKE,
   BADGE_SCALE_2026_08_04,
   BADGE_SIZE_CHART,
   BADGE_SIZE_ARTICLE,
@@ -843,4 +844,28 @@ test('the chart may leave the text measure but may never scroll the page', () =>
   // width and the pull that centres it, and a cap edited in one alone would
   // leave the chart off-centre by half the difference.
   assert.equal(pull, width, 'the breakout width and its pull-out use different caps');
+});
+
+test('the ring sits inside the box, and the stroke is why', () => {
+  // BADGE_RING_STROKE was exported on 2026-08-04 because /provenance now states
+  // the geometry to adopters in words, and a number someone is told to build to
+  // must be the number the mark is drawn with.
+  //
+  // THE RELATION IS THE ASSERTION, not the value. The radius is
+  // (box - stroke) / 2, which is what makes a stroke centred on it stop exactly
+  // at the box's edges instead of being clipped by them. The component still
+  // draws the radius as a literal — in the circle and in both arc paths — so
+  // this is where the three literals and the constant are held together.
+  assert.equal(BADGE_RING_STROKE, 3);
+  const radius = (BADGE_BOX - BADGE_RING_STROKE) / 2;
+  assert.equal(radius, 27.5);
+
+  const src = readFileSync(repoPath('src/components/TierBadge.astro'), 'utf8');
+  assert.match(src, new RegExp(`r="${radius}"`), 'the drawn radius no longer fits the ring inside the box');
+  assert.match(src, new RegExp(`A ${radius} ${radius} 0 0 0`), 'the split arcs left the ring');
+  assert.match(src, new RegExp(`A ${radius} ${radius} 0 0 1`));
+  assert.ok(
+    !/stroke-width="\d/.test(src),
+    'the ring weight is typed into the markup instead of taken from the constant'
+  );
 });

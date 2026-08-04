@@ -400,3 +400,71 @@ test('the shipped file agrees with itself about what has been asked', () => {
     'newest first'
   );
 });
+
+// --- The page's shape (2026-08-04) ---------------------------------------
+
+/** The page template with frontmatter, comments, scripts and styles dropped. */
+const promptsTemplate = () =>
+  readFileSync('src/pages/prompts.astro', 'utf8')
+    .replace(/^---[\s\S]*?\n---/, '')
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+    .replace(/<script>[\s\S]*?<\/script>/g, '')
+    .replace(/<style>[\s\S]*?<\/style>/g, '');
+
+test('nothing stands between the heading and the question', () => {
+  // Ruled 2026-08-04, one step past the walk that had already cut this to a
+  // single line. "Once a week the editors pose one question, and anyone may
+  // answer it" was explaining the page to a reader two inches from the page
+  // explaining itself — a question in the display face inside a double rule,
+  // with answers under it. The mechanics live under How to answer.
+  const page = promptsTemplate();
+  assert.ok(!page.includes('Once a week the editors pose'), 'the lede sentence is back');
+  assert.ok(!/class="lede"/.test(page), 'a lede has reappeared above the question');
+
+  // And it did not leave an empty wrapper behind, which would keep the margin
+  // the sentence used to fill and read as a gap nobody chose.
+  // Up to the question's own ternary, so the region is everything before the
+  // question in EITHER state — the posed one and the "none yet" placeholder.
+  const betweenHeaderAndQuestion = page.slice(
+    page.indexOf('</header>'),
+    page.indexOf('current === null')
+  );
+  assert.ok(
+    !/<div class="prose">\s*<\/div>/.test(betweenHeaderAndQuestion),
+    'an empty prose block is left where the lede was'
+  );
+  // The one thing still allowed in that gap is the also-open note, and it is
+  // allowed because it is conditional — it appears only when an earlier
+  // question is genuinely still taking answers, which is not the ordinary
+  // state. Anything unconditional there is a new sentence between the reader
+  // and the question, which is the thing that was just removed.
+  const paragraphs = betweenHeaderAndQuestion.match(/<p[^>]*>/g) ?? [];
+  for (const tag of paragraphs) {
+    assert.match(
+      tag,
+      /class="also-open"/,
+      `an unconditional paragraph sits between the heading and the question: ${tag}`
+    );
+  }
+});
+
+test('the heading arrangement is untouched, and the page keeps its one h1', () => {
+  // The instruction was that only the sentence goes. The h1 is still the
+  // section's own name in the accent kicker — the arrangement the 2026-08-03
+  // fix settled, when this page's large heading came off and the surviving
+  // kicker took the role so the page would not be the only one without one.
+  const page = promptsTemplate();
+  assert.equal((page.match(/<h1[\s>]/g) ?? []).length, 1, 'the page no longer has exactly one h1');
+  assert.match(page, /<h1 class="kicker kicker--accent kicker--lead">Prompts<\/h1>/);
+});
+
+test('the dead lede rule went with the sentence', () => {
+  // A style with nothing to style is a suggestion to put something back. The
+  // note in its place is deliberate: the next person who wants a line there
+  // should have to decide to add one.
+  const styles = readFileSync('src/pages/prompts.astro', 'utf8');
+  assert.ok(
+    !/^\s*\.lede\s*\{/m.test(styles),
+    'the .lede rule outlived the element it sized'
+  );
+});

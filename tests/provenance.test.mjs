@@ -341,3 +341,120 @@ test('the one-line sentence drops its dash when there is no description', () => 
   assert.match(s, /Authorship: AI¹ = Human – AI² \(editor\)\. Chain of custody:/);
   assert.ok(!s.includes('— .'), 'a dangling em dash survived an empty description');
 });
+
+// --- The page itself (2026-08-04) ----------------------------------------
+//
+// Three editors' items, each with a failure worth a test: a page that says its
+// own name twice, an adoption on-ramp promising something that already shipped,
+// and a standard's changelog with no entry for the standard's biggest change.
+
+const provenancePage = () => renderedTemplate('src/pages/provenance.astro');
+
+/** The template between two markers, so a section can be checked in isolation. */
+const section = (page, from, to) =>
+  page.slice(page.indexOf(from), to ? page.indexOf(to) : undefined);
+
+test('the page says its name once, at full size, and keeps its one heading', () => {
+  // It said it twice — a small kicker stacked over the full-size heading — and
+  // had since the page was written. THE OUTLINE IS THE PART THAT MATTERS: the
+  // /prompts fix had to move the h1 onto the surviving element, because there
+  // the large heading was the one removed. Here the duplicate was a <p> with no
+  // role, so the h1 neither moved nor changed, and this asserts that rather
+  // than trusting it.
+  const page = provenancePage();
+  assert.equal((page.match(/<h1[\s>]/g) ?? []).length, 1, 'the page no longer has exactly one h1');
+  assert.match(page, /<h1>Provenance<\/h1>/);
+
+  const header = section(page, '<header class="page-header">', '</header>');
+  assert.ok(
+    !/class="kicker"/.test(header),
+    'the duplicate name is back in the page header'
+  );
+  assert.equal(
+    (header.match(/Provenance/g) ?? []).length,
+    1,
+    'the page header names itself more than once again'
+  );
+
+  // v2 was the kicker's other half and is a thing adopters cite, so it moved to
+  // the standard's own line rather than going with it.
+  assert.match(header, /Version 2, free\s+to adopt/);
+});
+
+test('"Displaying it" is present-tense instructions, not a promise', () => {
+  // Every outreach link lands here. Until 2026-08-04 it closed by saying a badge
+  // "is being designed and will be published on this page" — of marks that had
+  // shipped the day before and gained a second style the day after.
+  const displaying = section(provenancePage(), '<h2>Displaying it</h2>', '<h2 id="changelog">');
+
+  for (const stale of ['being designed', 'will be published']) {
+    assert.ok(!displaying.includes(stale), `"${stale}" is back in the adoption on-ramp`);
+  }
+
+  // The four things the editors asked it to say, each checked by its own claim
+  // rather than by a word that could survive a rewrite that dropped the point.
+  assert.match(displaying, /a line beside the byline/, 'the simplest form is no longer offered');
+  assert.match(displaying, /use either style/, 'the two styles are not offered to adopters');
+  assert.match(displaying, /CC BY 4\.0 grant above/, 'the licence is not carried into the on-ramp');
+  assert.match(displaying, /Draw the notation as real text/, 'the real-text rule is gone');
+  assert.match(displaying, /accessible name/, 'the accessible-name rule is gone');
+  assert.match(displaying, /split down the middle/, 'the split-ring rule is gone');
+});
+
+test('the values an adopter is told to build to are the badge module\'s own', () => {
+  // A hex retyped into prose is the pair that drifts — and here it would drift
+  // into someone else's implementation, where no test of ours can reach it. The
+  // section renders the constants; it does not restate them.
+  const displaying = section(provenancePage(), '<h2>Displaying it</h2>', '<h2 id="changelog">');
+
+  for (const constant of ['RING_AI', 'RING_HUMAN', 'BADGE_INK', 'BADGE_RING_STROKE', 'BADGE_BOX']) {
+    assert.ok(displaying.includes(constant), `${constant} is no longer rendered into the on-ramp`);
+  }
+  assert.ok(
+    !/#[0-9a-f]{6}/i.test(displaying),
+    'a hex value is typed into the adoption instructions instead of rendered'
+  );
+});
+
+test('the changelog records the badges and the AI form', () => {
+  // The standard's own changelog carried no mention of the marks at all until
+  // 2026-08-04 — an adopter reading it to learn what was new found four
+  // entries about labels and nothing about the thing they would display.
+  const changelog = section(provenancePage(), '<h2 id="changelog">');
+
+  assert.match(changelog, /v2, amended August 4, 2026 \(R-050\)/);
+  assert.match(changelog, /v2, amended August 3, 2026 \(R-044, R-045, R-049\)/);
+
+  // Newest first, like every entry above them.
+  assert.ok(
+    changelog.indexOf('August 4, 2026') < changelog.indexOf('August 3, 2026'),
+    'the changelog is no longer in reverse chronological order'
+  );
+  assert.ok(
+    changelog.indexOf('August 3, 2026') < changelog.indexOf('August 1, 2026'),
+    'the new entries are not above the ones they follow'
+  );
+
+  // Both are add-only, and both say so where every other entry says it.
+  assert.match(changelog, /No version bump, and the set did not grow/);
+  assert.match(changelog, /No version bump: this is add-only\. Every tier name/);
+  assert.match(changelog, /machine codes are unchanged and shared between\s+the styles/);
+});
+
+test('the changelog quotes its values rather than deriving them', () => {
+  // THE RULE THE COUNTS ABOVE ALREADY FOLLOW, extended to the badge entries. A
+  // changelog records moments; its values are history. If the ring green ever
+  // moves, the August 3 entry should still say what was ratified on August 3 —
+  // rendering it from RING_AI would make the past mutate with the present.
+  //
+  // This is the exact opposite of the assertion on "Displaying it" above, and
+  // deliberately so: that section states what the mark IS and must track it;
+  // this one states what was decided and must not.
+  const changelog = section(provenancePage(), '<h2 id="changelog">');
+  assert.match(changelog, /#4B8E4D/, 'the ratified ring green is no longer quoted in the changelog');
+  assert.match(changelog, /#EFA48F/);
+  assert.ok(
+    !/RING_AI|RING_HUMAN|BADGE_INK/.test(changelog),
+    'the changelog renders a live value where it should quote a ratified one'
+  );
+});

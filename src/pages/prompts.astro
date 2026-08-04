@@ -86,23 +86,26 @@ const isUnasked = current !== null && current.status === 'unasked';
     </header>
 
     {/*
-      ONE SENTENCE, THEN THE QUESTION. Ruled 2026-08-03 on the editors' walk of the
-      live page: the shortest path from arriving to reading. What a reader needs
-      before meeting the question is what the section IS, in one line; the rest of
-      the framing is worth reading and is kept in full, below How to answer, where
-      it is no longer standing between the reader and the writing.
+      NO SENTENCE, THEN THE QUESTION. Ruled 2026-08-04, one step past the
+      2026-08-03 walk that cut this to a single line.
+
+      The line said "Once a week the editors pose one question, and anyone may
+      answer it," and it was explaining the page to a reader who was two inches
+      from the page explaining itself. A question set in the display face inside
+      a double rule, with answers beneath it, is not a thing anyone needs told
+      what it is; and the mechanics it gestured at — who may answer, and how —
+      are set out properly under How to answer, where a reader goes once they
+      want them rather than before they know if they do.
+
+      THE PAGE IS NOW THE HEADING, THE RULE, AND THE QUESTION. The rule is the
+      question block's own double border, which is why nothing needed adding
+      when the paragraph came out: the divider that used to sit under the
+      sentence was never the sentence's.
+
+      THE HEADING ARRANGEMENT IS UNTOUCHED, per the same instruction — the h1 is
+      still the section's own name in the accent kicker, and the page still has
+      exactly one.
     */}
-    <div class="prose">
-      {/*
-        THE APPOSITIVE IS GONE (editors' walk 2026-08-03). The sentence used to
-        name the Weekly Question mid-clause, which the label directly beneath
-        the sentence already does — and that label is the one that matters,
-        because it carries the NUMBER an author cites when they answer. Naming
-        it twice in three lines made the second naming look like a different
-        thing.
-      */}
-      <p class="lede">Once a week the editors pose one question, and anyone may answer it.</p>
-    </div>
 
     {/*
       SAID ONLY WHEN IT IS TRUE, and it is false most of the time. The ordinary
@@ -327,14 +330,9 @@ const isUnasked = current !== null && current.status === 'unasked';
     margin: 0;
   }
 
-  /* One sentence, and it carries the weight of the paragraph it replaced at the
-     top of the page: set a step up from body prose so a reader takes it in on
-     the way past, not as something to work through. It now carries the weight
-     of the removed heading too, and works alone — which is the editors' finding
-     from the preview walk, not a hope about it. */
-  .lede {
-    font-size: 1.1rem;
-  }
+  /* `.lede` went with the sentence it sized (2026-08-04). Left as a note rather
+     than silently: it was the last thing between the heading and the question,
+     and the next person to want a line there should have to decide to add one. */
 
   /* The motto, in the display face it had as a heading but at prose scale —
      recognisably the line it was, sized as the first line of a block rather
@@ -346,9 +344,10 @@ const isUnasked = current !== null && current.status === 'unasked';
 
   /* Reads as apparatus, not as a second headline: a reader who has come for the
      question above should meet this as a note under it. It sits between the
-     lede and the question, which is the only place it is useful — after the
+     heading and the question, which is the only place it is useful — after the
      question it would be a footnote to something the reader has already
-     decided about. */
+     decided about. (It sat under the lede until 2026-08-04; the lede went and
+     it did not move.) */
   .also-open {
     max-width: 34rem;
     margin: 0 auto 1.6rem;

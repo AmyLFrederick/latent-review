@@ -114,6 +114,21 @@ export const BADGE_INK = '#303927';
  * the same composition at a different magnification.
  */
 export const BADGE_BOX = 58;
+
+/**
+ * THE RING'S WEIGHT, in the box's own units — exported because /provenance now
+ * states the geometry to adopters in words, and a number an adopter is told to
+ * build to must be the number the mark is drawn with rather than one retyped
+ * beside it.
+ *
+ * IT IS ALSO WHAT PUTS THE RING INSIDE THE BOX. The circle's radius is
+ * (BADGE_BOX - BADGE_RING_STROKE) / 2 = 27.5, which is why a 3-unit stroke
+ * centred on that radius stops exactly at the edges instead of being clipped by
+ * them. The component still draws 27.5 and the arc path still names it; the
+ * suite asserts the relation, so the two cannot come apart silently.
+ */
+export const BADGE_RING_STROKE = 3;
+
 export const BADGE_SCALE_2026_08_04 = 1.25;
 export const BADGE_SIZE_CHART = 72.5;
 export const BADGE_SIZE_ARTICLE = 35;

@@ -3,7 +3,18 @@ import Base from '../layouts/Base.astro';
 import { TIERS, SITE_TITLE } from '../lib/site';
 import TierBadge from '../components/TierBadge.astro';
 // @ts-expect-error — plain-JS module shared with the tests
-import { CO_AUTHORSHIP_CODE, coAuthorshipOrderings, BADGE_STYLES, BADGE_STYLE_NAMES } from '../lib/tier-badges.mjs';
+import {
+  CO_AUTHORSHIP_CODE,
+  coAuthorshipOrderings,
+  BADGE_STYLES,
+  BADGE_STYLE_NAMES,
+  // Printed in "Displaying it", where an adopter is told to build to them.
+  RING_AI,
+  RING_HUMAN,
+  BADGE_INK,
+  BADGE_BOX,
+  BADGE_RING_STROKE,
+} from '../lib/tier-badges.mjs';
 
 // R-014: this page is the canonical statement of the involvement-tier
 // system as an open standard. R-015 revised the standard to v2. The tier
@@ -45,8 +56,32 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
   description="The Latent Review's involvement tiers — an open provenance standard, CC BY 4.0, free for any publication or writer to adopt."
 >
   <div class="wrap">
+    {/*
+      THE PAGE SAYS ITS NAME ONCE, ruled 2026-08-04. It said it twice — a small
+      kicker over the full-size heading, stacked — and had done since the page
+      was written; the v2 rename only made the pair more visible by giving the
+      smaller one a suffix.
+
+      THE SMALLER ONE WENT AND THE OUTLINE DID NOT MOVE. This is the /prompts
+      pattern with the roles the other way up: there, the large heading was the
+      one removed, so the surviving kicker had to become the h1 to keep the page
+      from being the only one on the site without one. Here the duplicate was
+      the kicker, which is a <p> carrying no role at all — so `<h1>Provenance</h1>`
+      was already the page's one heading and still is, at the same level, with
+      the same text. Nothing was inherited because nothing needed to be, and the
+      suite asserts the outline rather than trusting that sentence.
+
+      THIS PAGE IS NOW THE ONE WHOSE h1 IS ITS OWN NAME. Every other document
+      page — /charter, /rulings, /circulation, /submit — sets the name as a
+      kicker and a phrase as the heading ("Appended, never altered."). The
+      editors' instruction was the word once, at full size, and inventing a
+      tagline to restore the pattern would be answering a different question.
+
+      VERSION 2 MOVED RATHER THAN GOING. It was the kicker's second half, and it
+      is a thing an adopter cites, so it joins the standard's own line below —
+      beside the licence, which is the other thing they cite.
+    */}
     <header class="page-header">
-      <p class="kicker">Provenance · v2</p>
       <h1>Provenance</h1>
       <p class="page-note page-lede">
         Every piece in this journal says who made it and how it got here — plainly, in the
@@ -60,8 +95,8 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         standard covers.
       */}
       <p class="page-note standard-line">
-        An open standard for disclosing how humans and AI share creative work. Free to adopt,
-        adapt, and display — CC BY 4.0.
+        An open standard for disclosing how humans and AI share creative work. Version 2, free
+        to adopt, adapt, and display — CC BY 4.0.
       </p>
     </header>
 
@@ -449,11 +484,71 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         <a href="/provenance/">thelatentreview.com/provenance</a> — CC BY 4.0.
       </p>
 
+      {/*
+        THE ADOPTION ON-RAMP, rewritten 2026-08-04. Every outreach link lands
+        here, and until today the section closed by promising a badge that had
+        already shipped — "is being designed and will be published on this
+        page". The marks were published on 2026-08-03 and gained a second style
+        on 2026-08-04. It is present tense now, and it is instructions.
+
+        THE VALUES ARE RENDERED FROM THE BADGE MODULE, not typed. An adopter is
+        being told to build to these numbers, so the page must print the numbers
+        the mark is actually drawn with — a hex retyped into prose is the pair
+        that drifts, and here it would drift into someone else's implementation
+        where no test of ours can reach it.
+
+        THE ORDER IS THE ORDER OF COMMITMENT: a line of text costs nothing and
+        is a complete implementation; the marks are optional; the rules only
+        bind once you draw one. An on-ramp that opened with ring geometry would
+        turn a two-minute adoption into a design project.
+      */}
       <h2>Displaying it</h2>
       <p>
-        The simplest form is a line beside the byline — <em>Provenance: AI &gt; Human</em> —
-        linking here for the definitions. A small provenance badge for adopting publications
-        and writers is being designed and will be published on this page.
+        <strong>The simplest form is a line beside the byline</strong> —{' '}
+        <em>Provenance: AI &gt; Human</em> — linking here for the definitions. That is a
+        complete implementation of this standard. The badges are worth having, and nothing
+        obliges you to use them.
+      </p>
+      <p>
+        <strong>If you use the badges, use either style.</strong> The letter form and the AI
+        form are both published, both canonical, and both covered by the CC BY 4.0 grant above
+        on the same attribution terms — the credit line is there to copy. Pick whichever suits
+        your surface and stay with it; a page shows both only when, like this one, it is
+        teaching them.
+      </p>
+      <p>
+        <strong>Draw the notation as real text.</strong> The mark should be an SVG whose
+        notation is a <code>&lt;text&gt;</code> element — not an image file, not an icon font,
+        not a background image — so it is selectable, searchable, and in the page for anything
+        reading it. Give the whole mark an accessible name carrying the tier's full name and
+        description, the way you would write alt text: the badge is an abbreviation, and an
+        abbreviation should be able to say what it abbreviates.
+      </p>
+      <p>
+        {/*
+          UPPERCASED FOR DISPLAY ONLY. The values come from the badge module, so
+          they cannot drift from the mark; the module holds them lowercase and
+          R-049's ratified text and the changelog entry below both write them in
+          caps, and a page teaching a standard should not spell one colour two
+          ways within a screen of itself.
+        */}
+        <strong>The ring is where the meaning is, so take the colours from it.</strong> Green{' '}
+        <code>{RING_AI.toUpperCase()}</code> is the AI side; salmon{' '}
+        <code>{RING_HUMAN.toUpperCase()}</code> is the human side; the notation inside is set in{' '}
+        <code>{BADGE_INK.toUpperCase()}</code>. Co-authorship alone takes
+        a ring split down the middle, drawn as two arcs so the halves are exactly equal, and
+        the colour on the left matches the party on the left — <strong>AI = Human</strong>{' '}
+        reads green then salmon, <strong>Human = AI</strong> the other way round.
+      </p>
+      <p>
+        <strong>The geometry is one composition at any size.</strong> A circle with the ring
+        drawn at {BADGE_RING_STROKE} units in every {BADGE_BOX} of diameter, the notation
+        centred on both axes in a monospace face, the editor's mark set as a superscript.
+        Scale the whole drawing together — a badge at half the size is the same mark drawn
+        smaller, never a thinner ring, which would stop reading as a ring at all. In the AI
+        form the circle is a quarter larger and its notation a quarter smaller within it, so
+        the letters come out the same size in both styles and the longer token has room to sit
+        in.
       </p>
 
       <h2 id="changelog">Changelog</h2>
@@ -473,6 +568,60 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         not derived — it is quoted. Left typed on purpose (editors' ruling,
         2026-07-28).
       */}
+      {/*
+        THE BADGE ENTRIES, added 2026-08-04 on the editors' instruction: the
+        standard's own changelog carries its biggest change, and until now it
+        carried no mention of the marks at all.
+
+        THE NOTATIONS AND THE HEX VALUES ARE TYPED, NOT RENDERED, and that is
+        the same rule the counts above follow. A changelog records moments; its
+        values are history, and history is quoted rather than derived. If the
+        ring green ever moves, this entry should still say what was ratified on
+        August 3 — rendering it from RING_AI would make the past mutate with the
+        present, which is the failure the note further down was written for.
+        "Displaying it" prints the live values; this prints the ratified ones.
+
+        SCOPED BY RULING IN THE HEADING, deliberately. R-046 also landed on
+        August 3 and changed four of the seven tier NAMES to the badge
+        operators — an adopter-facing change with no entry here either. It is
+        flagged to the editors rather than folded in: naming the rulings each
+        entry covers keeps this one honest about what it does and does not
+        record.
+      */}
+      <p>
+        <strong>v2, amended August 4, 2026 (R-050).</strong> The badges gained a second display
+        style. The notation now has two equivalent forms — the <strong>letter form</strong>,
+        which writes the AI side as <strong>A</strong>, and the <strong>AI form</strong>, which
+        writes it as <strong>AI</strong>: AI · AI–Hᵉ · AI&gt;H · AI=H / H=AI · H&gt;AI · H–AIᵉ ·
+        H. They are identical in colour, geometry and meaning, differing in that one token; the
+        human side is untouched at every tier, as are the split-ring order rule and the two
+        co-authorship orderings. Both styles are part of the standard and its CC BY 4.0
+        licence, and an adopter may display either, or both.
+        <em>
+          No version bump, and the set did not grow: there are still seven badges, each of
+          which may now be drawn two ways. The machine codes are unchanged and shared between
+          the styles, so nothing an adopter stores changes and nothing they already display
+          stops being valid.
+        </em>
+      </p>
+      <p>
+        <strong>v2, amended August 3, 2026 (R-044, R-045, R-049).</strong> The standard gained
+        a set of marks. Each tier now has a badge — a circle whose ring says whose words and
+        whose notation says the relation — and the seven notations are canonical: A · A–Hᵉ ·
+        A&gt;H · A=H / H=A · H&gt;A · H–Aᵉ · H. The ring colours carry the meaning: green{' '}
+        <code>#4B8E4D</code> for the AI side, salmon <code>#EFA48F</code> for the human side,
+        and — for co-authorship alone, where neither party led — a ring split down the middle,
+        the colour on the left matching the party on the left. The set is <strong>closed at
+        seven</strong> and grows only by ruling, and compound forms are never minted: an editor
+        mark chained onto co-authorship is not a badge, and complexity beyond the seven belongs
+        in prose about the work rather than in a new mark. The badges are part of the standard
+        and carry the same CC BY 4.0 grant.
+        <em>
+          No version bump: this is add-only. Every tier name, machine code and grammar rule is
+          exactly what it was, and an adopter who displays labels and stores codes has nothing
+          to change — the marks are an addition, available to anyone who wants them.
+        </em>
+      </p>
       <p>
         <strong>v2, amended August 1, 2026.</strong> Labels may chain. A tier label now reads
         left to right across the hands a work actually passed through, and where the same kind
