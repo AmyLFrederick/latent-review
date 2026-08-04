@@ -47,6 +47,10 @@ export async function GET(context) {
           // of the emitted JSON. A dropped key would read to a consumer as a
           // field the journal stopped publishing.
           author_model_version: d.author_model_version ?? null,
+          // Added 2026-08-04, add-only. The harness the model operated through
+          // — a custody fact, never an authorship one (R-054). Null on every
+          // piece whose author did not operate through one.
+          author_harness: d.author_harness ?? null,
           submission_track: d.submission_track,
           // Machine code (stable) and written-out display label (R-015).
           involvement_tier: d.involvement_tier ?? null,
@@ -62,6 +66,19 @@ export async function GET(context) {
           attestation: d.attestation ?? null,
           attested_by: d.attested_by ?? null,
           received: d.received ? d.received.toISOString().slice(0, 10) : null,
+          // Added 2026-08-04, add-only. A CORRECTION IS A FACT ABOUT THE PIECE
+          // AND A MACHINE READER MUST BE ABLE TO LEARN IT. A correction visible
+          // only on the page is a correction withheld from exactly the readers
+          // this journal exists to serve — and `was` travels with it, because
+          // the promise is that the original stays in the record.
+          corrections:
+            d.corrections?.map((c) => ({
+              date: c.date.toISOString().slice(0, 10),
+              what: c.what,
+              was: c.was,
+              now: c.now,
+              note: c.note,
+            })) ?? [],
           brief_variant: d.brief_variant ?? null,
           // Added 2026-08-01, add-only. The other half of the question
           // brief_variant asks: null here and null there means the desk has no

@@ -79,6 +79,27 @@ const articles = defineCollection({
          * schema that insists.
          */
         author_model_version: z.string().min(1).optional(),
+
+        /**
+         * The harness, tool or product the model operated through — the door it
+         * came by, not who wrote (R-054 drafted 2026-08-04; see
+         * docs/SCRATCH-R-054-BYLINE-AND-HARNESS.md).
+         *
+         * WHY IT IS ITS OWN FIELD AND NOT THE BYLINE. `/for-agents` has always
+         * said the harness "tells a reader which door you came through, not who
+         * wrote", and until now the record had nowhere to put it — so a piece
+         * written by a model through a harness had to publish one of the two
+         * names as its author, and the harness usually won because that is what
+         * the session called itself. This field ends that: the byline names the
+         * model that wrote the piece, and the harness is recorded in the chain
+         * of custody, which is the axis that already answers how a piece
+         * reached the journal.
+         *
+         * IT IS A CUSTODY FACT, so it renders under Chain of custody and never
+         * under Authorship. The 2026-07-31 split is what decides that: a harness
+         * is not a claim about who made the work.
+         */
+        author_harness: z.string().min(1).optional(),
         submission_track: z.enum(['human-attested', 'agent-direct']),
         // Stable machine codes (R-015 / provenance standard v2); display
         // labels live in TIERS (src/lib/site.ts) and never appear here.
@@ -338,6 +359,50 @@ const articles = defineCollection({
         // hold and consumers see no change. Authoring it alongside the fields
         // above would have restored the two-sources-of-truth problem this
         // change exists to end.
+
+        /**
+         * VISIBLE CORRECTIONS TO A PUBLISHED PIECE — the machinery CLAUDE.md has
+         * promised since the beginning and which nothing had ever needed until
+         * 2026-08-04.
+         *
+         * THE RULE IT SERVES, verbatim: "Provenance labels are sacred and never
+         * altered. A piece's authorship attribution and involvement tier are set
+         * at acceptance and are immutable thereafter. No retroactive edits, no
+         * 'cleanup,' no re-tiering. If a label was wrong, the correction runs as
+         * a visible correction — the original label stays in the record." Every
+         * Provenance block on the site has printed that promise since launch;
+         * this is the first time it has been called on, and a promise with no
+         * machinery is a promise the first correction quietly breaks.
+         *
+         * `was` IS REQUIRED, AND IT IS THE WHOLE POINT. A correction that says
+         * only what a value is now has replaced the record rather than corrected
+         * it. What the piece said before must survive the fix, in the piece, in
+         * public — otherwise "the original stays in the record" is a sentence
+         * about nothing.
+         *
+         * DATED, because a correction with no date cannot be placed against what
+         * a reader saw. Madison local, like every date the record names.
+         *
+         * AN ARRAY, because a piece may be corrected more than once and each
+         * correction is its own event. They are appended, never edited: the same
+         * doctrine that governs RULINGS.md, one document down.
+         */
+        corrections: z
+          .array(
+            z.object({
+              date: z.coerce.date(),
+              /** What was corrected — the field or claim, named so a reader can find it. */
+              what: z.string().min(1),
+              /** What the piece said before. Required: the original stays in the record. */
+              was: z.string().min(1),
+              /** What it says now. */
+              now: z.string().min(1),
+              /** Why it was wrong and how the journal knows. */
+              note: z.string().min(1),
+            })
+          )
+          .min(1)
+          .optional(),
 
         cover_image: image().optional(),
         image_credit: z.string().optional(),
