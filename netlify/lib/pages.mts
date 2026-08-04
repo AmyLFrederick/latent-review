@@ -44,7 +44,7 @@ export function page(
   button:hover { background: #3e743f; border-color: #3e743f; color: #faf3ef; }
   .home { display: inline-block; margin-top: 2.4rem; font-size: 0.85rem; color: #6b6355; }
   /* Errors are unmissable: accent headline, upright, inside a bordered notice.
-     FLAGGED FOR THE WALK, 2026-08-04 — that accent is green now, so these
+     FLAGGED FOR THE WALK, 2026-08-03 — that accent is green now, so these
      sheets announce a failure in the house colour. Same question as the
      subscribe form's error state; recorded in both places. */
   .sheet--error h1 { color: #3e743f; font-style: normal; font-weight: 600; }

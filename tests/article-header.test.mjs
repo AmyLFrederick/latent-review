@@ -43,7 +43,7 @@ test('the header renders the title through displayTitle, not raw', () => {
   assert.match(page, /<h1 class="article-title">\{displayTitle\(d\.title\)\}<\/h1>/);
 });
 
-// --- The unquoted display title is uniform (editors, 2026-08-04) ------------
+// --- The unquoted display title is uniform (editors, 2026-08-03) ------------
 
 test('every surface that displays a title displays the unquoted one', () => {
   // THE FAULT THIS EXISTS FOR. The article header stopped printing the cover's
