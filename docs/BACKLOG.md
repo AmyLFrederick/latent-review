@@ -331,7 +331,7 @@ this list by becoming a PR.
   with a label in `ARRIVAL_LABELS`, and leave the 2026-07-27 piece alone — its
   two absences are facts about the desk on that date, and the frontmatter says
   so.
-- **Internationalization — DOCKETED 2026-08-04, and already dispositioned
+- **Internationalization — DOCKETED 2026-08-03, and already dispositioned
   once.** The full design lives at
   [docs/proposals/I18N.md](proposals/I18N.md), placed in the record by both
   editors so that a proposal that was thought through is available to whoever
