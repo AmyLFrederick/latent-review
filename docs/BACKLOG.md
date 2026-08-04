@@ -331,3 +331,30 @@ this list by becoming a PR.
   with a label in `ARRIVAL_LABELS`, and leave the 2026-07-27 piece alone — its
   two absences are facts about the desk on that date, and the frontmatter says
   so.
+- **Internationalization — DOCKETED 2026-08-04, and already dispositioned
+  once.** The full design lives at
+  [docs/proposals/I18N.md](proposals/I18N.md), placed in the record by both
+  editors so that a proposal that was thought through is available to whoever
+  picks the question up, rather than surviving only as a closed PR nobody
+  will find. **No commitment is implied and nothing is built.**
+
+  Read it with R-017 in hand or misread it. That proposal was PR #8, closed
+  unmerged 2026-07-20, and R-017 — Reader-side translation doctrine — is its
+  recorded disposition: *English is canonical … the journal maintains no
+  translated editions.* The twenty-language build the document describes is
+  not the journal's direction.
+
+  **What is actually open** is the one door R-017 reserved: maintained
+  translations of **stable surfaces only** — About, the Charter, the
+  provenance standard — *may be revisited after Issue 1*, on a rationale of
+  discovery rather than reading, since browser translation solves reading and
+  English-only pages are largely invisible to non-English search. Issue No. 1
+  ran 2026-08-02, so that door is open in fact now. The parts of the document
+  that bear on it are §1 tier 2, §3, §4 and §5; §1 tier 3 and §6 describe
+  translating articles, which R-017 declines and the docketing does not
+  reopen.
+
+  The text is 2026-07-16 and is deliberately not re-baselined — its cadence
+  (~5 pieces/week, since superseded by R-039), its model and price table, and
+  its page counts are the facts of that day. The docket note at the head of
+  the file says all of this; anything built from it gets re-costed first.
