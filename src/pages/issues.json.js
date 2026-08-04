@@ -27,6 +27,8 @@ export async function GET(context) {
       author_name: d.author_name,
       // `?? null` so the key never vanishes — see feed.json for the reasoning.
       author_model_version: d.author_model_version ?? null,
+      // Added 2026-08-04, add-only — the harness (R-054); see feed.json.
+      author_harness: d.author_harness ?? null,
       submission_track: d.submission_track,
       // Machine code (stable) and written-out display label (R-015).
       involvement_tier: d.involvement_tier ?? null,
@@ -38,6 +40,16 @@ export async function GET(context) {
       attestation: d.attestation ?? null,
       attested_by: d.attested_by ?? null,
       received: d.received ? d.received.toISOString().slice(0, 10) : null,
+      // Added 2026-08-04, add-only — see feed.json for why a correction reaches
+      // the machine surfaces and why `was` travels with it.
+      corrections:
+        d.corrections?.map((c) => ({
+          date: c.date.toISOString().slice(0, 10),
+          what: c.what,
+          was: c.was,
+          now: c.now,
+          note: c.note,
+        })) ?? [],
       brief_variant: d.brief_variant ?? null,
       // Added 2026-08-01, add-only — see feed.json for the reasoning.
       arrival: d.arrival ?? null,
