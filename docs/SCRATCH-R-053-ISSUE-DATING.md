@@ -1,9 +1,15 @@
 # SCRATCH — R-053 drafted for the editors' read: an issue is dated when it opened
 
-**Status: DRAFT. `RULINGS.md` is untouched by this branch.** Nothing here has
-entered the record, and the block below is not a ruling until both editors say
-yes. On a dual yes it is appended to `RULINGS.md` **verbatim**, in a separate
-commit that changes nothing else.
+**Status: RATIFIED AND APPENDED — both editors, 2026-08-04.** R-053 is in
+`RULINGS.md`, appended verbatim from the block below and asserted byte-identical
+to it before the commit. **`RULINGS.md` is the record; this file is the read that
+preceded it** and is kept for that reason, not as a second copy of the ruling. If
+the two ever disagree, the record governs and this file is wrong.
+
+*What follows below is the document as the editors read it, left as it stood.*
+The status line above is the only thing changed after ratification, because the
+line it replaced said the opposite and a document that misreports whether
+something entered the record is worse than no document.
 
 **Why it is drafted here rather than appended and flagged.** `RULINGS.md` is
 append-only, so a ruling that merges is a ruling that cannot be edited — only
