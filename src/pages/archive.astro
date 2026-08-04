@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getIssues } from '../lib/issues';
-import { formatDate, tierLabel, tierDescription } from '../lib/site';
+import { formatDate, tierLabel, tierDescription, displayTitle } from '../lib/site';
 // @ts-expect-error — plain-JS module shared with the tests
 import { tierNotation } from '../lib/tier-badges.mjs';
 import TierLabel from '../components/TierLabel.astro';
@@ -90,7 +90,7 @@ function coverCredit(
                   </p>
                   {issue.cover ? (
                     <h3 class="issue-entry-title">
-                      <a href={`/issue/${issue.number}/`}>{issue.cover.data.title}</a>
+                      <a href={`/issue/${issue.number}/`}>{displayTitle(issue.cover.data.title)}</a>
                     </h3>
                   ) : (
                     <h3 class="issue-entry-title issue-entry-title--none">

@@ -3,11 +3,71 @@
    Editorial voice: serif. Provenance and machine-facing data: mono. */
 
 :root {
-  --paper: #f9f6ef;
-  --paper-raised: #fdfbf6;
+  /* THE GROUND, nudged toward pink (editors, 2026-08-04). It was #f9f6ef, a
+     yellow cream at hue 42°; it is now a blush cream at hue ~21°, at the same
+     lightness. The move is a few points of hue and nothing else — no darker, no
+     more saturated — because the requirement was a ground that still reads as
+     cream at a glance and reads as warm only when looked at.
+
+     THE JOURNAL'S TWO IDENTITY COLOURS ARE NOW THE PROVENANCE COLOURS: the sage
+     of the badge ring is the voice (see --accent below), and the blush of the
+     human half is the ground. Nothing about the badges changed to make that
+     true — the page moved to meet them. */
+  --paper: #faf3ef;
+  --paper-raised: #fefaf7;
   --ink: #1b1813;
   --ink-soft: #6b6355;
-  --accent: #7a2e22; /* oxblood */
+
+  /* THE ACCENT IS GREEN (editors, 2026-08-04), replacing the oxblood #7a2e22
+     everywhere it served — kickers, section names, links on hover, labels.
+
+     ONE GREEN, AND IT IS THE BADGE RING'S GREEN (editors' preview walk,
+     2026-08-04). --accent-bright and RING_AI in src/lib/tier-badges.mjs are the
+     same value, and that is the point of the system rather than a coincidence
+     worth tolerating: the journal's identity colour and its provenance colour
+     are one colour, so the ring around a tier and the name of a section are
+     visibly the same statement. A test asserts the two stay equal, because two
+     literals in two languages is exactly the pair that drifts.
+
+     MATCHED TO THE FRAMES, AND SETTLED. The first pass took the badge ring's
+     own #7d9153, a muted sage. Three walks against the eyeglasses the colour
+     comes from moved it through an apple-olive and an olive-avocado before the
+     human editor held the frames to a swatch chart and read the match off it:
+     #4b8e4d.
+
+     IT IS A TRUE GREEN, NOT AN OLIVE, and that is the substance of the ruling
+     rather than a detail of it. Hue 79.4° → 121.8° — every earlier candidate
+     was a yellow-green within a few degrees of the last, and the answer turned
+     out to be a different family altogether. Saturation is essentially where it
+     started at 31%, lightness at 43%.
+
+     THERE ARE THREE STOPS OF THAT ONE GREEN, AND THE REASON IS CONTRAST. At
+     3.63:1 the colour clears the 3:1 a rule or a ring needs and does not clear
+     the 4.5:1 that type needs, so type takes a darker stop of the SAME green —
+     same hue, same saturation, lower lightness, which is what makes the three
+     read as one colour used three ways rather than as three greens.
+
+       --accent-bright  #4b8e4d   3.63:1   the colour itself. NON-TEXT ONLY:
+                                           the badge rings, and rules whose
+                                           meaning is carried by the words
+                                           beside them.
+       --accent         #3e743f   5.07:1   all type. Clears 4.5:1 at the
+                                           12.75px kicker and at the 19.5px
+                                           floor of the section-name clamp,
+                                           neither of which is large text.
+       --accent-deep    #305b32   7.17:1   a filled button's hover; cream on
+                                           it clears 7:1.
+
+     NO FLAG IS OPEN ON THIS PALETTE, which was not true of the two candidates
+     before it. The apple-olive measured 2.63:1 and so sat under the threshold
+     WCAG sets for a graphical object a reader must perceive to understand the
+     content; that was recorded as a deliberate decision rather than an
+     oversight, and it is now moot. This green is the most legible of every
+     candidate walked, and nothing was traded to get there. */
+  --accent: #3e743f;
+  --accent-bright: #4b8e4d;
+  --accent-deep: #305b32;
+
   --hairline: #e0d8c6;
   --rule: #2a251c;
 

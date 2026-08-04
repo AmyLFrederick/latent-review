@@ -1,9 +1,10 @@
 ---
 // @ts-expect-error — plain-JS module shared with the tests
-import { badgeFor, badgeLabel, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_SUP_SIZE } from '../lib/tier-badges.mjs';
+import { badgeFor, badgeLabel, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_SUP_SIZE, BADGE_BOX, BADGE_SIZE_CHART } from '../lib/tier-badges.mjs';
 
-// One tier badge: a 58px circle, a 3px ring, the page's cream showing through,
-// and the tier's notation set in the house monospace.
+// One tier badge: a circle drawn in a 58-unit box with a 3-unit ring, the
+// page's cream showing through, and the tier's notation set in the house
+// monospace.
 //
 // SVG AND REAL TEXT, NOT AN IMAGE — a house requirement rather than a
 // preference. This journal is read by machines, and iconography a machine
@@ -13,7 +14,7 @@ import { badgeFor, badgeLabel, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, B
 // and description, because the glyph is an abbreviation and an abbreviation
 // must be able to say what it abbreviates.
 //
-// THE RING ENCODES WHOSE WORDS AND NOTHING ELSE. Sage for the AI side, salmon
+// THE RING ENCODES WHOSE WORDS AND NOTHING ELSE. Green for the AI side, salmon
 // for the human side, and — for co-authorship alone — a ring split down the
 // middle, drawn as two arcs rather than a gradient so the halves are exactly
 // equal and no reader has to judge where one colour becomes the other.
@@ -21,6 +22,42 @@ import { badgeFor, badgeLabel, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, B
 // GEOMETRY. The box is 58; the stroke is 3, so the radius is 27.5 and the ring
 // sits entirely inside the box rather than being clipped at the edges. The
 // split arcs run from top centre to bottom centre, one each way.
+//
+// THE COMPOSITION IS FIXED, AND IT IS FIXED IN CSS (editors, 2026-08-04). The
+// badge must behave like an image: one arrangement of ring and letters, scaled
+// as a unit, never reflowing internally at any viewport or in any container.
+// It was not doing that, and the cause was INHERITANCE.
+//
+// Every typographic property of an SVG <text> inherits from the HTML around it
+// unless the element declares its own. This mark declared four — family, size,
+// anchor, baseline — and inherited the rest, so the notation was set by
+// whatever surrounded it. Two concrete faults followed, both readable in the
+// source before anyone measured a pixel:
+//
+//   font-style. `.article-byline` is italic, so the notation on every article
+//   header rendered in ITALIC mono while the same badge on /provenance rendered
+//   upright. Italic changes both the slant and the advance widths, which is a
+//   run of letters sitting left of where the upright one sits.
+//
+//   text-transform. The kickers around these placements are uppercase, and a
+//   single inherited `text-transform` anywhere above the badge turns the editor
+//   superscript from `e` into `E` — silently changing what the notation says.
+//
+// So the fix is not a nudge to a coordinate. Every inheritable property that
+// can move a glyph is now DECLARED in the scoped stylesheet below — family,
+// size, style, weight, variant, stretch, letter-spacing, transform, anchor,
+// baseline, direction, writing-mode — and a declaration always beats an
+// inherited value. Nothing above the badge can reach inside it any more.
+//
+// The two per-badge numbers travel as custom properties on the <svg> rather
+// than as presentation attributes, because a presentation attribute is the
+// WEAKEST kind of declaration: any author rule that ever matched `.tier-badge
+// text` would beat it. As custom properties they are consumed by the rules
+// themselves, so the values and the pinning cannot come apart.
+//
+// See tests/tier-badges.test.mjs, which asserts the pinning is present. The
+// failure mode recurs the moment someone wraps a badge in a styled container,
+// which is a thing that happens to a component used in four places.
 
 interface Props {
   /** A tier from TIERS — its label and description become the accessible name. */
@@ -34,7 +71,9 @@ interface Props {
   /** Appended to the accessible name. Co-authorship uses it to say it is one tier. */
   labelSuffix?: string;
   /**
-   * Rendered diameter in px. 58 on the chart, 36 on an article header.
+   * Rendered diameter in px — BADGE_SIZE_CHART on /provenance,
+   * BADGE_SIZE_ARTICLE on an article header. Both live in tier-badges.mjs, so
+   * the placements can be enlarged together and the ratio between them tested.
    *
    * THE GEOMETRY SCALES, THE ENCODING DOES NOT. Ring weight and type size are
    * derived from this rather than fixed, so a smaller badge is the same mark
@@ -44,7 +83,7 @@ interface Props {
   size?: number;
 }
 
-const { tier, notation, labelSuffix = '', size = 58 } = Astro.props;
+const { tier, notation, labelSuffix = '', size = BADGE_SIZE_CHART } = Astro.props;
 
 const badge = badgeFor(tier.code);
 if (!badge) {
@@ -80,10 +119,11 @@ const split = splitRingSides(spoken);
 
 <svg
   class="tier-badge"
-  style={`--badge-size:${size}px`}
-  viewBox="0 0 58 58"
+  style={`--badge-size:${size}px;--badge-notation-size:${badge.size}px;--badge-sup-size:${BADGE_SUP_SIZE}px;--badge-ink:${BADGE_INK}`}
+  viewBox={`0 0 ${BADGE_BOX} ${BADGE_BOX}`}
   width={size}
   height={size}
+  preserveAspectRatio="xMidYMid meet"
   role="img"
   aria-label={accessibleName}
 >
@@ -97,7 +137,7 @@ const split = splitRingSides(spoken);
     badge.ring === 'split' ? (
       <>
         {/* Co-authorship, neither leading — and the halves follow the letters,
-            so A=H reads sage-then-salmon and H=A reads salmon-then-sage. */}
+            so A=H reads green-then-salmon and H=A reads salmon-then-green. */}
         <path
           d="M 29 1.5 A 27.5 27.5 0 0 0 29 56.5"
           fill="none"
@@ -116,21 +156,15 @@ const split = splitRingSides(spoken);
     )
   }
 
-  {/* dominant-baseline centres the run on the circle's axis without the
-      hand-tuned dy a font change would invalidate. */}
-  <text
-    x="29"
-    y="29"
-    text-anchor="middle"
-    dominant-baseline="central"
-    fill={BADGE_INK}
-    font-family="var(--font-mono)"
-    font-size={badge.size}
-    letter-spacing="0.5"
-  >
+  {/* THE ONLY THINGS SET HERE ARE THE TWO COORDINATES AND THE SUPERSCRIPT'S
+      OFFSET — geometry, in the box's own units. Every typographic property is
+      declared in the stylesheet below, for the reason set out at the top of
+      this file. dominant-baseline (there, not here) centres the run on the
+      circle's axis without the hand-tuned dy a font change would invalidate. */}
+  <text x={BADGE_BOX / 2} y={BADGE_BOX / 2}>
     {parts.map((part) =>
       part.sup ? (
-        <tspan font-size={BADGE_SUP_SIZE} dy={-badge.size * 0.34}>
+        <tspan class="badge-sup" dy={-badge.size * 0.34}>
           {part.text}
         </tspan>
       ) : (
@@ -145,11 +179,56 @@ const split = splitRingSides(spoken);
     display: block;
     flex: none;
     /* Sized by the caller, not by the viewport. The viewBox scales every part
-       of the mark together, so a 36px badge is the 58px one drawn smaller —
+       of the mark together, so a 35px badge is the 72.5px one drawn smaller —
        the ring keeps its proportion instead of thinning into a hairline. It
        does not respond to width, because a ring that thinned on a phone would
-       stop encoding anything. */
-    width: var(--badge-size, 58px);
-    height: var(--badge-size, 58px);
+       stop encoding anything.
+
+       THE BOX IS SQUARE AND STAYS SQUARE. min-width and max-width are not
+       belt-and-braces: a single `svg { max-width: 100% }` in any ancestor
+       stylesheet — a rule people write for exactly the reason they write it for
+       images — would squeeze the width while the height held, and the mark
+       would letterbox itself inside its own line. Both dimensions are stated
+       three ways so no later rule can make the box a rectangle. */
+    width: var(--badge-size, 72.5px);
+    height: var(--badge-size, 72.5px);
+    min-width: var(--badge-size, 72.5px);
+    min-height: var(--badge-size, 72.5px);
+    max-width: var(--badge-size, 72.5px);
+    max-height: var(--badge-size, 72.5px);
+  }
+
+  /* THE PIN. Everything an ancestor could otherwise reach into the notation and
+     change is declared here — see the note at the top of this file for the two
+     faults this was written for, italic mono on article headers and an
+     uppercased superscript. These are not defaults restated for tidiness; each
+     one is a property that inherits, and inheritance is what moved the letters.
+
+     The values are the ones the mark has always drawn at: the house mono, the
+     badge's own type size, half a unit of tracking, centred on both axes.
+     Sizes are in px, which inside a viewBox ARE the box's user units — so a
+     19px notation is 19 of the 58 units across, at every rendered size. */
+  .tier-badge text {
+    font-family: var(--font-mono);
+    font-size: var(--badge-notation-size);
+    font-style: normal;
+    font-weight: 400;
+    font-variant: normal;
+    font-stretch: normal;
+    letter-spacing: 0.5px;
+    word-spacing: normal;
+    text-transform: none;
+    text-anchor: middle;
+    dominant-baseline: central;
+    direction: ltr;
+    writing-mode: horizontal-tb;
+    fill: var(--badge-ink);
+  }
+
+  /* The editor superscript. Its own size, and nothing else — the vertical
+     offset is a dy in the markup, because it is geometry in box units rather
+     than typography. */
+  .tier-badge .badge-sup {
+    font-size: var(--badge-sup-size);
   }
 </style>

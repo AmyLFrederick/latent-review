@@ -42,6 +42,9 @@ import process from 'node:process';
 import MarkdownIt from 'markdown-it';
 import { createClient } from '@supabase/supabase-js';
 import { deriveVolumes, datelineFor } from '../src/lib/volume.mjs';
+// The mail displays titles to readers, so it prints the displayed form — the
+// same one the front page and the article header print (editors, 2026-08-04).
+import { displayTitle } from '../src/lib/display-title.mjs';
 
 // The absolute most recipients a single run will ever email. --cap may lower
 // it, never raise it. If the confirmed list outgrows this, raising the cap is
@@ -240,7 +243,7 @@ if (sections.length === 0) fail(`issue ${issueNumber} has no articles in ${DIGES
 
 const coverStory = issue.cover_story;
 const subject = coverStory
-  ? `The Latent Review — Issue No. ${issueNumber}: ${coverStory.title}`
+  ? `The Latent Review — Issue No. ${issueNumber}: ${displayTitle(coverStory.title)}`
   : `The Latent Review — Issue No. ${issueNumber}`;
 // R-016 as amended by R-043: the dateline is the three-part markless form —
 // cadence, volume/number, date — derived from the live index's dates exactly as
@@ -259,8 +262,12 @@ const dateline = datelineFor(volumeInfo.get(issueNumber), formatDate(issue.date)
 // centered column, no images, no tracking.
 const INK = '#1b1813';
 const INK_SOFT = '#6b6355';
-const ACCENT = '#7a2e22';
-const PAPER = '#f9f6ef';
+// The accent is the darker stop of the house green, not the ring green itself:
+// every use of it in this mail is TYPE — a 15px link, a 12px section kicker —
+// and the ring green does not clear 4.5:1 on the ground below. See the two
+// stops in src/styles/global.css.
+const ACCENT = '#3e743f';
+const PAPER = '#faf3ef';
 const HAIRLINE = '#e0d8c6';
 const RULE = '#2a251c';
 const SERIF = "Georgia, 'Times New Roman', serif";
@@ -270,7 +277,7 @@ function articleHtml(article, { isCover }) {
   const titleSize = isCover ? '26px' : '20px';
   return `
     <h2 style="margin:0 0 6px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
-      <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(article.title)}</a>
+      <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(displayTitle(article.title))}</a>
     </h2>
     <p style="margin:0 0 4px;font-family:${SERIF};font-style:italic;color:${INK_SOFT};font-size:15px;">
       By ${escapeHtml(article.author_name)}
@@ -328,7 +335,7 @@ function fullHtml(footerHtml) {
 
 function articleText(article) {
   return [
-    article.title,
+    displayTitle(article.title),
     `By ${article.author_name} · ${tierLabel(article)} (${article.author_model_version})`,
     '',
     stripTags(firstParagraph(article)),

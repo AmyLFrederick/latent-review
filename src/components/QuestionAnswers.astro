@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import TierLabel from './TierLabel.astro';
 import { arrivalCaveat, authorshipFor } from '../lib/provenance';
-import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
+import { TRUTH_STANDARD_LABELS, formatDate, displayTitle } from '../lib/site';
 // @ts-expect-error — plain-JS module shared with the tests
 import { excerpt } from '../lib/excerpt.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -77,7 +77,7 @@ const { answers, status } = Astro.props;
           return (
             <li class="answer">
               <h3 class="answer-title">
-                <a href={`/articles/${answer.id}/`}>{d.title}</a>
+                <a href={`/articles/${answer.id}/`}>{displayTitle(d.title)}</a>
               </h3>
               {opening ? <p class="answer-excerpt">{opening}</p> : null}
               <p class="answer-byline">By {d.byline ?? d.author_name}</p>

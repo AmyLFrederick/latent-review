@@ -172,8 +172,9 @@ const jsonLd = ldJson(
 
   .support-button:hover,
   .support-button:focus-visible {
-    /* Darker oxblood; cream stays well past 4.5:1 on both states. */
-    background: #5f231a;
+    /* The deep stop of the accent green; cream stays well past 4.5:1 on both
+       states (5.05:1 at rest, 7.2:1 here). */
+    background: var(--accent-deep);
     color: var(--paper);
     text-decoration: none;
   }

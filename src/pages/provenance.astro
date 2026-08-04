@@ -459,9 +459,11 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
 </Base>
 
 <style>
-  /* The badge column: as narrow as a 58px mark plus breathing room, so the
-     tier name still starts near the left edge and the chart still reads as a
-     table of words with marks beside them. */
+  /* The badge column: as narrow as the mark plus breathing room, so the tier
+     name still starts near the left edge and the chart still reads as a table
+     of words with marks beside them. The mark is 72.5px since 2026-08-04, and
+     co-authorship's pair is twice that plus a gap — which is why the stacking
+     breakpoint below moved out with it. */
   .tier-badge-cell {
     width: 1%;
     white-space: nowrap;
@@ -545,8 +547,16 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
 
      This is the only media query in the codebase. The layout is otherwise
      fluid, and it stays that way — the breakpoint exists because a rigid label
-     has a width that fluidity cannot argue with. */
-  @media (max-width: 24rem) {
+     has a width that fluidity cannot argue with.
+
+     MOVED 24rem → 30rem ON 2026-08-04, because the badges grew a quarter and
+     the rigid width grew with them. Co-authorship's cell is two 72.5px marks
+     and a gap — 153px, up from 124px — and between the old breakpoint and about
+     30rem that left the tier name and the description sharing what was left of
+     a phone's measure. The badges are the reason the number moved, so the
+     number moves with them rather than the chart being allowed to crush its own
+     text. */
+  @media (max-width: 30rem) {
     .stackable,
     .stackable tbody,
     .stackable tr,
@@ -601,7 +611,9 @@ import { CO_AUTHORSHIP_CODE, CO_AUTHORSHIP_ORDERINGS } from '../lib/tier-badges.
      asked of them without first reading the standard around it. */
   .how-block {
     border: 1px solid var(--hairline);
-    border-left: 3px solid var(--accent);
+    /* A rule, not type — the ring green itself, per the two stops in
+       global.css. On this page especially: the mark it echoes is overhead. */
+    border-left: 3px solid var(--accent-bright);
     background: var(--paper-raised);
     padding: 1rem 1.25rem;
     margin: 1rem 0 1.4rem;

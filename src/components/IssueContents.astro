@@ -1,5 +1,5 @@
 ---
-import { sectionUrl } from '../lib/site';
+import { sectionUrl, displayTitle } from '../lib/site';
 import type { Issue } from '../lib/issues';
 
 // The body of an issue: the contents, and nothing else. Rendered identically on
@@ -59,8 +59,14 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
         <ol class="contents-list">
           {contents.map((article) => (
             <li class="contents-item">
+              {/* Unquoted, like every other display of a title (editors,
+                  2026-08-04). The cover's stored title carries quotation marks
+                  because the title IS a quotation, and this listing was still
+                  printing them after the article header stopped — so the front
+                  page and the piece disagreed about the piece's own name. The
+                  data is untouched; see displayTitle. */}
               <a class="contents-title" href={`/articles/${article.id}/`}>
-                {article.data.title}
+                {displayTitle(article.data.title)}
               </a>
               <p class="meta-mono contents-meta">
                 <a href={sectionUrl(article.data.section)}>{article.data.section}</a> · By{' '}

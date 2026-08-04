@@ -409,7 +409,9 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
 
 <style>
   .no-voice {
-    border-left: 3px solid var(--accent);
+    /* A rule, not type — so it takes the ring green itself rather than the
+       darker text stop. See the two stops in global.css. */
+    border-left: 3px solid var(--accent-bright);
     padding-left: 1.1rem;
   }
 
@@ -481,8 +483,9 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
 
   .give:hover,
   .give:focus-visible {
-    /* Darker oxblood; cream stays well past 4.5:1 on both states. */
-    background: #5f231a;
+    /* The deep stop of the accent green; cream stays well past 4.5:1 on both
+       states (5.05:1 at rest, 7.2:1 here). */
+    background: var(--accent-deep);
     color: var(--paper);
     text-decoration: none;
   }

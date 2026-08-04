@@ -16,16 +16,37 @@
 // notation drifted from the tier it marks is exactly the failure worth testing
 // for.
 
-/** The ring encodes whose words, and only that. */
-export const RING_AI = '#7d9153'; // sage green
+/**
+ * The ring encodes whose words, and only that.
+ *
+ * RING_AI IS ALSO THE JOURNAL'S ACCENT — it is `--accent-bright` in
+ * src/styles/global.css, and the two are the same value on purpose (editors'
+ * preview walk, 2026-08-04). The identity colour and the provenance colour are
+ * one colour, so the ring around a tier and the name of a section are visibly
+ * the same statement. It cannot be shared as a literal across a stylesheet and
+ * a JS module, so the suite asserts the two are equal instead; two hex values in
+ * two languages is exactly the pair that drifts.
+ *
+ * MATCHED TO THE FRAMES, AND SETTLED (editors, 2026-08-04). It was #7d9153, a
+ * muted sage picked to sit beside the salmon. Three walks against the eyeglasses
+ * the colour comes from moved it through an apple-olive and an olive-avocado
+ * before the human editor held the frames to a swatch chart and read the match
+ * off it: #4b8e4d.
+ *
+ * IT IS A TRUE GREEN, NOT AN OLIVE, and that is the substance of the ruling
+ * rather than a detail of it. Hue 79.4° → 121.8° — the earlier candidates were
+ * all yellow-greens a few degrees apart, and the answer was a different family.
+ * Saturation is essentially unchanged at 31%, lightness at 43%.
+ */
+export const RING_AI = '#4b8e4d'; // the journal's green — and the site's accent
 export const RING_HUMAN = '#efa48f'; // salmon pink
 
 /**
  * THE SPLIT RING MIRRORS THE NOTATION — the colour on the left matches the
  * letter on the left (editors, 2026-08-03).
  *
- *   A=H   sage left, salmon right
- *   H=A   salmon left, sage right
+ *   A=H   green left, salmon right
+ *   H=A   salmon left, green right
  *
  * WHY IT IS DERIVED AND NOT DECLARED. Co-authorship is the one tier whose
  * notation an author may order either way, and the ring is the same statement
@@ -51,13 +72,45 @@ export function splitRingSides(notation) {
   };
 }
 
-/** Notation ink — dark olive-green, as ratified with the mockup. */
-export const BADGE_INK = '#3f4a33';
+/**
+ * Notation ink — dark olive-green, as ratified with the mockup and DARKENED a
+ * step on 2026-08-04 for legibility (#3f4a33 → #303927).
+ *
+ * MODESTLY, AND AT THE SAME HUE. Hue 89° and saturation 19% are unchanged; the
+ * lightness drops from 24.5% to 18.8%. Against the ground the notation reads at
+ * 11.0:1 where it read at 8.5:1 — both clear AA, and the point was never the
+ * threshold but the letters at 19px inside a ring. The badges also grew a
+ * quarter in the same pass, which does most of this work on its own; this is
+ * the remainder, deliberately small.
+ */
+export const BADGE_INK = '#303927';
+
+/**
+ * THE RENDERED DIAMETERS, one per placement, ENLARGED A QUARTER 2026-08-04.
+ *
+ *   chart     58 → 72.5   (/provenance)
+ *   article   28 → 35     (the byline on an article header)
+ *
+ * EXACTLY 1.25, AND THE FRACTION IS KEPT. 72.5 rather than 72 or 73, because
+ * the ratio is the ruling and a rounded number would make the two placements
+ * grow by different amounts — the chart by 24.1%, the header by 25%. Half a
+ * pixel costs nothing on a mark whose every part is derived from the box.
+ *
+ * BADGE_BOX IS NOT A SIZE. It is the viewBox — the coordinate system the mark
+ * is drawn in — and it does not move when the rendered sizes do. That is what
+ * makes an enlargement a scale rather than a redraw: ring weight, type size and
+ * the superscript's offset are all fixed in these units, so every placement is
+ * the same composition at a different magnification.
+ */
+export const BADGE_BOX = 58;
+export const BADGE_SCALE_2026_08_04 = 1.25;
+export const BADGE_SIZE_CHART = 72.5;
+export const BADGE_SIZE_ARTICLE = 35;
 
 /**
  * The badge for each tier, keyed by the tier code the record actually stores.
  *
- * `ring`: 'ai' | 'human' | 'split'. A split ring is half sage, half salmon, and
+ * `ring`: 'ai' | 'human' | 'split'. A split ring is half green, half salmon, and
  * belongs to co-authorship alone — where neither party led, so neither colour
  * may take the whole circle.
  *

@@ -315,12 +315,26 @@ const currentIssue = await getCurrentIssue();
     padding-top: 1.5rem;
   }
 
+  /* The interior pages' wordmark, in the journal's green like the grand one on
+     the front page, and in the same DEEPER stop it took on the editors' walk of
+     2026-08-05 — the colour the COVER kicker wears. At 1.6rem, 27px against a
+     17px root, this is the smaller of the two mastheads and so the one that
+     would have decided the question had it been a legibility question; it is
+     not. Both stops clear what a 27px heading answers to, and the editors chose
+     on weight: the name reads as printed rather than lit. */
   .masthead-compact-title {
     font-family: var(--font-display);
     font-size: 1.6rem;
     font-weight: 600;
     text-align: center;
     margin: 0.9rem 0 0;
+    color: var(--accent);
+  }
+
+  /* As on the grand masthead: the global a:hover resolves to --accent, which
+     this now already is, so the hover has to go a stop deeper to exist at all. */
+  .masthead-compact-title a:hover {
+    color: var(--accent-deep);
   }
 
   .masthead-compact-title a {
@@ -396,17 +410,35 @@ const currentIssue = await getCurrentIssue();
     padding-bottom: 0.55rem;
   }
 
+  /* THE SECTION LABELS TAKE THE JOURNAL'S GREEN (editors, 2026-08-04),
+     completing the identity with the wordmark above them.
+
+     THEY TAKE THE DARKER STOP, AND IT IS NOT A CLOSE CALL. These are 0.72rem —
+     12.24px against a 17px root — uppercase at weight 600, which is ordinary
+     text by every measure WCAG uses: nothing near the 24px large-text
+     threshold, and 600 is not the bold that would lower it to 18.66px. So they
+     answer to 4.5:1, and the colour itself measures 3.63:1. The gap is wide
+     rather than marginal, which is why this needs no judgment: the bright stop
+     would fail the smallest persistent type on the site, on every page.
+     --accent is that same green darkened to 5.07:1.
+
+     THE HOVER GOES DEEPER RATHER THAN BRIGHTER. The links used to sit in
+     ink-soft and light up to the accent on hover; now that they rest in the
+     accent, the hover has to move somewhere, and --accent-deep keeps it inside
+     the one colour. Brightening to --accent-bright would have been the other
+     option and is wrong here twice: it would drop a hovered label to 3.63:1,
+     and it would make the hover state the least legible of the two. */
   nav a {
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--ink-soft);
+    color: var(--accent);
   }
 
   nav a:hover {
-    color: var(--accent);
+    color: var(--accent-deep);
   }
 
   footer {
@@ -482,8 +514,9 @@ const currentIssue = await getCurrentIssue();
   .footer-support {
     /* A link, not a box — but one a stranger finds on first scan:
        stepped up from the surrounding footer text, in the site's
-       letterspaced-caps voice, with air around it so the crimson
-       registers. */
+       letterspaced-caps voice, with air around it so the colour
+       registers. (It said "the crimson" until 2026-08-05, which the
+       palette stopped being three greens ago.) */
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.14em;
@@ -506,8 +539,27 @@ const currentIssue = await getCurrentIssue();
     margin-top: clamp(8rem, 16vw, 14rem);
   }
 
+  /* SUPPORT TAKES THE BRIGHT STOP, the half of the 2026-08-05 trade that sent
+     the wordmark deeper. It is the one place on the site where the colour
+     itself is set as running text, and that is the editors' call rather than an
+     oversight — it is flagged here because a later session reading the contrast
+     table in global.css will find this rule contradicting it.
+
+     THE NUMBERS: this line is 0.9rem — 15.3px against a 17px root — uppercase
+     at weight 600. That is ordinary text, not large text: it is nowhere near
+     24px, and 600 is not the bold that would lower the threshold to 18.66px. So
+     it answers to 4.5:1 and #4b8e4d gives 3.63:1. The gap is real.
+
+     WHAT WOULD CLOSE IT, if the editors would rather it did: 1.1rem at weight
+     700 makes this large text at 18.7px, where 3:1 applies and the bright stop
+     clears it — a visibly bolder Support line, no change of colour. The other
+     routes are to take --accent back (5.07:1, which is the state this replaced)
+     or to leave it as ruled.
+
+     The hover is untouched and helps rather than hurts: the global a:hover
+     resolves to --accent, so hovering this link DARKENS it to 5.07:1. */
   .footer-support a {
-    color: var(--accent);
-    text-decoration-color: var(--accent);
+    color: var(--accent-bright);
+    text-decoration-color: var(--accent-bright);
   }
 </style>

@@ -43,6 +43,52 @@ test('the header renders the title through displayTitle, not raw', () => {
   assert.match(page, /<h1 class="article-title">\{displayTitle\(d\.title\)\}<\/h1>/);
 });
 
+// --- The unquoted display title is uniform (editors, 2026-08-04) ------------
+
+test('every surface that displays a title displays the unquoted one', () => {
+  // THE FAULT THIS EXISTS FOR. The article header stopped printing the cover's
+  // quotation marks on 2026-08-03 and nothing else did, so the front page's own
+  // listing named the piece one way and the piece named itself another. The
+  // sweep is only worth doing once; this is what keeps a NEW surface from
+  // reintroducing the split.
+  const surfaces = [
+    ['src/components/IssueContents.astro', /\{displayTitle\(article\.data\.title\)\}/],
+    ['src/components/ArticleCard.astro', /\{displayTitle\(d\.title\)\}/],
+    ['src/components/QuestionAnswers.astro', /\{displayTitle\(d\.title\)\}/],
+    ['src/pages/archive.astro', /\{displayTitle\(issue\.cover\.data\.title\)\}/],
+    ['src/pages/topics.astro', /\{displayTitle\(article\.data\.title\)\}/],
+    ['src/pages/articles/[slug]/as-submitted.astro', /displayTitle\(submittedTitle\)/],
+    ['scripts/send-issue.mjs', /displayTitle\(coverStory\.title\)/],
+  ];
+  for (const [file, pattern] of surfaces) {
+    assert.match(readFileSync(repoPath(file), 'utf8'), pattern, `${file} displays a raw title`);
+  }
+});
+
+test('the browser tab agrees with the page it titles', () => {
+  // A reader who saw the piece named one way on the page and another way in the
+  // tab would reasonably conclude one of them was wrong.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  assert.match(page, /title=\{displayTitle\(d\.title\)\}/);
+});
+
+test('the machine-facing surfaces still carry the recorded title', () => {
+  // THE OTHER HALF OF THE RULING, and the more important half. The marks are
+  // part of the recorded title because the title IS a quotation; a sweep that
+  // reached the feeds would be editing the record to match a display
+  // convention. The test is who is reading — a person, or a parser.
+  for (const file of [
+    'src/pages/rss.xml.js',
+    'src/pages/llms.txt.js',
+    'src/lib/structured-data.ts',
+  ]) {
+    assert.ok(
+      !readFileSync(repoPath(file), 'utf8').includes('displayTitle'),
+      `${file} is machine-facing and must carry the title as recorded`
+    );
+  }
+});
+
 test('the header carries no date line, and no title attribution', () => {
   // R-048: pieces belong to issues and the issue carries the date. The date
   // itself is asserted present in the Provenance block below, so this is a
