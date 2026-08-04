@@ -1,6 +1,6 @@
 ---
 // @ts-expect-error — plain-JS module shared with the tests
-import { badgeFor, badgeLabel, badgeSupSize, badgeChartSize, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_BOX } from '../lib/tier-badges.mjs';
+import { badgeFor, badgeLabel, badgeSupSize, badgeChartSize, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_BOX, BADGE_RING_STROKE } from '../lib/tier-badges.mjs';
 
 // One tier badge: a circle drawn in a 58-unit box with a 3-unit ring, the
 // page's cream showing through, and the tier's notation set in the house
@@ -170,17 +170,17 @@ const split = splitRingSides(spoken);
           d="M 29 1.5 A 27.5 27.5 0 0 0 29 56.5"
           fill="none"
           stroke={split.left}
-          stroke-width="3"
+          stroke-width={BADGE_RING_STROKE}
         />
         <path
           d="M 29 1.5 A 27.5 27.5 0 0 1 29 56.5"
           fill="none"
           stroke={split.right}
-          stroke-width="3"
+          stroke-width={BADGE_RING_STROKE}
         />
       </>
     ) : (
-      <circle cx="29" cy="29" r="27.5" fill="none" stroke={ringColor} stroke-width="3" />
+      <circle cx="29" cy="29" r="27.5" fill="none" stroke={ringColor} stroke-width={BADGE_RING_STROKE} />
     )
   }
 
