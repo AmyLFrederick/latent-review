@@ -1,7 +1,12 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
-import { SITE_TITLE, formatDate, displayTitle } from '../../../lib/site';
+import { SITE_TITLE, TIERS, formatDate, displayTitle } from '../../../lib/site';
+import TierBadge from '../../../components/TierBadge.astro';
+// @ts-expect-error — plain-JS module shared with the tests
+import { badgeArticleSize } from '../../../lib/tier-badges.mjs';
+// @ts-expect-error — plain-JS module shared with the tests
+import { bylineBadgeTier } from '../../../lib/byline-badge.mjs';
 import { assertFullTextsPaired } from '../../../lib/full-text';
 
 // THE PIECE AS IT ARRIVED, at a permanent public URL beside the piece itself.
@@ -41,6 +46,10 @@ const { entry, article } = Astro.props;
 const d = article.data;
 const { Content } = await render(entry);
 
+// The same badge the published piece carries, from the same module. See the
+// note at the byline below.
+const bylineBadge = bylineBadgeTier(d, TIERS, article.id);
+
 // THE PAGE HEADS WITH THE TITLE THE PIECE ARRIVED UNDER (R-037). It used to head
 // with the published title unconditionally, which was harmless while the only
 // treatment was condensing — the titles matched — and is the whole failure on a
@@ -69,7 +78,27 @@ const submittedTitleShown = displayTitle(submittedTitle);
     <header class="page-header">
       <p class="kicker">As submitted</p>
       <h1>{submittedTitleShown}</h1>
-      <p class="article-byline">By {d.author_name}</p>
+      {/*
+        THE BADGE BELONGS HERE TOO, and its absence was the second half of what
+        the editors found (2026-08-04). This page prints a byline and had never
+        printed a mark beside it — not a section that forgot but a whole
+        template that did, on every piece it ever rendered. The rule was in the
+        article template, so it governed the article template.
+
+        IT ASKS THE SAME MODULE AND GETS THE SAME ANSWER. Nothing about the
+        badge is decided here; that is the point of src/lib/byline-badge.mjs. A
+        third byline surface would ask it too.
+      */}
+      <p class="article-byline">
+        {bylineBadge ? (
+          <TierBadge
+            tier={bylineBadge.tier}
+            size={badgeArticleSize()}
+            labelSuffix={bylineBadge.labelSuffix}
+          />
+        ) : null}
+        <span>By&#160;{d.author_name}</span>
+      </p>
       {
         retitled && (
           <p class="page-note retitled-note">

@@ -1,6 +1,6 @@
 ---
 // @ts-expect-error — plain-JS module shared with the tests
-import { badgeFor, badgeLabel, badgeSupSize, badgeChartSize, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_BOX, BADGE_RING_STROKE } from '../lib/tier-badges.mjs';
+import { badgeFor, badgeLabel, badgeSupSize, badgeChartSize, splitRingSides, RING_AI, RING_HUMAN, BADGE_INK, BADGE_BOX, BADGE_RING_STROKE, HOUSE_BADGE_FORM } from '../lib/tier-badges.mjs';
 
 // One tier badge: a circle drawn in a 58-unit box with a 3-unit ring, the
 // page's cream showing through, and the tier's notation set in the house
@@ -80,8 +80,9 @@ interface Props {
   labelSuffix?: string;
   /**
    * Which of the standard's two display styles to draw — 'letter' (`A>H`) or
-   * 'ai' (`AI>H`). Both are canonical (R-050); this journal's own pages set the
-   * letter form, so that is the default here rather than the correct one.
+   * 'ai' (`AI>H`). Both are canonical (R-050); the default is HOUSE_BADGE_FORM,
+   * which is what this journal sets rather than what is correct. A surface
+   * teaching both — the chart at /provenance — names the form it wants.
    *
    * IT IS NOT CALLED `style`. That name reads as CSS on a component that also
    * emits a style attribute, and the ruling's own word for the distinction is
@@ -107,7 +108,7 @@ interface Props {
   size?: number;
 }
 
-const { tier, notation, labelSuffix = '', form = 'letter', size } = Astro.props;
+const { tier, notation, labelSuffix = '', form = HOUSE_BADGE_FORM, size } = Astro.props;
 
 const badge = badgeFor(tier.code, form);
 if (!badge) {

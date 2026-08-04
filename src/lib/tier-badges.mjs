@@ -182,6 +182,29 @@ export const BADGE_STYLES = ['letter', 'ai'];
 export const BADGE_STYLE_NAMES = { letter: 'letter form', ai: 'AI form' };
 
 /**
+ * THE HOUSE FORM — what this journal's own pages set, amended to the AI form on
+ * 2026-08-04 under R-050's own clause ("unless the editors rule otherwise").
+ *
+ * IT IS ONE CONSTANT AND EVERY DEFAULT IN THIS MODULE READS IT. That is the
+ * point of it existing rather than the word 'ai' appearing at six call sites:
+ * a house form the editors can change is a house form that changes everywhere
+ * in one edit, and a surface added next month takes it without anyone
+ * remembering to. The chart at /provenance is the one place that names a form
+ * explicitly, because it is teaching both and must not follow the house.
+ *
+ * IT REACHES THE COMPACT NOTATION TOO, and it has to. The badge and the string
+ * are two renderings of one tier, and they meet on a single page: an article
+ * header carries the mark and the Provenance block beneath it carries the
+ * notation. A house form that moved one and not the other would have a piece
+ * calling itself `AI>H` at the top of the page and `A>H` a screen further down.
+ *
+ * THIS IS A HOUSE CHOICE AND NOT A RANKING. Both forms are canonical, both are
+ * licensed, and an adopter takes whichever suits them; this constant says only
+ * which one The Latent Review prints.
+ */
+export const HOUSE_BADGE_FORM = 'ai';
+
+/**
  * THE TOKEN, AND THE ONLY DIFFERENCE BETWEEN THE FORMS. The AI side is written
  * `AI`; the human side is untouched, in both forms, in every tier.
  *
@@ -249,15 +272,29 @@ export const BADGE_SUP_SIZE_AI = BADGE_SUP_SIZE / AI_FORM_SCALE;
 const BADGE_TABLES = { letter: TIER_BADGES, ai: TIER_BADGES_AI };
 
 /** The superscript size for a style. */
-export function badgeSupSize(style = 'letter') {
+export function badgeSupSize(style = HOUSE_BADGE_FORM) {
   assertStyle(style);
   return style === 'ai' ? BADGE_SUP_SIZE_AI : BADGE_SUP_SIZE;
 }
 
 /** The chart's rendered diameter for a style. */
-export function badgeChartSize(style = 'letter') {
+export function badgeChartSize(style = HOUSE_BADGE_FORM) {
   assertStyle(style);
   return style === 'ai' ? BADGE_SIZE_CHART_AI : BADGE_SIZE_CHART;
+}
+
+/**
+ * The article header's rendered diameter for a style.
+ *
+ * A FUNCTION RATHER THAN A CONSTANT AT THE CALL SITE, for the reason the chart's
+ * is: the byline set BADGE_SIZE_ARTICLE by name until 2026-08-04, which was
+ * exactly right while the house form was the letter form and became a badge a
+ * quarter too small the moment it was not. A placement asks for its size by
+ * placement and lets the form supply the number.
+ */
+export function badgeArticleSize(style = HOUSE_BADGE_FORM) {
+  assertStyle(style);
+  return style === 'ai' ? BADGE_SIZE_ARTICLE_AI : BADGE_SIZE_ARTICLE;
 }
 
 /**
@@ -307,13 +344,13 @@ export const CO_AUTHORSHIP_ORDERINGS = ['A=H', 'H=A'];
 export const CO_AUTHORSHIP_ORDERINGS_AI = CO_AUTHORSHIP_ORDERINGS.map(toAiForm);
 
 /** The orderings for a style. */
-export function coAuthorshipOrderings(style = 'letter') {
+export function coAuthorshipOrderings(style = HOUSE_BADGE_FORM) {
   assertStyle(style);
   return style === 'ai' ? CO_AUTHORSHIP_ORDERINGS_AI : CO_AUTHORSHIP_ORDERINGS;
 }
 
 /** The badge for a tier code in a style, or undefined — never a silent default. */
-export function badgeFor(code, style = 'letter') {
+export function badgeFor(code, style = HOUSE_BADGE_FORM) {
   assertStyle(style);
   return BADGE_TABLES[style][code];
 }
@@ -388,7 +425,7 @@ const NOTATION_TABLES = { letter: TIER_NOTATION, ai: TIER_NOTATION_AI };
  * (R-035 clause 6) — so this returns null for a case the record cannot yet
  * hold, and the fallback exists for the day it can.
  */
-export function tierNotation(code, style = 'letter') {
+export function tierNotation(code, style = HOUSE_BADGE_FORM) {
   assertStyle(style);
   return NOTATION_TABLES[style][code] ?? null;
 }

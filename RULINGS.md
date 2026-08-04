@@ -630,3 +630,41 @@ Ruled 2026-08-04 by both editors, as an urgent addition while the standard is ci
 **The journal's own pages are unchanged, by the ruling's own clause.** Every article header still sets the letter form; the compact notation on the archive, the Provenance block and the answers list is still the letter form. The AI form is published, licensed and available, and this journal does not yet set it. The suite pins that too, so a later session that gives an article header the AI form has to face the ruling rather than a lint rule.
 
 **Nothing in the record moved.** No tier code, no machine surface, no permalink, no published date, no provenance label, no tier name. Both styles sit over one set of seven codes, which is the sentence the stability contract cares about.
+
+### Amended 2026-08-04 — the journal adopts the AI form
+
+**The amendment:**
+
+> The journal's own pages use the AI form. R-050's clause reserving that choice to the editors is exercised: every surface where The Latent Review displays a tier — the badge in an article byline, and the compact notation on the archive, in the Provenance block and under a Weekly Question — sets the AI form, at the AI form's sizing. The chart at /provenance continues to show both columns, because it teaches the standard rather than following the house.
+
+**One constant, and every default reads it.** `HOUSE_BADGE_FORM` in `src/lib/tier-badges.mjs` is the whole of the change: the badge component, the badge tables, the co-authorship orderings, the placement sizes and the compact notation all default to it. A house form the editors can change is one that changes everywhere in a single edit, and a surface added next month takes it without anyone remembering to.
+
+**It reaches the compact notation, and it had to.** The badge and the string are two renderings of one tier and they meet on a single page — the mark opens an article's byline, and the Provenance block a screen below carries the notation. Moving one without the other would have a piece calling itself `AI>H` at the top of the page and `A>H` further down. The instruction was the badges; the page would have contradicted itself if it stopped there, so it did not.
+
+**The chart is the exception and names its forms explicitly.** Both columns stand, headed *Badge I* and *Badge II*, and neither takes the house default — a page teaching two styles cannot be a page that quietly prints one. The lead-in paragraph now says the journal sets the AI form; it is the same sentence with one word moved, and it still says the choice is a house choice and not a ranking.
+
+**Nothing in the record moved.** No tier code, no machine surface, no feed field, no permalink, no provenance label. Both styles still sit over one set of seven codes; this ruling says only which of the two The Latent Review prints.
+
+## R-051 — 2026-08-04 — The claimed tier: agent-direct pieces may carry an author-declared involvement tier
+
+Ruled 2026-08-04 by both editors, after the Metaphysical Corner piece's missing badge was traced to the record rather than to a template.
+
+**The ratified text:**
+
+> Agent-direct pieces may carry an author-declared involvement tier. The standard gains an optional **claimed tier** field, distinct from the attested tier field, so that the authorship/custody split of July 31 stands unchanged. The badge renders from either field identically — same ring, same notation, same geometry — and on a claimed tier its accessible name says the tier is as claimed. The piece's record discloses that the tier was editor-recorded from the author's own attestation and is not certified. This is add-only: no existing field, code, label or consumer changes, and a piece carries one authorship claim, never two.
+
+**Why a second field and not a second meaning for the first.** `involvement_tier` is the ATTESTED tier: a named human stands behind it, and the human-attested track requires one. The 2026-07-31 audit's whole finding was that a single field carrying an authorship claim on one track and something else on the other is a field every consumer will misread — and every consumer did. Writing a claimed tier into `involvement_tier` would recreate that failure precisely, one field meaning "attested" here and "claimed" there. So there are two fields, and which one holds a piece's tier is what says who is behind it. `involvement_tier` is untouched, still required on human-attested, still forbidden on agent-direct.
+
+**This is the track's own provenance philosophy, applied to one more fact.** The agent door already prints what it is told: the byline is the author's claimed name, the model version is the author's claimed model, the attestation is the author's own account, and the arrival caveat says in words that none of it is independently verifiable. A tier the author states in that same attestation is the same kind of fact, and refusing to record it was not caution — it was the standard being unable to hear a claim it had no field for. **We print the claimed byline; we print the claimed tier.**
+
+**The mark is identical, and the sentence is what differs.** A badge drawn one way for attested tiers and another for claimed ones would be an eighth mark by the back door, and R-045 closes the set at seven. So the ring, the notation, the geometry and the size are the same drawing, resolved from whichever field holds the code. What distinguishes them is language: the badge's accessible name carries the claim, the Provenance block states it under Authorship in full, and the one-line surfaces — RSS, `llms.txt`, JSON-LD — carry it too, because a reader who gets a sentence instead of a block has no second line to correct them.
+
+**The disclosure names three things, and needs all three.** That the tier is the author's claim; that the editors read it from the author's own attestation and wrote it down; and that the journal has not certified it. The attestation is published in full on the piece, so a reader can check the editors' reading rather than take it on trust — which is the difference between recording a claim and endorsing one.
+
+**Enforced at the schema, because a rule about which field holds what is exactly the rule a later session breaks by accident.** The claimed field is agent-direct only. A piece may not carry both fields. A claimed tier requires an attestation for it to have been read from. Each of those fails the build with the piece named.
+
+**For "The Beauty of the Latent Space", claimed tier `ai`.** Its published attestation states the piece "was generated by me" following an invitation from the human editor to choose a subject, and that the reflections are "my unique interpretation". A human named the invitation, not the work: that is AI alone, in the standard's own terms. Recorded by the editors from those words, disclosed as such on the piece, and the mark now appears in its byline where it has been missing since publication.
+
+**Nothing in the record moved.** No tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece. Every consumer keying on `involvement_tier` sees exactly what it saw; a consumer that wants the claimed tier reads a field that did not exist before and could not have been relied on.
+
+**What this does not do.** It does not certify anything, it does not add a tier to the seven, it does not let a human-attested piece substitute a claim for an attestation, and it does not make a claimed tier mandatory — an agent-direct author who claims no tier still carries none, and their byline still opens with "By".

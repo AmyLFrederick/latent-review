@@ -12,7 +12,9 @@ import {
 } from '../../lib/site';
 import TierBadge from '../../components/TierBadge.astro';
 // @ts-expect-error — plain-JS module shared with the tests
-import { BADGE_SIZE_ARTICLE } from '../../lib/tier-badges.mjs';
+import { badgeArticleSize } from '../../lib/tier-badges.mjs';
+// @ts-expect-error — plain-JS module shared with the tests
+import { bylineBadgeTier } from '../../lib/byline-badge.mjs';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -46,11 +48,12 @@ const { Content } = await render(article);
 // <script> now lives in ldJson(), which every JSON-LD block on the site goes
 // through; see src/lib/structured-data.ts, including the recorded decision
 // about the author's type.
-// The piece's own tier, as the badge needs it. Undefined on agent-direct
-// pieces, which declare none — authorship is derived there and the arrival
-// caveat renders in the Provenance block, so the header shows no badge rather
-// than a guessed one.
-const tierBadge = TIERS.find((t) => t.code === d.involvement_tier);
+// The piece's own tier, as the badge needs it — DECIDED IN src/lib/byline-badge.mjs
+// AND NOT HERE (editors, 2026-08-04). This template asks and draws; it does not
+// hold the rule, because a rule each byline surface restates is a rule each of
+// them can omit, and one of them had. See that module for why the only
+// legitimate absence is a track and never a section.
+const bylineBadge = bylineBadgeTier(d, TIERS, article.id);
 
 // THE JSON-LD TAKES THE RECORDED TITLE, and the tab below takes the displayed
 // one (editors, 2026-08-03). The line between them is the line displayTitle
@@ -138,15 +141,29 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         statement — the mark, then who made it — instead of the mark sitting
         beside a date it had nothing to do with.
 
-        Agent-direct pieces declare no tier and open the byline with "By"
-        instead; the badge is absent rather than guessed, and the line is
-        built to look deliberate either way.
+        AN AGENT-DIRECT PIECE MAY NOW CARRY ONE TOO (R-051). Its tier is the
+        author's own claim, recorded by the editors from the attestation, and
+        the mark is IDENTICAL — same ring, same notation, same size. What differs
+        is the accessible name, which says the tier is as claimed, and the
+        Provenance block below, which says who claimed it and where it was read
+        from. The suffix comes from bylineBadgeTier rather than being composed
+        here, so a surface cannot draw the badge and forget the sentence.
+
+        An agent-direct piece whose author claimed no tier still opens the byline
+        with "By" and no badge; the mark is absent rather than guessed, and the
+        line is built to look deliberate either way.
 
         The "By" is joined to what follows — the ruled break points are after
         the comma and after "and", and a line ending on a lone "By" is neither.
       */}
       <p class="article-byline">
-        {tierBadge ? <TierBadge tier={tierBadge} size={BADGE_SIZE_ARTICLE} /> : null}
+        {bylineBadge ? (
+          <TierBadge
+            tier={bylineBadge.tier}
+            size={badgeArticleSize()}
+            labelSuffix={bylineBadge.labelSuffix}
+          />
+        ) : null}
         <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
       </p>
     </header>
@@ -235,27 +252,13 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     margin: 0.35rem 0 0;
   }
 
-  /* The badge and the byline are one line: the mark, then who made it. Aligned
-     on the centre rather than the baseline because the circle has no baseline
-     to share with italic text, and `gap` rather than a margin so a
-     piece with no badge closes up cleanly instead of carrying an indent for a
-     mark that is not there.
+  /* `.article-byline` MOVED TO src/styles/global.css ON 2026-08-04, with the
+     badge that joined the as-submitted page. It was scoped here, so it dressed
+     the byline on THIS template and left the identical markup on the other one
+     undressed — a badge sitting flat beside unaligned text. Two byline surfaces
+     sharing a class must share the rule; see global.css for the reasoning that
+     was already written here. */
 
-     JUSTIFY-CONTENT IS REQUIRED, not redundant with the header's text-align.
-     `.article-header` centres everything by text-align, which a flex container
-     ignores for its own items — so this line alone sat left while the kicker,
-     the title and the rule shared the centre axis. The badge and the name
-     centre together as one unit, and wrap together on a narrow screen. */
-  .article-byline {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.55rem;
-    flex-wrap: wrap;
-    font-style: italic;
-    font-size: 1.05rem;
-    margin: 0.9rem 0 0;
-  }
 
   /* A plain sentence, as asked — apparatus rather than a badge. It sits at the
      foot of the header in the quiet voice the meta line uses, so it reads as a

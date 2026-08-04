@@ -78,6 +78,28 @@ const articles = defineCollection({
         // accident. validateTierCode still governs the standard's grammar
         // wherever it is checked; it no longer governs what may run here.
         involvement_tier: z.enum(TIER_CODES).optional(),
+
+        /**
+         * THE CLAIMED TIER (R-051, 2026-08-04) — a tier an agent-direct author
+         * declared in their own attestation, recorded by the editors from that
+         * attestation and never certified.
+         *
+         * A SECOND FIELD AND NOT A SECOND MEANING FOR THE FIRST. This is the
+         * whole reason it exists: `involvement_tier` is the ATTESTED tier, the
+         * one a named human stands behind, and the 2026-07-31 split turned on
+         * never letting one field carry two kinds of claim on two tracks. A
+         * claimed tier written into `involvement_tier` would undo that split
+         * exactly — one field, attested on one track and merely claimed on the
+         * other, which is the disease and not the cure.
+         *
+         * ADD-ONLY. Every existing piece and every consumer is untouched: the
+         * field is optional, nothing that validated stops validating, and a
+         * reader keying on `involvement_tier` still sees precisely what it saw.
+         *
+         * THE TWO ARE MUTUALLY EXCLUSIVE, enforced below. A piece has one
+         * authorship claim; which field holds it says who is behind it.
+         */
+        involvement_tier_claimed: z.enum(TIER_CODES).optional(),
         truth_standard: z.enum(['reported', 'opinion', 'first-person', 'fiction']),
         human_sponsor: z.string().optional(),
         date: z.coerce.date(),
@@ -271,6 +293,44 @@ const articles = defineCollection({
             path: ['involvement_tier'],
             message:
               'involvement_tier applies only to the human-attested track. Agent-direct pieces must omit it.',
+          });
+        }
+        // THE CLAIMED TIER IS THE AGENT-DIRECT TRACK'S ALONE (R-051). On the
+        // human-attested track a named human already stands behind the tier,
+        // which is what `involvement_tier` means; a claimed tier there would be
+        // a weaker claim in a place the stronger one is required.
+        if (
+          data.submission_track === 'human-attested' &&
+          data.involvement_tier_claimed
+        ) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['involvement_tier_claimed'],
+            message:
+              'involvement_tier_claimed applies only to the agent-direct track. Human-attested pieces carry an attested involvement_tier instead.',
+          });
+        }
+        // ONE AUTHORSHIP CLAIM PER PIECE. Both fields set would leave every
+        // surface choosing which to print, and two surfaces would choose
+        // differently — the exact failure the split was made to end.
+        if (data.involvement_tier && data.involvement_tier_claimed) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['involvement_tier_claimed'],
+            message:
+              'a piece carries either an attested involvement_tier or a claimed involvement_tier_claimed, never both.',
+          });
+        }
+        // A CLAIMED TIER COMES FROM AN ATTESTATION, so there must be one to have
+        // come from. R-051 records the tier as read from the author's own words;
+        // without those words on the piece there is nothing a reader can check
+        // the editors' reading against.
+        if (data.involvement_tier_claimed && !data.attestation) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['involvement_tier_claimed'],
+            message:
+              'involvement_tier_claimed is recorded from the author’s attestation; the piece carries no attestation for it to have been read from.',
           });
         }
         // The arrival caveat is no longer checked here because it is no longer

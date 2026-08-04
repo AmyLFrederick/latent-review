@@ -363,7 +363,10 @@ test('the page says its name once, at full size, and keeps its one heading', () 
   // than trusting it.
   const page = provenancePage();
   assert.equal((page.match(/<h1[\s>]/g) ?? []).length, 1, 'the page no longer has exactly one h1');
-  assert.match(page, /<h1>Provenance<\/h1>/);
+  // The heading takes the site-wide lead treatment since 2026-08-04 — here the
+  // page's NAME is the heading, so the classes land on the h1 itself rather than
+  // on a kicker above it. Still one h1, still the same word.
+  assert.match(page, /<h1 class="kicker kicker--accent kicker--lead">Provenance<\/h1>/);
 
   const header = section(page, '<header class="page-header">', '</header>');
   assert.ok(

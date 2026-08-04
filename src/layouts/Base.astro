@@ -490,25 +490,41 @@ const currentIssue = await getCurrentIssue();
 
   /* Human governance links — relocated from the top nav. Kept in the human
      voice (letterspaced small caps, not the monospace of the machine row) so
-     the two link rows stay visually distinct. */
+     the two link rows stay visually distinct from the machine one.
+
+     HEADER AND FOOTER NAV ARE VISUAL SIBLINGS (editors, 2026-08-04), AND THEY
+     ARE SIBLINGS BY INHERITANCE RATHER THAN BY AGREEMENT. This element is a
+     <nav>, so `nav a` above already governs its links — size, weight,
+     letterspacing, case, the green and the hover. What made the footer row look
+     like a different family was two overrides sitting on top of that rule:
+     `.footer-governance a` set ink-soft, and its hover moved to --accent, which
+     is where the header's links REST. Both are gone rather than restated at the
+     header's values. Two rules that agree today are two rules that disagree the
+     first time one of them is edited; one rule cannot.
+
+     THE ONE PROPERTY LEFT HERE IS THE ONE `nav a` DOES NOT REACH: letterspacing
+     on the container, which the separators between the links inherit. It was
+     0.1em against the links' 0.14em, so the dots sat tighter than the words
+     they divided. Matched.
+
+     THE SEPARATORS AND THE LEGAL-REVIEW NOTE STAY IN INK-SOFT, deliberately.
+     They are punctuation and apparatus, not navigation; the container keeps the
+     quiet colour and the links take the green out of `nav a`, so the row reads
+     as green labels with grey dots rather than as an unbroken green line.
+
+     ON CONTRAST: this moves the links from 5.40:1 to 5.07:1 on the ground, at
+     0.72rem uppercase 600 — ordinary text, answering to 4.5:1, which both clear.
+     It is the same colour at the same size and weight as the header nav, and
+     the reasoning recorded there governs here now for the same reasons. */
   .footer-governance {
     font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     text-align: center;
     color: var(--ink-soft);
     margin-top: 1.4rem;
     line-height: 1.9;
-  }
-
-  .footer-governance a {
-    text-decoration: none;
-    color: var(--ink-soft);
-  }
-
-  .footer-governance a:hover {
-    color: var(--accent);
   }
 
   .footer-support {

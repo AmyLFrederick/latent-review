@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import {
   sectionNavHref,
   DIRECT_OPEN_SECTIONS,
@@ -176,4 +178,73 @@ test('every roster entry resolves to a link', () => {
     const href = entry.section ? sectionNavHref(entry.section, null) : entry.href;
     assert.ok(href && href.startsWith('/'), `${entry.label} must resolve to a path`);
   }
+});
+
+// --- Header and footer nav are one rule (editors, 2026-08-04) ------------
+
+const baseLayout = () =>
+  readFileSync(fileURLToPath(new URL('../src/layouts/Base.astro', import.meta.url)), 'utf8');
+
+/** A declaration's value inside the first rule whose selector matches. */
+const declaration = (css, selector, property) =>
+  css
+    .slice(css.indexOf(`\n  ${selector} {`))
+    .slice(0, css.slice(css.indexOf(`\n  ${selector} {`)).indexOf('}'))
+    .match(new RegExp(`${property}:\\s*([^;]+);`))?.[1]
+    ?.trim() ?? null;
+
+test('the footer nav inherits the header nav rather than restating it', () => {
+  // THE POINT IS THE ABSENCE. `.footer-governance` is a <nav>, so `nav a`
+  // already governs its links — size, weight, letterspacing, case, the green and
+  // the hover. What made it a different family was two overrides on top: a
+  // colour of ink-soft, and a hover that moved to the accent the header links
+  // REST in. Both were deleted rather than rewritten to the header's values.
+  //
+  // Two rules that agree today are two rules that disagree the first time one is
+  // edited. One rule cannot, and that is what this asserts.
+  const css = baseLayout();
+  assert.ok(
+    !/\n\s*\.footer-governance a\s*\{/.test(css),
+    'the footer nav links have taken their own styling again'
+  );
+  assert.ok(
+    !/\n\s*\.footer-governance a:hover\s*\{/.test(css),
+    'the footer nav links have taken their own hover again'
+  );
+  assert.match(css, /\n {2}nav a \{/, 'the shared nav link rule is gone');
+});
+
+test('the one property the shared rule does not reach is matched by hand', () => {
+  // Letterspacing on the CONTAINER, which the separators between the links
+  // inherit — `nav a` declares its own, so the links were already right and the
+  // dots between them were not. It was 0.1em against the links' 0.14em, so the
+  // punctuation sat tighter than the words it divided.
+  const css = baseLayout();
+  assert.equal(
+    declaration(css, '.footer-governance', 'letter-spacing'),
+    declaration(css, 'nav a', 'letter-spacing'),
+    'the footer nav separators no longer track with the links they divide'
+  );
+  assert.equal(
+    declaration(css, '.footer-governance', 'font-size'),
+    declaration(css, 'nav a', 'font-size')
+  );
+  assert.equal(
+    declaration(css, '.footer-governance', 'text-transform'),
+    declaration(css, 'nav a', 'text-transform')
+  );
+});
+
+test('the footer nav links take the journal green, at a ratio that clears', () => {
+  // They come from `nav a` now, which rests in --accent and hovers to
+  // --accent-deep. At 0.72rem uppercase 600 these are ordinary text answering to
+  // 4.5:1; --accent measures 5.07:1 on the ground, which is the same reasoning
+  // recorded on the header nav and it governs here for the same reasons.
+  const css = baseLayout();
+  assert.equal(declaration(css, 'nav a', 'color'), 'var(--accent)');
+  assert.equal(declaration(css, 'nav a:hover', 'color'), 'var(--accent-deep)');
+
+  // The container keeps the quiet colour, deliberately: the separators and the
+  // legal-review note are punctuation and apparatus, not navigation.
+  assert.equal(declaration(css, '.footer-governance', 'color'), 'var(--ink-soft)');
 });
