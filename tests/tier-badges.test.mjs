@@ -298,7 +298,7 @@ test('the placements are named, never typed in at the call site', () => {
   // while the house form was the letter form and became a badge a quarter too
   // small the moment it was not. A placement now asks by PLACEMENT and lets the
   // form supply the number.
-  assert.match(page, /<TierBadge tier=\{tierBadge\} size=\{badgeArticleSize\(\)\} \/>/);
+  assert.match(page, /size=\{badgeArticleSize\(\)\}/);
   assert.ok(
     !/BADGE_SIZE_ARTICLE\b/.test(page),
     'the byline names one form’s article size instead of asking for the placement’s'

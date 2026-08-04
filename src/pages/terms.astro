@@ -1,13 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
-import { renderGovernanceDoc } from '../lib/markdown';
+import { renderGovernanceDocParts } from '../lib/markdown';
 import { REPO_URL, TERMS_UNDER_LEGAL_REVIEW } from '../lib/site';
 import termsRaw from '../../docs/TERMS.md?raw';
 
 // Single source of truth: this page renders docs/TERMS.md from the
 // repository verbatim. The document is editor-drafted; the review note
 // stays until Amy L. Frederick clears it (see TERMS_UNDER_LEGAL_REVIEW).
-const html = renderGovernanceDoc(termsRaw);
+// SPLIT LIKE /charter AND /rulings (editors, 2026-08-04, with the site-wide
+// heading pass). This page rendered the document whole, so its H1 — "The Latent
+// Review — Terms of Use" — landed inside the prose and the page had no header at
+// all: no name in the site's voice, and the one governance page that did not
+// look like the other two. renderGovernanceDocParts lifts the title into the
+// header, where the other two put theirs, and leaves the body untouched.
+//
+// THE FILE ON DISK IS NEVER TOUCHED. The split happens at render time; the
+// "rendered verbatim" claim is about docs/TERMS.md, which is unchanged, and the
+// source line beneath the heading still points a reader at it.
+const { title, html } = renderGovernanceDocParts(termsRaw);
 ---
 
 <Base
@@ -15,10 +25,14 @@ const html = renderGovernanceDoc(termsRaw);
   description="The terms of The Latent Review, including its open republication policy, rendered from the public repository."
 >
   <div class="wrap">
-    <p class="kicker doc-source">
-      Rendered verbatim from{' '}
-      <a href={`${REPO_URL}/blob/main/docs/TERMS.md`}>docs/TERMS.md</a> in the public repository
-    </p>
+    <header class="page-header">
+      <p class="kicker kicker--accent kicker--lead">Terms</p>
+      <h1>{title}</h1>
+      <p class="kicker doc-source">
+        Rendered verbatim from{' '}
+        <a href={`${REPO_URL}/blob/main/docs/TERMS.md`}>docs/TERMS.md</a> in the public repository
+      </p>
+    </header>
     {
       TERMS_UNDER_LEGAL_REVIEW ? (
         <p class="kicker kicker--accent review-note">
@@ -26,6 +40,7 @@ const html = renderGovernanceDoc(termsRaw);
         </p>
       ) : null
     }
+
     <div class="prose" set:html={html} />
   </div>
 </Base>

@@ -64,10 +64,12 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
       for a chain would be a notation the standard does not define.
     */}
     <p class="tier-name">
-      {tierNotation(d.involvement_tier) ?? <TierLabel label={authorship.label} />}
+      {tierNotation(d.involvement_tier ?? d.involvement_tier_claimed) ?? (
+        <TierLabel label={authorship.label} />
+      )}
     </p>
     {
-      tierNotation(d.involvement_tier) ? (
+      tierNotation(d.involvement_tier ?? d.involvement_tier_claimed) ? (
         <p class="tier-full"><TierLabel label={authorship.label} /></p>
       ) : null
     }
@@ -86,9 +88,30 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
       ) : null
     }
     {
-      /* Agent-direct: no tier was declared, and saying so is more honest than a
-         bare label that looks like one. The caveat itself lives below, in Chain
-         of custody, where an arrival fact belongs. */
+      /* THE CLAIMED TIER SAYS SO, IN THE AUTHORSHIP POSITION (R-051). The badge
+         above and the notation beside it are identical to an attested tier's by
+         the ruling's own words, so this sentence is the only thing on the page
+         that distinguishes them — which makes it load-bearing rather than
+         explanatory. It names all three facts a reader needs: that the tier is
+         the author's claim, where it was read from, and that the journal
+         recorded it without certifying it.
+
+         IT SITS UNDER AUTHORSHIP AND NOT UNDER CHAIN OF CUSTODY, deliberately.
+         A claimed tier is a claim about WHO MADE IT, which is this axis; the
+         arrival caveat is a fact about how it got here and stays below. The
+         2026-07-31 split is what says which box a statement goes in, and this
+         one goes here. */
+      authorship.claimed ? (
+        <p class="attest">
+          The tier above is as claimed by the author, recorded by the editors from the author's
+          own attestation below and not certified.
+        </p>
+      ) : null
+    }
+    {
+      /* Agent-direct with no claimed tier: none was declared, and saying so is
+         more honest than a bare label that looks like one. The caveat itself
+         lives below, in Chain of custody, where an arrival fact belongs. */
       !authorship.declared ? (
         <p class="attest">
           No tier is declared — the agent-direct track carries none. How this piece reached

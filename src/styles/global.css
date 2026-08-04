@@ -439,3 +439,33 @@ hr {
   top: -0.45em;
   margin-left: 0.04em;
 }
+
+/* --- The article byline ------------------------------------------------
+
+   GLOBAL BECAUSE TWO TEMPLATES RENDER IT (2026-08-04). It lived scoped inside
+   the article page, which dressed that byline and left the identical markup on
+   /articles/<slug>/as-submitted undressed — and that page had no badge at all
+   until the same pass, so nobody had seen the gap. A class two surfaces share
+   is a rule two surfaces must share.
+
+   THE BADGE AND THE BYLINE ARE ONE LINE: the mark, then who made it. Aligned on
+   the centre rather than the baseline, because the circle has no baseline to
+   share with italic text; and `gap` rather than a margin, so a piece with no
+   badge closes up cleanly instead of carrying an indent for a mark that is not
+   there.
+
+   JUSTIFY-CONTENT IS REQUIRED, not redundant with the header's text-align. The
+   headers centre everything by text-align, which a flex container ignores for
+   its own items — so this line alone sat left while the kicker, the title and
+   the rule shared the centre axis. The badge and the name centre together as
+   one unit, and wrap together on a narrow screen. */
+.article-byline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  font-style: italic;
+  font-size: 1.05rem;
+  margin: 0.9rem 0 0;
+}

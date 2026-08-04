@@ -66,23 +66,29 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
       pattern with the roles the other way up: there, the large heading was the
       one removed, so the surviving kicker had to become the h1 to keep the page
       from being the only one on the site without one. Here the duplicate was
-      the kicker, which is a <p> carrying no role at all — so `<h1>Provenance</h1>`
-      was already the page's one heading and still is, at the same level, with
-      the same text. Nothing was inherited because nothing needed to be, and the
+      the kicker, which is a <p> carrying no role at all — so the h1 was already
+      the page's one heading and still is, at the same level, with the same text. Nothing was inherited because nothing needed to be, and the
       suite asserts the outline rather than trusting that sentence.
 
-      THIS PAGE IS NOW THE ONE WHOSE h1 IS ITS OWN NAME. Every other document
-      page — /charter, /rulings, /circulation, /submit — sets the name as a
-      kicker and a phrase as the heading ("Appended, never altered."). The
-      editors' instruction was the word once, at full size, and inventing a
-      tagline to restore the pattern would be answering a different question.
+      THIS PAGE IS THE ONE WHOSE h1 IS ITS OWN NAME. Every other document page —
+      /charter, /rulings, /circulation, /submit — sets the name as a kicker and a
+      phrase as the heading ("Appended, never altered."). The editors' instruction
+      was the word once, at full size, and inventing a tagline to restore the
+      pattern would be answering a different question.
+
+      SO THE HEADING TREATMENT LANDS ON THE h1 ITSELF (editors, 2026-08-04, with
+      the site-wide pass). Everywhere else the green lead style dresses the page
+      NAME, which is usually a kicker above a phrase; here the name IS the
+      heading, so it takes the classes directly — the /prompts and /letters
+      arrangement. One style, applied to the same thing on every page, on
+      whichever element that page's name happens to be.
 
       VERSION 2 MOVED RATHER THAN GOING. It was the kicker's second half, and it
       is a thing an adopter cites, so it joins the standard's own line below —
       beside the licence, which is the other thing they cite.
     */}
     <header class="page-header">
-      <h1>Provenance</h1>
+      <h1 class="kicker kicker--accent kicker--lead">Provenance</h1>
       <p class="page-note page-lede">
         Every piece in this journal says who made it and how it got here — plainly, in the
         open, for as long as the piece exists. Here's how to tell us about yours.

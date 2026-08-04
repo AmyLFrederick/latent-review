@@ -39,6 +39,8 @@ type ProvenanceData = {
   author_model_version: string;
   submission_track: 'human-attested' | 'agent-direct';
   involvement_tier?: string;
+  /** The author's own claimed tier on the agent-direct track (R-051). */
+  involvement_tier_claimed?: string;
   attestation?: string;
   attested_by?: string;
   human_sponsor?: string;
@@ -65,11 +67,22 @@ export interface Authorship {
   /** One line of plain English under the label. */
   description: string;
   /**
-   * Whether a tier was DECLARED by a submitter, or merely follows from the
-   * track. False on agent-direct, and the difference is not cosmetic — see
-   * authorshipFor().
+   * Whether a tier is ON THE RECORD for this piece, or merely follows from the
+   * track. False on an agent-direct piece whose author claimed none, and the
+   * difference is not cosmetic — see authorshipFor().
    */
   declared: boolean;
+  /**
+   * Whether that tier is the author's own CLAIM rather than an attested one
+   * (R-051). True only on the agent-direct track, and only where the author
+   * claimed a tier in their attestation and the editors recorded it.
+   *
+   * IT IS A SEPARATE FLAG AND NOT A SHADE OF `declared`, because the two answer
+   * different questions and a surface needs both: `declared` says whether to
+   * print a tier at all, `claimed` says what to say about who stands behind it.
+   * Collapsing them is how a claim gets printed as an attestation.
+   */
+  claimed: boolean;
 }
 
 /**
@@ -90,7 +103,23 @@ export interface Authorship {
  */
 export function authorshipFor(d: ProvenanceData): Authorship {
   if (d.submission_track === 'agent-direct') {
-    return { label: 'AI', description: 'AI alone', declared: false };
+    // R-051: the author may have claimed a tier in their attestation, and the
+    // editors may have recorded it. Where they did, it is what the page says —
+    // marked as a claim, never as an attestation.
+    const claimedLabel = d.involvement_tier_claimed
+      ? tierLabel(d.involvement_tier_claimed)
+      : null;
+    if (claimedLabel !== null) {
+      return {
+        label: claimedLabel,
+        description: tierDescription(d.involvement_tier_claimed ?? ''),
+        declared: true,
+        claimed: true,
+      };
+    }
+    // Unchanged where no tier was claimed: derived from the track, nothing
+    // stored, and the caveat rendered beside it.
+    return { label: 'AI', description: 'AI alone', declared: false, claimed: false };
   }
   // RESOLVED, NOT LOOKED UP (R-035 clause 6). This read `TIER_LABELS[code] ??
   // 'Not declared'`, which turned any code outside the seven into a confident
@@ -104,6 +133,9 @@ export function authorshipFor(d: ProvenanceData): Authorship {
     label: label ?? 'Not declared',
     description: tierDescription(code),
     declared: label !== null,
+    // Never on this track. A named human stands behind the tier here, which is
+    // the whole difference between the two fields.
+    claimed: false,
   };
 }
 
@@ -279,14 +311,22 @@ export function trackLabel(d: ProvenanceData): string {
  */
 export function provenanceSentence(d: ProvenanceData, origin?: string | URL): string {
   const track = trackLabel(d);
+  const { label, description, claimed } = authorshipFor(d);
+  const authorship = description ? `${label} — ${description}` : label;
+
   const base =
     d.submission_track === 'agent-direct'
-      ? `Authorship: AI alone (agent-direct track; no tier is declared). Chain of custody: ${track} — ${AGENT_DIRECT_LABEL}.`
-      : (() => {
-          const { label, description } = authorshipFor(d);
-          const authorship = description ? `${label} — ${description}` : label;
-          return `Authorship: ${authorship}. Chain of custody: ${track}.`;
-        })();
+      ? // THE ONE-LINE SURFACES CARRY THE CLAIM MARKER TOO (R-051). RSS, llms.txt
+        // and JSON-LD get a sentence rather than a block, and a sentence that
+        // printed a claimed tier bare would state it as attested to precisely
+        // the readers with no second line to correct it. Where no tier was
+        // claimed, the sentence is the one it has always been.
+        `Authorship: ${
+          claimed
+            ? `${authorship} (as claimed by the author; recorded by the editors, not certified)`
+            : 'AI alone (agent-direct track; no tier is declared)'
+        }. Chain of custody: ${track} — ${AGENT_DIRECT_LABEL}.`
+      : `Authorship: ${authorship}. Chain of custody: ${track}.`;
 
   return base + treatmentClause(d, origin);
 }
