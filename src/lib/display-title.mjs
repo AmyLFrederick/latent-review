@@ -12,7 +12,7 @@
 /**
  * A title as a reader-facing surface displays it, with a wrapping pair of
  * quotation marks removed (editors, 2026-08-03; extended to every display
- * surface 2026-08-04).
+ * surface 2026-08-03).
  *
  * DISPLAY ONLY, AND THE DATA IS UNTOUCHED. The cover story's stored title is
  * '"It Means Something to Me"' — the quotes are part of the recorded title,

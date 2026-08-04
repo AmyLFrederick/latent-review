@@ -75,7 +75,7 @@ export {
 // @ts-expect-error — plain-JS module shared with the tests and the digest
 export { CADENCE_LINE, datelineFor } from './volume.mjs';
 
-// The displayed form of a title, moved out to a plain-JS module 2026-08-04 for
+// The displayed form of a title, moved out to a plain-JS module 2026-08-03 for
 // exactly the reason the dateline is in one: the digest displays titles too,
 // and a rule about how the journal prints a piece's name that reached the site
 // but not the mail would put the two at odds about the same piece.

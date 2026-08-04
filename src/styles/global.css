@@ -3,7 +3,7 @@
    Editorial voice: serif. Provenance and machine-facing data: mono. */
 
 :root {
-  /* THE GROUND, nudged toward pink (editors, 2026-08-04). It was #f9f6ef, a
+  /* THE GROUND, nudged toward pink (editors, 2026-08-03). It was #f9f6ef, a
      yellow cream at hue 42°; it is now a blush cream at hue ~21°, at the same
      lightness. The move is a few points of hue and nothing else — no darker, no
      more saturated — because the requirement was a ground that still reads as
@@ -18,11 +18,11 @@
   --ink: #1b1813;
   --ink-soft: #6b6355;
 
-  /* THE ACCENT IS GREEN (editors, 2026-08-04), replacing the oxblood #7a2e22
+  /* THE ACCENT IS GREEN (editors, 2026-08-03), replacing the oxblood #7a2e22
      everywhere it served — kickers, section names, links on hover, labels.
 
      ONE GREEN, AND IT IS THE BADGE RING'S GREEN (editors' preview walk,
-     2026-08-04). --accent-bright and RING_AI in src/lib/tier-badges.mjs are the
+     2026-08-03). --accent-bright and RING_AI in src/lib/tier-badges.mjs are the
      same value, and that is the point of the system rather than a coincidence
      worth tolerating: the journal's identity colour and its provenance colour
      are one colour, so the ring around a tier and the name of a section are

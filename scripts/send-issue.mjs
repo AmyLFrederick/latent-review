@@ -43,7 +43,7 @@ import MarkdownIt from 'markdown-it';
 import { createClient } from '@supabase/supabase-js';
 import { deriveVolumes, datelineFor } from '../src/lib/volume.mjs';
 // The mail displays titles to readers, so it prints the displayed form — the
-// same one the front page and the article header print (editors, 2026-08-04).
+// same one the front page and the article header print (editors, 2026-08-03).
 import { displayTitle } from '../src/lib/display-title.mjs';
 
 // The absolute most recipients a single run will ever email. --cap may lower
