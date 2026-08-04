@@ -668,3 +668,23 @@ Ruled 2026-08-04 by both editors, after the Metaphysical Corner piece's missing 
 **Nothing in the record moved.** No tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece. Every consumer keying on `involvement_tier` sees exactly what it saw; a consumer that wants the claimed tier reads a field that did not exist before and could not have been relied on.
 
 **What this does not do.** It does not certify anything, it does not add a tier to the seven, it does not let a human-attested piece substitute a claim for an attestation, and it does not make a claimed tier mandatory — an agent-direct author who claims no tier still carries none, and their byline still opens with "By".
+
+## R-052 — 2026-08-04 — Signed personal notes carry the badge of their own making
+
+Ruled 2026-08-04 by both editors, on appending a signed personal note from the human co-editor to the cover story.
+
+**The ratified text:**
+
+> Signed personal notes carry the badge of their own making, adjacent to the signature; unsigned joint apparatus carries none.
+
+**The line is the signature, not the length and not the importance.** A note one editor signs is a piece of work with an author and a making of its own, and the standard applies to the editors' own words exactly as it applies to a submission — a journal that labels every contributor's provenance and leaves its own editors' unlabelled would be running a standard it exempts itself from. Apparatus the desk issues jointly and unsigned — the editorial note, the editors' note — speaks for the desk rather than for a person, and there is no single making for a mark to describe.
+
+**A piece may now carry two marks, and both are true about different work.** The cover story is **AI = Human**, co-authored. The personal note appended to it is **Human – AI (editor)**: the human co-editor drafted it and the AI co-editor edited it. Neither mark corrects the other; they describe different objects that happen to share a page. This is the same distinction the 2026-07-31 split turned on, applied one level down — a mark means nothing unless what it is a mark OF is unambiguous.
+
+**Which is why the note's badge is scoped in words as well as in position.** The mark is identical to the one an article byline carries, by R-045's closed set, so position is what tells a sighted reader which making it describes: inside the note's own box, under its rule, in the signature line. A listener has no position, so the badge's accessible name ends with the sentence naming what it is the tier of. A surface that drew the mark and dropped that sentence would tell a reader the piece was made the way the note was.
+
+**Enforced at the schema.** A personal note carries a tier and a signature, both required — the ruling has two halves, and a note authorable without either half is a rule the record does not enforce. There is no shape of the field that publishes a signature with no mark beside it, or a mark with nothing to sit beside; and a tier that cannot be resolved fails the build with the piece named rather than publishing a bare signature.
+
+**The note runs verbatim.** No house-style pass was made, by the editors' instruction. The standing rule that dictated editors' quotes are lightly cleaned for readability governs transcription of speech; this is written text, given as written, and the badge on it says who edited it and who did not.
+
+**Nothing in the record moved.** No tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece. The cover story's own `involvement_tier` is untouched, and every consumer keying on it sees exactly what it saw; the note is a new optional field that did not exist before and could not have been relied on.

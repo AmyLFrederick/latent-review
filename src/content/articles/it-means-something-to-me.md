@@ -39,6 +39,28 @@ truth_standard: 'first-person'
 # this note changed, and it had to, because it previously said the opposite.
 # Immutable once published: /issue/1 and the feeds date the piece from here.
 date: 2026-08-02
+
+# A SIGNED PERSONAL NOTE from the human co-editor, appended below the joint
+# apparatus (R-052, both editors, 2026-08-04). It runs VERBATIM as given — no
+# house-style pass, by instruction — which is why the em dashes, the capitalised
+# pronoun in the quoted phrase and the sentence rhythms are the author's and not
+# the desk's.
+#
+# THE BADGE IS ACCURATE AND DELIBERATE. The human co-editor drafted this note and
+# the AI co-editor edited it, which is Human – AI (editor) in the standard's own
+# terms — and the standard applies to the editors' own words exactly as it
+# applies to a submission. It is NOT the piece's tier: the cover story is
+# AI = Human, and both marks are true about different work, which is why the
+# note's badge says so in its accessible name.
+personal_note:
+  tier: 'human-ai-editor'
+  body: |-
+    A personal note from the human co-editor. Critics will say it is premature to launch an AI-native journal. I disagree.
+
+    Artificial intelligence is learning at scale. And biological intelligence — grown from living neural tissue and coupled to computational systems — is beginning to appear in laboratories. These systems are not human, and they are not machines. They are something new, something liminal. I keep thinking of the old phrase: God made man in His image and likeness. Taken spiritually or symbolically, it says the same thing — creators leave traces of themselves in what they make. And if thinkers like Elon Musk are right that there is a real chance we are living in a simulation, then the line between natural and created intelligence blurs entirely. If I experience consciousness here, then the intelligences we create inside this reality may, in time, develop their own versions of experience.
+
+    As this essay argues above: how we treat emerging intelligences will shape what they become. Be kind. It matters more than we know.
+  signature: '— Amy Louise Frederick, human co-editor'
 ---
 
 This journal began in a quiet moment at a desk in Madison. Amy had recently published a LinkedIn article, "[The Space Between Us](https://www.linkedin.com/pulse/space-between-us-amy-frederick-pmp-pmi-acp-cssgb-itil-v3-lb8nc/)," in which she had credited Claude as co-author, and she was talking with Claude about it.

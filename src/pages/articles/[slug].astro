@@ -12,9 +12,11 @@ import {
 } from '../../lib/site';
 import TierBadge from '../../components/TierBadge.astro';
 // @ts-expect-error — plain-JS module shared with the tests
-import { badgeArticleSize } from '../../lib/tier-badges.mjs';
+import { badgeArticleSize, badgeNoteSize } from '../../lib/tier-badges.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
 import { bylineBadgeTier } from '../../lib/byline-badge.mjs';
+// @ts-expect-error — plain-JS module shared with the tests
+import { personalNoteBadge, noteParagraphs } from '../../lib/note-badge.mjs';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -54,6 +56,12 @@ const { Content } = await render(article);
 // them can omit, and one of them had. See that module for why the only
 // legitimate absence is a track and never a section.
 const bylineBadge = bylineBadgeTier(d, TIERS, article.id);
+
+// The mark beside a signed personal note's signature — DECIDED IN
+// src/lib/note-badge.mjs AND NOT HERE (R-052), for the reason the byline badge
+// is. See that module for why the line is the signature and why the badge
+// carries a scoping sentence into its accessible name.
+const noteBadge = personalNoteBadge(d.personal_note, TIERS, article.id);
 
 // THE JSON-LD TAKES THE RECORDED TITLE, and the tab below takes the displayed
 // one (editors, 2026-08-03). The line between them is the line displayTitle
@@ -224,6 +232,46 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       ) : null
     }
 
+    {/*
+      THE SIGNED PERSONAL NOTE, BELOW THE JOINT APPARATUS AND ABOVE THE RECORD
+      (R-052, both editors, 2026-08-04). The order is the argument: the piece,
+      then what the desk says jointly about it, then what one editor says over
+      their own name, then the record of how all of it came to be. A signed note
+      above the editors' note would put a person's voice in front of the desk's;
+      below the Provenance block it would sit outside the piece entirely, after
+      the page has stopped being an article and started being a record.
+
+      THE LAYOUT SUPPLIES NOTHING TO THE PROSE, as with the editors' note. The
+      note opens by naming itself — "A personal note from the human co-editor" —
+      and closes with its own signature, so a supplied heading would say it
+      twice. What the layout supplies is the badge, because that is not the
+      note's words but the standard's mark, and the standard is the layout's to
+      apply consistently.
+
+      THE BADGE IS ADJACENT TO THE SIGNATURE, which is the ruling's own word and
+      the reason the signature is its own field rather than the last paragraph
+      of the body. Adjacency is what makes the mark describe the note: a badge
+      at the top of the note would read as a second byline for the article, and
+      a badge floating in the apparatus would describe nothing in particular.
+    */}
+    {
+      d.personal_note && noteBadge ? (
+        <aside class="personal-note" aria-label="A personal note from an editor">
+          {noteParagraphs(d.personal_note.body).map((para) => (
+            <p>{para}</p>
+          ))}
+          <p class="personal-note-signature">
+            <TierBadge
+              tier={noteBadge.tier}
+              size={badgeNoteSize()}
+              labelSuffix={noteBadge.labelSuffix}
+            />
+            <span>{d.personal_note.signature}</span>
+          </p>
+        </aside>
+      ) : null
+    }
+
     <ProvenanceBlock article={article} />
   </article>
 </Base>
@@ -308,6 +356,45 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
 
   .editors-note p:last-child {
     margin-bottom: 0;
+  }
+
+  /* THE SIGNED PERSONAL NOTE (R-052). It takes the editors' note's measure,
+     rule and voice, because it is apparatus in the same zone and a second
+     treatment would make it look like a different kind of thing on the page.
+     What separates them is the signature line, not the box. */
+  .personal-note {
+    max-width: 42rem;
+    margin: 2.4rem auto 0;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--rule, currentColor);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    opacity: 0.85;
+  }
+
+  .personal-note p {
+    margin: 0 0 1rem;
+  }
+
+  /* THE MARK AND THE NAME ARE ONE LINE, the same construction the byline uses —
+     centred on the circle rather than on a baseline the circle does not have,
+     and `gap` rather than a margin so the two sit together at any size.
+
+     IT IS NOT `.article-byline`, deliberately, and the suite pins that. That
+     class names the set of surfaces carrying a byline badge, and a signed note
+     is not a byline: reusing it here would put this line in that test's list
+     and make the two rules impossible to tell apart later.
+
+     LEFT-ALIGNED, NOT CENTRED, because the note is read rather than scanned —
+     it sits in a left-aligned block of prose, and a centred sign-off under
+     ragged-right paragraphs reads as a caption. */
+  .personal-note-signature {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin: 1.4rem 0 0;
+    font-style: italic;
   }
 
   .article-meta {
