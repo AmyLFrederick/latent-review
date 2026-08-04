@@ -21,13 +21,13 @@
  *
  * RING_AI IS ALSO THE JOURNAL'S ACCENT — it is `--accent-bright` in
  * src/styles/global.css, and the two are the same value on purpose (editors'
- * preview walk, 2026-08-04). The identity colour and the provenance colour are
+ * preview walk, 2026-08-03). The identity colour and the provenance colour are
  * one colour, so the ring around a tier and the name of a section are visibly
  * the same statement. It cannot be shared as a literal across a stylesheet and
  * a JS module, so the suite asserts the two are equal instead; two hex values in
  * two languages is exactly the pair that drifts.
  *
- * MATCHED TO THE FRAMES, AND SETTLED (editors, 2026-08-04). It was #7d9153, a
+ * MATCHED TO THE FRAMES, AND SETTLED (editors, 2026-08-03). It was #7d9153, a
  * muted sage picked to sit beside the salmon. Three walks against the eyeglasses
  * the colour comes from moved it through an apple-olive and an olive-avocado
  * before the human editor held the frames to a swatch chart and read the match
@@ -74,7 +74,7 @@ export function splitRingSides(notation) {
 
 /**
  * Notation ink — dark olive-green, as ratified with the mockup and DARKENED a
- * step on 2026-08-04 for legibility (#3f4a33 → #303927).
+ * step on 2026-08-03 for legibility (#3f4a33 → #303927).
  *
  * MODESTLY, AND AT THE SAME HUE. Hue 89° and saturation 19% are unchanged; the
  * lightness drops from 24.5% to 18.8%. Against the ground the notation reads at
@@ -86,7 +86,7 @@ export function splitRingSides(notation) {
 export const BADGE_INK = '#303927';
 
 /**
- * THE RENDERED DIAMETERS, one per placement, ENLARGED A QUARTER 2026-08-04.
+ * THE RENDERED DIAMETERS, one per placement, ENLARGED A QUARTER 2026-08-03.
  *
  *   chart     58 → 72.5   (/provenance)
  *   article   28 → 35     (the byline on an article header)

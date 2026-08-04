@@ -133,7 +133,7 @@ test('the badge renders as SVG with real text, not as an image', () => {
 });
 
 test('the ring colours are the ratified ones', () => {
-  // RING_AI settled 2026-08-04. Three preview walks against the eyeglass frames
+  // RING_AI settled 2026-08-03. Three preview walks against the eyeglass frames
   // the colour comes from moved it off the original sage #7d9153, through an
   // apple-olive and an olive-avocado, before the human editor held the frames to
   // a swatch chart and read the match off it. It is a true green — hue 79° →
@@ -143,7 +143,7 @@ test('the ring colours are the ratified ones', () => {
 });
 
 test('the ring green and the site accent are ONE colour', () => {
-  // THE POINT OF THE SYSTEM, made mechanical (editors, 2026-08-04). The
+  // THE POINT OF THE SYSTEM, made mechanical (editors, 2026-08-03). The
   // journal's identity colour and its provenance colour are the same colour, so
   // the ring around a tier and the name of a section are visibly the same
   // statement. It cannot be shared as a literal across a stylesheet and a JS
@@ -235,7 +235,7 @@ test('the accent stops clear the contrast they are used at', () => {
   );
 });
 
-// --- The mark is fixed geometry (editors, 2026-08-04) ----------------------
+// --- The mark is fixed geometry (editors, 2026-08-03) ----------------------
 
 test('every placement grew by exactly a quarter, and the box did not', () => {
   // The ruling was a SCALE, not a redraw. The rendered diameters go up 25% and
@@ -273,7 +273,7 @@ test('the placements are named, never typed in at the call site', () => {
 
 test('the notation is pinned against everything it could inherit', () => {
   // THE FAILURE THIS EXISTS FOR, and it is not hypothetical — it is what was
-  // shipping before 2026-08-04. An SVG <text> inherits every typographic
+  // shipping before 2026-08-03. An SVG <text> inherits every typographic
   // property from the HTML around it unless it declares its own, so the
   // notation was set by whatever container it landed in: italic inside
   // `.article-byline`, and one inherited `text-transform` away from rendering
@@ -377,7 +377,7 @@ test('the box is square and cannot be made a rectangle', () => {
 });
 
 test('the notation ink is the darker stop, and still the same colour', () => {
-  // Darkened 2026-08-04 for legibility. Modestly, and at the same hue: the
+  // Darkened 2026-08-03 for legibility. Modestly, and at the same hue: the
   // instruction anticipated that the 25% enlargement would do most of the work.
   assert.equal(BADGE_INK, '#303927');
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(BADGE_INK.slice(i, i + 2), 16));

@@ -8,8 +8,21 @@
   It mirrors the real grand masthead in src/components/IssueMasthead.astro,
   element for element and in the same order: the mono dateline between its two
   hairlines, the title, the letterspaced tagline, the thick-over-thin double
-  rule. Every colour is a token from src/styles/global.css (paper, ink,
+  rule. Every colour is a token from src/styles/global.css (paper, accent,
   ink-soft, hairline, rule).
+
+  REPAINTED 2026-08-03 WITH THE PALETTE (R-049). The ground is the blush cream
+  and the wordmark is the journal's green at the stop the real masthead takes.
+  This file is not built by the site and so does not follow global.css on its
+  own: it is a hand-kept copy of those tokens, and it goes stale silently. If
+  the palette moves again, it moves here too, and the PNG is re-rendered.
+
+  THE CADENCE LINE WAS ALSO WRONG, AND THAT WAS THE WORSE OF THE TWO. It read
+  "A weekly journal" — true when the card was cut on 2026-07-27, and false from
+  R-039 on 2026-08-03, which moved the journal to an issue every two weeks. It
+  now reads exactly what CADENCE_LINE in src/lib/volume.mjs holds. A stale
+  colour is a mismatch; a stale cadence is the journal telling every reader who
+  pastes a link something untrue about itself, on the one image it shows them.
 
   Deliberately evergreen: no issue number, no volume, no date. The card is
   linked from every page and must not go stale between issues.
@@ -20,21 +33,23 @@
   dashes.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <!-- Ground: paper #f9f6ef -->
-  <rect width="1200" height="630" fill="#f9f6ef"/>
+  <!-- Ground: paper #faf3ef, the blush cream (R-049). -->
+  <rect width="1200" height="630" fill="#faf3ef"/>
 
   <!-- Dateline, between its hairlines (#e0d8c6), in the mono face at ink-soft.
        Left and right ends, as on the site. -->
   <line x1="100" y1="156" x2="1100" y2="156" stroke="#e0d8c6" stroke-width="1.5"/>
   <text x="100" y="192" font-family="IBM Plex Mono" font-size="21" fill="#6b6355"
-        letter-spacing="0.4">A weekly journal</text>
+        letter-spacing="0.4">Published every two weeks</text>
   <text x="1100" y="192" font-family="IBM Plex Mono" font-size="21" fill="#6b6355"
         letter-spacing="0.4" text-anchor="end">thelatentreview.com</text>
   <line x1="100" y1="212" x2="1100" y2="212" stroke="#e0d8c6" stroke-width="1.5"/>
 
-  <!-- Title: display face, weight 600, tracking 0.01em, ink #1b1813. -->
+  <!-- Title: display face, weight 600, tracking 0.01em, in the journal's green
+       at the wordmark's stop #3e743f — the same colour and the same stop the
+       real masthead takes (R-049), not ink. -->
   <text x="600" y="374" font-family="EB Garamond" font-size="125" font-weight="600"
-        fill="#1b1813" letter-spacing="1.25" text-anchor="middle">The Latent Review</text>
+        fill="#3e743f" letter-spacing="1.25" text-anchor="middle">The Latent Review</text>
 
   <!-- Tagline: uppercase, 0.14em tracking, ink-soft, body face weight 600.
        Set as one line; the em dash is the site's own. -->
