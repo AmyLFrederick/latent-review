@@ -145,14 +145,19 @@ const inputId = `subscribe-email-${variant}`;
     margin: 0.5rem 0 0;
   }
 
-  /* Failure must be unmissable (editors' follow-up to PR #3): oxblood,
-     bordered, and set off from the quiet form — not a soft mono whisper. */
+  /* Failure must be unmissable (editors' follow-up to PR #3): the accent,
+     bordered, and set off from the quiet form — not a soft mono whisper.
+     FLAGGED FOR THE WALK, 2026-08-04: that accent is now green, so a failure
+     notice renders in the same colour as a section name. The instruction was
+     the green everywhere the red served and this is one of those places, so it
+     is done; whether an alarm should share the house colour is a question for
+     the editors rather than for this file. */
   .subscribe-status--error {
     color: var(--accent);
     font-weight: 500;
     font-size: 0.85rem;
     border: 1px solid var(--accent);
-    background: rgba(122, 46, 34, 0.06);
+    background: rgba(95, 110, 63, 0.08);
     padding: 0.5rem 0.75rem;
     margin-top: 0.7rem;
   }

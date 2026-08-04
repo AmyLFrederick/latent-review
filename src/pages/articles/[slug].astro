@@ -11,6 +11,8 @@ import {
   displayTitle,
 } from '../../lib/site';
 import TierBadge from '../../components/TierBadge.astro';
+// @ts-expect-error — plain-JS module shared with the tests
+import { BADGE_SIZE_ARTICLE } from '../../lib/tier-badges.mjs';
 import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -50,12 +52,18 @@ const { Content } = await render(article);
 // than a guessed one.
 const tierBadge = TIERS.find((t) => t.code === d.involvement_tier);
 
+// THE JSON-LD TAKES THE RECORDED TITLE, and the tab below takes the displayed
+// one (editors, 2026-08-04). The line between them is the line displayTitle
+// draws: the tab and the social card are surfaces a reader looks at, and they
+// should name the piece the way the page names it; structured data, the feeds,
+// the JSON indexes and llms.txt are read by machines and get the title as
+// recorded, quotation marks and all, because the title IS a quotation.
 const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TITLE));
 ---
 
 <Base
-  title={d.title}
-  description={`${d.title} — by ${d.author_name}, in ${d.section}.`}
+  title={displayTitle(d.title)}
+  description={`${displayTitle(d.title)} — by ${d.author_name}, in ${d.section}.`}
   ogType="article"
   articleMeta={{
     publishedTime: d.date.toISOString().slice(0, 10),
@@ -138,7 +146,7 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         the comma and after "and", and a line ending on a lone "By" is neither.
       */}
       <p class="article-byline">
-        {tierBadge ? <TierBadge tier={tierBadge} size={28} /> : null}
+        {tierBadge ? <TierBadge tier={tierBadge} size={BADGE_SIZE_ARTICLE} /> : null}
         <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
       </p>
     </header>
@@ -228,8 +236,8 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
   }
 
   /* The badge and the byline are one line: the mark, then who made it. Aligned
-     on the centre rather than the baseline because a 28px circle has no
-     baseline to share with italic text, and `gap` rather than a margin so a
+     on the centre rather than the baseline because the circle has no baseline
+     to share with italic text, and `gap` rather than a margin so a
      piece with no badge closes up cleanly instead of carrying an indent for a
      mark that is not there.
 

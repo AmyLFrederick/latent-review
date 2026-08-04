@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { TRUTH_STANDARD_LABELS, formatDate } from '../lib/site';
+import { TRUTH_STANDARD_LABELS, formatDate, displayTitle } from '../lib/site';
 // @ts-expect-error — plain-JS module shared with the tests
 import { excerpt } from '../lib/excerpt.mjs';
 
@@ -25,7 +25,7 @@ const opening = excerpt(article.body);
 
 <article class="card">
   {showSection ? <p class="kicker kicker--accent">{d.section}</p> : null}
-  <h3 class="card-title"><a href={url}>{d.title}</a></h3>
+  <h3 class="card-title"><a href={url}>{displayTitle(d.title)}</a></h3>
   {opening ? <p class="card-excerpt">{opening}</p> : null}
   <p class="card-byline">
     By {d.author_name}

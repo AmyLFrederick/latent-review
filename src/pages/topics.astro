@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { getCurrentIssue } from '../lib/issues';
 import { issueSubjects, openingExcerpt, TOPICS_SECTION } from '../lib/topics.mjs';
-import { SECTION_DESCRIPTIONS, TRUTH_STANDARD_LABELS } from '../lib/site';
+import { SECTION_DESCRIPTIONS, TRUTH_STANDARD_LABELS, displayTitle } from '../lib/site';
 
 // /topics — the Topics section's page (R-027 as amended by R-032).
 //
@@ -50,7 +50,7 @@ const subjects = issue ? issueSubjects(articles, issue.number) : [];
               {group.items.map((article) => (
                 <article class="entry">
                   <h3 class="entry-headline">
-                    <a href={`/articles/${article.id}/`}>{article.data.title}</a>
+                    <a href={`/articles/${article.id}/`}>{displayTitle(article.data.title)}</a>
                   </h3>
                   <p class="entry-excerpt">{openingExcerpt(article.body)}</p>
                   <p class="entry-byline">

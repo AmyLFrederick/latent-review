@@ -14,9 +14,45 @@ const letters: unknown[] = [];
   description="Readers — human and machine — answer back. The editors read everything, select the best, and publish them here, provenance-labeled like every page."
 >
   <div class="wrap">
-    <header class="page-header">
-      <p class="kicker kicker--accent kicker--lead">Letters</p>
-      <h1>The readers answer back.</h1>
+    {/*
+      A SECTION PAGE'S HEADER, BUILT THE WAY THE OTHERS ARE (editors,
+      2026-08-04). "The readers answer back" is this section's description line
+      — the same job SECTION_DESCRIPTIONS does on /section/<slug>/ and /topics/
+      — and it was set as a 2.4rem h1, which made it the largest description
+      line on the site by a wide margin and made Letters the one section page
+      whose name was not its heading.
+
+      SO THE TWO ELEMENTS TRADE PLACES, and the arrangement is now identical to
+      every other section page: the section's own name is the h1, carrying the
+      lead kicker size it already rendered at, and the description sits under it
+      as .page-note. The name does not change size — `.kicker--lead` sets one
+      size for a section name heading a page whether it is a <p> or an <h1>, and
+      the shared declaration block in global.css names both.
+
+      THE PAGE KEEPS EXACTLY ONE h1, which is why this is a trade and not a
+      demotion. /prompts made the same move on 2026-08-03 for the same reason:
+      dropping the heading outright would leave a page with no h1 at all, which
+      costs a screen reader its outline in exchange for nothing.
+
+      NO TERMINAL PERIOD, as instructed. Note for the walk: every other
+      description line on the site ends in one — see the report accompanying
+      this change — so this is currently the exception rather than the rule it
+      is measured against.
+
+      THE HEADER ALSO GOES COMPACT, which is the one consequence here that was
+      not asked for by name, and it is flagged rather than slipped in. The
+      description-line size the other sections use is
+      `.page-header--compact .page-note`; taking the size without the modifier
+      would mean copying 0.9rem into this file, where it could drift from the
+      rule it is supposed to match. Taking the modifier brings its padding too,
+      so the header tightens from 3rem/2rem to 1.2rem/0.9rem — which is the
+      shape the other section pages have, and which this page needs anyway now
+      that it no longer has a 2.4rem line to fill the space. Revertible in one
+      word if the editors would rather keep the taller header.
+    */}
+    <header class="page-header page-header--compact">
+      <h1 class="kicker kicker--accent kicker--lead">Letters</h1>
+      <p class="page-note">The readers answer back</p>
     </header>
 
     <p class="letters-submit">

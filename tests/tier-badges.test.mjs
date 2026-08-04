@@ -6,6 +6,8 @@
 //   3. Co-authorship stays ONE tier with ONE code, however many circles the
 //      chart prints for it.
 //   4. The edited variants are never set smaller than the relational ones.
+//   5. The badge's internal composition is PINNED — nothing an ancestor
+//      stylesheet declares can move the notation inside its ring.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -21,6 +23,11 @@ import {
   RING_AI,
   RING_HUMAN,
   BADGE_SUP_SIZE,
+  BADGE_INK,
+  BADGE_BOX,
+  BADGE_SCALE_2026_08_04,
+  BADGE_SIZE_CHART,
+  BADGE_SIZE_ARTICLE,
   TIER_NOTATION,
   tierNotation,
   splitRingSides,
@@ -128,6 +135,155 @@ test('the badge renders as SVG with real text, not as an image', () => {
 test('the ring colours are the ratified ones', () => {
   assert.equal(RING_AI, '#7d9153');
   assert.equal(RING_HUMAN, '#efa48f');
+});
+
+// --- The mark is fixed geometry (editors, 2026-08-04) ----------------------
+
+test('every placement grew by exactly a quarter, and the box did not', () => {
+  // The ruling was a SCALE, not a redraw. The rendered diameters go up 25% and
+  // the viewBox stays at 58, which is what makes ring weight, type size and the
+  // superscript's offset come along unchanged — every placement is the same
+  // composition at a different magnification.
+  assert.equal(BADGE_SCALE_2026_08_04, 1.25);
+  assert.equal(BADGE_SIZE_CHART, 58 * BADGE_SCALE_2026_08_04);
+  assert.equal(BADGE_SIZE_ARTICLE, 28 * BADGE_SCALE_2026_08_04);
+  assert.equal(BADGE_BOX, 58, 'the drawing units moved; the mark has been redrawn, not scaled');
+
+  // THE FRACTION IS THE POINT. Rounding 72.5 to 72 or 73 would grow the two
+  // placements by different amounts, which is the one thing "keeping
+  // proportions" rules out.
+  assert.equal(
+    BADGE_SIZE_CHART / 58,
+    BADGE_SIZE_ARTICLE / 28,
+    'the two placements no longer scale by the same factor'
+  );
+});
+
+test('the placements are named, never typed in at the call site', () => {
+  // A literal size on a call site is how one placement gets left behind the
+  // next time the editors resize the mark — which is exactly what "at every
+  // placement" was written to prevent.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  assert.match(page, /<TierBadge tier=\{tierBadge\} size=\{BADGE_SIZE_ARTICLE\} \/>/);
+
+  const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  assert.ok(
+    !/<TierBadge[^>]*size=\{?\d/.test(chart),
+    'the chart hard-codes a badge size instead of taking the component default'
+  );
+});
+
+test('the notation is pinned against everything it could inherit', () => {
+  // THE FAILURE THIS EXISTS FOR, and it is not hypothetical — it is what was
+  // shipping before 2026-08-04. An SVG <text> inherits every typographic
+  // property from the HTML around it unless it declares its own, so the
+  // notation was set by whatever container it landed in: italic inside
+  // `.article-byline`, and one inherited `text-transform` away from rendering
+  // the editor superscript as a capital E.
+  //
+  // It recurs the moment someone wraps a badge in a styled container, which is
+  // an ordinary thing to do to a component used in four places. So each
+  // property that can move a glyph is asserted DECLARED — the whole list, not a
+  // sample, because the one that gets dropped is the one that bites.
+  const src = readFileSync(repoPath('src/components/TierBadge.astro'), 'utf8');
+  const style = src.slice(src.indexOf('<style>'));
+  const pinned = style.slice(style.indexOf('.tier-badge text'));
+
+  for (const property of [
+    'font-family',
+    'font-size',
+    'font-style',
+    'font-weight',
+    'font-variant',
+    'font-stretch',
+    'letter-spacing',
+    'word-spacing',
+    'text-transform',
+    'text-anchor',
+    'dominant-baseline',
+    'direction',
+    'writing-mode',
+    'fill',
+  ]) {
+    assert.match(
+      pinned,
+      new RegExp(`^\\s*${property}:`, 'm'),
+      `${property} is not declared on .tier-badge text, so the notation inherits it`
+    );
+  }
+});
+
+test('the pinned values are the ones the mark has always drawn at', () => {
+  // Pinning the wrong numbers would be worse than not pinning: it would freeze
+  // a mark nobody approved. The two per-badge values travel as custom
+  // properties, so the assertion is that the rules consume them rather than
+  // restating a size that could drift from tier-badges.mjs.
+  const src = readFileSync(repoPath('src/components/TierBadge.astro'), 'utf8');
+  assert.match(src, /font-size: var\(--badge-notation-size\)/);
+  assert.match(src, /font-size: var\(--badge-sup-size\)/);
+  assert.match(src, /--badge-notation-size:\$\{badge\.size\}px/);
+  assert.match(src, /--badge-sup-size:\$\{BADGE_SUP_SIZE\}px/);
+  assert.match(src, /font-family: var\(--font-mono\)/);
+  assert.match(src, /text-anchor: middle/);
+  assert.match(src, /dominant-baseline: central/);
+});
+
+test('no typography is left in a presentation attribute', () => {
+  // A presentation attribute is the WEAKEST declaration in the cascade: any
+  // author rule matching `.tier-badge text` beats it. Leaving one behind means
+  // two places state the same property and the loser is invisible — so the
+  // markup carries geometry only, and the stylesheet carries type.
+  const src = readFileSync(repoPath('src/components/TierBadge.astro'), 'utf8');
+  // `<text x=` rather than `<text`: the file's own header comment names the
+  // element in prose, and slicing from there would sweep in the ring's fills.
+  const text = src.slice(src.indexOf('<text x='), src.indexOf('</text>'));
+  for (const attribute of [
+    'font-family=',
+    'font-size=',
+    'letter-spacing=',
+    'text-anchor=',
+    'dominant-baseline=',
+    'fill=',
+  ]) {
+    assert.ok(
+      !text.includes(attribute),
+      `${attribute} is still a presentation attribute, where any stylesheet outranks it`
+    );
+  }
+  // The dy stays: it is the superscript's offset in box units — geometry, not
+  // typography — and it is derived from the badge's own size.
+  assert.match(text, /dy=\{-badge\.size \* 0\.34\}/);
+});
+
+test('the box is square and cannot be made a rectangle', () => {
+  // `svg { max-width: 100% }` is a rule people write for the same reason they
+  // write it for images, and one of them in any ancestor stylesheet would
+  // squeeze the width while the height held — letterboxing the mark inside its
+  // own line. Both dimensions are stated three ways so no later rule can win.
+  const src = readFileSync(repoPath('src/components/TierBadge.astro'), 'utf8');
+  for (const property of [
+    'width',
+    'height',
+    'min-width',
+    'min-height',
+    'max-width',
+    'max-height',
+  ]) {
+    assert.match(
+      src,
+      new RegExp(`^\\s*${property}: var\\(--badge-size`, 'm'),
+      `${property} is not pinned to the badge size`
+    );
+  }
+  assert.match(src, /preserveAspectRatio="xMidYMid meet"/);
+});
+
+test('the notation ink is the darker stop, and still the same colour', () => {
+  // Darkened 2026-08-04 for legibility. Modestly, and at the same hue: the
+  // instruction anticipated that the 25% enlargement would do most of the work.
+  assert.equal(BADGE_INK, '#303927');
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(BADGE_INK.slice(i, i + 2), 16));
+  assert.ok(g > r && r > b, 'the ink has stopped being a green');
 });
 
 // --- R-045: the set is closed -------------------------------------------

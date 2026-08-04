@@ -474,7 +474,12 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
      page that is not the heading. */
   .start-here {
     border: 1px solid var(--rule, #ddd);
-    border-left: 3px solid var(--accent, #8a1c1c);
+    /* A rule, not type — the ring green itself (see the two stops in
+       global.css). The literal fallback that stood here was a red the site
+       never used, left over from before --accent existed; a fallback for a
+       token that has been defined in :root for the life of the file is dead
+       code that would repaint this border if it ever fired. */
+    border-left: 3px solid var(--accent-bright);
     padding: 1rem 1.25rem;
     margin: 1.5rem 0 0;
     background: var(--paper-shade, rgba(0, 0, 0, 0.02));

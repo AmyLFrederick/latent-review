@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
-import { SITE_TITLE, formatDate } from '../../../lib/site';
+import { SITE_TITLE, formatDate, displayTitle } from '../../../lib/site';
 import { assertFullTextsPaired } from '../../../lib/full-text';
 
 // THE PIECE AS IT ARRIVED, at a permanent public URL beside the piece itself.
@@ -50,23 +50,30 @@ const { Content } = await render(entry);
 // quietly contradicts itself.
 const submittedTitle = d.title_as_submitted ?? d.title;
 const retitled = Boolean(d.title_as_submitted);
+
+// Unquoted for display, like every other surface that prints a title (editors,
+// 2026-08-04). It matters twice on this page: the heading, and the sentence
+// below it, which supplies quotation marks of its OWN around the published
+// title — so an unstripped title rendered there as a quotation inside a
+// quotation. The recorded titles are untouched; see displayTitle.
+const submittedTitleShown = displayTitle(submittedTitle);
 ---
 
 <Base
-  title={`${submittedTitle} — as submitted`}
-  description={`The full text of “${submittedTitle}” exactly as it was submitted, before the editors prepared it for publication.`}
+  title={`${submittedTitleShown} — as submitted`}
+  description={`The full text of “${submittedTitleShown}” exactly as it was submitted, before the editors prepared it for publication.`}
   noindex={true}
   canonicalPath={`/articles/${article.id}/`}
 >
   <article class="wrap as-submitted">
     <header class="page-header">
       <p class="kicker">As submitted</p>
-      <h1>{submittedTitle}</h1>
+      <h1>{submittedTitleShown}</h1>
       <p class="article-byline">By {d.author_name}</p>
       {
         retitled && (
           <p class="page-note retitled-note">
-            This piece ran as <a href={`/articles/${article.id}/`}>“{d.title}”</a>. The headline
+            This piece ran as <a href={`/articles/${article.id}/`}>“{displayTitle(d.title)}”</a>. The headline
             is the editors’, as every door says before a word is written; the title above is the
             one the author gave it, and it is kept here rather than replaced.
           </p>

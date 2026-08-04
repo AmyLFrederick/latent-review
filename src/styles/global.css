@@ -3,11 +3,48 @@
    Editorial voice: serif. Provenance and machine-facing data: mono. */
 
 :root {
-  --paper: #f9f6ef;
-  --paper-raised: #fdfbf6;
+  /* THE GROUND, nudged toward pink (editors, 2026-08-04). It was #f9f6ef, a
+     yellow cream at hue 42°; it is now a blush cream at hue ~21°, at the same
+     lightness. The move is a few points of hue and nothing else — no darker, no
+     more saturated — because the requirement was a ground that still reads as
+     cream at a glance and reads as warm only when looked at.
+
+     THE JOURNAL'S TWO IDENTITY COLOURS ARE NOW THE PROVENANCE COLOURS: the sage
+     of the badge ring is the voice (see --accent below), and the blush of the
+     human half is the ground. Nothing about the badges changed to make that
+     true — the page moved to meet them. */
+  --paper: #faf3ef;
+  --paper-raised: #fefaf7;
   --ink: #1b1813;
   --ink-soft: #6b6355;
-  --accent: #7a2e22; /* oxblood */
+
+  /* THE ACCENT IS GREEN (editors, 2026-08-04), replacing the oxblood #7a2e22
+     everywhere it served — kickers, section names, links on hover, labels.
+
+     THERE ARE TWO STOPS OF ONE GREEN, AND THE REASON IS CONTRAST. The badge
+     ring's sage (#7d9153, RING_AI in src/lib/tier-badges.mjs) is the identity
+     colour, and against this ground it measures 3.16:1 — enough for a rule or a
+     border, not enough for text at any size the site actually sets. The oxblood
+     it replaces measured 8.5:1, so adopting the ring colour as-is for type
+     would have quietly cost every kicker and every section name its legibility.
+
+     So --accent is the SAME GREEN AT A LOWER LIGHTNESS: hue 79°, saturation
+     27%, identical to the ring on both, lightness 45% → 34%. It measures 5.05:1
+     on the new ground, which clears 4.5:1 at every size we set it — including
+     the 12.75px kicker and the 19.5px floor of the section-name clamp, neither
+     of which qualifies as large text. --accent-bright is the ring colour
+     exactly, and it is for NON-TEXT ONLY: rules, borders, focus outlines.
+
+     Where the darker stop appears, the hue is unchanged. This is the "darker
+     stop of the same green" the brief asked for rather than a different green,
+     and the two stops are related by lightness alone so they read as one colour
+     used twice. */
+  --accent: #5f6e3f;
+  --accent-bright: #7d9153;
+  /* Deeper still, for a hover or press state on a filled button. Same hue and
+     saturation again; cream on it measures 7.2:1. */
+  --accent-deep: #4a5631;
+
   --hairline: #e0d8c6;
   --rule: #2a251c;
 
