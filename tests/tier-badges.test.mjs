@@ -133,8 +133,104 @@ test('the badge renders as SVG with real text, not as an image', () => {
 });
 
 test('the ring colours are the ratified ones', () => {
-  assert.equal(RING_AI, '#7d9153');
+  // RING_AI recalibrated 2026-08-04 on the editors' preview walk: the sage
+  // #7d9153 read too dull and too blue against the eyeglass frames the colour
+  // comes from, and became this apple-olive.
+  assert.equal(RING_AI, '#8ca054');
   assert.equal(RING_HUMAN, '#efa48f');
+});
+
+test('the ring green and the site accent are ONE colour', () => {
+  // THE POINT OF THE SYSTEM, made mechanical (editors, 2026-08-04). The
+  // journal's identity colour and its provenance colour are the same colour, so
+  // the ring around a tier and the name of a section are visibly the same
+  // statement. It cannot be shared as a literal across a stylesheet and a JS
+  // module — which is precisely why it is asserted. Two hex values in two
+  // languages, meaning one thing, is the pair that drifts.
+  const css = readFileSync(repoPath('src/styles/global.css'), 'utf8');
+  const bright = css.match(/--accent-bright:\s*(#[0-9a-f]{6})/i)?.[1];
+  assert.equal(
+    bright,
+    RING_AI,
+    'the accent and the badge ring have come apart; they are one colour by ruling'
+  );
+});
+
+test('the accent stops are one green at three lightnesses', () => {
+  // "A darker stop of the same green" is the rule, and the failure it guards
+  // against is someone reaching for a different green that merely looks darker.
+  // Hue and saturation are what make three values read as one colour used three
+  // ways, so those are what is asserted — the lightnesses are free to be tuned.
+  const css = readFileSync(repoPath('src/styles/global.css'), 'utf8');
+  const stops = ['--accent', '--accent-bright', '--accent-deep'].map((name) => {
+    const hex = css.match(new RegExp(`${name}:\\s*(#[0-9a-f]{6})`, 'i'))?.[1];
+    assert.ok(hex, `${name} is missing from :root`);
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    const d = max - min;
+    const s = d === 0 ? 0 : l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    let h = 0;
+    if (d !== 0) {
+      h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+      h *= 60;
+    }
+    return { name, hex, h, s, l };
+  });
+
+  const [h0, s0] = [stops[0].h, stops[0].s];
+  for (const stop of stops) {
+    assert.ok(
+      Math.abs(stop.h - h0) <= 2,
+      `${stop.name} (${stop.hex}) is hue ${stop.h.toFixed(1)}°, ${Math.abs(stop.h - h0).toFixed(1)}° off the family — a different green, not a darker stop of this one`
+    );
+    assert.ok(
+      Math.abs(stop.s - s0) <= 0.03,
+      `${stop.name} (${stop.hex}) differs in saturation by ${(Math.abs(stop.s - s0) * 100).toFixed(1)} points`
+    );
+  }
+
+  // The ordering is the whole reason there are three: bright is the colour,
+  // and each stop below it exists to buy contrast that the one above cannot.
+  const [accent, bright, deep] = stops;
+  assert.ok(bright.l > accent.l, 'the bright stop is no longer the lightest');
+  assert.ok(accent.l > deep.l, 'the deep stop is no longer the darkest');
+});
+
+test('the accent stops clear the contrast they are used at', () => {
+  // Re-derived from the new hue rather than carried over from the sage: a
+  // brighter green buys less contrast, so the stops below it had to move too.
+  // These are the thresholds each stop is USED at, which is the only question
+  // that matters — the bright stop is deliberately not held to a text ratio,
+  // because it is deliberately never set as text.
+  const css = readFileSync(repoPath('src/styles/global.css'), 'utf8');
+  const value = (name) => css.match(new RegExp(`${name}:\\s*(#[0-9a-f]{6})`, 'i'))?.[1];
+  const lin = (c) => {
+    c /= 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const lum = (hex) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  };
+  const ratio = (a, b) => {
+    const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+    return (x + 0.05) / (y + 0.05);
+  };
+
+  const paper = value('--paper');
+  // Type, at every size the site sets it — the 12.75px kicker and the 19.5px
+  // floor of the section-name clamp are both ordinary text, not large text.
+  assert.ok(
+    ratio(value('--accent'), paper) >= 4.5,
+    `--accent is ${ratio(value('--accent'), paper).toFixed(2)}:1 on the ground; kickers and section names need 4.5:1`
+  );
+  // A filled button's hover, with cream set on it.
+  assert.ok(
+    ratio(paper, value('--accent-deep')) >= 4.5,
+    'cream no longer reads on the deep stop'
+  );
 });
 
 // --- The mark is fixed geometry (editors, 2026-08-04) ----------------------

@@ -266,7 +266,7 @@ const INK_SOFT = '#6b6355';
 // every use of it in this mail is TYPE — a 15px link, a 12px section kicker —
 // and the ring green does not clear 4.5:1 on the ground below. See the two
 // stops in src/styles/global.css.
-const ACCENT = '#5f6e3f';
+const ACCENT = '#606d39';
 const PAPER = '#faf3ef';
 const HAIRLINE = '#e0d8c6';
 const RULE = '#2a251c';

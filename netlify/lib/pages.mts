@@ -41,14 +41,14 @@ export function page(
   button { background: none; border: 1px solid #2a251c; color: #1b1813; cursor: pointer;
            font-family: inherit; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em;
            text-transform: uppercase; padding: 0.65rem 1.6rem; }
-  button:hover { background: #5f6e3f; border-color: #5f6e3f; color: #faf3ef; }
+  button:hover { background: #606d39; border-color: #606d39; color: #faf3ef; }
   .home { display: inline-block; margin-top: 2.4rem; font-size: 0.85rem; color: #6b6355; }
   /* Errors are unmissable: accent headline, upright, inside a bordered notice.
      FLAGGED FOR THE WALK, 2026-08-04 — that accent is green now, so these
      sheets announce a failure in the house colour. Same question as the
      subscribe form's error state; recorded in both places. */
-  .sheet--error h1 { color: #5f6e3f; font-style: normal; font-weight: 600; }
-  .sheet--error .notice { border: 1px solid #5f6e3f; background: rgba(95, 110, 63, 0.08);
+  .sheet--error h1 { color: #606d39; font-style: normal; font-weight: 600; }
+  .sheet--error .notice { border: 1px solid #606d39; background: rgba(96, 109, 57, 0.08);
                           max-width: 28rem; margin: 1.6rem auto 0; padding: 0.4rem 1.1rem 1.1rem; }
   .sheet--error .notice p { color: #1b1813; }
 </style>

@@ -16,8 +16,24 @@
 // notation drifted from the tier it marks is exactly the failure worth testing
 // for.
 
-/** The ring encodes whose words, and only that. */
-export const RING_AI = '#7d9153'; // sage green
+/**
+ * The ring encodes whose words, and only that.
+ *
+ * RING_AI IS ALSO THE JOURNAL'S ACCENT — it is `--accent-bright` in
+ * src/styles/global.css, and the two are the same value on purpose (editors'
+ * preview walk, 2026-08-04). The identity colour and the provenance colour are
+ * one colour, so the ring around a tier and the name of a section are visibly
+ * the same statement. It cannot be shared as a literal across a stylesheet and
+ * a JS module, so the suite asserts the two are equal instead; two hex values in
+ * two languages is exactly the pair that drifts.
+ *
+ * RECALIBRATED TO THE FRAMES. It was #7d9153, a muted sage. The editors walked
+ * it against the eyeglasses the colour comes from and found it too dull and too
+ * blue: hue 79.4° → 75.8°, saturation 27% → 31%, lightness 45% → 48%. A fresh
+ * apple-olive. The type stops in global.css were re-derived from this hue in the
+ * same pass rather than left where the sage put them.
+ */
+export const RING_AI = '#8ca054'; // apple-olive — and the site's accent
 export const RING_HUMAN = '#efa48f'; // salmon pink
 
 /**

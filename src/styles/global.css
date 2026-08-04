@@ -21,29 +21,51 @@
   /* THE ACCENT IS GREEN (editors, 2026-08-04), replacing the oxblood #7a2e22
      everywhere it served — kickers, section names, links on hover, labels.
 
-     THERE ARE TWO STOPS OF ONE GREEN, AND THE REASON IS CONTRAST. The badge
-     ring's sage (#7d9153, RING_AI in src/lib/tier-badges.mjs) is the identity
-     colour, and against this ground it measures 3.16:1 — enough for a rule or a
-     border, not enough for text at any size the site actually sets. The oxblood
-     it replaces measured 8.5:1, so adopting the ring colour as-is for type
-     would have quietly cost every kicker and every section name its legibility.
+     ONE GREEN, AND IT IS THE BADGE RING'S GREEN (editors' preview walk,
+     2026-08-04). --accent-bright and RING_AI in src/lib/tier-badges.mjs are the
+     same value, and that is the point of the system rather than a coincidence
+     worth tolerating: the journal's identity colour and its provenance colour
+     are one colour, so the ring around a tier and the name of a section are
+     visibly the same statement. A test asserts the two stay equal, because two
+     literals in two languages is exactly the pair that drifts.
 
-     So --accent is the SAME GREEN AT A LOWER LIGHTNESS: hue 79°, saturation
-     27%, identical to the ring on both, lightness 45% → 34%. It measures 5.05:1
-     on the new ground, which clears 4.5:1 at every size we set it — including
-     the 12.75px kicker and the 19.5px floor of the section-name clamp, neither
-     of which qualifies as large text. --accent-bright is the ring colour
-     exactly, and it is for NON-TEXT ONLY: rules, borders, focus outlines.
+     RECALIBRATED TO THE FRAMES. The first pass took the ring's #7d9153, a muted
+     sage; the editors walked it against the eyeglasses the colour comes from
+     and found it too dull and too blue. It is now #8ca054 — hue 79.4° → 75.8°
+     (a touch toward yellow), saturation 27% → 31%, lightness 45% → 48%. A
+     fresh apple-olive rather than a sage.
 
-     Where the darker stop appears, the hue is unchanged. This is the "darker
-     stop of the same green" the brief asked for rather than a different green,
-     and the two stops are related by lightness alone so they read as one colour
-     used twice. */
-  --accent: #5f6e3f;
-  --accent-bright: #7d9153;
-  /* Deeper still, for a hover or press state on a filled button. Same hue and
-     saturation again; cream on it measures 7.2:1. */
-  --accent-deep: #4a5631;
+     THERE ARE STILL THREE STOPS OF THAT ONE GREEN, AND THE REASON IS CONTRAST.
+     Brighter costs contrast against a light ground: #8ca054 measures 2.63:1
+     here, where the sage measured 3.16:1 and the oxblood it all replaces
+     measured 8.5:1. Adopting it for type would cost every kicker and every
+     section name its legibility, so type takes a darker stop of the SAME green
+     — same hue, same saturation, lower lightness, which is what makes the three
+     read as one colour used three ways rather than as three greens.
+
+       --accent-bright  #8ca054   2.63:1   the colour itself. NON-TEXT ONLY:
+                                           the badge rings, and rules whose
+                                           meaning is carried by the words
+                                           beside them.
+       --accent         #606d39   5.11:1   all type. Clears 4.5:1 at the
+                                           12.75px kicker and at the 19.5px
+                                           floor of the section-name clamp,
+                                           neither of which is large text.
+       --accent-deep    #4b562d   7.17:1   a filled button's hover; cream on
+                                           it clears 7:1.
+
+     FLAGGED, AND IT IS THE ONE JUDGMENT CALL THIS RECALIBRATION FORCES: at
+     2.63:1 the colour itself no longer clears 3:1, the threshold WCAG sets for
+     a graphical object that a reader must perceive to understand the content.
+     Nothing here is such an object — every badge ring's meaning is also written
+     out in its accessible name and printed beside it on the chart, and the
+     three left-hand rules that take it are decoration next to text that says
+     the same thing. So this is legible-as-decoration, deliberately, rather than
+     a threshold quietly missed. If the editors would rather the borders read
+     harder, they move to --accent and the ring alone keeps the bright stop. */
+  --accent: #606d39;
+  --accent-bright: #8ca054;
+  --accent-deep: #4b562d;
 
   --hairline: #e0d8c6;
   --rule: #2a251c;
