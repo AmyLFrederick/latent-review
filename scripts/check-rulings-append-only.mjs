@@ -38,6 +38,12 @@ const currentText = readFileSync(FILE, 'utf8');
 const baseLines = baseText.split('\n');
 if (baseLines.at(-1) === '') baseLines.pop();
 const currentLines = currentText.split('\n');
+// Trimmed the same way the base is, so the two counts are comparable. Without
+// this the trailing empty string survives on one side only and the "added"
+// figure below reads one too high on every run — including on a file that has
+// not changed at all. The check itself was never affected; the number it
+// reported was, and that number gets quoted into commit messages.
+if (currentLines.at(-1) === '') currentLines.pop();
 
 // Every base line must appear in the current file, in the same order.
 let cursor = 0;
