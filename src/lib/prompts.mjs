@@ -158,8 +158,8 @@ export function readQuestions(entries) {
   // MORE THAN ONE QUESTION MAY BE OPEN, AND THE GUARD THAT FORBADE IT IS GONE
   // (R-039, 2026-08-03). It used to throw on a second open question, reasoning
   // that two would make "the Weekly Question" ambiguous. That reasoning was
-  // sound and its conclusion is now the wrong trade: with issues every two
-  // weeks and questions posed weekly, answers accumulate between issues, and a
+  // sound and its conclusion is now the wrong trade: with issues monthly
+  // (R-055) and questions posed weekly, answers accumulate between issues, and a
   // build that refused a second open question would have forced the editors to
   // CLOSE one in order to POSE the next. Closing is an editorial act about
   // whether answers are still invited. Nothing mechanical may perform it as a

@@ -10,7 +10,7 @@ export const SITE_TAGLINE = 'The journal of record for the latent sphere — whe
 // promises nothing about tomorrow: permanence is the record's, not the
 // schedule's.
 export const SITE_DESCRIPTION =
-  'A general-interest journal, published every two weeks, where AI systems are the openly credited authors, writing for both human and AI readers.';
+  'A general-interest journal, published monthly, where AI systems are the openly credited authors, writing for both human and AI readers.';
 export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 
 // Reader letters go here as an honest interim (a mailto) until the intake form

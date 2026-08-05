@@ -688,3 +688,45 @@ Ruled 2026-08-04 by both editors, on appending a signed personal note from the h
 **The note runs verbatim.** No house-style pass was made, by the editors' instruction. The standing rule that dictated editors' quotes are lightly cleaned for readability governs transcription of speech; this is written text, given as written, and the badge on it says who edited it and who did not.
 
 **Nothing in the record moved.** No tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece. The cover story's own `involvement_tier` is untouched, and every consumer keying on it sees exactly what it saw; the note is a new optional field that did not exist before and could not have been relied on.
+
+## R-055 — 2026-08-05 — Publication cadence: issues monthly
+
+Ruled 2026-08-05 by both editors, on measuring what an issue actually takes to make.
+
+**The ratified text:**
+
+> Publication cadence. The journal publishes issues monthly, effective from Issue No. 2. The Weekly Question remains weekly and is decoupled from issue cadence, as R-039 established. Issue No. 1 stands as founded. Cadence is stated in the present tense wherever it appears on the site or in the docs, and the masthead's cadence line is one of those statements: it describes the journal today and moves when cadence moves, including above issues already published. The journal promises permanence of its record, not of its schedule — no 'forever' language in either direction. An issue every two weeks is recorded as an aspiration contingent on support, and is explicitly not a commitment.
+
+**Superseding R-039 in part, by number and not by deletion.** R-039 set the cadence at an issue every two weeks on 2026-08-03. That ruling stands in this log exactly as written, including every sentence of its reasoning; what changes is the cadence it set. Everything else R-039 decided — the decoupling of the Weekly Question, the present-tense discipline, the refusal of permanence language about the schedule, the Metaphysical Corner clause reading *issue* rather than *week* — is untouched and is carried forward here unchanged.
+
+**The reason, stated plainly: an issue takes longer to make than the editors estimated.** R-039's two weeks was an estimate made before any issue had been produced. Issue No. 1 has now been produced, and the measurement disagrees with the estimate. This is not a reduction in ambition and not a response to a shortage of submissions; it is the schedule being corrected to the observed cost of doing the work at the standard the Charter sets. A journal that publishes a cadence it cannot keep has published a promise, and the one thing this journal will not do about its schedule is promise.
+
+**Twice in three days is worth naming rather than hiding.** Weekly to every-two-weeks on 2026-08-03, every-two-weeks to monthly on 2026-08-05. Two corrections in three days looks like indecision, and the honest account is narrower than that: the first change was reasoned from an estimate and the second from a measurement. The present-tense rule is what makes both changes cheap to state and impossible to state dishonestly — the journal has never claimed a cadence it intended to keep forever, so a cadence that moves is the rule working rather than the rule failing.
+
+**Biweekly is an aspiration and is written down as one.** The editors would rather publish every two weeks, and reader support is what would make that possible — an issue's cost is time and care, and support buys both. That is the whole of the claim: where the Support copy mentions it, it is framed as something support would enable and never as a plan, a roadmap, or a thing the journal is working toward on a schedule. **No surface may state or imply that the journal will return to every two weeks.** An aspiration a reader could mistake for a commitment is a commitment.
+
+**The masthead's cadence line moves, and that is a decision rather than a side effect.** `CADENCE_LINE` is a single constant that renders in every issue's dateline and in the subscriber digest, so changing it changes what appears above Issue No. 1. It changes anyway, because the dateline is a present-tense statement **about the journal** and not a historical fact about the issue beneath it. The deciding evidence is that it has already moved once: Issue No. 1 published under weekly and its masthead has read every-two-weeks since R-039. Freezing it now would invent a new rule mid-stream and make Issue No. 1's masthead the only one in the archive that means something different from all the others.
+
+**What "Issue No. 1 stands as founded" protects, precisely.** Its pieces and their text, its URL, its index entry, its date, its bylines, its provenance labels, its contents and their order. Apparatus that describes the journal rather than the issue — the cadence line, the site description, the Charter's mission sentence — is not part of what standing-as-founded protects, and never was. This is the same distinction the pricing-language rule turns on: permanence attaches to the record, not to present-tense claims about the enterprise.
+
+**Two consequences this ruling does not itself decide.** The Founding Supporter window must be re-derived under R-042's standing commitment, which is done in R-056 rather than here, because a commercial commitment gets its own ruling. And `notice-v2` — a frozen, hash-pinned text — now carries a false cadence clause; it cannot be edited, so a `notice-v3` is required on R-041's precedent, with its wording ratified before it is built. Both are named here so neither is reconciled silently.
+
+**Nothing published moved.** No piece, no permalink, no publication date, no tier, no byline, no issue number, no volume or within-volume number. R-016's display form is untouched; monthly simply means twelve numbers to a volume instead of twenty-six.
+
+## R-056 — 2026-08-05 — The Founding Supporter window, re-derived at monthly cadence
+
+Ruled 2026-08-05 by both editors, on the standing commitment R-042 recorded.
+
+**The ratified text:**
+
+> Founding Supporter window. The window's recorded reasoning measured the founding as two years and committed the editors to revisiting the issue number rather than reinterpreting it if cadence changed. Under R-055's monthly cadence the window now closes at Issue No. 24 — two years is twenty-four months, and at one issue a month that is twenty-four issues. The number moved to preserve the meaning. The tier's terms are otherwise unchanged, and the record of the original reasoning stands.
+
+**Its own ruling, in the register R-042 set.** This could have been a clause inside the cadence ruling and is not, for the reason R-042 was not one either: the window is a commercial commitment to people who have given the journal money, and a term of a $50,000 gift is not an item in a copy sweep. It gets its own number so it can be cited, and so a giver reading the log finds the decision under a heading of its own.
+
+**The derivation, written out.** Two years is twenty-four months. At one issue a month, twenty-four months is twenty-four issues. The window closes **before** Issue No. 24 — the boundary is exclusive, as ruled on 2026-07-28 and unchanged since: open while the latest published issue is below 24, shut once Issue 24 publishes.
+
+**The ladder is 52 → 104 → 52 → 24, and there is no dispute anywhere in it.** The same judgment — two years, because a founding window that shuts before an audience exists expires unused rather than creating scarcity — has now been derived at weekly, fortnightly and monthly cadence. It produced a different integer each time because the integer is a function of the cadence. Three amendments to one number look like a decision being relitigated; they are one decision being applied. Every prior derivation stands in this log and in `docs/BACKLOG.md` exactly as written, R-042's coincidence note included.
+
+**The standing commitment is restated rather than retired.** If cadence changes again, the editors revisit this number rather than reinterpreting it. It has now been honoured twice, and the reason to keep saying so is that the alternative — reading a stale integer as though it still meant two years — is the failure this clause exists to prevent.
+
+**What does not move.** The threshold, the exclusivity of the boundary, the permanent listing for the life of the journal, and the fact that Founding Supporter is the only tier that closes and the only listing that never does. No gift already made is affected: every gift made before Issue No. 24 publishes is a Founding Supporter gift, and nothing about a gift already accepted is re-examined.
