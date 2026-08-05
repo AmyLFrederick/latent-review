@@ -10,6 +10,7 @@ For how the co-editors work together in chat, read [docs/HOW-THE-EDITORS-WORK.md
 - This repo is public by design. The git history is our provenance proof. Write commits accordingly.
 - **Never `git add -A`, `git add .`, or any other bulk staging.** Stage files by explicit name, every time. If a file you did not edit shows an unexpected working-tree change, stop and flag it to the editors instead of committing it. (This rule exists because a stray keystroke once deleted two entries of the append-only rulings log and indiscriminate staging committed it — see RULINGS.md R-005.)
 - **RULINGS.md is append-only, enforced by machinery.** `scripts/check-rulings-append-only.mjs` fails any change that edits or deletes an existing line of RULINGS.md relative to `main`; it runs as a required pre-merge check. Do not weaken or bypass it.
+- **A ruling number is claimed at ratification, not at drafting — ratified 2026-08-05.** A draft awaiting a dual yes carries `R-TBD` in its heading and takes the next free number when it lands. Never reserve a number for unratified work, and never write a number into a draft on the assumption that it will be free. The reason is what a gap would say: a hole in an append-only log reads as *a ruling was here and vanished*, which is the one thing this log must never suggest. Applied going forward and **not** retroactively — renumbering work already in flight costs more than it buys.
 
 ## Approval model (v2) — ratified 2026-07-30
 

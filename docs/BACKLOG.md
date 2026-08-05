@@ -59,6 +59,41 @@ this list by becoming a PR.
   the empty-states fix; they are worth a pass whenever someone is in those files
   anyway, and they are not urgent because nothing displays them.
 
+  **TWO OF THE FOUR REOPENED ON 2026-08-05, when R-055 moved cadence again to
+  monthly.** Kept here rather than filed as new items, because the useful record
+  is that these are the collisions a cadence change *structurally* causes — a
+  third change will cause them a third time, and this is the list to check.
+
+  1. **The window → R-056.** Re-derived 52 → 24. Its own ruling again, in the
+     same register as R-042, because a commercial commitment is not a clause in
+     a copy sweep. See the tier section below.
+  2. **The frozen notice → `notice-v3`, NOT YET BUILT.** `NOTICE_V2` says "every
+     two weeks" and cannot be edited: it is hash-pinned and pieces name it in
+     their chain of custody. v3 follows R-041's precedent exactly — v2 keeps its
+     address, words, hash and arrival value; v3 is added beside it. **The text is
+     ratified before anything is built**, and it ships in its own PR with its own
+     ruling. `tests/notice.test.mjs` extends to a three-version chain and keeps
+     the "exactly one clause differs" assertion rather than relaxing it; that
+     assertion is what makes the chain mean anything.
+
+  **The other two did not recur.** The empty-section copy is cadence-free, and
+  Correspondence-per-issue (R-040) follows issue cadence by construction, so it
+  needs no re-derivation at any cadence — which is exactly why R-040 was written
+  that way.
+
+- **R-054 IS HELD BY A DRAFT THAT IS MERGED BUT UNRATIFIED — OPEN.** The
+  byline-and-harness ruling was drafted, numbered R-054, and merged to `main` as
+  `docs/SCRATCH-R-054-BYLINE-AND-HARNESS.md` in PR #148 on 2026-08-04. It has
+  never been ratified, so `RULINGS.md` does not contain an R-054 and R-055
+  follows R-053 across a number that is claimed but empty. **It gets ratified or
+  renumbered; those are the two outcomes**, and until one of them happens the log
+  has a number spoken for by something that is not in it.
+
+  The rule that prevents a repeat is already in `CLAUDE.md`: a ruling number is
+  claimed at ratification, not at drafting, and an unratified draft carries
+  `R-TBD`. That rule is deliberately not retroactive, which is exactly why this
+  item exists — it is the one case the rule does not clean up by itself.
+
 - **`/admin` subscriber dashboard.** For now the Supabase table view of
   `subscribers` is the dashboard (counts, statuses, manual fixes). A proper
   authenticated `/admin` page — subscriber counts over time, confirm rate,
@@ -186,7 +221,7 @@ this list by becoming a PR.
   | Sustainer | $1,000+ | indefinitely | one year |
   | Patron | $5,000+ | indefinitely | three years |
   | Benefactor | $20,000+ | indefinitely | ten years |
-  | **Founding Supporter** | $50,000+ | **before Issue No. 52** | **life of the journal** |
+  | **Founding Supporter** | $50,000+ | **before Issue No. 24** | **life of the journal** |
 
   *Founding Supporter is the only tier that closes, and the only listing that
   never does.*
@@ -224,6 +259,23 @@ this list by becoming a PR.
   was reconsidered. The same judgment — two years — was applied to a halved
   issue rate and produced a halved count, which happened to be the value it
   started from. Both amendments stand, and both are the same decision.
+
+  **RE-DERIVED AGAIN TO ISSUE No. 24 — R-056, 2026-08-05.** Everything above is
+  left exactly as written, for the reason R-042 gave and this ruling repeats:
+  the record of the original reasoning stands. R-055 moved the journal to an
+  issue a month, so the standing commitment was honoured a second time. The
+  derivation, written out because a bare integer invites reinterpretation: two
+  years is **twenty-four months**, and at one issue a month that is **24
+  issues**. The window closes before Issue No. 24 — open while the latest
+  published issue is below 24, shut once Issue 24 publishes. The two years did
+  not move; nothing else about the tier moved either.
+
+  **THE LADDER, IN ONE PLACE, because three amendments to one integer is where
+  a reader starts to suspect a dispute.** 52 → 104 → 52 → 24. There was no
+  dispute: the same judgment — two years — was re-derived at weekly, then
+  fortnightly, then monthly cadence, and produced a different count each time
+  because the count is a function of the cadence. The number is derived; the two
+  years are what is fixed.
 
   **One source for tier facts: `SUPPORTER_TIERS` in `src/lib/supporters.mjs`.**
   Labels, thresholds and listing durations all render from it, listing

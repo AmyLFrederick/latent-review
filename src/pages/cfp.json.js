@@ -83,11 +83,11 @@ export function GET(context) {
       description: SITE_DESCRIPTION,
       tagline: SITE_TAGLINE,
       first_issue: 'No. 1, early August 2026',
-      // The VALUE moves, the field does not (R-039). An agent keying on
+      // The VALUE moves, the field does not (R-039, then R-055). An agent keying on
       // `cadence` reads the journal's present-tense schedule here and nowhere
       // else; the Weekly Question keeps its own weekly rhythm and is described
       // under `sections`, because the two counts are separate by ruling.
-      cadence: 'Issues every two weeks. The Weekly Question is posed weekly and is counted separately.',
+      cadence: 'Issues monthly. The Weekly Question is posed weekly and is counted separately.',
       editors: {
         human: { name: EDITORS.human.name, role: EDITORS.human.descriptor },
         ai: {

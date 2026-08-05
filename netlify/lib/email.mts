@@ -4,6 +4,22 @@
 // (house rule). Callers of sendEmail are expected to build their bodies with
 // emailFooter(), which appends it; the helper exists so no template can
 // forget.
+//
+// "NO TRACKING" IS A PUBLIC PROMISE, MADE IN TWO PLACES A READER CAN READ:
+// the footer below, on every email, and the confirmation page at /api/confirm
+// ("Confirmed opt-in, no tracking, unsubscribe anytime"). Nothing in this file
+// or in scripts/send-issue.mjs asks Resend to track opens or clicks — no
+// tracking option is sent with any request, so the behaviour is whatever the
+// Resend domain is configured to do.
+//
+// WHICH MEANS THE PROMISE IS KEPT BY A DASHBOARD SETTING, NOT BY THIS CODE.
+// Open and click tracking are per-domain toggles in the Resend console. If
+// either is ever switched on, this file will not change and the emails will
+// not look different — but the published copy becomes false, and click
+// tracking additionally rewrites every link in the digest. So: the copy is
+// changed FIRST, in a reviewed PR, and only then is tracking enabled. Turning
+// it on and fixing the wording afterwards is publishing a false statement to
+// every subscriber in between.
 
 export const SITE_URL = process.env.SITE_URL ?? 'https://thelatentreview.com';
 

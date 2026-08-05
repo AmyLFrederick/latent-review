@@ -33,19 +33,24 @@
 //
 //   52  → 104  (2026-07-28)  at weekly cadence, 104 issues ≈ two years
 //   104 → 52   (2026-08-03, R-042)  at an issue every two weeks, 52 ≈ two years
+//   52  → 24   (2026-08-05, R-056)  at an issue a month, 24 ≈ two years
 //
-// THE NUMBER RETURNED TO 52 AND THAT IS NOT A REVERSAL. Nothing about the
-// 2026-07-28 amendment was undone; it was applied again to a new cadence and
+// THE ARITHMETIC IS THE WHOLE DERIVATION, and it is written out so the next
+// revision meets reasoning rather than an integer: two years is twenty-four
+// months, and at one issue a month that is twenty-four issues. The window did
+// not shorten. The issues it spans got longer.
+//
+// THE 2026-08-03 VALUE RETURNING TO 52 WAS NOT A REVERSAL EITHER. Nothing about
+// the 2026-07-28 amendment was undone; it was applied again to a new cadence and
 // landed where it started, because halving the issue rate halves the count that
-// spans two years. A session reading "52" and finding an older note that says
-// "amended from 52" is looking at a coincidence of arithmetic, not at a
-// decision that was reconsidered. Both amendments stand in the record and both
-// were the same judgment.
+// spans two years. A session reading an older note that says "amended from 52"
+// beside a number that is no longer 52 is reading a ladder, not a dispute. All
+// three amendments stand in the record and all three were the same judgment.
 //
 // If cadence ever changes again, revisit this number rather than reinterpreting
-// it — the standing commitment, honoured once already and restated here so the
+// it — the standing commitment, honoured twice now and restated here so the
 // next session meets reasoning that explains itself instead of a bare integer.
-export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 52;
+export const SUPPORTER_WINDOW_CLOSES_AT_ISSUE = 24;
 
 /**
  * What the window is actually for, in the editors' words — so the page can lead
@@ -218,10 +223,12 @@ export function tierFor(key) {
  *
  * THE BOUNDARY IS EXCLUSIVE: the window is open while the latest issue is
  * BELOW the closing number, and shuts when that issue publishes. "Open to
- * gifts made before Issue No. 104" — a gift made while 103 is the newest issue
- * is before 104; one made after 104 is out is not. Stated here because an
+ * gifts made before Issue No. 24" — a gift made while 23 is the newest issue
+ * is before 24; one made after 24 is out is not. Stated here because an
  * off-by-one in a commercial commitment is worth being explicit about, and the
- * tests name the boundary at 103, 104 and 105.
+ * tests name the boundary at 23, 24 and 25. The illustration tracks the current
+ * number rather than the one this docstring was written under; the RULE is what
+ * this paragraph fixes, and the rule has never moved.
  *
  * Pass the latest issue number, not the issue count — they are the same today
  * because numbering is contiguous from 1 (enforced in lib/issues.ts), and the

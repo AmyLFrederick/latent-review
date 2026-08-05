@@ -42,8 +42,17 @@ export function deriveVolumes(issues) {
  * its own .mjs. site.ts re-exports it, so the masthead component reads it from
  * where it reads everything else. Two copies of this string would be two
  * cadence claims, and R-039 exists because the journal had several.
+ *
+ * IT IS A PRESENT-TENSE CLAIM ABOUT THE JOURNAL, NOT A FACT ABOUT AN ISSUE, and
+ * it therefore moves when cadence moves — even though it renders above issues
+ * already published, Issue No. 1 included. Ruled deliberately rather than
+ * allowed as a side effect (R-055): "Issue No. 1 stands as founded" protects its
+ * pieces, its URL, its index entry and its bylines; masthead apparatus describes
+ * the journal today. The evidence is that this line has already moved once —
+ * Issue No. 1 published under weekly and its masthead read every-two-weeks from
+ * R-039 onward — so freezing it now would invent a new rule mid-stream.
  */
-export const CADENCE_LINE = 'Published every two weeks';
+export const CADENCE_LINE = 'Published monthly';
 
 /**
  * THE DATELINE — three parts, separated by space and by no mark at all.

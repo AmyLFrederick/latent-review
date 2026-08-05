@@ -55,12 +55,13 @@ import { displayTitle } from '../src/lib/display-title.mjs';
 // confirmation emails, magic links, and correspondence — inside the paid
 // Resend plan.
 //
-// THE ARITHMETIC CHANGED WITH CADENCE, AND THE CAP DID NOT (R-039, 2026-08-03).
-// This sum was written at weekly cadence, where 9,000 subscribers meant
-// ≈ 38,700 digest emails/month against the Pro plan's 50,000 — about 11k of
-// headroom. At an issue every two weeks the same 9,000 subscribers means
-// ≈ 19,500/month, roughly 30k of headroom. The constraint moved in the safe
-// direction, so nothing here needed fixing.
+// THE ARITHMETIC HAS CHANGED TWICE WITH CADENCE, AND THE CAP HAS NOT MOVED
+// EITHER TIME (R-039, 2026-08-03; R-055, 2026-08-05). The sum was written at
+// weekly cadence, where 9,000 subscribers meant ≈ 38,700 digest emails/month
+// against the Pro plan's 50,000 — about 11k of headroom. At an issue every two
+// weeks it was ≈ 19,500/month. At an issue a month the same 9,000 subscribers
+// mean ≈ 9,000 digest emails/month, roughly 41k of headroom. Both moves went in
+// the safe direction, so neither needed a fix here.
 //
 // HARD_CAP STAYS 9,000 REGARDLESS, because the line below says raising it is an
 // editorial decision and a wider plan ceiling is not that decision being made.
@@ -99,6 +100,13 @@ loadDotEnv();
 
 const SITE_URL = process.env.SITE_URL ?? 'https://thelatentreview.com';
 const FROM = process.env.RESEND_FROM ?? 'The Latent Review <notifications@mail.thelatentreview.com>';
+
+// NO TRACKING OPTION IS SENT WITH ANY REQUEST IN THIS FILE, and the footer and
+// the confirmation page both promise a reader that nothing is tracked. Open and
+// click tracking are per-domain toggles in the Resend console rather than
+// anything this script controls — see the note at the head of
+// netlify/lib/email.mts. If either is ever enabled, the published copy changes
+// first, in a reviewed PR.
 
 // --- arguments --------------------------------------------------------------
 

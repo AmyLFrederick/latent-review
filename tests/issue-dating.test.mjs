@@ -10,8 +10,8 @@
 // change that fact after the event.
 //
 // THE OTHER HALF OF THE RULE: pieces keep their own dates. A piece published
-// during an issue's window says so. The issue is a window (R-039's two-week
-// cadence), not a single instant.
+// during an issue's window says so. The issue is a window — two weeks under
+// R-039, a month under R-055 — not a single instant.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

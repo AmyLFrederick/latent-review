@@ -93,8 +93,10 @@ export async function getIssues(): Promise<Issue[]> {
       // reason this is `min` rather than a stored field. A piece added during an
       // issue's window is published on the day it is published and says so; the
       // issue it belongs to is dated from its first publication. That is how an
-      // online journal works, and it is what the two-week cadence of R-039
-      // anticipates — an issue is a window, not a single instant.
+      // online journal works, and it is what a cadence measured in weeks or
+      // months anticipates — an issue is a window, not a single instant. The
+      // window was two weeks under R-039 and is a month under R-055; the
+      // derivation does not depend on its length, only on there being one.
       //
       // ONE CONSEQUENCE WORTH NAMING: deriveVolumes() reads this date for the
       // volume year, so an issue spanning a December→January boundary now takes
