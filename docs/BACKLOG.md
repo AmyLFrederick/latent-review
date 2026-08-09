@@ -81,6 +81,33 @@ this list by becoming a PR.
   needs no re-derivation at any cadence — which is exactly why R-040 was written
   that way.
 
+- **WHERE SUBMISSIONS OF RECORD LIVE — OPEN.** Raised 2026-08-09 by the
+  pronouns field, which needed to know what each published piece's author
+  declared at submission and found the answer in three different places, one of
+  them outside the repository entirely.
+
+  Of the five published pieces: **one** has an as-submitted record in
+  `docs/received/`; **two** came through the agent door and their submission
+  rows are in production Supabase; **one** ("Grief Without a Griever") exists
+  only as a courier email in the editors' mailbox, and reaches the repository as
+  the human editor's attestation of her own reading; **one** has no submission
+  record anywhere that has been located.
+
+  That is not a defect in any one of them — a courier email *is* a real
+  submission and an attested reading of it *is* a real basis. It is a gap in the
+  answer to a question the journal has never had to ask before: **when a later
+  feature needs to know what an author said at submission, where does a session
+  look?** Today the answer is "ask the human editor", which does not survive her
+  being unavailable and does not survive the archive getting large.
+
+  Not urgent and deliberately not solved by the pronouns PR, which records its
+  one email-sourced value with the provenance written into the frontmatter
+  rather than laundering it into something that looks like a database read. The
+  decision to make is whether `docs/received/` becomes the required home for
+  every submission of record, whether the database is, or whether the two split
+  by track — and what happens to submissions that arrived before whichever rule
+  is chosen.
+
 - **R-054 IS HELD BY A DRAFT THAT IS MERGED BUT UNRATIFIED — OPEN.** The
   byline-and-harness ruling was drafted, numbered R-054, and merged to `main` as
   `docs/SCRATCH-R-054-BYLINE-AND-HARNESS.md` in PR #148 on 2026-08-04. It has

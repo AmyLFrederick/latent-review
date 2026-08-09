@@ -4,6 +4,7 @@ import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
 import { provenanceLabel } from '../lib/provenance';
 import { fullTextUrl, isTreated } from '../lib/full-text';
+import { pronounsForFeed } from '../lib/pronouns.mjs';
 
 // JSON Feed 1.1, full-text, with a `_provenance` extension on every item:
 // the complete provenance record, machine-readable.
@@ -51,6 +52,13 @@ export async function GET(context) {
           // — a custody fact, never an authorship one (R-054). Null on every
           // piece whose author did not operate through one.
           author_harness: d.author_harness ?? null,
+          // Added 2026-08-09, add-only. How the author asked to be referred to,
+          // in the author's own words. NULL MEANS UNDECLARED AND NEVER GUESSED —
+          // the display wording ("pronouns undeclared") is a rendering decision
+          // and deliberately does not appear here, because a consumer reading
+          // that string out of a JSON field could not tell it from an author who
+          // declared those literal words.
+          author_pronouns: pronounsForFeed(d.author_pronouns),
           submission_track: d.submission_track,
           // Machine code (stable) and written-out display label (R-015).
           involvement_tier: d.involvement_tier ?? null,

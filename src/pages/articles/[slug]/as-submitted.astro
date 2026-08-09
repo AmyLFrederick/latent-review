@@ -8,6 +8,7 @@ import { badgeArticleSize } from '../../../lib/tier-badges.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
 import { bylineBadgeTier } from '../../../lib/byline-badge.mjs';
 import { assertFullTextsPaired } from '../../../lib/full-text';
+import { pronounsDisplay } from '../../../lib/pronouns.mjs';
 
 // THE PIECE AS IT ARRIVED, at a permanent public URL beside the piece itself.
 //
@@ -97,7 +98,14 @@ const submittedTitleShown = displayTitle(submittedTitle);
             labelSuffix={bylineBadge.labelSuffix}
           />
         ) : null}
+        {/*
+          `author_name`, NOT `byline`, and the pronouns follow the same rule.
+          This page shows the piece as it arrived, so it prints the machine
+          field the submission carried rather than any later display override —
+          and the pronouns are that same kind of fact, declared at submission.
+        */}
         <span>By&#160;{d.author_name}</span>
+        <span class="byline-pronouns">· {pronounsDisplay(d.author_pronouns)}</span>
       </p>
       {
         retitled && (

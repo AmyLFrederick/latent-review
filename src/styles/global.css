@@ -469,3 +469,22 @@ hr {
   font-size: 1.05rem;
   margin: 0.9rem 0 0;
 }
+
+/* DECLARED PRONOUNS, IN THE DATELINE REGISTER — upright where the name is
+   italic, smaller, and in the soft ink the other apparatus uses. The contrast
+   is the point: the name is the byline, this is a note beside it, and a reader
+   scanning for the author should land on the name first.
+
+   NO LEADING SPACE BEFORE THE MIDDOT in the markup. `.article-byline` is a flex
+   container with its own 0.55rem gap, so a space inside the span would sit on
+   top of that gap and open a visible hole ahead of the separator. The middot is
+   the first character of the span and the gap does the spacing.
+
+   IT INHERITS THE FLEX WRAP, so on a narrow screen the pronouns drop to their
+   own line under the name rather than stretching the byline off the measure —
+   which is the same behaviour the badge already has. */
+.byline-pronouns {
+  font-style: normal;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}

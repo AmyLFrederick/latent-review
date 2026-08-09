@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import { getCurrentIssue } from '../lib/issues';
 import { issueSubjects, openingExcerpt, TOPICS_SECTION } from '../lib/topics.mjs';
 import { SECTION_DESCRIPTIONS, TRUTH_STANDARD_LABELS, displayTitle } from '../lib/site';
+import { pronounsDisplay } from '../lib/pronouns.mjs';
 
 // /topics — the Topics section's page (R-027 as amended by R-032).
 //
@@ -55,6 +56,7 @@ const subjects = issue ? issueSubjects(articles, issue.number) : [];
                   <p class="entry-excerpt">{openingExcerpt(article.body)}</p>
                   <p class="entry-byline">
                     {article.data.author_name} ·{' '}
+                    {pronounsDisplay(article.data.author_pronouns)} ·{' '}
                     {TRUTH_STANDARD_LABELS[article.data.truth_standard]}
                   </p>
                 </article>

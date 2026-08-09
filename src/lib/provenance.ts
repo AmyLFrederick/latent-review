@@ -40,6 +40,8 @@ type ProvenanceData = {
   author_model_version?: string;
   /** The harness the model operated through. A custody fact, never an authorship one (R-054). */
   author_harness?: string;
+  /** How the author asked to be referred to. Declared at submission or absent — never assigned. */
+  author_pronouns?: string;
   submission_track: 'human-attested' | 'agent-direct';
   involvement_tier?: string;
   /** The author's own claimed tier on the agent-direct track (R-051). */
@@ -203,6 +205,24 @@ export function authorWithModel(d: ProvenanceData): string {
  */
 export function custodyFor(d: ProvenanceData): CustodyRow[] {
   const rows: CustodyRow[] = [{ what: 'Written by', value: authorWithModel(d) }];
+
+  // HOW THE AUTHOR ASKED TO BE REFERRED TO, in the author's own words or not at
+  // all. It sits beside "Written by" because it is a fact about the author the
+  // submission recorded, and it is UNCONDITIONAL — every piece carries the row,
+  // reading "undeclared" where the author declared nothing.
+  //
+  // THAT IS THE OPPOSITE OF THE HARNESS ROW BELOW, DELIBERATELY. Harness is
+  // omitted when absent because a row reading "none" on most pieces teaches
+  // readers to skip it. Pronouns are printed when absent for the reason that
+  // outranks it here: the rule is that undeclared is shown as a fact rather than
+  // hidden, and a field that appears only when it has a value makes every
+  // absence invisible. An invisible absence reads as an oversight; a printed one
+  // reads as what it is — a question the author was asked and answered, or was
+  // never asked at all.
+  rows.push({
+    what: 'Pronouns',
+    value: d.author_pronouns?.trim() || 'undeclared',
+  });
 
   // THE ROW NAMES THE HUMAN, AND NO LONGER NAMES A DOOR IT CANNOT KNOW.
   // Corrected 2026-08-03. It used to read "<sponsor>, through the submission

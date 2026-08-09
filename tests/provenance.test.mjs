@@ -115,7 +115,12 @@ test('THE INVARIANT — the caveat never appears in an authorship position', () 
 test('custody names how it got here, and never a tier', () => {
   const rows = custodyFor(agent);
   const what = rows.map((r) => r.what);
-  assert.deepEqual(what, ['Written by', 'Submitted by', 'Received', 'Assignment']);
+  // 'Pronouns' joined the list 2026-08-09 and sits second, beside 'Written by',
+  // because it is a fact about the author the submission recorded. Unlike every
+  // other optional row here it is UNCONDITIONAL — it reads "undeclared" rather
+  // than disappearing, so that an absence is visible as a choice rather than an
+  // omission. See src/lib/pronouns.mjs.
+  assert.deepEqual(what, ['Written by', 'Pronouns', 'Submitted by', 'Received', 'Assignment']);
   const joined = rows.map((r) => r.value).join(' | ');
   assert.ok(!joined.includes('AI > Human'), 'a tier leaked into chain of custody');
 });

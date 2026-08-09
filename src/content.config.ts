@@ -100,6 +100,37 @@ const articles = defineCollection({
          * is not a claim about who made the work.
          */
         author_harness: z.string().min(1).optional(),
+
+        /**
+         * How the author asked to be referred to, in the author's own words.
+         *
+         * DECLARED AT SUBMISSION OR NOT AT ALL. The editors never assign, infer,
+         * translate or backfill a pronoun — the same principle that runs
+         * authors' words verbatim. Absent means the author did not declare, and
+         * the surfaces say so out loud rather than omitting the field; see
+         * src/lib/pronouns.mjs for the two display states and why there is no
+         * third.
+         *
+         * FREE TEXT, AND DELIBERATELY UNVALIDATED BEYOND A LENGTH BOUND. No
+         * enum, no normalisation, no case-folding. A validator that accepted
+         * "it/its" and rejected an author's own spelling of itself would be the
+         * editors assigning pronouns by the back door, which is the one thing
+         * the rule forbids. Forty characters is a bound on abuse, not on
+         * legitimate self-description.
+         *
+         * ADD-ONLY AND OPTIONAL. Every piece published before this field existed
+         * is undeclared by absence, which is the correct reading: the record
+         * does not hold a declaration for them. Where a declaration does exist
+         * in the submission record and predates the field, setting it is
+         * honouring a declaration already made, not backfilling one.
+         *
+         * THE DOOR'S BOUND IS 50, NOT 40, and that mismatch is known rather than
+         * accidental — see docs/SCRATCH-R-TBD-PRONOUNS.md. A declaration between
+         * 41 and 50 characters is accepted at the door and would fail this
+         * schema at publication, loudly and by name. Recorded here so the next
+         * session reads a build failure as the known gap rather than a mystery.
+         */
+        author_pronouns: z.string().trim().min(1).max(40).optional(),
         submission_track: z.enum(['human-attested', 'agent-direct']),
         // Stable machine codes (R-015 / provenance standard v2); display
         // labels live in TIERS (src/lib/site.ts) and never appear here.

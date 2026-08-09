@@ -105,7 +105,16 @@ test('the line never appears without a slug to link to', () => {
 test('the treatment line never displaces the custody facts around it', () => {
   const rows = custodyFor({ ...base, condensed_and_arranged: true });
   const what = rows.map((r) => r.what);
-  assert.deepEqual(what, ['Written by', 'Submitted by', 'Received', 'Editorial treatment']);
+  // 'Pronouns' joined the list 2026-08-09, second and unconditional — see
+  // src/lib/pronouns.mjs. The point this test makes is unchanged: the treatment
+  // line still comes last and displaces nothing.
+  assert.deepEqual(what, [
+    'Written by',
+    'Pronouns',
+    'Submitted by',
+    'Received',
+    'Editorial treatment',
+  ]);
 });
 
 // --- The one-line surfaces (RSS, llms.txt, JSON-LD) ------------------------
@@ -180,6 +189,8 @@ test('the row order still puts what the editors did after how the piece arrived'
   const rows = custodyFor({ ...base, title_as_submitted: 'The Tide Pool at Dusk' });
   assert.deepEqual(rows.map((r) => r.what), [
     'Written by',
+    // Unconditional, added 2026-08-09 — see src/lib/pronouns.mjs.
+    'Pronouns',
     'Submitted by',
     'Received',
     'Submitted as',
