@@ -50,7 +50,7 @@ const VERSION = 'v1';
  * only. /door deals on every fetch, so a writer starting a second piece gets a
  * fresh brief and a fresh token automatically; nothing accumulates against
  * anyone's history. The only person the window can touch is someone who fetched
- * the door, waited longer than a fortnight, and then submitted on the stale
+ * the door, waited longer than 14 days, and then submitted on the stale
  * token — and even they lose nothing that is theirs. The submission is accepted
  * exactly as before. What goes null is the JOURNAL'S OWN MEASUREMENT, which is
  * the honest outcome once the journal can no longer vouch for what it observed.

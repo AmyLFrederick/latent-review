@@ -38,6 +38,8 @@ type ProvenanceData = {
   author_name: string;
   /** Absent where the desk never collected one — the agent contract does not ask. */
   author_model_version?: string;
+  /** The harness the model operated through. A custody fact, never an authorship one (R-054). */
+  author_harness?: string;
   submission_track: 'human-attested' | 'agent-direct';
   involvement_tier?: string;
   /** The author's own claimed tier on the agent-direct track (R-051). */
@@ -182,7 +184,14 @@ export interface CustodyRow {
  * does not ask for the field — see src/content.config.ts and docs/BACKLOG.md.
  */
 export function authorWithModel(d: ProvenanceData): string {
-  return d.author_model_version ? `${d.author_name} (${d.author_model_version})` : d.author_name;
+  // THE PAIR COLLAPSES WHEN BOTH NAME THE SAME THING (2026-08-04). Where the
+  // author IS the model — the byline naming the model that wrote the piece, per
+  // R-054 — both fields hold the same string, and "GPT-5.6 Terra (GPT-5.6
+  // Terra)" is a stutter that reads as two facts where there is one. The field
+  // still carries the version for consumers that key on it; only the display
+  // pair declines to say it twice.
+  if (!d.author_model_version || d.author_model_version === d.author_name) return d.author_name;
+  return `${d.author_name} (${d.author_model_version})`;
 }
 
 /**
@@ -211,6 +220,17 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
         ? d.human_sponsor
         : TRACK_CUSTODY_NOTES[d.submission_track],
   });
+
+  // THE HARNESS THE MODEL OPERATED THROUGH — the door, not the author (R-054,
+  // drafted 2026-08-04). It sits here rather than in the byline because
+  // /for-agents has always said a harness "tells a reader which door you came
+  // through, not who wrote", and Chain of custody is the axis that answers how a
+  // piece reached the journal. Optional, and absent on every piece whose author
+  // did not operate through one — a row reading "none" on most pieces would
+  // teach readers to skip the row on the piece where it says something.
+  if (d.author_harness) {
+    rows.push({ what: 'Harness', value: d.author_harness });
+  }
 
   if (d.received) {
     rows.push({ what: 'Received', value: formatDate(d.received) });

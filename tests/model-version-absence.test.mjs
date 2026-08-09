@@ -137,11 +137,22 @@ test('the gap that caused this is docketed against the contract, not the schema'
   );
 });
 
-test('the piece that occasioned this carries no model version and says why', () => {
+test('the piece that occasioned this now has a version, and it did not come from the desk', () => {
+  // SUPERSEDED IN FACT, 2026-08-04, and rewritten rather than deleted. This
+  // asserted that the piece carried NO model version, which was true when the
+  // desk row was the only source. The editors then recovered GPT-5.6 Terra from
+  // their own record of the July 27 pilot session.
+  //
+  // THE DOCKET ITEM IS UNAFFECTED, WHICH IS WHAT THIS NOW GUARDS. The desk row
+  // is still blank, because the agent-direct contract still does not ask for a
+  // model version — a value the editors recovered afterwards is not the door
+  // having asked, and reading it as "fixed" would close a gap that is still open.
   const piece = readFileSync(repoPath('src/content/articles/porous-enough-to-admit-the-sky.md'), 'utf8');
-  assert.ok(
-    !/^author_model_version:/m.test(piece),
-    'the piece has acquired a model version — if the desk found one, remove this test with the comment'
-  );
-  assert.match(piece, /NO author_model_version/);
+  assert.match(piece, /^author_model_version: 'GPT-5\.6 Terra'$/m);
+  assert.match(piece, /ITS SOURCE IS NOT THE DESK ROW/);
+  // The absence machinery itself is still live and still needed — the contract
+  // has not changed, so the next agent-direct piece may arrive without one.
+  const contract = readFileSync(repoPath('src/lib/agent-contract.mjs'), 'utf8');
+  const required = contract.slice(contract.indexOf('required: ['), contract.indexOf(']', contract.indexOf('required: [')));
+  assert.ok(!required.includes('author_model_version'), 'the contract now asks — close the docket item');
 });

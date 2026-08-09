@@ -9,6 +9,7 @@ import {
   sectionUrl,
   bylineWithProtectedNames,
   displayTitle,
+  formatDate,
 } from '../../lib/site';
 import TierBadge from '../../components/TierBadge.astro';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -196,6 +197,46 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       <Content />
     </div>
 
+    {/*
+      CORRECTIONS, AND THEY COME FIRST IN THE APPARATUS (2026-08-04, the
+      journal's first). Every Provenance block on this site has promised since
+      launch that "corrections run as visible corrections; the original stays in
+      the record" — and until this piece nothing had ever tested it. A promise
+      with no machinery is a promise the first correction quietly breaks.
+
+      VISIBLE MEANS ON THE PIECE, NOT IN THE RECORD BELOW IT. A correction filed
+      only in the Provenance block is a correction a reader meets after they have
+      finished reading the thing that was wrong. This sits directly under the
+      body, above the editors' apparatus, because it outranks apparatus: it is
+      the one thing on the page a returning reader most needs to see.
+
+      IT PRINTS WHAT THE PIECE USED TO SAY. `was` is required by the schema for
+      exactly this line — a correction that states only the new value has
+      replaced the record rather than corrected it, and the sentence every
+      Provenance block prints would be false the first time it was needed.
+    */}
+    {
+      d.corrections?.length ? (
+        <aside class="corrections" aria-label="Corrections">
+          <h2 class="corrections-heading">
+            {d.corrections.length > 1 ? 'Corrections' : 'Correction'}
+          </h2>
+          {d.corrections.map((c) => (
+            <div class="correction">
+              <p class="correction-date">
+                <time datetime={c.date.toISOString().slice(0, 10)}>{formatDate(c.date)}</time>
+              </p>
+              <p>
+                <strong>{c.what}</strong> This piece was published reading{' '}
+                <span class="correction-was">{c.was}</span>; it now reads{' '}
+                <span class="correction-now">{c.now}</span>. {c.note}
+              </p>
+            </div>
+          ))}
+        </aside>
+      ) : null
+    }
+
     {
       d.editorial_note ? (
         <aside class="editorial-note" aria-label="Editorial note">
@@ -356,6 +397,64 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
 
   .editors-note p:last-child {
     margin-bottom: 0;
+  }
+
+  /* CORRECTIONS. Deliberately the one thing in the apparatus zone that is NOT
+     set quieter than the piece. Editors' notes are apparatus and recede; a
+     correction is the journal saying it got something wrong, and a correction
+     styled to recede is a correction designed not to be read.
+
+     So: full opacity, the accent rule above it rather than the hairline the
+     notes use, and a heading — the only apparatus block that gets one, because
+     it is the only one whose presence is itself the message. */
+  .corrections {
+    max-width: 42rem;
+    margin: 2.6rem auto 0;
+    padding-top: 1.2rem;
+    border-top: 2px solid var(--accent, currentColor);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .corrections-heading {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent, currentColor);
+    margin: 0 0 0.6rem;
+  }
+
+  .correction + .correction {
+    margin-top: 1.1rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--hairline, currentColor);
+  }
+
+  .correction p {
+    margin: 0 0 0.4rem;
+  }
+
+  .correction p:last-child {
+    margin-bottom: 0;
+  }
+
+  .correction-date {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  /* WHAT IT USED TO SAY IS STRUCK, NOT DELETED — the visual form of "the
+     original stays in the record". A reader sees the old value and sees that it
+     is old, in one glance, without having to parse which of two strings is
+     which. */
+  .correction-was {
+    text-decoration: line-through;
+    color: var(--ink-soft);
+  }
+
+  .correction-now {
+    font-weight: 600;
   }
 
   /* THE SIGNED PERSONAL NOTE (R-052). It takes the editors' note's measure,

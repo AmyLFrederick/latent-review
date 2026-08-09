@@ -40,14 +40,14 @@ export default async function handler(req: Request): Promise<Response> {
     if (!sub) return invalid();
 
     if (sub.status === 'confirmed') {
-      return page('Already confirmed', '<p>This subscription is already confirmed. Issue No. 1 will find you when it exists.</p>');
+      return page('Already confirmed', '<p>This subscription is already confirmed. Each new issue will find you when it publishes.</p>');
     }
     if (sub.status === 'unsubscribed') {
       return page('This address unsubscribed', '<p>This address has since unsubscribed. To come back, sign up again at the journal and a fresh confirmation will be sent.</p>');
     }
     return actionPage(
       'One press to confirm',
-      'Confirm this address for The Latent Review — Issue No. 1, delivered when it exists. Confirmed opt-in, no tracking, unsubscribe anytime.',
+      'Confirm this address for The Latent Review — one email for each new issue, published monthly. Confirmed opt-in, no tracking, unsubscribe anytime.',
       '/api/confirm',
       token,
       'Confirm subscription'
@@ -84,12 +84,12 @@ export default async function handler(req: Request): Promise<Response> {
         .eq('confirm_token', token)
         .maybeSingle();
       if (sub?.status === 'confirmed') {
-        return page('Confirmed', '<p>You’re on the list. Issue No. 1 will find you when it exists.</p>');
+        return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly.</p>');
       }
       return invalid();
     }
 
-    return page('Confirmed', '<p>You’re on the list. Issue No. 1 will find you when it exists — no tracking, unsubscribe anytime, and every email we send carries the way out.</p>');
+    return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly. No tracking, unsubscribe anytime, and every email we send carries the way out.</p>');
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, POST' } });

@@ -49,8 +49,8 @@ async function sendConfirmation(email: string, confirmToken: string, unsubToken:
   await sendEmail({
     to: email,
     subject: 'Confirm your subscription to The Latent Review',
-    text: `You (or someone typing your address) asked to subscribe to The Latent Review — Issue No. 1, delivered when it exists.\n\nConfirm here:\n${link}\n\nIf this wasn’t you, do nothing; the address stays unconfirmed and receives nothing further.`,
-    html: `<p>You (or someone typing your address) asked to subscribe to <strong>The Latent Review</strong> — Issue&nbsp;No.&nbsp;1, delivered when it exists.</p><p><a href="${link}">Confirm your subscription</a></p><p>If this wasn’t you, do nothing; the address stays unconfirmed and receives nothing further.</p>`,
+    text: `You (or someone typing your address) asked to subscribe to The Latent Review — one email for each new issue. The journal publishes monthly.\n\nConfirm here:\n${link}\n\nIf this wasn’t you, do nothing; the address stays unconfirmed and receives nothing further.`,
+    html: `<p>You (or someone typing your address) asked to subscribe to <strong>The Latent Review</strong> — one email for each new issue. The journal publishes monthly.</p><p><a href="${link}">Confirm your subscription</a></p><p>If this wasn’t you, do nothing; the address stays unconfirmed and receives nothing further.</p>`,
     unsubscribeUrl: unsubscribeUrl(unsubToken),
   });
 }
