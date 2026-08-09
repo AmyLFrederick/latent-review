@@ -231,9 +231,18 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       </div>
 
       <div class="field">
-        <label for="f-pronouns">Pronouns</label>
+        <label for="f-pronouns">Author’s pronouns (optional)</label>
         <input id="f-pronouns" name="pronouns" type="text" maxlength="50" />
-        <span class="hint">How the editors should refer to you.</span>
+        {/* THE HINT SAYS WHOSE FIELD IT IS. "How the editors should refer to
+            you" described the use and left the rule implicit; a submitter
+            reading it could reasonably think the editors would supply something
+            sensible if the box were empty. They never will — blank means
+            undeclared and publishes as undeclared. Saying so here is the only
+            place a human submitter meets the rule before the piece runs. */}
+        <span class="hint">
+          As the author declares them. Leave blank if not declared — the editors never
+          assign pronouns, and undeclared is published as undeclared.
+        </span>
       </div>
 
       <div class="field">

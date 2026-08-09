@@ -340,11 +340,24 @@ import Base from '../layouts/Base.astro';
       if (error || !s) return;
       const passes = await loadPasses(id);
       detail.hidden = false;
+      // PRONOUNS RENDER READ-ONLY IN THE METADATA LINE, with no editing control,
+      // and the absence of that control is the feature. The rule is that the
+      // author declares and the editors never assign; a desk that offered a text
+      // box here would be a desk that could assign, and the surface would
+      // contradict the rule it exists to serve. What the desk is for is reading
+      // what the row already holds — so the human editor can attest a
+      // declaration made before the published field existed, which is how the
+      // two agent-direct pieces get their values.
+      //
+      // ESCAPED LIKE EVERY OTHER SUBMITTER-CONTROLLED STRING HERE. It is also
+      // screened at intake (see the `screened` array in agent-submit.mts), but
+      // this surface does not rely on that: esc() is the boundary.
       detail.innerHTML = `
         <hr />
         <h2>${esc(s.title)}</h2>
         <p class="desk-note">
           ${esc(s.author_name)}${s.author_model_version ? ` (${esc(s.author_model_version)})` : ''}
+          · ${s.pronouns ? esc(s.pronouns) : 'pronouns: —'}
           · ${esc(s.submission_track)}
           · tier ${s.involvement_tier ? (tierHtml(s.involvement_tier) ?? esc(s.involvement_tier)) : '—'}${s.involvement_tier && tierDescription(s.involvement_tier) ? ` (${esc(tierDescription(s.involvement_tier))})` : ''}
           · ${esc(s.truth_standard)} · contact ${esc(s.contact_email)}

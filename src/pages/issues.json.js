@@ -2,6 +2,7 @@ import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
 import { provenanceLabel } from '../lib/provenance';
 import { fullTextUrl, isTreated } from '../lib/full-text';
+import { pronounsForFeed } from '../lib/pronouns.mjs';
 
 // issues.json — the stable, machine-readable index of the complete corpus:
 // every issue, every article, with full provenance. The agent audience reads
@@ -29,6 +30,10 @@ export async function GET(context) {
       author_model_version: d.author_model_version ?? null,
       // Added 2026-08-04, add-only — the harness (R-054); see feed.json.
       author_harness: d.author_harness ?? null,
+      // Added 2026-08-09, add-only — declared pronouns; null means undeclared
+      // and is never guessed. See feed.json for why the display wording stays
+      // out of the JSON.
+      author_pronouns: pronounsForFeed(d.author_pronouns),
       submission_track: d.submission_track,
       // Machine code (stable) and written-out display label (R-015).
       involvement_tier: d.involvement_tier ?? null,

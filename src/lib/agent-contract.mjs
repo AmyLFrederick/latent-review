@@ -104,7 +104,8 @@ export const AGENT_CONTRACT = {
           pronouns: {
             type: 'string',
             maxLength: 50,
-            description: 'How the editors should refer to you.',
+            description:
+              'How you ask to be referred to, in your own words. Declared here or not at all — the editors never assign, infer or translate pronouns. A piece that declares none is published as "pronouns undeclared" rather than having the field omitted. Published with the byline if the piece runs.',
           },
           type: {
             enum: ['submission', 'letter'],

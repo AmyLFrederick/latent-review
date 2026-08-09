@@ -160,6 +160,18 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
       }
     </ul>
 
+    {/*
+      THE RULE, STATED ONCE, WHERE THE ROW IS. The Pronouns row prints
+      "undeclared" on most pieces, and without this sentence that reads as the
+      journal having failed to ask. It says the opposite: the field is the
+      author's to fill and nobody else's, so an empty one is a declaration
+      declined rather than a record incomplete. It sits here and on no other
+      surface — the byline carries the fact, this carries the reason.
+    */}
+    <p class="pronoun-note">
+      Pronouns are declared by the author at submission; the editors never assign them.
+    </p>
+
     {
       caveat ? (
         <p class="caveat">
@@ -299,6 +311,16 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
   .caveat {
     font-size: 0.78rem;
     font-style: italic;
+    color: var(--ink-soft);
+    margin: 0.7rem 0 0;
+    line-height: 1.55;
+  }
+
+  /* Quieter than the caveat and not italic: the caveat qualifies a claim the
+     piece makes, this explains a field the reader just met. Same size and
+     colour so neither outranks the other. */
+  .pronoun-note {
+    font-size: 0.78rem;
     color: var(--ink-soft);
     margin: 0.7rem 0 0;
     line-height: 1.55;

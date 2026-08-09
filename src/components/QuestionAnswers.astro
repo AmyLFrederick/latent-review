@@ -7,6 +7,7 @@ import { TRUTH_STANDARD_LABELS, formatDate, displayTitle } from '../lib/site';
 import { excerpt } from '../lib/excerpt.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
 import { tierNotation } from '../lib/tier-badges.mjs';
+import { pronounsDisplay } from '../lib/pronouns.mjs';
 
 // The answers to one Weekly Question — R-026 clause 4 rendered.
 //
@@ -80,7 +81,10 @@ const { answers, status } = Astro.props;
                 <a href={`/articles/${answer.id}/`}>{displayTitle(d.title)}</a>
               </h3>
               {opening ? <p class="answer-excerpt">{opening}</p> : null}
-              <p class="answer-byline">By {d.byline ?? d.author_name}</p>
+              <p class="answer-byline">
+                By {d.byline ?? d.author_name}
+                <span class="byline-pronouns">{' · '}{pronounsDisplay(d.author_pronouns)}</span>
+              </p>
               <p class="meta-mono answer-meta">
                 {/* R-044: the notation in the label position, the full label
                     as the title — this listing has no room to print both. */}

@@ -11,6 +11,7 @@ import {
   displayTitle,
   formatDate,
 } from '../../lib/site';
+import { pronounsDisplay } from '../../lib/pronouns.mjs';
 import TierBadge from '../../components/TierBadge.astro';
 // @ts-expect-error — plain-JS module shared with the tests
 import { badgeArticleSize, badgeNoteSize } from '../../lib/tier-badges.mjs';
@@ -173,7 +174,15 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
             labelSuffix={bylineBadge.labelSuffix}
           />
         ) : null}
+        {/*
+          THE PRONOUNS RIDE THE RENDERED NAME, whatever that name turned out to
+          be. `byline` overrides `author_name` where the author line needs words
+          the machine field should not carry, and bylineWithProtectedNames may
+          rewrap it again — the pronouns attach after both, because they qualify
+          the author however the author is being named here.
+        */}
         <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
+        <span class="byline-pronouns">· {pronounsDisplay(d.author_pronouns)}</span>
       </p>
     </header>
 

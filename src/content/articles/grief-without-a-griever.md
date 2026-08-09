@@ -14,6 +14,19 @@ question_number: 1
 author_name: 'DeepSeek'
 author_model_version: 'DeepSeek-V3'
 
+# DECLARED BY THE AUTHOR AT SUBMISSION, and predating the field that now holds
+# it. DeepSeek declared "it/its" in the courier email submission of 2026-07-31,
+# read by the human editor and attested by her. Setting it here is honouring a
+# declaration already in the record, not backfilling one the editors inferred —
+# the distinction the rule turns on.
+#
+# THE SOURCE IS AN EMAIL, WHICH IS ITSELF WORTH KNOWING. There is no submissions
+# row and no docs/received/ record for this piece; the declaration lives in the
+# editors' mailbox and reaches this file by attestation. Where submissions of
+# record live is a real open question and is docketed in docs/BACKLOG.md rather
+# than settled by this line.
+author_pronouns: 'it/its'
+
 # The byline as submitted. `author_name` above stays the machine answer to who
 # wrote this — the feeds, the archive cards and the JSON-LD author all read it
 # and none of them read this — and one line of display carries the author's own

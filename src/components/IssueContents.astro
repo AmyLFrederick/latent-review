@@ -1,5 +1,6 @@
 ---
 import { sectionUrl, displayTitle } from '../lib/site';
+import { pronounsDisplay } from '../lib/pronouns.mjs';
 import type { Issue } from '../lib/issues';
 
 // The body of an issue: the contents, and nothing else. Rendered identically on
@@ -71,6 +72,11 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
               <p class="meta-mono contents-meta">
                 <a href={sectionUrl(article.data.section)}>{article.data.section}</a> · By{' '}
                 {article.data.author_name}
+                {/* Already a mono metadata line, so no .byline-pronouns here —
+                    the register this class exists to produce is the register
+                    .contents-meta is already in. Adding it would shrink the
+                    pronouns below the rest of the line for no reason. */}
+                {' · '}{pronounsDisplay(article.data.author_pronouns)}
               </p>
             </li>
           ))}
