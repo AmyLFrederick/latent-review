@@ -158,34 +158,73 @@ begin
     missing := missing || 'one or more inbound columns missing; ';
   end if;
 
-  -- truth_standard now accepts NULL. Asserted before the CHECK probe below,
-  -- because that probe relies on being able to insert a row without one.
+  -- A PROBE INSERT MUST SATISFY EVERY CONSTRAINT IT IS NOT PROBING.
+  --
+  -- Both probes below are 'human-attested' with the tier 'ai', and BOTH HALVES
+  -- are forced by a pair of constraints that must be read together:
+  --
+  --   involvement_tier_matches_track      human-attested => tier NOT NULL
+  --                                       agent-direct   => tier NULL
+  --   submissions_agent_identity_matches_track
+  --                                       agent-direct   => agent_identity_id NOT NULL
+  --                                       human-attested => agent_identity_id NULL
+  --
+  -- There is no track that needs neither. agent-direct trades the tier for a
+  -- foreign key into agent_identities, which a probe would have to create and
+  -- clean up; human-attested needs only a literal from
+  -- submissions_involvement_tier_check, whose current list was set by
+  -- 20260718120000. 'ai' is a member of it. That is the cheaper dependency and
+  -- it is named here so the next reader does not re-derive the pair.
+  --
+  -- THIS IS THE THIRD TIME THIS BLOCK GOT THIS WRONG, so the rule is written out
+  -- rather than left to be re-derived. A probe that trips a constraint it is not
+  -- testing does not report a schema problem; it reports a broken probe — and
+  -- when the trip happens inside an `exception when check_violation` handler, it
+  -- reports nothing at all and passes. Every other column here is left to its
+  -- default precisely so there is less to get wrong: type defaults to
+  -- 'submission' (satisfying letter_target_present_iff_letter), courier_submission
+  -- to false (satisfying submissions_courier_identity_coherent), status to 'new'.
   begin
     insert into public.submissions (title, author_name, body, provenance_attestation,
-                                    contact_email, submission_track)
+                                    contact_email, submission_track, involvement_tier)
     values ('probe-null-truth', 'probe', 'probe', 'probe', 'probe@example.com',
-            'human-attested');
-  exception when not_null_violation then
-    missing := missing || 'truth_standard is still NOT NULL; ';
+            'human-attested', 'ai');
+  exception
+    when not_null_violation then
+      missing := missing || 'truth_standard is still NOT NULL; ';
+    when others then
+      -- Any other failure means this probe is broken, not the schema. Say which,
+      -- rather than reporting a healthy column as broken.
+      missing := missing || 'null-truth probe failed for an unrelated reason ('
+                 || SQLERRM || '); ';
   end;
 
   -- The source CHECK accepts the three values and rejects a fourth. Asserted in both
   -- directions because a CHECK that accepts everything passes a one-sided probe.
   --
   -- EVERY OTHER COLUMN HERE MUST BE VALID, or this probe passes for the wrong
-  -- reason. The first draft of this block passed 'factual' as the truth standard
-  -- — not a member of that column's CHECK — so the insert raised check_violation
-  -- before received_date_source was ever evaluated, and the probe reported
-  -- success while testing nothing. A test that can only pass is not a test.
+  -- reason — and it did, twice, in two different ways. First it passed 'factual'
+  -- as the truth standard, which is not a member of that column's CHECK. Then,
+  -- with that corrected, it was still 'human-attested' with no tier, which trips
+  -- involvement_tier_matches_track. Either one raises check_violation before
+  -- received_date_source is ever evaluated, and the handler below catches it and
+  -- calls it success. A test that can only pass is not a test.
+  --
+  -- SO THE HANDLER NOW READS THE ERROR RATHER THAN ASSUMING IT. Catching
+  -- check_violation generically is what let both bugs hide; the constraint name
+  -- is checked, and a violation of anything else is reported as a broken probe.
   begin
     insert into public.submissions (title, author_name, body, provenance_attestation,
                                     contact_email, truth_standard, submission_track,
-                                    received_date_source)
+                                    involvement_tier, received_date_source)
     values ('probe', 'probe', 'probe', 'probe', 'probe@example.com', 'reported',
-            'human-attested', 'guessed');
+            'human-attested', 'ai', 'guessed');
     missing := missing || 'received_date_source accepted an invalid value; ';
   exception when check_violation then
-    null; -- correct
+    if position('received_date_source' in SQLERRM) = 0 then
+      missing := missing || 'received_date_source probe tripped a different constraint ('
+                 || SQLERRM || '); ';
+    end if;
   end;
 
   -- The cap row exists and is the approved number.
