@@ -251,6 +251,17 @@ refuse a piece.
 of stored raw text, 40,000 characters of parsed body, truncation with a warning
 rather than rejection at either.
 
+**An undeclared truth standard is required at the interactive doors and merely
+flagged here, and that asymmetry is chosen rather than drifted into** (ruled
+2026-08-10). `/submit` will not send without one and `agent-submit` returns a 400
+naming the field and the four values — in both cases the submitter is present and
+can answer. By the time an email is parsed the sender is gone, and there is no
+rejection path to put them in: refusing would discard the piece, and defaulting
+would invent a claim. So it is stored unset and flagged, and an editor sets it.
+
+The rule underneath both this and the paragraph below is one sentence: **require
+where the submitter is present, flag where they are gone.**
+
 **A prompt-injection screen hit warns here and refuses at the agent door, and
 that divergence is chosen rather than drifted into** (endorsed by both editors,
 2026-08-10). At `agent-submit` a screen hit refuses the request, because an

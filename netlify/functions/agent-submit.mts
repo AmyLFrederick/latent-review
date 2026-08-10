@@ -125,6 +125,51 @@ export function refusalWords(words: number, min: number, max: number, isLetter: 
   });
 }
 
+// FOUR, NOT THREE. 'fiction' was added to the submissions CHECK and the article
+// schema by 20260730130000 and has been offered at /submit and published in the
+// contract at /for-agents ever since — but this list was never widened, so the
+// agent door has been refusing fiction as a schema violation the whole time,
+// with the opaque refusal that cannot say why. An agent reading the contract saw
+// four valid values and could use three. Corrected 2026-08-10.
+const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'];
+
+/**
+ * The second refusal that names its field — and the second exception to C-1.
+ *
+ * RULED 2026-08-10, when the truth standard became required at the interactive
+ * doors. It earns the exception on exactly the test the length refusal set, and
+ * it is worth restating rather than citing, because the test is what keeps this
+ * list from growing by habit.
+ *
+ * WHAT THE NO-ORACLE RULE PROTECTS: a refusal must not let a caller learn
+ * something it does not already have — which keys exist, whether an identity is
+ * banned, which bucket is full. This reveals none of those. The four values are
+ * already published by name in the contract the caller is told to read, and the
+ * value being rejected is the caller's own. There is nothing here to probe for.
+ *
+ * IT DOES NOT MOVE THE AUTH BOUNDARY EITHER. Validation runs at step (5) and the
+ * key is authenticated in the RPC at step (7), so a caller with a bogus key can
+ * already tell a 400 from a 401 today. Naming the field changes what the 400
+ * says about the caller's own payload, not which requests get one.
+ *
+ * WHY IT IS WORTH THE EXCEPTION. Until today this door accepted three of the
+ * four published standards — 'fiction' was widened into the database and the
+ * contract on 2026-07-30 and never added here. Every agent that read the
+ * contract and sent `fiction` got an opaque "not accepted" for a value the
+ * journal had told it was valid. That is the exact failure the legibility ruling
+ * describes: the refusal a correct, honest author is most likely to hit is the
+ * one that must explain itself.
+ */
+export function refusalTruthStandard() {
+  return Object.freeze({
+    ok: false,
+    code: 'LR400',
+    error:
+      `truth_standard is required and must be one of: ${TRUTH_STANDARDS.join(', ')}. ` +
+      'Nothing else about this submission was judged; the full schema is documented at /for-agents.',
+  });
+}
+
 export const REFUSAL_AUTH = Object.freeze({
   ok: false,
   code: 'LR401',
@@ -187,7 +232,6 @@ function readString(
   return { ok: true, value };
 }
 
-const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // the DB's own regex
 
 export default async function handler(req: Request, context: Context): Promise<Response> {
@@ -268,11 +312,21 @@ export default async function handler(req: Request, context: Context): Promise<R
   if (
     !title.ok || !authorName.ok || !modelVersion.ok || !attestation.ok ||
     !body.ok || !email.ok || !suggestedSection.ok || !pronouns.ok || !promptDisclosure.ok ||
-    typeof payload.truth_standard !== 'string' ||
-    !TRUTH_STANDARDS.includes(payload.truth_standard) ||
     !EMAIL_RE.test(email.value as string)
   ) {
     return refuseValidation('validation');
+  }
+
+  // (5·i) THE TRUTH STANDARD, REFUSED BY NAME. Required at this door as of
+  // 2026-08-10: an agent is present and can retry, so the door asks rather than
+  // accepting silence. It is checked apart from the block above because its
+  // refusal says which field and which values, which the block's cannot.
+  if (
+    typeof payload.truth_standard !== 'string' ||
+    !TRUTH_STANDARDS.includes(payload.truth_standard)
+  ) {
+    console.log('agent submit refused: truth_standard');
+    return json(refusalTruthStandard(), 400);
   }
 
   // (5a) The type allowlist. Absent is 'submission' — the two identities
