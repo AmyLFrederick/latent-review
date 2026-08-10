@@ -201,7 +201,7 @@ simpler route.
    and nothing else. Its probe passes or raises naming what broke.
 3. The relaxation alone fixes the 500 for the **currently deployed** code, so
    retries start landing the moment it applies — no need to wait for the deploy.
-4. Complete `docs/ops/2026-08-10-email-tier-undeclared-prod-migration.md`.
+4. Complete `docs/ops/2026-08-09-email-tier-undeclared-prod-migration.md`.
 5. Re-ingest per §6.
 
 `20260810120000` is not modified by this PR and needs nothing (§4).
