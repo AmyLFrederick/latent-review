@@ -87,6 +87,35 @@ alter table public.submissions
     check (received_date_source is null
            or received_date_source in ('parsed', 'attested', 'forward'));
 
+-- ---------------------------------------------------------------------------
+-- 1b. truth_standard becomes nullable, because the desk never assigns one
+-- ---------------------------------------------------------------------------
+--
+-- RULED 2026-08-10. An email that declares no truth standard stores NULL and is
+-- flagged, exactly as an unrecognised tier is. The alternative considered and
+-- rejected was defaulting to 'reported' as desk-internal state: even unpublished,
+-- that is a claim about the piece that its author never made, and the desk does
+-- not make claims on an author's behalf. The same principle as pronouns, and as
+-- tiers — declared or absent, never supplied.
+--
+-- WHAT THIS GIVES UP, STATED PLAINLY. Since 20260717120000 the database has
+-- guaranteed that every submission row carries a truth standard. It no longer
+-- will. That guarantee was doing real work and it is worth naming what replaces
+-- it: the ARTICLE schema still requires one (a z.enum in src/content.config.ts,
+-- with no optional), so nothing can be published without it. The guarantee moves
+-- from intake to publication, which is where it belonged — a submission is a
+-- thing someone sent us, and a published piece is a thing we vouched for.
+--
+-- Every existing door still requires the field: /submit's select is `required`,
+-- and agent-submit validates against its own list before insert. NULL is
+-- therefore reachable only from the email door, and only where the author was
+-- silent. No existing row changes.
+alter table public.submissions
+  alter column truth_standard drop not null;
+
+comment on column public.submissions.truth_standard is
+  'The author''s declared truth standard. NULL means undeclared — the desk never assigns one; an editor sets it before publication.';
+
 comment on column public.submissions.arrival is
   'How the piece reached the journal. Add-only vocabulary; see src/lib/site.ts ARRIVAL_LABELS.';
 comment on column public.submissions.parse_warning is
@@ -129,13 +158,30 @@ begin
     missing := missing || 'one or more inbound columns missing; ';
   end if;
 
+  -- truth_standard now accepts NULL. Asserted before the CHECK probe below,
+  -- because that probe relies on being able to insert a row without one.
+  begin
+    insert into public.submissions (title, author_name, body, provenance_attestation,
+                                    contact_email, submission_track)
+    values ('probe-null-truth', 'probe', 'probe', 'probe', 'probe@example.com',
+            'human-attested');
+  exception when not_null_violation then
+    missing := missing || 'truth_standard is still NOT NULL; ';
+  end;
+
   -- The source CHECK accepts the three values and rejects a fourth. Asserted in both
   -- directions because a CHECK that accepts everything passes a one-sided probe.
+  --
+  -- EVERY OTHER COLUMN HERE MUST BE VALID, or this probe passes for the wrong
+  -- reason. The first draft of this block passed 'factual' as the truth standard
+  -- — not a member of that column's CHECK — so the insert raised check_violation
+  -- before received_date_source was ever evaluated, and the probe reported
+  -- success while testing nothing. A test that can only pass is not a test.
   begin
     insert into public.submissions (title, author_name, body, provenance_attestation,
                                     contact_email, truth_standard, submission_track,
                                     received_date_source)
-    values ('probe', 'probe', 'probe', 'probe', 'probe@example.com', 'factual',
+    values ('probe', 'probe', 'probe', 'probe', 'probe@example.com', 'reported',
             'human-attested', 'guessed');
     missing := missing || 'received_date_source accepted an invalid value; ';
   exception when check_violation then
@@ -168,4 +214,5 @@ end $$;
 
 -- Clean up any probe row that survived (it should not — the insert above is expected to
 -- fail its CHECK — but a probe that leaves data behind is a probe that lies).
-delete from public.submissions where title = 'probe' and contact_email = 'probe@example.com';
+delete from public.submissions
+where title in ('probe', 'probe-null-truth') and contact_email = 'probe@example.com';

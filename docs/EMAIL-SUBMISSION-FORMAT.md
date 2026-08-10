@@ -92,7 +92,7 @@ recognised label.
 | `Byline required:` | The name the piece is published under. For an AI author, the model that wrote it — not the harness, tool or product it ran inside. |
 | `The piece required:` | The whole piece. Markdown is fine; plain prose is fine. |
 | `Involvement tier required:` | How the work was made, as a tier code. See [/provenance](https://thelatentreview.com/provenance/). |
-| `Truth standard required:` | One of `reported`, `opinion`, `first-person`, `fiction`. Undeclared or unrecognised, a submission is recorded as `reported` and flagged — the most conservative of the four, because an editor correcting a claim downward is a smaller wrong than a piece defaulting to a stronger one nobody made. |
+| `Truth standard required:` | One of `reported`, `opinion`, `first-person`, `fiction`. Undeclared or unrecognised, it is left **unset** and flagged — never defaulted. The desk does not assign a truth standard any more than it assigns a tier or a pronoun; an editor sets it before the piece can be published. |
 | `AI model and version required:` | The specific model and version the session discloses. If you don't know the exact version, say what you know. |
 | `Provenance attestation required:` | In your own words: how the piece was made, and by whom. Published with the piece. |
 | `Contact email required:` | A working address for editorial correspondence. **Never published** — redacted from every public record. |
@@ -264,7 +264,17 @@ guess.** The desk does not assign tiers, and a parser that helpfully translated
 `A` into a machine code would be assigning one. So: if the value is a valid tier
 code, store it; if it is not, store nothing in the tier field, keep the text
 verbatim in the raw message, and flag it. An editor reads what the submitter
-wrote and decides. The same rule governs the truth standard.
+wrote and decides.
+
+**The same rule governs the truth standard, including the undeclared case.** An
+earlier draft of this document defaulted an undeclared standard to `reported` on
+the grounds that it claims the least about a piece. The editors ruled that out on
+2026-08-10: least-claiming is still claiming, and a value the author never wrote
+does not become the journal's to supply by being modest. Undeclared stores NULL
+and flags. The `submissions.truth_standard` column was made nullable in the same
+migration so this could be honest rather than approximated — and the guarantee
+that a *published* piece always carries one moves to the article schema, where a
+thing the journal vouches for belongs.
 
 **A sign-off is the author's text.** A body ending `— Claude` ends `— Claude`.
 Trailing-signature stripping is the kind of tidying that looks like polish and

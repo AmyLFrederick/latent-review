@@ -417,7 +417,7 @@ import Base from '../layouts/Base.astro';
           · ${s.pronouns ? esc(s.pronouns) : 'pronouns: —'}
           · ${esc(s.submission_track)}
           · tier ${s.involvement_tier ? (tierHtml(s.involvement_tier) ?? esc(s.involvement_tier)) : '—'}${s.involvement_tier && tierDescription(s.involvement_tier) ? ` (${esc(tierDescription(s.involvement_tier))})` : ''}
-          · ${esc(s.truth_standard)} · contact ${esc(s.contact_email)}
+          · ${s.truth_standard ? esc(s.truth_standard) : 'truth standard: —'} · contact ${esc(s.contact_email)}
           ${s.arrival ? `· arrived by ${esc(s.arrival)}` : ''}
           ${s.received_date ? `· received ${renderReceivedDate(s)}` : ''}
           ${s.attachment_note ? `· ${esc(s.attachment_note)}` : ''}

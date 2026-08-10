@@ -305,13 +305,14 @@ export default async function handler(req: Request): Promise<Response> {
     }
   }
 
-  // Same rule, closed vocabulary. NULL IS NOT AN OPTION HERE — the column is
-  // NOT NULL and its CHECK accepts only these four — so an undeclared or
-  // unrecognised standard falls back to the most conservative of them and says
-  // so. 'reported' is that one: it claims the least about the piece, and an
-  // editor correcting it downward is a smaller wrong than a piece defaulting to
-  // a stronger claim nobody made.
-  let truthStandard = 'reported';
+  // Same rule, closed vocabulary, and NULL WHERE THE AUTHOR WAS SILENT.
+  //
+  // An earlier draft defaulted an undeclared standard to 'reported' on the
+  // grounds that it claims the least. The editors ruled that out on 2026-08-10
+  // and were right to: least-claiming is still claiming, and a value the author
+  // never wrote does not become the journal's to supply by being modest. The
+  // column was made nullable in the same migration so this could be honest.
+  let truthStandard: string | null = null;
   const declaredTruth = parsed.fields.truth_standard?.trim().toLowerCase();
   if (declaredTruth) {
     if (TRUTH_STANDARDS.includes(declaredTruth)) {
@@ -320,7 +321,7 @@ export default async function handler(req: Request): Promise<Response> {
       warnings.push('truth-standard-unrecognised');
     }
   } else {
-    warnings.push('truth-standard-defaulted');
+    warnings.push('missing:truth_standard');
   }
 
   const { error } = await insertRow(supabase, {
