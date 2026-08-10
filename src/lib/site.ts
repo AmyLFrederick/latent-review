@@ -344,6 +344,29 @@ export const ARRIVAL_LABELS: Record<string, string> = {
     'Unsolicited — no assignment was dealt; the piece came in response to a public notice (notice-v1)',
   'unsolicited — notice-v2':
     'Unsolicited — no assignment was dealt; the piece came in response to a public notice (notice-v2)',
+  // Added 2026-08-10 with the email door. Add-only, like every value above it: a
+  // published piece names the value it arrived under forever, so a value leaves
+  // placement and never this map.
+  email: 'Email — the piece was sent to the journal’s submissions address; no assignment was dealt',
+};
+
+/**
+ * Which Chain of custody row an arrival value belongs under.
+ *
+ * TWO LABELS, BECAUSE "ASSIGNMENT" WAS NEVER A GENERAL WORD FOR ARRIVAL. The map
+ * above began as answers to one question — which brief was dealt — and
+ * "Assignment" was the honest row for both of them, including the unsolicited
+ * values, which say *no assignment was dealt* and are therefore still about
+ * assignment. An email is not: nothing was dealt and nothing declined to be
+ * dealt, the piece simply came by a door. Rendering it as "Assignment: Email"
+ * would publish a category error on the piece, in the half of the provenance
+ * block that exists to be precise about how work reached the journal.
+ *
+ * Values absent from this map keep "Assignment", so the two notice values render
+ * exactly as they always have and no published page moves.
+ */
+export const ARRIVAL_ROW_LABELS: Record<string, string> = {
+  email: 'Arrived by',
 };
 
 // Charter: the order of names names who led; the equals sign names

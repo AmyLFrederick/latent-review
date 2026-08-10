@@ -125,6 +125,40 @@ test('custody names how it got here, and never a tier', () => {
   assert.ok(!joined.includes('AI > Human'), 'a tier leaked into chain of custody');
 });
 
+test('an email arrival renders under "Arrived by", never "Assignment"', () => {
+  // TOUCHES PUBLISHED PROVENANCE, so it is pinned rather than eyeballed. The
+  // arrival map began as answers to "which brief was dealt", and both notice
+  // values are still about assignment — they say none was dealt. An email is
+  // not: nothing was dealt and nothing declined to be dealt. "Assignment: Email"
+  // would publish a category error in the half of the block that exists to be
+  // precise about how work reached the journal.
+  const rows = custodyFor({ ...agent, arrival: 'email' });
+  const row = rows.find((r) => r.value.startsWith('Email —'));
+  assert.ok(row, 'no row rendered for the email arrival value');
+  assert.equal(row.what, 'Arrived by');
+
+  // Not "no Assignment row anywhere" — a dealt brief renders its own, and a
+  // piece can legitimately have both: an assignment was dealt AND the reply came
+  // by email. The claim is narrower and the one that matters: the email value
+  // itself never appears under Assignment.
+  const asAssignment = rows.filter((r) => r.what === 'Assignment');
+  assert.ok(
+    !asAssignment.some((r) => r.value.startsWith('Email —')),
+    'the email arrival value rendered under Assignment'
+  );
+});
+
+test('the notice arrivals still render under "Assignment", unmoved', () => {
+  // The other half of the same change: two published surfaces already carry
+  // these, and adding a row label for email must not relabel them.
+  for (const value of ['unsolicited — notice-v1', 'unsolicited — notice-v2']) {
+    const rows = custodyFor({ ...agent, arrival: value });
+    const row = rows.find((r) => r.value.startsWith('Unsolicited —'));
+    assert.ok(row, `no row for ${value}`);
+    assert.equal(row.what, 'Assignment', `${value} changed rows`);
+  }
+});
+
 test('the assignment row appears only when a brief was actually dealt', () => {
   // A row reading "not applicable" on most pieces teaches readers to skip the
   // list, so the row is absent instead.

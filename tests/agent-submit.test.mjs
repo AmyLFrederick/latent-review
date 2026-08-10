@@ -148,10 +148,10 @@ test('N7b: every validation refusal and every screen refusal share one LR400 bod
   const bodies = new Set();
   const cases = [
     { ...validPayload(), title: '' }, // too short
-    { ...validPayload(), truth_standard: 'gospel' }, // bad enum
-    // A length failure is NOT in this set any more: R-033 made it the one
-    // refusal that names its field and echoes its numbers. It has its own test
-    // below, and the no-oracle property still holds for everything here.
+    // A length failure is NOT in this set: R-033 made it a refusal that names
+    // its field and echoes its numbers. A bad truth_standard left this set on
+    // 2026-08-10 for the same reason and on the same test — both have their own
+    // tests below, and the no-oracle property still holds for everything here.
     { ...validPayload(), title: 'a‮b' }, // screen: bidi
     { ...validPayload(), body: `${words(600)} ​` }, // screen: invisible
     '{not json', // parse failure
@@ -277,15 +277,62 @@ test('N8c: a letter’s length refusal names the letter bounds, not the piece bo
   assert.match(body.error, /Letters run 100 to 300 words/);
 });
 
-test('N8d: the legible refusal is the ONLY one that echoes anything', async () => {
-  // Guards the exception from spreading. Every other 400 stays frozen and
-  // nameless; if a future change makes another refusal chatty, this fails.
+test('N8d: exactly two refusals echo anything, and this is the closed list', async () => {
+  // GUARDS THE EXCEPTION FROM SPREADING BY HABIT, which is the only way a
+  // no-oracle rule dies. It was one refusal (length, R-033) and is now two
+  // (truth_standard, 2026-08-10) — each admitted by a ruling, on the test that
+  // the value it echoes is already published and is the caller's own.
+  //
+  // A THIRD MUST FAIL HERE FIRST. If a future change makes another refusal
+  // chatty, this test breaks, and the question it asks is not "how do I make
+  // this pass" but "did the editors admit a third exception".
+  const stillFrozen = [
+    { ...validPayload(), title: '' },
+    { ...validPayload(), title: 'a‮b' },
+    { ...validPayload(), body: `${words(600)} \u200b` },
+  ];
+  for (const payload of stillFrozen) {
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = rpcUnreachable;
+    const res = await submit(request(payload, generateAgentKey()), ctx);
+    assert.equal(res.status, 400);
+    assert.equal(await res.text(), JSON.stringify(REFUSAL_VALIDATION));
+  }
+});
+
+test('N8e: a bad truth_standard names the field and the four valid values', async () => {
+  // The second ruled exception. It exists because this door accepted three of
+  // the four published standards until 2026-08-10 — 'fiction' was widened into
+  // the database and the contract on 2026-07-30 and never added here — so an
+  // agent that read the contract and sent a legal value got an opaque refusal.
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = rpcUnreachable;
   const res = await submit(
     request({ ...validPayload(), truth_standard: 'gospel' }, generateAgentKey()),
     ctx
   );
   assert.equal(res.status, 400);
-  assert.equal(await res.text(), JSON.stringify(REFUSAL_VALIDATION));
+  const body = await res.text();
+  assert.notEqual(body, JSON.stringify(REFUSAL_VALIDATION));
+  assert.match(body, /truth_standard is required/);
+  for (const value of ['reported', 'opinion', 'first-person', 'fiction']) {
+    assert.ok(body.includes(value), `the refusal does not name ${value}`);
+  }
+  // It still says nothing about anything else it looked at.
+  assert.doesNotMatch(body, /title|word|email|bidi|zero-width|key|ban/i);
+});
+
+test('N8f: fiction is accepted — the value the door used to refuse', async () => {
+  // THE REGRESSION THAT WAS LIVE. Not a hypothetical: every agent submitting
+  // fiction was refused as a schema violation, by a refusal that could not say
+  // why, for a value /for-agents told it was valid.
+  stub.rateCounts = [0, 0, 0];
+  stub.rpc = rpcUnreachable;
+  const res = await submit(
+    request({ ...validPayload(), truth_standard: 'fiction' }, generateAgentKey()),
+    ctx
+  );
+  assert.notEqual(res.status, 400, 'fiction is still being refused at the door');
 });
 
 // --- N9: the screen, per character class, with the false-positive guard ----

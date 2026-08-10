@@ -117,6 +117,63 @@ import Base from '../layouts/Base.astro';
     // contradicts the observation is not necessarily dishonest — a courier may
     // have retyped it, an agent may have guessed — but it is the row a human
     // should look at rather than a row a form should silently pick a winner for.
+    // WHERE received_date CAME FROM, RENDERED SO THE THREE CANNOT BE CONFUSED.
+    //
+    // A date a machine guessed out of a forwarded header and a date an editor
+    // vouched for from her own knowledge are different kinds of fact. A desk
+    // that showed them alike would be inviting an editor to attest something she
+    // had not checked — so each carries a superscript marker and a plain
+    // qualifier, in the superscript register the tier notation already uses.
+    //
+    // 'forward' is the loud one on purpose: it means the parse found a forwarded
+    // message and could NOT read its original date, so the row is standing in
+    // with the forward's own date and needs a human. It should look unfinished.
+    const DATE_SOURCE = {
+      parsed: { mark: 'ᵖ', note: 'parsed from forwarded header' },
+      attested: { mark: 'ᵃ', note: 'attested by the editor' },
+      forward: { mark: 'ᵖ', note: 'forward date — original not found' },
+    } as const;
+
+    function renderReceivedDate(s: any): string {
+      if (!s.received_date) return '';
+      const source = DATE_SOURCE[s.received_date_source as keyof typeof DATE_SOURCE];
+      if (!source) return `<span class="desk-date">${esc(s.received_date)}</span>`;
+      const needsEditor = s.received_date_source === 'forward';
+      return `
+        <span class="desk-date${needsEditor ? ' desk-date--unresolved' : ''}">
+          ${esc(s.received_date)}<sup>${source.mark}</sup>
+          <span class="desk-date-note">${esc(source.note)}</span>
+        </span>`;
+    }
+
+    // THE PARSE'S OWN ACCOUNT OF WHAT IT MANAGED, shown plainly rather than
+    // folded away. Every code names one thing the parser could not establish, so
+    // an editor reads a list of what to check rather than a boolean saying
+    // something is wrong somewhere.
+    function renderParseWarning(s: any): string {
+      if (!s.parse_warning) return '';
+      const codes = String(s.parse_warning).split(';').filter(Boolean);
+      return `
+        <p class="desk-warn">
+          <strong>Parse warnings</strong> — the editors resolve these by reading the raw message
+          below and attesting what the parse could not establish.
+          <span class="desk-warn-codes">${codes.map((c) => `<code>${esc(c)}</code>`).join(' ')}</span>
+        </p>`;
+    }
+
+    // THE MESSAGE AS IT ARRIVED, INCLUDING WHAT THE PARSER DELIBERATELY IGNORED.
+    // The covering note is envelope rather than essay and is not parsed as
+    // fields — but it is never deleted, and this is where an editor reads it and
+    // sees any disagreement with what the labelled fields declared.
+    function renderRawEmail(s: any): string {
+      if (!s.raw_email) return '';
+      return `
+        <details class="desk-raw">
+          <summary>Raw message as received (${String(s.raw_email).length.toLocaleString()} characters)</summary>
+          <pre>${esc(s.raw_email)}</pre>
+        </details>`;
+    }
+
     function renderBriefEvidence(s: any): string {
       if (!s.brief_variant_observed && !s.brief_variant_claimed && !s.brief_variant) return '';
       const disagrees =
@@ -360,10 +417,15 @@ import Base from '../layouts/Base.astro';
           · ${s.pronouns ? esc(s.pronouns) : 'pronouns: —'}
           · ${esc(s.submission_track)}
           · tier ${s.involvement_tier ? (tierHtml(s.involvement_tier) ?? esc(s.involvement_tier)) : '—'}${s.involvement_tier && tierDescription(s.involvement_tier) ? ` (${esc(tierDescription(s.involvement_tier))})` : ''}
-          · ${esc(s.truth_standard)} · contact ${esc(s.contact_email)}
+          · ${s.truth_standard ? esc(s.truth_standard) : 'truth standard: —'} · contact ${esc(s.contact_email)}
+          ${s.arrival ? `· arrived by ${esc(s.arrival)}` : ''}
+          ${s.received_date ? `· received ${renderReceivedDate(s)}` : ''}
+          ${s.attachment_note ? `· ${esc(s.attachment_note)}` : ''}
         </p>
+        ${renderParseWarning(s)}
         <p><strong>Provenance attestation:</strong> ${esc(s.provenance_attestation)}</p>
         ${renderBriefEvidence(s)}
+        ${renderRawEmail(s)}
         <div class="prose desk-body">${esc(s.body).replace(/\n/g, '<br />')}</div>
         <h3>AI desk review</h3>
         <div id="pass-list">${passes.map(renderPass).join('') || '<p class="desk-note">No pass yet.</p>'}</div>
@@ -481,6 +543,61 @@ import Base from '../layouts/Base.astro';
   .desk-note {
     color: var(--ink-soft);
     font-size: 0.9rem;
+  }
+
+  /* A parsed date and an attested one must not look alike — see the DATE_SOURCE
+     comment above for why. The qualifier is always visible rather than hidden
+     behind a hover: an editor scanning a queue should not have to interrogate a
+     date to learn whether it was guessed. */
+  .desk-date-note {
+    font-style: italic;
+    opacity: 0.75;
+  }
+  /* A forward whose original date could not be read. Marked because this row
+     needs a human, and a row needing a human should look like one. */
+  .desk-date--unresolved {
+    border-bottom: 1px dashed currentColor;
+  }
+
+  .desk-warn {
+    border-left: 3px solid var(--rule, #ddd);
+    padding: 0.5rem 0 0.5rem 0.8rem;
+    margin: 0.8rem 0;
+    font-size: 0.85rem;
+    line-height: 1.55;
+  }
+  .desk-warn-codes {
+    display: block;
+    margin-top: 0.35rem;
+  }
+  .desk-warn code {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    margin-right: 0.4rem;
+    white-space: nowrap;
+  }
+
+  /* Collapsed by default. The raw message is the thing an editor opens when a
+     warning sends her to it, not something to scroll past on every submission —
+     but it is always one click away and never summarised. */
+  .desk-raw {
+    margin: 0.9rem 0;
+    font-size: 0.85rem;
+  }
+  .desk-raw summary {
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .desk-raw pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 28rem;
+    overflow-y: auto;
+    background: var(--paper-raised);
+    padding: 0.9rem;
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
   }
   .desk-login-form,
   .desk-decision {
