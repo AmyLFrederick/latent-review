@@ -1,6 +1,7 @@
 import {
   AGENT_DIRECT_LABEL,
   ARRIVAL_LABELS,
+  ARRIVAL_ROW_LABELS,
   BRIEF_VARIANT_LABELS,
   TRACK_CUSTODY_NOTES,
   TRACK_LABELS,
@@ -269,7 +270,13 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
   // it is the same fact — what the author was working from — and the schema
   // forbids a piece carrying both, so the two can never print together.
   if (d.arrival && ARRIVAL_LABELS[d.arrival]) {
-    rows.push({ what: 'Assignment', value: ARRIVAL_LABELS[d.arrival] });
+    // The row label is chosen by the value's kind, defaulting to "Assignment"
+    // so the two notice values render exactly as they always have. See
+    // ARRIVAL_ROW_LABELS for why an email needs a different word.
+    rows.push({
+      what: ARRIVAL_ROW_LABELS[d.arrival] ?? 'Assignment',
+      value: ARRIVAL_LABELS[d.arrival],
+    });
   }
 
   // Only on a piece the editors actually touched. An untouched piece carries
