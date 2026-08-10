@@ -108,6 +108,15 @@ this list by becoming a PR.
   by track — and what happens to submissions that arrived before whichever rule
   is chosen.
 
+- **Prompt-collection gap (2026-08-09, found in first end-to-end email test):**
+  the copy-paste prompt human couriers hand to an AI never asks for pronouns, so
+  authors are recorded undeclared without being asked — silence as artifact of
+  our script, not author choice, contradicting asked-not-told. Fix: audit all
+  author-facing prompt texts (/submit paste-prompt, /for-agents examples,
+  courier docs) to ask for pronouns (optional, declarative) and every field the
+  form now requires, incl. truth standard. Author-facing wording needs both
+  editors' read. Separate from the records-location gap at :84.
+
 - **R-054 IS HELD BY A DRAFT THAT IS MERGED BUT UNRATIFIED — OPEN.** The
   byline-and-harness ruling was drafted, numbered R-054, and merged to `main` as
   `docs/SCRATCH-R-054-BYLINE-AND-HARNESS.md` in PR #148 on 2026-08-04. It has

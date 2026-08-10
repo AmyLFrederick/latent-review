@@ -59,6 +59,25 @@ const MAX_BODY_CHARS = 40_000;
 const ARRIVAL_EMAIL = 'email';
 
 /**
+ * What goes in `contact_email` when there is nothing true to put there.
+ *
+ * The column is NOT NULL and regex-checked (20260717120000), so the door cannot
+ * decline to answer, and a message whose envelope address is unreadable must
+ * still become a row — nothing sent in good faith is dropped. `.invalid` is the
+ * reserved TLD for exactly this (RFC 2606): it can never be a real address, so
+ * nobody can mistake it for one and no mail can ever be sent to it.
+ *
+ * IT IS NEVER STORED SILENTLY. Approved 2026-08-10 on that condition: every row
+ * that receives it also carries CONTACT_SENTINEL_WARNING, so the desk shows it
+ * and an editor knows the real address has to come out of the raw message.
+ */
+const CONTACT_SENTINEL = 'unknown@invalid.local';
+const CONTACT_SENTINEL_WARNING = 'envelope from failed validation; sentinel stored';
+
+/** The column's own CHECK, mirrored so a row is never sent that cannot land. */
+const CONTACT_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
  * The truth standards the submissions CHECK accepts, widened to four by
  * 20260730130000. Held here rather than imported so this door cannot start
  * accepting a value the database will reject at insert time — the list and the
@@ -189,17 +208,51 @@ export default async function handler(req: Request): Promise<Response> {
   // 200 so Resend does not retry a refusal into a worse flood. The message
   // itself is still on Resend and can be fetched with the id below.
   if (throttled) {
-    await insertRow(supabase, {
+    // EVERY COLUMN THE SCHEMA DEMANDS IS SUPPLIED HERE, and the ones the sender
+    // did not give us are named as the journal's own note rather than left
+    // blank. `submissions` requires a non-empty body, a provenance attestation
+    // and a contact email; an earlier draft of this row omitted all three, so
+    // the insert could never succeed and its error was discarded a line later.
+    // Every over-cap message would have been dropped in silence — the one
+    // outcome this file's header promises is impossible. The parenthetical
+    // register is the one author_name already uses: a machine note, legible as
+    // a machine note, never a claim made on the sender's behalf.
+    //
+    // The sentinel is announced here for the reason CONTACT_SENTINEL gives: a
+    // placeholder the desk cannot see is an invented value.
+    const contactUsable = CONTACT_EMAIL_RE.test(from.trim());
+    const stubWarnings = [
+      'throttled',
+      `resend_id:${emailId}`,
+      `sender_hash:${identifierHash(senderKey)}`,
+    ];
+    if (!contactUsable) stubWarnings.push(CONTACT_SENTINEL_WARNING);
+
+    const { error: stubError } = await insertRow(supabase, {
       title: subject || '(over the intake cap — subject unavailable)',
       author_name: '(unparsed — intake throttled)',
-      body: '',
+      body: `(over the intake cap — the message was not fetched. It is still on Resend as ${emailId} and can be retrieved from there.)`,
+      provenance_attestation: '(none received — intake throttled before the message was fetched)',
+      contact_email: contactUsable ? from.trim() : CONTACT_SENTINEL,
       raw_email: '',
-      parse_warning: `throttled;resend_id:${emailId};sender_hash:${identifierHash(senderKey)}`,
+      arrival: ARRIVAL_EMAIL,
+      parse_warning: stubWarnings.join(';'),
       arrived_at: arrivedAt,
       received_date: arrivedAt.slice(0, 10),
       received_date_source: 'forward',
       attachment_note: null,
     });
+
+    // A THROTTLE IS ANSWERED 200; A FAILURE TO RECORD ONE IS NOT. The 200 above
+    // exists so Resend does not retry a refusal into a worse flood, and that
+    // reasoning covers a message we declined to fetch — not a message we failed
+    // to write down. If the stub did not store, nothing anywhere records that
+    // this message arrived, and a retry is the only thing standing between that
+    // and a silent loss.
+    if (stubError) {
+      console.error(`email-inbound: throttle stub insert failed: ${stubError}`);
+      return new Response('Storage failed', { status: 500 });
+    }
     return new Response(null, { status: 200 });
   }
 
@@ -287,6 +340,21 @@ export default async function handler(req: Request): Promise<Response> {
   const body = (parsed.fields.body ?? '').slice(0, MAX_BODY_CHARS);
   if ((parsed.fields.body ?? '').length > MAX_BODY_CHARS) warnings.push('truncated:body');
 
+  // The declared address, else the envelope's, else the sentinel — and the
+  // sentinel is announced. Same rule as the throttled stub above, and it belongs
+  // on this path too: `contact_email` is NOT NULL and regex-checked, so a sender
+  // whose address the column would refuse must not cost us the submission.
+  const declaredContact = parsed.fields.contact_email?.trim();
+  let contactEmail = CONTACT_SENTINEL;
+  if (declaredContact && CONTACT_EMAIL_RE.test(declaredContact)) {
+    contactEmail = declaredContact;
+  } else if (CONTACT_EMAIL_RE.test(from.trim())) {
+    contactEmail = from.trim();
+    if (declaredContact) warnings.push('contact-email-unreadable; envelope from stored');
+  } else {
+    warnings.push(CONTACT_SENTINEL_WARNING);
+  }
+
   // (10) ACCEPTED AS WRITTEN, STORED ONLY IF VALID, NEVER MAPPED BY GUESS.
   //
   // The desk does not assign tiers, so a parser that helpfully translated the
@@ -303,6 +371,12 @@ export default async function handler(req: Request): Promise<Response> {
     } else {
       warnings.push('tier-unrecognised');
     }
+  } else {
+    // Flagged on the same terms as an undeclared truth standard below. Silence
+    // about a tier is a fact about the submission and the desk should see it;
+    // until 20260810120000 §1c the database refused to store a human-attested
+    // row without one, which is what turned every undeclared tier into a 500.
+    warnings.push('missing:involvement_tier');
   }
 
   // Same rule, closed vocabulary, and NULL WHERE THE AUTHOR WAS SILENT.
@@ -330,7 +404,7 @@ export default async function handler(req: Request): Promise<Response> {
     body,
     author_model_version: parsed.fields.author_model_version ?? null,
     provenance_attestation: parsed.fields.provenance_attestation ?? '',
-    contact_email: parsed.fields.contact_email ?? from,
+    contact_email: contactEmail,
     pronouns: parsed.fields.pronouns ?? null,
     suggested_section: parsed.fields.suggested_section ?? null,
     prompt_disclosure: parsed.fields.prompt_disclosure ?? null,
