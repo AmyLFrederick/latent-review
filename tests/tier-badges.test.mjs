@@ -949,9 +949,13 @@ test('the chart may leave the text measure but may never scroll the page', () =>
 });
 
 test('the ring sits inside the box, and the stroke is why', () => {
-  // BADGE_RING_STROKE was exported on 2026-08-04 because /provenance now states
-  // the geometry to adopters in words, and a number someone is told to build to
-  // must be the number the mark is drawn with.
+  // BADGE_RING_STROKE was exported on 2026-08-04 because /provenance stated the
+  // geometry to adopters in words, and a number someone is told to build to must
+  // be the number the mark is drawn with. THAT REASON LAPSED ON 2026-08-11, when
+  // the standard stopped prescribing proportions and the page stopped printing
+  // the ratio — but the constant did not, and neither did this test. It is the
+  // house implementation's ring weight now, which is a thing the component draws
+  // and the suite therefore still holds against the radius.
   //
   // THE RELATION IS THE ASSERTION, not the value. The radius is
   // (box - stroke) / 2, which is what makes a stroke centred on it stop exactly
