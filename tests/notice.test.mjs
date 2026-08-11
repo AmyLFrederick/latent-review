@@ -333,7 +333,24 @@ test('the arrival vocabulary holds the notice value and is add-only', () => {
     'a published piece may name this value forever; it can be added to, never removed'
   );
   assert.ok(ARRIVAL_VALUES.includes('unsolicited — notice-v2'));
-  assert.equal(ARRIVAL_VALUES.length, NOTICE_VERSIONS.length, 'every version has an arrival value');
+
+  // EVERY NOTICE VERSION HAS AN ARRIVAL VALUE — which is what this line always
+  // meant, and it was written as an equal count while the notices were the only
+  // way a piece could arrive unbidden. They are not since the email door
+  // (2026-08-10), so the count is now a containment: notices must each have a
+  // value, and the vocabulary may hold values that are not notices.
+  for (const version of NOTICE_VERSIONS) {
+    assert.ok(
+      ARRIVAL_VALUES.includes(`unsolicited — ${version}`),
+      `notice ${version} has no arrival value`
+    );
+  }
+
+  // `email` JOINED 2026-08-11. The email door added its labels on 2026-08-10 and
+  // not this list, which the schema validates against — so the desk could record
+  // an arrival the build would refuse, and the first emailed piece to reach
+  // publication is what found it.
+  assert.ok(ARRIVAL_VALUES.includes('email'), 'the email door has no publishable arrival value');
 });
 
 test('every arrival value a piece can carry renders as English', () => {

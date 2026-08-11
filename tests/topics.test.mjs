@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import {
   topicsOf,
@@ -9,6 +11,8 @@ import {
   parseTopicData,
   formatTopicData,
 } from '../src/lib/topics.mjs';
+
+const repoPath = (rel) => fileURLToPath(new URL(`../${rel}`, import.meta.url));
 
 // Fixtures only. The corpus is empty before Issue No. 1 and changes every week
 // afterwards, so these tests describe the rules and never the contents — the
@@ -209,4 +213,18 @@ test('Topic_Data round-trips through the Desk input', () => {
   assert.equal(formatTopicData(stored), 'Shipping, Archives');
   assert.deepEqual(parseTopicData(formatTopicData(stored)), stored);
   assert.equal(formatTopicData(null), '');
+});
+
+// --- The dek as the listing excerpt (2026-08-11) ----------------------------
+
+test('the listing prefers a piece’s dek to its opening sentences', () => {
+  // Same slot, better text. A dek is the editors' summary written for a reader
+  // deciding whether to read, which is the decision this listing exists to
+  // serve; the opening sentences are the fallback where nobody wrote one.
+  const page = readFileSync(repoPath('src/pages/topics.astro'), 'utf8');
+  assert.match(
+    page,
+    /\{article\.data\.dek \?\? openingExcerpt\(article\.body\)\}/,
+    'the topics listing no longer prefers the dek'
+  );
 });

@@ -54,6 +54,17 @@ type ProvenanceData = {
   brief_variant?: string;
   /** How it arrived when the desk dealt it nothing (2026-08-01). */
   arrival?: string;
+  /**
+   * What the author was working from, where the desk did not deal it at /door
+   * (2026-08-11). A house label, written by the editors at acceptance.
+   *
+   * NOT A SECOND `brief_variant`. That field is the journal's own server-side
+   * observation of a brief dealt at /door, and R-033 defines it that narrowly on
+   * purpose. This one carries the same kind of fact for the doors /door is not:
+   * a standard prompt sent by email was a real assignment, and until now the
+   * record had nowhere to say so without widening a ruled field.
+   */
+  assignment?: string;
   prompt_disclosure?: string;
   /**
    * Set when the editors condensed or arranged the piece (2026-08-01). Paired
@@ -277,6 +288,21 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
       what: ARRIVAL_ROW_LABELS[d.arrival] ?? 'Assignment',
       value: ARRIVAL_LABELS[d.arrival],
     });
+  }
+
+  // WHAT THE AUTHOR WAS WORKING FROM, where the desk did not deal it at /door
+  // (2026-08-11). It sits after the arrival row because the two answer different
+  // questions in the order a reader asks them — how it got here, then what it
+  // was answering — and a piece may honestly carry both: a standard prompt sent
+  // by email is an assignment that arrived by a door /door does not serve.
+  //
+  // FREE TEXT, NOT A VOCABULARY. The two fields above are enumerated because a
+  // machine writes them: `brief_variant` is recorded server-side at /door and
+  // `arrival` names a frozen notice by version. This one is written by the
+  // editors at acceptance, and an enum would mean a schema change every time the
+  // desk sends a prompt it has not sent before.
+  if (d.assignment) {
+    rows.push({ what: 'Assignment', value: d.assignment });
   }
 
   // Only on a piece the editors actually touched. An untouched piece carries

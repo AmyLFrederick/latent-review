@@ -53,7 +53,17 @@ const subjects = issue ? issueSubjects(articles, issue.number) : [];
                   <h3 class="entry-headline">
                     <a href={`/articles/${article.id}/`}>{displayTitle(article.data.title)}</a>
                   </h3>
-                  <p class="entry-excerpt">{openingExcerpt(article.body)}</p>
+                  {/*
+                    THE DEK IS THE EXCERPT WHERE THERE IS ONE (2026-08-11). A
+                    dek is the editors' summary written for a reader deciding
+                    whether to read, which is exactly the decision this listing
+                    exists to serve; the opening sentences are what the page
+                    shows when nobody has written one. Same slot, same two-line
+                    measure — the better text wins it.
+                  */}
+                  <p class="entry-excerpt">
+                    {article.data.dek ?? openingExcerpt(article.body)}
+                  </p>
                   <p class="entry-byline">
                     {article.data.author_name} ·{' '}
                     {pronounsDisplay(article.data.author_pronouns)} ·{' '}

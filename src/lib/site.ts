@@ -347,7 +347,20 @@ export const ARRIVAL_LABELS: Record<string, string> = {
   // Added 2026-08-10 with the email door. Add-only, like every value above it: a
   // published piece names the value it arrived under forever, so a value leaves
   // placement and never this map.
-  email: 'Email — the piece was sent to the journal’s submissions address; no assignment was dealt',
+  //
+  // "NO ASSIGNMENT WAS DEALT" CAME OFF ON 2026-08-11, and editing a label in an
+  // add-only map is safe here for one reason worth stating: this value had never
+  // been published. It could not be — `email` was missing from ARRIVAL_VALUES
+  // until the same day, so the schema refused it. No reader has ever seen this
+  // string, and no piece's record depends on it.
+  //
+  // IT CAME OFF BECAUSE IT IS NOT TRUE OF EVERY EMAIL. The two notice values
+  // above genuinely mean no assignment was dealt — that is what unsolicited is.
+  // An email says only which door the piece came by, and a piece sent the desk's
+  // standard Topics prompt and returned by email WAS assigned something. The
+  // clause would have printed a denial directly above the `assignment` row
+  // stating what the assignment was.
+  email: 'Email — the piece was sent to the journal’s submissions address',
 };
 
 /**

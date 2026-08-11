@@ -10,6 +10,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { displayTitle, TIER_CODES, DIRECT_OPEN_SECTIONS, TIERS } from '../src/lib/site.ts';
+import { TOPICS_V3 } from '../src/lib/door.mjs';
 import {
   bylineBadgeTier,
   CLAIMED_BADGE_SUFFIX,
@@ -519,4 +520,80 @@ test('the pages deliberately left out are left out for a reason', () => {
   // reader destination, and not linked from anywhere a reader can see.
   const admin = readFileSync(repoPath('src/pages/admin.astro'), 'utf8');
   assert.match(admin, /<p class="kicker">Editors’ Desk<\/p>/, '/admin has been swept into the pass');
+});
+
+// --- The dek (2026-08-11) ---------------------------------------------------
+
+test('the dek renders between the title and the byline, outside the prose', () => {
+  // THE ORDER IS THE HOUSE PATTERN: section eyebrow, title, dek, byline, body.
+  // A dek is what a reader meets before committing to the piece, so it has to
+  // sit above the byline and below the title — anywhere else and it is either
+  // a subtitle or an epigraph, neither of which it is.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  const dek = page.indexOf('class="article-dek"');
+  assert.ok(dek > 0, 'the dek no longer renders on the article page');
+  assert.ok(page.indexOf('class="article-title"') < dek, 'the dek rose above the title');
+  assert.ok(dek < page.indexOf('class="article-byline"'), 'the dek sank below the byline');
+
+  // OUTSIDE THE PROSE, which is the reason it is a field at all. Written into
+  // the body it would be indistinguishable from the author's own opening.
+  assert.ok(dek < page.indexOf('<div class="prose">'), 'the dek moved inside the body');
+
+  // ABSENT IS ORDINARY — a piece without one renders nothing, not an empty
+  // element that would take the margin and leave a gap under every title.
+  assert.match(page, /\{d\.dek \? <p class="article-dek">\{d\.dek\}<\/p> : null\}/);
+});
+
+test('the header still carries no truth standard and no date (R-048)', () => {
+  // THE DEK IS NOT A DOORWAY BACK. R-048 moved the truth standard and the date
+  // off the header into the Provenance block, and adding a line to the header
+  // is exactly the occasion on which somebody restores them for symmetry. The
+  // header is the human-readable layer — section, title, dek, who made it —
+  // and the precise layer is one block down.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  const header = page.slice(
+    page.indexOf('<header class="article-header">'),
+    page.indexOf('</header>')
+  );
+  for (const [pattern, what] of [
+    [/TRUTH_STANDARD_LABELS/, 'the truth standard'],
+    [/formatDate\(d\.date\)/, 'the date'],
+    [/d\.attestation/, 'the attestation'],
+    [/d\.assignment/, 'the assignment'],
+    [/d\.arrival/, 'the arrival'],
+    [/d\.received/, 'the received date'],
+    [/d\.attested_by/, 'the attesting editor'],
+  ]) {
+    assert.ok(!pattern.test(header), `${what} is back in the article header`);
+  }
+});
+
+test('a standard-Topics piece is labelled with a beat from the frozen brief', () => {
+  // THE SUBJECT HEADING IS THE BEAT, NOT A DESCRIPTION OF THE PIECE. topics-v3
+  // is frozen and names the subjects an author was invited to write on; a label
+  // off that list would be a heading the author could not have been writing
+  // toward, and a reader comparing the two would find the journal had renamed
+  // the assignment after the fact.
+  //
+  // SCOPED TO PIECES SENT THAT ASSIGNMENT. The editors' labels are theirs on
+  // every other piece — this asserts only that where the desk named the
+  // subjects, the heading is one of the subjects it named.
+  const beats = TOPICS_V3.split('\n')
+    .filter((line) => / — /.test(line))
+    .map((line) => line.split(' — ')[0].trim());
+  assert.ok(beats.includes('Science & Nature'), 'the frozen beat list no longer parses');
+
+  for (const rel of readdirSync(repoPath('src/content/articles'))) {
+    if (rel.startsWith('_') || !rel.endsWith('.md')) continue;
+    const src = readFileSync(repoPath(`src/content/articles/${rel}`), 'utf8');
+    if (!/^assignment: 'Standard Topics assignment'/m.test(src)) continue;
+    const labels = src.match(/^topics: \[(.*)\]/m)?.[1] ?? '';
+    for (const label of labels.split(',').map((l) => l.trim().replace(/^'|'$/g, ''))) {
+      if (!label) continue;
+      assert.ok(
+        beats.includes(label),
+        `${rel} is labelled "${label}", which is not a beat on the frozen topics-v3 list`
+      );
+    }
+  }
 });
