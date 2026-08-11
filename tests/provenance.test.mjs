@@ -449,13 +449,62 @@ test('the values an adopter is told to build to are the badge module\'s own', ()
   // section renders the constants; it does not restate them.
   const displaying = section(provenancePage(), '<h2>Displaying it</h2>', '<h2 id="changelog">');
 
-  for (const constant of ['RING_AI', 'RING_HUMAN', 'BADGE_INK', 'BADGE_RING_STROKE', 'BADGE_BOX']) {
+  // THREE CONSTANTS, NOT FIVE, since 2026-08-11. BADGE_RING_STROKE and
+  // BADGE_BOX were rendered here as the ring's weight in units of diameter —
+  // correct while the standard prescribed proportions, and a number binding
+  // nobody once it stopped. The rule this test exists for is unchanged and now
+  // covers the three that remain: a value an adopter builds to is rendered from
+  // the module, never retyped into prose.
+  for (const constant of ['RING_AI', 'RING_HUMAN', 'BADGE_INK']) {
     assert.ok(displaying.includes(constant), `${constant} is no longer rendered into the on-ramp`);
   }
   assert.ok(
     !/#[0-9a-f]{6}/i.test(displaying),
     'a hex value is typed into the adoption instructions instead of rendered'
   );
+});
+
+test('the standard prescribes no size, and says so in one sentence', () => {
+  // THE SCOPE CORRECTION (editors, 2026-08-11). The on-ramp carried three
+  // prescriptions about proportion — the ring's weight as a ratio of the
+  // diameter, an instruction to scale the drawing as a unit, and the AI form's
+  // circle at a quarter larger than the letter form's with its notation a
+  // quarter smaller. None of them is what the standard is for. It governs
+  // notation, tier meaning and form; how large a badge is on an adopter's page
+  // is their layout's business.
+  //
+  // ASSERTED AS THE ABSENCE PLUS THE SENTENCE, because either alone passes for
+  // the wrong reason: a page that dropped the prescriptions and said nothing
+  // leaves an adopter guessing whether size is unstated or merely unwritten,
+  // and the sentence without the deletion is a permission contradicted three
+  // lines above it.
+  const displaying = section(provenancePage(), '<h2>Displaying it</h2>', '<h2 id="changelog">');
+
+  assert.match(
+    displaying,
+    /Render badges at whatever size suits your layout; legibility of the\s+notation is the only requirement\./,
+    'the permissive sentence is gone from the adoption on-ramp'
+  );
+
+  for (const [pattern, what] of [
+    [/quarter (larger|smaller)/i, 'the cross-form sizing rule'],
+    [/units in every/i, "the ring's weight as a ratio"],
+    [/half the size/i, 'the scale-the-drawing instruction'],
+    [/same size in both/i, 'the equal-letters claim'],
+    [/\d+\s*px/i, 'a pixel measurement'],
+    [/BADGE_BOX|BADGE_RING_STROKE|BADGE_SIZE/, 'a size constant'],
+  ]) {
+    assert.ok(!pattern.test(displaying), `${what} is back in the adoption on-ramp`);
+  }
+
+  // AND THE FORM IS STILL THERE. Dropping the proportions must not drop what a
+  // badge actually IS — the circle, the ring, the centred monospace notation,
+  // the superscript — which is the half of that paragraph the standard does
+  // govern.
+  assert.match(displaying, /a circle, a coloured ring, and the notation inside it/);
+  assert.match(displaying, /centred on both axes/);
+  assert.match(displaying, /monospace face/);
+  assert.match(displaying, /superscript/);
 });
 
 test('the changelog records the badges and the AI form', () => {

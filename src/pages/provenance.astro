@@ -12,11 +12,16 @@ import {
   // tier-badges.mjs, and the paragraph above the table below.
   BADGE_SIZE_CHART_TABLE,
   // Printed in "Displaying it", where an adopter is told to build to them.
+  //
+  // THREE, NOT FIVE, since 2026-08-11: BADGE_BOX and BADGE_RING_STROKE were
+  // printed there too, as the ring's weight in units of diameter. The standard
+  // no longer prescribes proportions, so the page no longer states them — the
+  // constants stay in the module, which is where an implementation's numbers
+  // belong. What an adopter is still told to build to is the meaning: the two
+  // ring colours and the ink.
   RING_AI,
   RING_HUMAN,
   BADGE_INK,
-  BADGE_BOX,
-  BADGE_RING_STROKE,
 } from '../lib/tier-badges.mjs';
 
 // R-014: this page is the canonical statement of the involvement-tier
@@ -567,15 +572,30 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         the colour on the left matches the party on the left — <strong>AI = Human</strong>{' '}
         reads green then salmon, <strong>Human = AI</strong> the other way round.
       </p>
+      {/*
+        THE STANDARD STOPPED PRESCRIBING SIZE (editors, 2026-08-11). This
+        paragraph told an adopter the ring's weight as a ratio, told them to
+        scale the drawing as a unit, and told them the AI form's circle is a
+        quarter larger than the letter form's with its notation a quarter
+        smaller — three prescriptions about proportion, in a standard whose
+        subject is notation, tier meaning and form.
+
+        SIZING WAS NEVER THE POINT, and a standard that specifies it is asking
+        an adopter to fit their design to ours. What a badge must do is say
+        which tier a piece is: the ring's colour, the notation, the split rule,
+        the accessible name. How big it is on someone else's page is their
+        layout's business, and the only thing that survives from the old
+        paragraph as a requirement is that the notation can be read.
+
+        THE HOUSE'S OWN NUMBERS DID NOT GO ANYWHERE — they are in
+        tier-badges.mjs, which is where an implementation's numbers belong. What
+        left is the claim that they bind anyone else.
+      */}
       <p>
-        <strong>The geometry is one composition at any size.</strong> A circle with the ring
-        drawn at {BADGE_RING_STROKE} units in every {BADGE_BOX} of diameter, the notation
-        centred on both axes in a monospace face, the editor's mark set as a superscript.
-        Scale the whole drawing together — a badge at half the size is the same mark drawn
-        smaller, never a thinner ring, which would stop reading as a ring at all. In the AI
-        form the circle is a quarter larger and its notation a quarter smaller within it, so
-        the letters come out the same size in both styles and the longer token has room to sit
-        in.
+        <strong>The badge is a circle, a coloured ring, and the notation inside it.</strong> The
+        notation is centred on both axes, set in a monospace face, with the editor's mark as a
+        superscript. Render badges at whatever size suits your layout; legibility of the
+        notation is the only requirement.
       </p>
 
       <h2 id="changelog">Changelog</h2>
