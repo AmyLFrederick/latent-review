@@ -8,6 +8,9 @@ import {
   coAuthorshipOrderings,
   BADGE_STYLES,
   BADGE_STYLE_NAMES,
+  // The one diameter every badge in the chart is drawn at — see the note in
+  // tier-badges.mjs, and the paragraph above the table below.
+  BADGE_SIZE_CHART_TABLE,
   // Printed in "Displaying it", where an adopter is told to build to them.
   RING_AI,
   RING_HUMAN,
@@ -148,6 +151,18 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         CO-AUTHORSHIP TAKES TWO BADGES IN ONE ROW PER COLUMN — one tier, both
         orderings, because the order of names around "=" carries no meaning. One
         row, because there is one tier and one code.
+
+        EVERY CIRCLE IN THIS TABLE IS THE SAME SIZE (editors, 2026-08-11), and
+        that is a departure from the sizes the two forms take everywhere else.
+        The columns drew at their own diameters until today — the AI form's a
+        quarter larger, which is the seating rule — and side by side in a grid
+        that read as an error rather than as a specification. Both columns now
+        name BADGE_SIZE_CHART_TABLE, so the difference a reader sees between them
+        is the notation and nothing else.
+
+        IT IS THE ONLY PLACEMENT THAT DOES THIS. An article byline and a signed
+        note still take the form's own size, where the mark stands alone and
+        nothing sits beside it to look unequal to.
       */}
       <p>
         Each tier has one badge, and the badge has two styles. <strong>Badge I</strong> is the
@@ -198,13 +213,19 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
                           <TierBadge
                             tier={tier}
                             form={column.form}
+                            size={BADGE_SIZE_CHART_TABLE}
                             notation={notation}
                             labelSuffix={`${column.labelSuffix} One tier, shown in both orderings; the order of names carries no meaning here.`}
                           />
                         ))}
                       </span>
                     ) : (
-                      <TierBadge tier={tier} form={column.form} labelSuffix={column.labelSuffix} />
+                      <TierBadge
+                        tier={tier}
+                        form={column.form}
+                        size={BADGE_SIZE_CHART_TABLE}
+                        labelSuffix={column.labelSuffix}
+                      />
                     )}
                   </td>
                 ))}
@@ -688,12 +709,17 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
 
      THE ARITHMETIC, because a breakout is the kind of rule that gets deleted by
      someone who reads it as decoration. At 0.95rem the chart's rigid content is:
-     co-authorship's letter pair, two 72.5px marks and a gap, 153px, plus 28px of
-     padding; its AI pair, two 90.625px marks and a gap, 189px, plus 28px; and
-     the tier name, which is nowrap by the rule below, about 169px. That is 567px
-     before a single word of the description column. The prose measure is 42rem
-     and gives 632px of content, which would leave the description 65px — about
-     seven characters, running every tier to ten lines.
+     co-authorship's pair in each column, two 72.5px marks and a gap, 153px, plus
+     28px of padding, twice — 362px — and the tier name, which is nowrap by the
+     rule below, about 169px. That is 531px before a single word of the
+     description column. The prose measure is 42rem and gives 632px of content,
+     which would leave the description 101px — about eleven characters, running
+     every tier to seven lines.
+
+     THE NUMBER WAS 567px UNTIL 2026-08-11, when the two columns were levelled to
+     one diameter and the AI pair came down from 189px to 153px. The breakout
+     survives the change on its own arithmetic: 531px of rigid content still does
+     not leave a readable description inside 42rem, so the measure still gives.
 
      So one of the four columns had to give, and the measure is the right one:
      the rigid widths are all ruled — the badge sizes by R-049 and R-050, the
@@ -717,9 +743,9 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
 
   /* The badge columns: each as narrow as its mark plus breathing room, so the
      tier name still starts near the left edge and the chart still reads as a
-     table of words with marks beside them. The letter mark is 72.5px and the AI
-     mark 90.625px since 2026-08-04, and co-authorship's pair is twice the mark
-     plus a gap — which is why the stacking breakpoint below moved out with it. */
+     table of words with marks beside them. Both marks are 72.5px as of
+     2026-08-11 — the AI column drew at 90.625px between August 4 and then — and
+     co-authorship's pair is twice the mark plus a gap. */
   .tier-badge-cell {
     width: 1%;
     white-space: nowrap;
@@ -814,12 +840,20 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
      text.
 
      MOVED 30rem → 44rem ON 2026-08-04, for the same reason at a larger size: a
-     whole second badge column arrived. The rigid content is now 567px (the
+     whole second badge column arrived. The rigid content was 567px (the
      arithmetic is at .chart-wide above), and the threshold both previous moves
      were set at is about 90–100px of description before the table stops being
      readable as one. 567 + 100 = 667px of table, which the breakout gives at a
      viewport of about 44rem. The number is derived from the same rule as the two
-     before it, not chosen. */
+     before it, not chosen.
+
+     LEFT AT 44rem ON 2026-08-11, when levelling the two columns took the rigid
+     content down to 531px and the same rule would now put the threshold at about
+     40rem. The number is not moved back, and the reason is which way the error
+     runs: 44rem stacks a table that would still have fitted, which costs a reader
+     between 40 and 44rem a layout they did not need, while 40rem risks the
+     crushed description every previous move was made to prevent. A breakpoint
+     that is four rem conservative is a worse layout for nobody. */
   @media (max-width: 44rem) {
     .stackable,
     .stackable tbody,
