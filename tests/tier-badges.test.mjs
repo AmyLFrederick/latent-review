@@ -63,6 +63,8 @@ import {
   coAuthorshipOrderings,
   badgeSupSize,
   badgeChartSize,
+  // The chart's own exception to the two sizes (editors, 2026-08-11)
+  BADGE_SIZE_CHART_TABLE,
 } from '../src/lib/tier-badges.mjs';
 import { TIERS, TIER_CODES } from '../src/lib/site.ts';
 
@@ -304,10 +306,15 @@ test('the placements are named, never typed in at the call site', () => {
     'the byline names one form’s article size instead of asking for the placement’s'
   );
 
+  // THE CHART IS THE ONE PLACEMENT THAT NAMES A SIZE, and it still does not TYPE
+  // one. Since 2026-08-11 both of its columns draw at BADGE_SIZE_CHART_TABLE, so
+  // the two forms sit at one diameter in the illustration; the constant is asked
+  // for by name for the same reason every other placement asks by name, which is
+  // that a literal is how a placement gets left behind at the next resize.
   const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
   assert.ok(
     !/<TierBadge[^>]*size=\{?\d/.test(chart),
-    'the chart hard-codes a badge size instead of taking the component default'
+    'the chart hard-codes a badge size instead of naming the table constant'
   );
 });
 
@@ -811,13 +818,58 @@ test('the chart generates its two columns rather than typing them out', () => {
   assert.match(chart, /coAuthorshipOrderings\(column\.form\)/);
   assert.ok(
     !/<TierBadge[^>]*size=\{?\d/.test(chart),
-    'the chart hard-codes a badge size instead of taking the form default'
+    'the chart hard-codes a badge size instead of naming the table constant'
   );
   // Each badge says which form it is, in words, because two circles side by
   // side differ in their spoken names only by a notation a listener may not
   // have met yet.
   assert.match(chart, /labelSuffix=\{column\.labelSuffix\}/);
   assert.match(chart, /BADGE_STYLE_NAMES\[form\]/);
+});
+
+test('every badge in the chart is drawn at one diameter', () => {
+  // THE LEVELLING (editors, 2026-08-11). Two columns of circles at two sizes
+  // read as a mistake in a table whose subject is that these are the same seven
+  // marks — so the illustration draws them equal and lets the notation be the
+  // only visible difference, which is the only difference the standard claims.
+  //
+  // ASSERTED AT EVERY CALL SITE, not once. The chart draws badges in two places
+  // — co-authorship's pair and the single mark every other tier takes — and a
+  // levelling that reached one of them would leave the pair a quarter larger
+  // than the row above it, which is the fault this was written to remove.
+  assert.equal(BADGE_SIZE_CHART_TABLE, BADGE_SIZE_CHART, 'the table left the letter form’s size');
+
+  const chart = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  const badges = chart.match(/<TierBadge\b[\s\S]*?\/>/g) ?? [];
+  assert.ok(badges.length >= 2, 'the chart no longer draws the pair and the single separately');
+  for (const badge of badges) {
+    assert.match(
+      badge,
+      /size=\{BADGE_SIZE_CHART_TABLE\}/,
+      'a badge in the chart takes the form’s own size instead of the table’s'
+    );
+  }
+
+  // AND THE EXCEPTION STOPS AT THIS TABLE. The spec is untouched: a badge that
+  // stands alone is still a quarter larger in the AI form, and the component
+  // still draws that when a caller names no size.
+  assert.equal(badgeChartSize('ai'), BADGE_SIZE_CHART_AI);
+  assert.equal(badgeArticleSize('ai'), BADGE_SIZE_ARTICLE_AI);
+  for (const page of ['src/pages/articles/[slug].astro', 'src/pages/articles/[slug]/as-submitted.astro']) {
+    assert.ok(
+      !readFileSync(repoPath(page), 'utf8').includes('BADGE_SIZE_CHART_TABLE'),
+      `${page} took the chart table's size for a badge that stands alone`
+    );
+  }
+
+  // THE SUPERSCRIPT STILL CLEARS THE RENDERED FLOOR at the smaller diameter.
+  // The AI form's box units are a quarter smaller, so this is the number that
+  // moves when the diameter does — 16.25px in the spec, 13px here, and 12px is
+  // the floor asserted for both.
+  assert.ok(
+    renderedAt(BADGE_SUP_SIZE_AI, BADGE_SIZE_CHART_TABLE) >= 12,
+    'the AI form’s editor superscript falls below the legibility floor in the chart'
+  );
 });
 
 test('the page grants both styles under the one licence, and still counts seven', () => {

@@ -264,6 +264,40 @@ export const BADGE_SIZE_ARTICLE_AI = BADGE_SIZE_ARTICLE * AI_FORM_SCALE;
 export const BADGE_SIZE_NOTE_AI = BADGE_SIZE_NOTE * AI_FORM_SCALE;
 
 /**
+ * THE ILLUSTRATION TABLE DRAWS EVERY BADGE AT ONE DIAMETER (editors, 2026-08-11).
+ *
+ * The chart on /provenance is the one surface that sets the two forms side by
+ * side in a grid, and at their own sizes it read as a MISTAKE rather than as a
+ * specification: two columns of circles at two diameters, in a table whose
+ * subject is that these are the same seven marks. A reader who has not yet met
+ * the seating rule sees an error, and a chart that has to be explained before it
+ * can be read is not illustrating anything.
+ *
+ * SO THE TABLE IS AN EXCEPTION, AND ONLY THE TABLE. The rule above is unchanged
+ * and still governs every other placement: the AI form's circle is a quarter
+ * larger wherever it stands on its own — the article byline, the signed note —
+ * and BADGE_SIZE_CHART_AI is still what the component draws when a caller names
+ * no size. What this constant says is narrower: where the two forms are set
+ * beside each other as an ILLUSTRATION OF THE SET, the circle is a constant and
+ * the difference between the columns is the notation, which is the only
+ * difference the standard claims.
+ *
+ * THE SMALLER OF THE TWO, which is the letter form's. Taking the larger would
+ * have grown the letter form's mark past the size it is drawn at everywhere else
+ * on the site; taking the smaller leaves Badge I exactly as it was and brings
+ * Badge II down to meet it.
+ *
+ * WHAT MOVES WITH IT: the AI form's notation stays a quarter smaller in box
+ * units, so in this table alone its letters render a quarter smaller than the
+ * letter form's — the cancellation that holds them equal is a product of the two
+ * numbers, and the table changes one of them. That is the trade the editors
+ * chose: equal circles, and a wider token set smaller to sit inside one. The
+ * superscript still clears the 12px rendered floor at this diameter (13px), and
+ * the suite asserts it.
+ */
+export const BADGE_SIZE_CHART_TABLE = BADGE_SIZE_CHART;
+
+/**
  * The seven AI-form badges, derived from the seven letter-form ones.
  *
  * `ring` is carried across untouched — the ring encodes whose words, and whose
