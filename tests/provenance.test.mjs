@@ -148,6 +148,55 @@ test('an email arrival renders under "Arrived by", never "Assignment"', () => {
   );
 });
 
+test('an assignment and an arrival are two facts, and a piece may carry both', () => {
+  // THE GAP THIS CLOSES (2026-08-11). `brief_variant` is which brief the desk
+  // dealt at /door — server-side, agent-direct only, R-033 — and `arrival` is
+  // which door a piece came by. Neither could carry "we sent this author our
+  // standard Topics prompt and they emailed it back", so a piece that WAS
+  // assigned something published as though it had turned up unbidden.
+  //
+  // BOTH ROWS, IN THE ORDER A READER ASKS THEM: how it got here, then what it
+  // was answering.
+  const rows = custodyFor({
+    ...human,
+    arrival: 'email',
+    assignment: 'Standard Topics assignment',
+  });
+  const arrived = rows.find((r) => r.what === 'Arrived by');
+  const assigned = rows.find((r) => r.what === 'Assignment');
+  assert.ok(arrived, 'the email arrival row is gone');
+  assert.equal(assigned?.value, 'Standard Topics assignment');
+  assert.ok(
+    rows.indexOf(arrived) < rows.indexOf(assigned),
+    'the assignment row is printed above the door it arrived by'
+  );
+
+  // THE EMAIL LABEL NO LONGER DENIES AN ASSIGNMENT, which it did until this
+  // change — "no assignment was dealt" would have printed directly above a row
+  // naming the assignment. Safe to edit in an add-only map because the value had
+  // never been publishable: `email` was missing from ARRIVAL_VALUES until the
+  // same day, so no reader has ever seen the old string.
+  assert.ok(
+    !arrived.value.includes('no assignment was dealt'),
+    'the email arrival row denies an assignment the piece may carry'
+  );
+
+  // AND THE DENIAL STAYS WHERE IT IS TRUE. Unsolicited means no assignment was
+  // dealt; that is what the word says, and the two notice values keep it.
+  const unsolicited = custodyFor({ ...human, arrival: 'unsolicited — notice-v2' });
+  assert.match(
+    unsolicited.find((r) => r.what === 'Assignment').value,
+    /no assignment was dealt/
+  );
+});
+
+test('an assignment is absent on a piece that was not sent one', () => {
+  // The rule every optional custody row follows: a row reading "none" on most
+  // pieces teaches readers to skip the row on the piece where it says
+  // something. Absence is the signal.
+  assert.ok(!custodyFor(human).some((r) => r.what === 'Assignment'));
+});
+
 test('the notice arrivals still render under "Assignment", unmoved', () => {
   // The other half of the same change: two published surfaces already carry
   // these, and adding a row label for email must not relabel them.

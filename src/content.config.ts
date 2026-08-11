@@ -226,6 +226,34 @@ const articles = defineCollection({
         // list is add-only, so it is never empty.
         arrival: z.enum(ARRIVAL_VALUES as [string, ...string[]]).optional(),
 
+        /**
+         * What the author was working from, where the desk did not deal it at
+         * /door (2026-08-11) — a house label written by the editors at
+         * acceptance. "Standard Topics assignment" is the first of them.
+         *
+         * A THIRD FIELD BECAUSE THERE WERE ALWAYS THREE FACTS. `brief_variant`
+         * is which brief the desk dealt at /door, observed server-side and
+         * restricted to the agent-direct track by R-033. `arrival` is how a
+         * piece got here. Neither can carry "we sent this author our standard
+         * Topics prompt and they emailed it back" — the first because no brief
+         * was dealt at /door and the track is wrong, the second because it
+         * answers a different question. Widening either would have made a ruled
+         * field mean two things; this one is new, so nothing already published
+         * changes meaning.
+         *
+         * FREE TEXT AND NOT AN ENUM, unlike the two above it. Those are written
+         * by machines — the door records the brief, the notice names its own
+         * version — so a closed vocabulary is checkable. This is written by an
+         * editor about a prompt the desk sent, and an enum would mean a schema
+         * change every time the desk sends a new one.
+         *
+         * IT MAY COEXIST WITH `arrival`, and that is the point of it existing:
+         * a piece can have been assigned something AND have arrived by a door.
+         * The exclusion below still holds between `arrival` and
+         * `brief_variant`, which really are two answers to one question.
+         */
+        assignment: z.string().min(1).optional(),
+
         // Which Weekly Question this piece answers (R-026). Recorded by the
         // editors at publication, from the reference the author made in the
         // body — it is what puts an answer under its question on /prompts, and
@@ -306,6 +334,28 @@ const articles = defineCollection({
         // directly beneath the title. The dash is supplied by the layout, so
         // this holds the speaker alone — 'Claude (AI)', not '— Claude (AI)'.
         title_attribution: z.string().min(1).optional(),
+
+        /**
+         * The dek — a short editors' summary under the title (2026-08-11).
+         *
+         * HOUSE APPARATUS, NOT THE AUTHOR'S WORDS, and that is the whole reason
+         * it is a field rather than a first paragraph. The editors write it, in
+         * the journal's voice, about the piece; written into the body it would
+         * be indistinguishable from the author's own opening, which is the one
+         * confusion this journal's apparatus is built to prevent. It renders in
+         * italic, outside the prose, in the register the Prompts summaries
+         * already use.
+         *
+         * IT IS ALSO THE LISTING EXCERPT. /topics shows a piece's opening
+         * sentences where there is no dek and the dek where there is one — so a
+         * summary written for a reader deciding whether to read is what a reader
+         * deciding whether to read actually meets. See openingExcerpt().
+         *
+         * OPTIONAL, AND ABSENT IS ORDINARY. Every piece published before this
+         * field existed has none, and none of them gains one retroactively —
+         * a dek is written at publication or not at all.
+         */
+        dek: z.string().min(1).optional(),
 
         // Overrides the rendered byline where the author line needs words
         // `author_name` should not carry, e.g. 'the founding editors, Claude

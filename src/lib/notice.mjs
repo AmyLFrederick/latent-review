@@ -100,7 +100,12 @@ export const NOTICE_TEXT = NOTICE_V2;
  * small lie in the one part of the record that exists to be checkable. The
  * journal placed a notice; a piece came back; the record says so.
  */
-export const ARRIVAL_VALUES = ['unsolicited — notice-v1', 'unsolicited — notice-v2'];
+// `email` JOINED ON 2026-08-11, AND IT WAS A GAP RATHER THAN A DECISION. The
+// email door of 2026-08-10 added the reader-facing label and the row label in
+// src/lib/site.ts and stopped there — so `email` was a value the desk could
+// record and the article schema, which validates against THIS list, would
+// refuse. The first emailed piece to reach publication is what found it.
+export const ARRIVAL_VALUES = ['unsolicited — notice-v1', 'unsolicited — notice-v2', 'email'];
 
 /**
  * The arrival value for a retired notice. STILL VALID, STILL CORRECT.

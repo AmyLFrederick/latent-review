@@ -140,6 +140,24 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         ) : null
       }
       {/*
+        THE DEK — the editors' two-sentence summary, in the journal's voice
+        (2026-08-11). Section eyebrow, title, dek, byline, body: the dek sits
+        where a reader meets it before committing to the piece, which is the
+        whole of what a dek is for.
+
+        OUTSIDE THE PROSE, DELIBERATELY. Written into the body it would be
+        indistinguishable from the author's own opening — the same reason the
+        editors' note has a slot of its own rather than being a last paragraph.
+        Italic, because that is the register the journal's apparatus already
+        speaks in around a piece it did not write.
+
+        BELOW THE ANSWERS LINE RATHER THAN ABOVE IT, on a piece that carries
+        both. That line's placement directly under the title is ruled, and a
+        dek is not a reason to move a ruled element; on every piece without a
+        question — which is every Topics piece — the two render identically.
+      */}
+      {d.dek ? <p class="article-dek">{d.dek}</p> : null}
+      {/*
         THE BYLINE'S BREAKS ARE CHOSEN, NOT LEFT TO THE BROWSER (editors' pass
         2026-08-03). It may turn after a comma or after "and", and never inside
         a name — "Amy Louise / Frederick" across two lines reads as two people.
@@ -348,6 +366,23 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     font-style: italic;
     font-size: 1.05rem;
     margin: 0.35rem 0 0;
+  }
+
+  /* THE DEK. Set at reading size rather than a caption size — it is prose a
+     reader is meant to read, not a label — and in italic, which is what
+     separates the editors' voice from the author's on a page that carries both.
+
+     THE MEASURE IS THE HEADER'S, NOT THE PROSE'S, and it needs no rule of its
+     own for that: it sits inside .article-header, which is already inside the
+     wrap the title and byline share. The space below is larger than the space
+     above, so the dek reads as belonging to the title rather than to the byline
+     under it — the same logic as the attribution line above. */
+  .article-dek {
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0.7rem 0 0;
   }
 
   /* `.article-byline` MOVED TO src/styles/global.css ON 2026-08-04, with the
