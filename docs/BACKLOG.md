@@ -130,6 +130,20 @@ this list by becoming a PR.
   `R-TBD`. That rule is deliberately not retroactive, which is exactly why this
   item exists — it is the one case the rule does not clean up by itself.
 
+- **Sizing-leaves-the-standard ruling: DRAFTED, AWAITING A DUAL YES.**
+  `docs/SCRATCH-R-TBD-SIZING-LEAVES-THE-STANDARD.md`, drafted 2026-08-11. It
+  supersedes, in part and by number, the sizing clauses of R-049 and R-050 —
+  they stop being terms of the published standard and stand as descriptions of
+  the house implementation. The prescriptions were already removed from
+  `/provenance`, so **the published standard and the log disagree about whether
+  size is prescribed until this is ratified.**
+
+  Listed here because the item above is what happens to a draft nobody is
+  tracking. This one carries `R-TBD` rather than a number, so ratifying it costs
+  a heading change and an append and creates no gap either way. Two things ride
+  with it and neither happens first: the number, and the `/provenance` changelog
+  entry recording the amendment.
+
 - **`/admin` subscriber dashboard.** For now the Supabase table view of
   `subscribers` is the dashboard (counts, statuses, manual fixes). A proper
   authenticated `/admin` page — subscriber counts over time, confirm rate,
