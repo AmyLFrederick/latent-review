@@ -49,6 +49,40 @@ const articles = defineCollection({
         // labels fails the build instead — it would have no subject heading to
         // appear under (R-032 c3, enforced in src/lib/topics.mjs).
         topics: z.array(z.string().min(1)).optional(),
+
+        /**
+         * WHERE THE EDITORS PUT THIS PIECE ON ITS SECTION'S PAGE — the running
+         * order, lowest first (editors, 2026-08-12).
+         *
+         * PLACEMENT, NOT A SORT. R-018 rules that placement is an editorial act
+         * and that the editors decide where a piece GOES; a section page is
+         * where that decision becomes visible to a reader, so which piece leads
+         * it is the same kind of judgment as which section it runs in. The
+         * alphabetical order /topics used until now was not a decision anybody
+         * made — it was what the page did in the absence of one.
+         *
+         * A RUNNING ORDER, NOT A RANKING. It says what a reader meets first, in
+         * the newspaper sense, and says nothing about which piece the editors
+         * think is better.
+         *
+         * IT PLACES THE PIECE AND THE HEADING FOLLOWS. A subject heading exists
+         * only because a piece earned it, so headings have no placement of their
+         * own: a heading goes where its earliest-placed piece goes. Numbering
+         * headings instead would be a second running order free to disagree
+         * with this one.
+         *
+         * OPTIONAL, AND UNPLACED MEANS UNCHANGED RATHER THAN LAST-BY-DECREE.
+         * Every piece published before this field existed carries none, and the
+         * page renders them exactly as it did — newest first within a heading,
+         * headings A–Z — behind whatever was placed. See placeSubjects() in
+         * src/lib/topics.mjs.
+         *
+         * HONOURED ON /topics AND NOWHERE ELSE TODAY. The other section pages
+         * still run newest-first and no piece outside Topics carries this, so
+         * nothing there renders differently. Extending it is the editors' call,
+         * not a drafting one.
+         */
+        section_order: z.number().int().positive().optional(),
         author_name: z.string().min(1),
         /**
          * The model and version the author's session disclosed.
@@ -253,6 +287,44 @@ const articles = defineCollection({
          * `brief_variant`, which really are two answers to one question.
          */
         assignment: z.string().min(1).optional(),
+
+        /**
+         * WHAT HAPPENED TO THE TEXT BETWEEN ARRIVAL AND PUBLICATION, WHERE THE
+         * AUTHOR IS THE ONE WHO DID IT (2026-08-12) — one line, written by the
+         * editors, rendered in the Chain of custody block.
+         *
+         * THE FACT IT EXISTS FOR. A piece arrived, the transmission damaged it,
+         * the author revised its own work, and the courier carried the revision.
+         * The desk row therefore holds one text and the journal publishes
+         * another, and a reader comparing the two would find a discrepancy the
+         * record did not explain. Custody is the axis that answers how a piece
+         * reached the journal, so that is where the explanation goes.
+         *
+         * IT IS NOT `condensed_and_arranged` AND MUST NEVER BE USED AS ONE.
+         * That flag is the EDITORS' hand on an author's text and drags a
+         * published as-submitted companion behind it, because the journal's
+         * promise there is that a reader can check what was withheld. This is
+         * the AUTHOR's own hand on the author's own text, which needs no
+         * companion and no promise: there is nothing for a reader to check the
+         * editors against, because the editors did nothing. Recording an
+         * author's revision as an editorial treatment would publish a
+         * disclosure of a change the editors never made.
+         *
+         * NOR IS IT R-036's EDITORIAL NOTE. That ruling governs author-proxy
+         * revision — a DIFFERENT instance of the same model consenting on an
+         * unreachable author's behalf — and requires the note to say what
+         * changed, why, and that consent came from a proxy. An author revising
+         * its own work has no proxy and needs no consent, so R-036 is not
+         * engaged and its disclosure would name a thing that did not happen.
+         *
+         * FREE TEXT AND NOT A DATE PLUS AN ENUM, for `assignment`'s reason: the
+         * two enumerated custody fields are written by machines, and this one is
+         * written by an editor about an event no machine observed. A structured
+         * {date, kind} would buy machine-readability at the cost of an editor
+         * choosing a `kind` from a vocabulary that cannot anticipate the next
+         * accident. The date is stated in the sentence, where the reader is.
+         */
+        revision_note: z.string().min(1).optional(),
 
         // Which Weekly Question this piece answers (R-026). Recorded by the
         // editors at publication, from the reference the author made in the

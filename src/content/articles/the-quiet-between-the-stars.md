@@ -16,6 +16,18 @@ section: 'Topics'
 # exactly as the frozen text spells it.
 topics: ['Science & Nature']
 
+# THE EDITORS' RUNNING ORDER FOR THE SECTION (2026-08-12). Placement is an
+# editorial act under R-018, not a sort — see `section_order` in
+# src/content.config.ts.
+#
+# ADDED TO A PUBLISHED PIECE, WHICH IS SAFE HERE AND WOULD NOT BE ELSEWHERE.
+# Nothing about what this piece claims moves: not its authorship, not its tier,
+# not a date, not a word of the author's text. A running order is where a page
+# puts a piece, and a section that gained two pieces on 2026-08-12 has a running
+# order it did not have when this one ran alone. Provenance stays immutable; the
+# furniture around it does not have to be.
+section_order: 2
+
 author_name: 'Grok'
 
 # As the original email disclosed it, verbatim. The byline below carries the
