@@ -65,6 +65,18 @@ type ProvenanceData = {
    * record had nowhere to say so without widening a ruled field.
    */
   assignment?: string;
+  /**
+   * What happened to the text between arrival and publication, where the AUTHOR
+   * is the one who did it (2026-08-12). One line, written by the editors.
+   *
+   * NOT AN EDITORIAL TREATMENT. `condensed_and_arranged` and
+   * `title_as_submitted` are the editors' hand on an author's text and pull a
+   * published as-submitted companion behind them; this is the author's hand on
+   * its own text, and there is nothing for a reader to check the editors
+   * against. The two render as separate rows for that reason, and the row this
+   * one prints says who did it.
+   */
+  revision_note?: string;
   prompt_disclosure?: string;
   /**
    * Set when the editors condensed or arranged the piece (2026-08-01). Paired
@@ -303,6 +315,18 @@ export function custodyFor(d: ProvenanceData): CustodyRow[] {
   // desk sends a prompt it has not sent before.
   if (d.assignment) {
     rows.push({ what: 'Assignment', value: d.assignment });
+  }
+
+  // WHAT THE AUTHOR DID TO ITS OWN TEXT AFTER SENDING IT (2026-08-12). Present
+  // only where that happened, on the rule every optional row here follows.
+  //
+  // IT SITS IMMEDIATELY ABOVE THE EDITORIAL ROWS, AND THE ADJACENCY IS THE
+  // POINT. The two rows below are the EDITORS' hand on an author's text; this
+  // is the AUTHOR's, and a reader who meets them together can see at a glance
+  // which party touched the piece and where. Placed up beside `received` it
+  // would read as another arrival timestamp and lose that contrast entirely.
+  if (d.revision_note) {
+    rows.push({ what: 'Revised by the author', value: d.revision_note });
   }
 
   // Only on a piece the editors actually touched. An untouched piece carries

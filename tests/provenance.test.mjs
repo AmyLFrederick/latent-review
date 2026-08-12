@@ -219,6 +219,60 @@ test('the assignment row appears only when a brief was actually dealt', () => {
   );
 });
 
+// --- The author's own revision (2026-08-12) --------------------------------
+
+test("an author's revision is a custody fact, and the row says who did it", () => {
+  // THE GAP THIS CLOSES. A piece arrived, the transmission damaged it, the
+  // author revised its own work and the courier carried the revision — so the
+  // desk row holds one text and the journal publishes another. Nothing in the
+  // record could say so: every field that describes a change between arrival
+  // and publication describes an EDITORIAL change.
+  const note = '2026-08-12 — the courier carried the revision.';
+  const row = custodyFor({ ...human, revision_note: note }).find((r) =>
+    r.what.startsWith('Revised')
+  );
+  assert.ok(row, 'the revision row is gone');
+  assert.equal(row.value, note);
+
+  // THE LABEL NAMES THE PARTY, and that is the whole guard. A bare "Revised"
+  // sits one row above "Editorial treatment" and would be read as the editors'
+  // work — which is the claim this row exists to deny.
+  assert.equal(row.what, 'Revised by the author');
+});
+
+test('the revision row is absent on a piece nobody revised', () => {
+  // The rule every optional custody row follows: absence is the signal, and a
+  // row reading "not revised" on every other piece would teach readers to skip
+  // the row on the one piece where it says something.
+  assert.ok(!custodyFor(human).some((r) => r.what.startsWith('Revised')));
+});
+
+test("an author's revision is never an editorial treatment", () => {
+  // THE CONFUSION THIS PINS SHUT. `condensed_and_arranged` and
+  // `title_as_submitted` are the EDITORS' hand on an author's text and drag a
+  // published as-submitted companion behind them, because the journal's promise
+  // there is that a reader can check what the editors withheld. A revision by
+  // the author needs no companion and makes no such promise — and a piece that
+  // recorded one as the other would publish a disclosure of a change the
+  // editors never made.
+  const rows = custodyFor({ ...human, revision_note: 'Revised by the author 2026-08-12.' });
+  assert.ok(!rows.some((r) => r.what === 'Editorial treatment'), 'a treatment row appeared');
+  assert.ok(!rows.some((r) => r.href), 'an as-submitted link was published for an untouched piece');
+
+  // AND WHERE BOTH ARE TRUE THEY ARE TWO ROWS, IN THAT ORDER — the author's
+  // hand, then the editors'. One row would state two parties' work as one act.
+  const both = custodyFor({
+    ...human,
+    revision_note: 'Revised by the author 2026-08-12.',
+    condensed_and_arranged: true,
+    slug: 'a-piece',
+  });
+  const revised = both.findIndex((r) => r.what === 'Revised by the author');
+  const treated = both.findIndex((r) => r.what === 'Editorial treatment');
+  assert.ok(revised >= 0 && treated >= 0, 'one of the two rows is missing');
+  assert.ok(revised < treated, "the editors' row is printed above the author's own revision");
+});
+
 test('a human courier is named; an agent door is described', () => {
   const couriered = custodyFor({ ...human, human_sponsor: 'A. Courier' });
   assert.match(couriered.find((r) => r.what === 'Submitted by').value, /A\. Courier/);

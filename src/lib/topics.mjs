@@ -160,12 +160,78 @@ export function issueSubjects(articles, issueNumber) {
   // three times on one page reads as a bug rather than as thoroughness. The
   // other labels are not discarded: they stay in the piece's frontmatter and in
   // topicIndex, which is the cross-issue view. Only the section page collapses.
-  return topicIndex(
+  const grouped = topicIndex(
     inSection.map((article) => ({
       ...article,
       data: { ...article.data, topics: [topicsOf(article)[0]] },
     }))
   );
+
+  return placeSubjects(grouped);
+}
+
+/**
+ * Where the editors put a piece on its section's page — `section_order`, or
+ * Infinity where they placed nothing.
+ *
+ * ORDER ON THIS PAGE IS EDITORIAL PLACEMENT, NOT A SORT (editors, 2026-08-12).
+ * R-018 says placement is an act the editors perform and submitters do not:
+ * they decide where a piece GOES. A section page is where that decision becomes
+ * visible, so which piece leads it is the same kind of judgment as which
+ * section a piece runs in — not a property of the data to be derived from a
+ * date, a title or a label. Alphabetical order was never a decision anyone
+ * made; it was what the page did in the absence of one.
+ *
+ * NOT A RANKING, AND NOT A CLAIM ABOUT QUALITY. It is a running order, in the
+ * newspaper sense: what a reader meets first.
+ */
+const placement = (article) => {
+  const n = article?.data?.section_order;
+  return Number.isInteger(n) && n > 0 ? n : Infinity;
+};
+
+/**
+ * Numeric compare that is safe on Infinity.
+ *
+ * `a - b` would be NaN for two unplaced pieces, and a comparator returning NaN
+ * hands the engine an incoherent ordering. Two unplaced pieces are equal here,
+ * which is what lets the stable sorts below leave them exactly as they were.
+ */
+const byNumber = (a, b) => (a === b ? 0 : a < b ? -1 : 1);
+
+/** The earliest placement in a group — the piece that makes its heading lead. */
+const leadPlacement = (group) => group.items.reduce((min, a) => Math.min(min, placement(a)), Infinity);
+
+/**
+ * Apply the editors' running order to grouped subjects.
+ *
+ * A HEADING GOES WHERE ITS LEADING PIECE GOES, and that follows from what the
+ * editors actually place. They place PIECES; a heading exists only because a
+ * piece earned it (topicIndex), so a heading has no placement of its own to be
+ * given. Ordering headings directly would mean maintaining a second running
+ * order that could disagree with the first.
+ *
+ * UNPLACED IS NOT LAST-BY-DECREE, IT IS UNCHANGED. Both sorts are stable, so a
+ * piece the editors did not place keeps precisely the order it had before this
+ * function existed — newest first within a heading, headings A–Z — and falls in
+ * behind whatever was placed. A page where nobody placed anything renders
+ * exactly as it did on 2026-08-11, which is what makes this additive rather
+ * than a change to every Topics page ever built.
+ *
+ * IT REACHES /topics AND NO OTHER SECTION PAGE. src/pages/section/[slug].astro
+ * still runs newest-first, and no piece outside the Topics section carries
+ * `section_order` today — so nothing there renders differently. Whether the
+ * editors want a running order on the other section pages is their call and not
+ * a drafting one; recorded here so the next session reads the difference as a
+ * decision that has not been made rather than a sweep that was missed.
+ */
+function placeSubjects(groups) {
+  return groups
+    .map((group) => ({
+      topic: group.topic,
+      items: [...group.items].sort((a, b) => byNumber(placement(a), placement(b))),
+    }))
+    .sort((a, b) => byNumber(leadPlacement(a), leadPlacement(b)));
 }
 
 /**

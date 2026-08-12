@@ -151,6 +151,114 @@ test('one subject spelled two ways still fails, inside a single issue', () => {
 });
 
 // ---------------------------------------------------------------------------
+// The editors' running order (2026-08-12). Placement is an editorial act under
+// R-018 — the editors decide where a piece goes — so the section page renders
+// what they placed rather than what a sort produced.
+// ---------------------------------------------------------------------------
+
+/** A Topics piece the editors placed at position `n`. */
+const placedPiece = (id, topics, n, date = '2026-08-03') =>
+  piece(id, date, topics, { section: 'Topics', issue: 1, section_order: n });
+
+test('the editors place pieces, and the headings follow them', () => {
+  // THE ORDER IS NOT ALPHABETICAL AND IS NOT MEANT TO BE. These three headings
+  // sort A–Z as Alpha, Mid, Zulu; the editors placed their pieces in the
+  // opposite order, and the page runs what the editors placed.
+  const groups = issueSubjects(
+    [
+      placedPiece('a', ['Alpha'], 3),
+      placedPiece('z', ['Zulu'], 1),
+      placedPiece('m', ['Mid'], 2),
+    ],
+    1
+  );
+  assert.deepEqual(
+    groups.map((g) => g.topic),
+    ['Zulu', 'Mid', 'Alpha']
+  );
+});
+
+test('a heading goes where its earliest-placed piece goes', () => {
+  // A heading has no placement of its own — it exists only because a piece
+  // earned it. So the lead piece carries its heading, and a second piece placed
+  // later in the running order does not drag the heading down with it.
+  const groups = issueSubjects(
+    [
+      placedPiece('late', ['Shared'], 4, '2026-08-01'),
+      placedPiece('lead', ['Shared'], 1, '2026-08-02'),
+      placedPiece('other', ['Other'], 2),
+    ],
+    1
+  );
+  assert.deepEqual(
+    groups.map((g) => g.topic),
+    ['Shared', 'Other']
+  );
+  assert.deepEqual(
+    groups[0].items.map((a) => a.id),
+    ['lead', 'late'],
+    'the running order inside a heading is the editors’ too, not the dates'
+  );
+});
+
+test('an unplaced piece is unchanged, not demoted by decree', () => {
+  // THE PROPERTY THAT MAKES THIS ADDITIVE. Every piece published before the
+  // field existed carries none, and a page where nobody placed anything must
+  // render exactly as it did on 2026-08-11 — headings A–Z, newest first within
+  // one. Unplaced pieces simply fall in behind whatever was placed.
+  const corpus = [
+    topicsPiece('older', ['Zulu'], 1, '2026-08-01'),
+    topicsPiece('newer', ['Zulu'], 1, '2026-08-03'),
+    topicsPiece('alpha', ['Alpha'], 1, '2026-08-02'),
+  ];
+  assert.deepEqual(
+    issueSubjects(corpus, 1).map((g) => g.topic),
+    ['Alpha', 'Zulu'],
+    'an all-unplaced page stopped rendering the way it always has'
+  );
+  assert.deepEqual(
+    issueSubjects(corpus, 1).find((g) => g.topic === 'Zulu').items.map((a) => a.id),
+    ['newer', 'older'],
+    'unplaced pieces lost their newest-first order'
+  );
+
+  // And a single placed piece leads, with the rest untouched behind it.
+  const withLead = issueSubjects([...corpus, placedPiece('led', ['Mid'], 1)], 1);
+  assert.deepEqual(
+    withLead.map((g) => g.topic),
+    ['Mid', 'Alpha', 'Zulu']
+  );
+});
+
+test('placement is a running order, not a rank, and gaps are ordinary', () => {
+  // The editors number what they place; nothing requires 1, 2, 3 with no holes,
+  // and a page that failed the build over a gap would be enforcing a rule
+  // nobody made. Only the relative order is read.
+  const groups = issueSubjects(
+    [placedPiece('second', ['Beta'], 40), placedPiece('first', ['Alpha'], 7)],
+    1
+  );
+  assert.deepEqual(
+    groups.map((g) => g.topic),
+    ['Alpha', 'Beta']
+  );
+});
+
+test('the cross-issue index is still A–Z, and placement does not reach it', () => {
+  // topicIndex is an INDEX — a reference view of the whole corpus, where A–Z is
+  // the useful order and a running order would be meaningless across issues.
+  // Only the section page renders a running order.
+  const index = topicIndex([
+    placedPiece('z', ['Zulu'], 1),
+    placedPiece('a', ['Alpha'], 2),
+  ]);
+  assert.deepEqual(
+    index.map((g) => g.topic),
+    ['Alpha', 'Zulu']
+  );
+});
+
+// ---------------------------------------------------------------------------
 // The excerpt: roughly two lines of the opening, plain text, ellipsis.
 // ---------------------------------------------------------------------------
 
