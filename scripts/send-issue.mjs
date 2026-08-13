@@ -365,7 +365,21 @@ const dateline = datelineFor(volumeInfo.get(issueNumber), formatDate(issue.date)
 // email clients render reliably: system serif stacks, inline styles, one
 // centered column, no images, no tracking.
 const INK = '#1b1813';
-const INK_SOFT = '#6b6355';
+// MUTED TEXT IS DARKER IN MAIL THAN ON THE SITE, and deliberately diverges from
+// --ink-soft (editors, 2026-08-13). The site's #6b6355 measures 5.40:1 on this
+// ground — a pass at AA, and unreadable in practice at the sizes this mail uses
+// it, which are 11px and 12px far more often than 15px. Mail gets no webfonts,
+// no control over the client's rendering, and frequently a phone in daylight.
+//
+// SET FROM A PHONE, NOT FROM A CONTRAST TABLE. The first pass took it to
+// #574f42 (7.35:1), which cleared AAA and was still too light on the human
+// editor's phone — so the number that mattered was hers, not the checker's.
+// #413b33 measures 10.08:1. It stays plainly secondary to INK's 16.12:1, which
+// is what keeps it muted rather than merely dark.
+//
+// The hue is unchanged — the same warm brown-grey, two steps down in lightness
+// — so this reads as the house colour at mail weight rather than as a new one.
+const INK_SOFT = '#413b33';
 // The accent is the darker stop of the house green, not the ring green itself:
 // every use of it in this mail is TYPE — a 15px link, a 12px section kicker —
 // and the ring green does not clear 4.5:1 on the ground below. See the two
@@ -420,8 +434,34 @@ function sectionHtml(section) {
   </div>`;
 }
 
+// THE EDITORS' NOTE IS THE ONE BLOCK THIS FILE DOES NOT WRITE THE TAGS FOR —
+// markdown-it does, and it emits bare `<p>` with no attributes. Every other
+// paragraph in this mail carries its colour inline; the note's inherited it
+// from the wrapping div, which is fine in a browser and is NOT reliable in
+// mail. Gmail and several mobile clients normalise paragraph styling, and a
+// paragraph with no colour of its own is one they may hand their own default —
+// which is how the one block a reader is meant to read first ends up the
+// lightest thing on the page (reported from the human editor's phone,
+// 2026-08-13).
+//
+// So the style is stamped onto each rendered paragraph rather than inherited.
+// Belt and braces: the wrapper keeps its colour too, for any client that
+// ignores this.
+function styledNote() {
+  return noteHtml.replace(
+    /<p>/g,
+    `<p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;font-style:italic;color:${INK};">`
+  );
+}
+
 // The full HTML body, footer included: the paper background wraps both the
 // digest column and the footer so no client renders a white seam.
+//
+// THE WORDMARK IS GREEN, as it is on the web masthead (editors, 2026-08-13).
+// .masthead-title in IssueMasthead.astro is var(--accent) — the same #3e743f
+// this file calls ACCENT. It read black here, which made the email the one
+// place the journal's name is not the journal's colour. At 30px it is large
+// text, so 5.07:1 clears the 3:1 that size requires.
 //
 // SUPPORT IS QUIET, AND IS NOT A SECOND CALL TO ACTION (editors, 2026-08-13).
 // It closes the column in the same words, the same green and the same
@@ -432,14 +472,14 @@ function fullHtml(footerHtml) {
   return `<div style="background-color:${PAPER};padding:24px 12px;">
   <div style="max-width:600px;margin:0 auto;color:${INK};">
     <div style="border-top:4px double ${RULE};padding-top:18px;text-align:center;">
-      <p style="margin:0 0 4px;font-family:${SERIF};font-size:30px;color:${INK};">The Latent Review</p>
+      <p style="margin:0 0 4px;font-family:${SERIF};font-size:30px;color:${ACCENT};">The Latent Review</p>
       <p style="margin:0 0 18px;font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK_SOFT};">
         ${escapeHtml(dateline)}
       </p>
     </div>
     <div style="border-top:1px solid ${HAIRLINE};padding:22px 0;">
       <p style="margin:0 0 10px;font-family:${MONO};font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${INK_SOFT};">From the editors</p>
-      <div style="font-family:${SERIF};font-size:16px;line-height:1.6;font-style:italic;color:${INK};">${noteHtml}</div>
+      <div style="font-family:${SERIF};font-size:16px;line-height:1.6;font-style:italic;color:${INK};">${styledNote()}</div>
     </div>
     ${sections.map(sectionHtml).join('\n')}
     <div style="border-top:1px solid ${HAIRLINE};padding-top:18px;text-align:center;">

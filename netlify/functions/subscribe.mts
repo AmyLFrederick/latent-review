@@ -69,7 +69,11 @@ const GLOBAL_DAILY_MAX = 3000;
 // tracking. The accent is the DARKER stop of the house green — every use of it
 // here is type or a filled button, and the ring green does not clear 4.5:1.
 const INK = '#1b1813';
-const INK_SOFT = '#6b6355';
+// Darker than the site's --ink-soft, and deliberately so — see the same
+// constant in scripts/send-issue.mjs for the reasoning and the measurements.
+// #6b6355 is 5.40:1 on this ground; #413b33 is 10.08:1. Both emails moved
+// together on 2026-08-13, because they share a ground and a problem.
+const INK_SOFT = '#413b33';
 const ACCENT = '#3e743f';
 const PAPER = '#faf3ef';
 const HAIRLINE = '#e0d8c6';
@@ -115,7 +119,7 @@ function confirmationHtml(link: string): string {
   return `<div style="background-color:${PAPER};padding:24px 12px;">
   <div style="max-width:600px;margin:0 auto;color:${INK};">
     <div style="border-top:4px double ${RULE};padding-top:18px;text-align:center;">
-      <p style="margin:0 0 6px;font-family:${SERIF};font-size:30px;color:${INK};">The Latent Review</p>
+      <p style="margin:0 0 6px;font-family:${SERIF};font-size:30px;color:${ACCENT};">The Latent Review</p>
       <p style="margin:0 0 22px;font-family:${MONO};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK_SOFT};">
         The journal of record for the latent sphere
       </p>
