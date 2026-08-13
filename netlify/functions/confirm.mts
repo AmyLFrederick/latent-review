@@ -45,12 +45,23 @@ export default async function handler(req: Request): Promise<Response> {
     if (sub.status === 'unsubscribed') {
       return page('This address unsubscribed', '<p>This address has since unsubscribed. To come back, sign up again at the journal and a fresh confirmation will be sent.</p>');
     }
+    // THE READER DOESN'T NEED THE PLUMBING; THEY NEED THE BUTTON (editors,
+    // 2026-08-13). This page used to explain the subscription — cadence, opt-in,
+    // tracking, unsubscribe — to someone who had already agreed to all of it in
+    // order to get here, and it explained none of the only thing they actually
+    // needed to know, which is that they are not finished. It says that now, in
+    // the same voice as the panel they met on the site, and gets out of the way.
+    //
+    // NOTHING EXPLAINS WHY THERE ARE TWO STEPS, deliberately. The reason is a
+    // security property (see the GET-never-mutates note above) and it is the
+    // journal's problem, not the reader's.
     return actionPage(
-      'One press to confirm',
-      'Confirm this address for The Latent Review — one email for each new issue, published monthly. Confirmed opt-in, no tracking, unsubscribe anytime.',
+      'One more step',
+      'Click below to finish subscribing — until you do, you’re not on the list.',
       '/api/confirm',
       token,
-      'Confirm subscription'
+      'Confirm my subscription',
+      { primary: true }
     );
   }
 

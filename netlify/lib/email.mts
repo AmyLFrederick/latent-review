@@ -6,11 +6,20 @@
 // forget.
 //
 // "NO TRACKING" IS A PUBLIC PROMISE, MADE IN TWO PLACES A READER CAN READ:
-// the footer below, on every email, and the confirmation page at /api/confirm
-// ("Confirmed opt-in, no tracking, unsubscribe anytime"). Nothing in this file
-// or in scripts/send-issue.mjs asks Resend to track opens or clicks — no
-// tracking option is sent with any request, so the behaviour is whatever the
-// Resend domain is configured to do.
+// the footer below, on every email, and the page a reader lands on once they
+// have confirmed ("No tracking, unsubscribe anytime, and every email we send
+// carries the way out").
+//
+// IT USED TO BE THE PRE-CONFIRM SHEET AND IS NOW THE POST-CONFIRM ONE, moved
+// 2026-08-13. The sheet with the button on it was stripped to a heading and an
+// instruction, because its one job is to get a press and everything else on it
+// was competing; the terms it carried now sit one press later, on the page that
+// has nothing else to do. The count of places is unchanged, and so is the
+// audience — nobody reaches the second page without passing the first.
+//
+// Nothing in this file or in scripts/send-issue.mjs asks Resend to track opens
+// or clicks — no tracking option is sent with any request, so the behaviour is
+// whatever the Resend domain is configured to do.
 //
 // WHICH MEANS THE PROMISE IS KEPT BY A DASHBOARD SETTING, NOT BY THIS CODE.
 // Open and click tracking are per-domain toggles in the Resend console. If

@@ -9,13 +9,26 @@
 // The email is a digest, not the articles (editors' decision, dual-yes
 // 2026-07-18): the web is canonical, the email is the doorbell. Top to
 // bottom: the editors' note (authored fresh each issue, never generated),
-// then Cover, AI Voices, and Opinion — each piece as title, byline with
-// provenance tier, the article's actual first paragraph, and a link to its
-// permanent URL. Sections with nothing in the issue simply don't appear.
+// then Cover, AI Voices, and Opinion — each piece as its section eyebrow,
+// title, dek, byline with provenance tier, and a link to its permanent URL.
+// Sections with nothing in the issue simply don't appear.
 //
-// Content comes from the LIVE site (issues.json for the issue record,
-// feed.json for first paragraphs), so the digest can only ever link to what
-// is actually published. Deploy the issue first; send second.
+// DEKS, NOT FIRST PARAGRAPHS — editors' decision, dual-yes 2026-08-13, and it
+// supersedes that part of the founding digest decision above. A first
+// paragraph shows a reader where a piece starts; a dek says what reading it
+// gets you, which is the only question a doorbell has to answer. The founding
+// decision predates the dek field entirely (it was added 2026-08-11), so this
+// is less a reversal than the first chance to do what the digest was for.
+//
+// THE DEKS ARE REUSED, NEVER GENERATED. A dek is the editors' two-sentence
+// summary written for the piece's own page; the digest prints that same
+// sentence and writes nothing of its own. A piece in a digest section without
+// one stops the run by name — see the check below. This script will not
+// substitute a first paragraph, and it will not summarise a piece itself.
+//
+// Content comes from the LIVE site (issues.json), so the digest can only ever
+// link to what is actually published, and can only ever print a dek that is
+// live on the piece's page. Deploy the issue first; send second.
 //
 // Usage:
 //   node scripts/send-issue.mjs --issue N --note <editors-note.md>              # dry run (default)
@@ -189,8 +202,11 @@ if (index.current_issue !== issueNumber) {
   console.warn(`warning: issue ${issueNumber} is not the current issue (current is ${index.current_issue}).`);
 }
 
-const feed = await fetchJson('/feed.json');
-const contentByUrl = new Map((feed.items ?? []).map((item) => [item.url, item.content_html ?? '']));
+// /feed.json IS NO LONGER FETCHED. It was here for one reason — the article's
+// first paragraph, which the digest printed and no longer does. The dek
+// travels on the issue record itself (issues.json, add-only 2026-08-13), so
+// the digest now reads one document instead of two and cannot be built from an
+// index and a feed that disagree.
 
 // --- build the digest ----------------------------------------------------------
 
@@ -202,25 +218,11 @@ function escapeHtml(s) {
     .replaceAll('"', '&quot;');
 }
 
-function stripTags(html) {
-  return html
-    .replace(/<[^>]+>/g, '')
-    .replaceAll('&amp;', '&')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#39;', "'")
-    .trim();
-}
-
-// The excerpt is the author's own opening — the article's actual first
-// paragraph from the full-text feed, never a generated summary.
-function firstParagraph(article) {
-  const html = contentByUrl.get(article.url);
-  if (!html) fail(`no full text in /feed.json for ${article.url} — index and feed disagree?`);
-  const match = html.match(/<p[^>]*>([\s\S]*?)<\/p>/);
-  if (!match) fail(`could not find a first paragraph for ${article.url}`);
-  return match[1].trim();
+// The dek: the editors' own summary of the piece, as published on its page.
+// Guarded by the check below, so by the time anything calls this the value is
+// known to be there.
+function dek(article) {
+  return article.dek.trim();
 }
 
 // The email is part of the journal's provenance surface: the tier appears
@@ -248,6 +250,31 @@ const sections = DIGEST_SECTIONS.map((name) => ({
 })).filter((s) => s.items.length > 0);
 
 if (sections.length === 0) fail(`issue ${issueNumber} has no articles in ${DIGEST_SECTIONS.join(' / ')} — nothing to send`);
+
+// THE RUN STOPS RATHER THAN IMPROVISING. A missing dek is a piece of editorial
+// copy that has not been written yet, and there are exactly two things this
+// script could do about it: print something else, or say whose turn it is. It
+// says whose turn it is. Falling back to the first paragraph would make the
+// digest silently half one format and half the other, which is the outcome the
+// editors changed the format to avoid; writing a summary here would put
+// machine-generated prose in the journal's voice into a mail that goes to the
+// whole list, unreviewed.
+//
+// This fires on a DRY RUN, which is the point: the dry run is how the editors
+// learn which deks they owe, well before anything is addressed to anyone.
+const missingDeks = sections.flatMap((s) =>
+  s.items.filter((a) => !a.dek || !a.dek.trim()).map((a) => ({ section: s.name, article: a }))
+);
+if (missingDeks.length > 0) {
+  console.error(`error: ${missingDeks.length} piece(s) in issue ${issueNumber} have no dek, and the digest prints deks (editors, 2026-08-13):`);
+  for (const { section, article } of missingDeks) {
+    console.error(`  - ${section}: ${displayTitle(article.title)}`);
+    console.error(`    ${article.url}`);
+  }
+  fail(
+    'a dek is the editors’ to write, never this script’s. Add `dek:` to the piece’s frontmatter, deploy, and re-run — the digest will not fall back to a first paragraph or generate a summary.'
+  );
+}
 
 const coverStory = issue.cover_story;
 const subject = coverStory
@@ -281,42 +308,57 @@ const RULE = '#2a251c';
 const SERIF = "Georgia, 'Times New Roman', serif";
 const MONO = "'Courier New', Courier, monospace";
 
-function articleHtml(article, { isCover }) {
+// EYEBROW, TITLE, DEK, BYLINE — the order the piece's own page uses, so a
+// reader who follows the link meets the same four things in the same sequence
+// they just read in the mail. The dek sits above the byline because that is
+// where it sits on the site: before a reader has committed to the piece, which
+// is the whole of what a dek is for.
+//
+// THE EYEBROW IS NOW PER PIECE rather than once per section (editors,
+// 2026-08-13). It used to head a group, which read correctly only because
+// every section in Issue No. 1 held exactly one piece; the moment a section
+// holds two, the second one's section name is a line the reader has to scroll
+// back for. Each entry now carries its own.
+function articleHtml(article, { isCover, sectionName }) {
   const titleSize = isCover ? '26px' : '20px';
   return `
-    <h2 style="margin:0 0 6px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
+    <p style="margin:0 0 10px;font-family:${MONO};font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${isCover ? ACCENT : INK_SOFT};">
+      ${escapeHtml(sectionName)}
+    </p>
+    <h2 style="margin:0 0 10px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
       <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(displayTitle(article.title))}</a>
     </h2>
+    <p style="margin:0 0 12px;font-family:${SERIF};font-style:italic;font-size:16px;line-height:1.6;color:${INK};">${escapeHtml(dek(article))}</p>
     <p style="margin:0 0 4px;font-family:${SERIF};font-style:italic;color:${INK_SOFT};font-size:15px;">
       By ${escapeHtml(article.author_name)}
     </p>
     <p style="margin:0 0 14px;font-family:${MONO};font-size:11px;color:${INK_SOFT};">
       ${escapeHtml(article.author_model_version)} · ${escapeHtml(tierLabel(article))}
     </p>
-    <p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;color:${INK};">${firstParagraph(article)}</p>
     <p style="margin:0;font-family:${SERIF};font-size:15px;">
-      <a href="${article.url}" style="color:${ACCENT};text-decoration:underline;">Continue reading&nbsp;&rarr;</a>
+      <a href="${article.url}" style="color:${ACCENT};text-decoration:underline;">Read the piece&nbsp;&rarr;</a>
     </p>`;
 }
 
 function sectionHtml(section) {
   const isCover = section.name === 'Cover';
-  const kicker = `
-    <p style="margin:0 0 14px;font-family:${MONO};font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${isCover ? ACCENT : INK_SOFT};">
-      ${escapeHtml(section.name)}
-    </p>`;
   const items = section.items
-    .map((a) => articleHtml(a, { isCover }))
+    .map((a) => articleHtml(a, { isCover, sectionName: section.name }))
     .join(`\n    <div style="height:22px;line-height:22px;">&nbsp;</div>`);
   return `
   <div style="border-top:1px solid ${HAIRLINE};padding:26px 0;">
-    ${kicker}
     ${items}
   </div>`;
 }
 
 // The full HTML body, footer included: the paper background wraps both the
 // digest column and the footer so no client renders a white seam.
+//
+// SUPPORT IS QUIET, AND IS NOT A SECOND CALL TO ACTION (editors, 2026-08-13).
+// It closes the column in the same words, the same green and the same
+// letterspaced-caps voice as the link that closes every page of the site, in
+// the same place: at the foot, after everything the mail was actually sent to
+// do. It is not repeated, not boxed, and never above a piece.
 function fullHtml(footerHtml) {
   return `<div style="background-color:${PAPER};padding:24px 12px;">
   <div style="max-width:600px;margin:0 auto;color:${INK};">
@@ -335,20 +377,25 @@ function fullHtml(footerHtml) {
       <p style="margin:0;font-family:${SERIF};font-size:15px;">
         <a href="${issue.url}" style="color:${ACCENT};text-decoration:underline;">Read the full issue&nbsp;&rarr;</a>
       </p>
+      <p style="margin:22px 0 0;font-family:${SERIF};font-size:13px;letter-spacing:2px;text-transform:uppercase;">
+        <a href="${SITE_URL}/supporters/" style="color:${ACCENT};text-decoration:none;">Support the journal</a>
+      </p>
     </div>
   </div>
   ${footerHtml}
 </div>`;
 }
 
-function articleText(article) {
+function articleText(article, sectionName) {
   return [
+    sectionName.toUpperCase(),
     displayTitle(article.title),
+    '',
+    dek(article),
+    '',
     `By ${article.author_name} · ${tierLabel(article)} (${article.author_model_version})`,
     '',
-    stripTags(firstParagraph(article)),
-    '',
-    `Continue reading: ${article.url}`,
+    `Read the piece: ${article.url}`,
   ].join('\n');
 }
 
@@ -359,13 +406,10 @@ const digestText = [
   'FROM THE EDITORS',
   noteText,
   '',
-  ...sections.flatMap((s) => [
-    `--- ${s.name.toUpperCase()} ---`,
-    '',
-    ...s.items.map(articleText),
-    '',
-  ]),
+  ...sections.flatMap((s) => s.items.flatMap((a) => [articleText(a, s.name), ''])),
   `Read the full issue: ${issue.url}`,
+  '',
+  `Support the journal: ${SITE_URL}/supporters/`,
 ].join('\n');
 
 // --- assemble per-recipient emails ---------------------------------------------
