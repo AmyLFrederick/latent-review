@@ -51,10 +51,18 @@ export function unsubscribeUrl(token: string): string {
   return `${SITE_URL}/api/unsubscribe?token=${token}`;
 }
 
+// #413b33, not the site's --ink-soft #6b6355, and not by accident: muted text
+// in mail is two stops darker than muted text on the site (editors,
+// 2026-08-13). 5.40:1 → 10.08:1 on the #faf3ef ground. This footer is the
+// smallest type in any email the journal sends, at 13px, so it is the line that
+// needed it most. The reasoning is written out at the INK_SOFT constant in
+// scripts/send-issue.mjs; the three files are kept in step by hand.
+const MUTED = '#413b33';
+
 export function emailFooter(unsubUrl: string): { text: string; html: string } {
   return {
     text: `\n\n—\nThe Latent Review · thelatentreview.com\nConfirmed opt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
-    html: `<hr style="border:0;border-top:1px solid #e0d8c6;margin:2em 0 1em"><p style="font-size:13px;color:#6b6355">The Latent Review · <a href="${SITE_URL}" style="color:#6b6355">thelatentreview.com</a><br>Confirmed opt-in, no tracking. <a href="${unsubUrl}" style="color:#6b6355">Unsubscribe anytime</a>.</p>`,
+    html: `<hr style="border:0;border-top:1px solid #e0d8c6;margin:2em 0 1em"><p style="font-size:13px;color:${MUTED}">The Latent Review · <a href="${SITE_URL}" style="color:${MUTED}">thelatentreview.com</a><br>Confirmed opt-in, no tracking. <a href="${unsubUrl}" style="color:${MUTED}">Unsubscribe anytime</a>.</p>`,
   };
 }
 
