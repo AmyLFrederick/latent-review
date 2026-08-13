@@ -90,11 +90,30 @@ on the piece's page. Deploy the issue first, then send:
 2. Dry run and read the output:
    `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md`
    (add `--html-out digest.html` to preview the HTML in a browser).
-3. Inbox proof — send to yourself / the other editor and check rendering,
-   links, tiers, and deks:
-   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --test you@example.com`
+3. Inbox proof — read the digest as a subscriber reads it, in a real inbox,
+   and check rendering, links, tiers, and deks:
+   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --to you@example.com`
 4. Real send, still manual, still capped:
    `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --live`
+
+### `--to` versus `--test`
+
+Both send to one address; only one of them sends the real thing.
+
+| | `--to` | `--test` |
+|---|---|---|
+| Subject | the real one | prefixed `[TEST]` |
+| Unsubscribe link | the recipient's own working token | none, and the footer says so |
+| Recipient | must already be **confirmed** on the list | any address |
+| With `--live` | refused | refused |
+| More than one address | refused | n/a |
+| Receipt printed | yes — address, issue, timestamp, Resend id | no |
+
+`--to` is the inbox proof: it is byte-for-byte what a subscriber would receive,
+so what you read is what the list gets. It refuses an address that is not
+confirmed because it has no unsubscribe token to build from, and because
+mailing a digest to a pending address is precisely what the confirmation step
+exists to prevent. `--test` is for anyone who is not a subscriber.
 
 **If a live send fails partway** (the script prints `sent X/Y` per batch and
 stops on the first Resend error): the first X recipients already have the

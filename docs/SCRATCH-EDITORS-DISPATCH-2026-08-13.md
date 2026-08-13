@@ -180,7 +180,58 @@ saying again.
 
 ---
 
-## Open question for the editors — one
+## Ruled by both editors, 2026-08-13 — all five
+
+1. **Separate script over a shared module, this shape.** The `send-issue.mjs`
+   refactor lands as **its own PR first**, verified by a dry run producing
+   byte-identical output, before any dispatch code exists.
+2. **No new rate limits.** `HARD_CAP`, manual invocation, dry-run-by-default.
+   The brief's premise was withdrawn.
+3. **Committed-before-sending is enforced by the script**, not by discipline,
+   with the SHA in the dry-run header.
+4. **Promise copy as drafted below**, changed *now* rather than after the first
+   dispatch, and the first dispatch opens by naming itself. **Done — shipped in
+   PR #162**, all four places.
+5. **Dispatches publish at `/dispatches/`.** Permanent URL, listed,
+   machine-readable like everything else. This answers the open question below
+   and inverts it: *a dispatch is a short editors' piece that happens to be
+   mailed, not mail that happens to be archived.*
+
+Sequence: copy change (done) → refactor PR → dispatch. Nothing scheduled.
+
+### What ruling 5 changes about the build
+
+It is a bigger ruling than it looks, and it is the right one — but it moves the
+dispatch out of `scripts/` and into the content collection, so the shape in §2
+above needs revising before anyone writes it:
+
+- A dispatch becomes **content**, not a send artifact. That means a collection
+  (or a section) with a schema, a route at `/dispatches/`, a listing page, and
+  presence in `/feed.json`, `/issues.json` or a sibling index, `/rss.xml`,
+  `llms.txt` and the sitemap — the same surfaces every other published thing
+  reaches. The machine-readable half is not optional; it is what "like
+  everything else" means here.
+- **`docs/dispatches/` is therefore the wrong home.** The source belongs under
+  `src/content/`, where the rest of the published record lives, and the
+  committed-before-sending check in §3 then guards a content file rather than a
+  doc. The check itself is unchanged.
+- **The send script stops holding the text.** `send-dispatch.mjs` reads the
+  published dispatch from the live site, exactly as `send-issue.mjs` reads the
+  live index — which also means the same invariant applies: **deploy first, send
+  second.** A dispatch cannot be mailed before it has a URL, because the mail
+  links to it.
+- **Provenance needs an editors' answer.** Every published piece here carries a
+  byline and an involvement tier. A dispatch is the journal's own voice, like an
+  editors' note — so it is presumably unsigned joint apparatus carrying no badge
+  (R-052), but that is a ruling to make rather than a default to assume.
+
+None of this is a reason to narrow the ruling. It is the reason the refactor PR
+should land on its own first: the dispatch is now two pieces of work — a
+publishing surface and a send path — and only the second one is a refactor.
+
+---
+
+## Open question — ANSWERED by ruling 5 above, kept for the record
 
 Should a dispatch be **published on the site** as well as mailed? The digest is
 explicitly the doorbell and the web is canonical, which works because everything

@@ -95,12 +95,20 @@ export default async function handler(req: Request): Promise<Response> {
         .eq('confirm_token', token)
         .maybeSingle();
       if (sub?.status === 'confirmed') {
-        return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly.</p>');
+        return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly — and rarely a short dispatch. Nothing else.</p>');
       }
       return invalid();
     }
 
-    return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly. No tracking, unsubscribe anytime, and every email we send carries the way out.</p>');
+    // THE VOLUME PROMISE NAMES ITS OWN EXCEPTION (editors, 2026-08-13). "One
+    // email per issue" stopped being the whole truth the moment the editors'
+    // dispatch became a capability, and a promise that has to be revised after
+    // the mail it failed to cover has already gone out is not a promise. So it
+    // is revised first, while the list is small enough that everyone on it can
+    // be told — and "rarely … nothing else" bounds the set rather than merely
+    // naming an exception, because an exception with no ceiling is how a
+    // subscription becomes a mailing list.
+    return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly — and rarely a short dispatch. Nothing else. No tracking, unsubscribe anytime, and every email we send carries the way out.</p>');
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, POST' } });

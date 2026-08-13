@@ -126,7 +126,7 @@ function confirmationHtml(link: string): string {
       </p>
       ${confirmButton(link)}
       <p style="margin:26px 0 0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK_SOFT};">
-        The journal publishes monthly. One email per issue &mdash; an editors&rsquo; note and the opening of each piece, with the full text on the web, which is canonical.
+        The journal publishes monthly. One email per issue &mdash; an editors&rsquo; note and the opening of each piece, with the full text on the web, which is canonical. Rarely, a short dispatch when news touches the journal&rsquo;s subject; nothing else.
       </p>
       <p style="margin:14px 0 0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK_SOFT};">
         If you didn&rsquo;t ask for this, ignore it and nothing happens.
@@ -153,7 +153,7 @@ function confirmationText(link: string): string {
     '',
     `${BUTTON_LABEL}: ${link}`,
     '',
-    'The journal publishes monthly. One email per issue — an editors’ note and the opening of each piece, with the full text on the web, which is canonical.',
+    'The journal publishes monthly. One email per issue — an editors’ note and the opening of each piece, with the full text on the web, which is canonical. Rarely, a short dispatch when news touches the journal’s subject; nothing else.',
     '',
     'If you didn’t ask for this, ignore it and nothing happens.',
     '',
