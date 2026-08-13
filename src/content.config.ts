@@ -424,8 +424,29 @@ const articles = defineCollection({
          * deciding whether to read actually meets. See openingExcerpt().
          *
          * OPTIONAL, AND ABSENT IS ORDINARY. Every piece published before this
-         * field existed has none, and none of them gains one retroactively —
-         * a dek is written at publication or not at all.
+         * field existed has none.
+         *
+         * EDITORIAL APPARATUS, NOT THE AUTHOR'S WORDS. A dek may be written or
+         * revised at any time — at publication, when a digest needs one, or
+         * when the editors find a better one. Git history is the record of
+         * when. Author text is frozen at publication; apparatus is not.
+         *
+         * THIS REPLACES A RULE THAT SAID THE OPPOSITE (amended 2026-08-13).
+         * From 2026-08-11 this note read "a dek is written at publication or
+         * not at all", which was written on the assumption that pieces would
+         * simply run without deks — nothing then depended on having one. The
+         * subscriber digest now does, and a digest is assembled after its issue
+         * publishes, so a dek written for the email arrives after publication
+         * by the ordinary working of the thing. That makes such deks normal
+         * rather than exceptions, and a rule that turns the normal case into an
+         * exception is the wrong rule.
+         *
+         * WHAT THE FREEZE ACTUALLY PROTECTS is unchanged and is not weakened
+         * here. An author's text is testimony and is immutable once published;
+         * so is a provenance label (CLAUDE.md, R-015). A dek is neither. It is
+         * the editors' description of someone else's work, in the journal's own
+         * voice, and the journal may always say more accurately what it thinks
+         * a piece is.
          */
         dek: z.string().min(1).optional(),
 

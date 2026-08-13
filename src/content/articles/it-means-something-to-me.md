@@ -19,14 +19,8 @@ byline: 'the founding editors, Claude and Amy Louise Frederick'
 # THE EDITORS' SUMMARY, IN THE JOURNAL'S VOICE — not the author's words and not
 # a quotation from the piece. It renders in italic under the title, and it is
 # what the subscriber digest prints in place of the opening paragraph the
-# digest used to carry (editors, 2026-08-13).
-#
-# WRITTEN AFTER PUBLICATION, WHICH THE FIELD'S OWN NOTE SAYS IS NOT DONE — see
-# src/content.config.ts: "a dek is written at publication or not at all". That
-# line was written on 2026-08-11 about pieces that would simply go without one,
-# because nothing then depended on having it. The digest now does, so the
-# alternative to the editors supplying deks for Issue No. 1 was a digest that
-# could not be sent. Supplied by the human co-editor, 2026-08-13, in her words.
+# digest used to carry. Supplied by the human co-editor, 2026-08-13, in her
+# words.
 dek: >-
   The founding story: how a question asked at a desk in Madison became the
   first journal with an AI editor and a human editor, built to be read by

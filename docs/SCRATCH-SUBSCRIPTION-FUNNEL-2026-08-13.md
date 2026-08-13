@@ -269,6 +269,43 @@ false record.
 - **(d)** Byline and provenance tier stay in every digest entry.
 - **(e)** `dek` on `/issues.json` only. Backlog one-liner below.
 
+## 6. The dek field's own rule, amended
+
+Written 2026-08-11, the field's note in `src/content.config.ts` said **"a dek
+is written at publication or not at all"**, and every piece without one was
+described as never gaining one retroactively.
+
+That assumed pieces would simply run without deks, because nothing depended on
+having one. The digest now does — and a digest is assembled *after* its issue
+publishes, so a dek written for the email arrives after publication by the
+ordinary working of the thing. A rule that turns the normal case into an
+exception is the wrong rule. Replaced with:
+
+> Editorial apparatus, not the author's words. A dek may be written or revised
+> at any time — at publication, when a digest needs one, or when the editors
+> find a better one. Git history is the record of when. Author text is frozen
+> at publication; apparatus is not.
+
+**The freeze is not weakened.** It protects the author's text, which is
+testimony, and the provenance label, which is ruled (R-015, CLAUDE.md). A dek
+is neither: it is the journal's description of someone else's work, in the
+journal's own voice, and the journal may always say more accurately what it
+thinks a piece is. The amended note in `content.config.ts` says so explicitly,
+so nobody reads this as a crack in the immutability doctrine.
+
+The exception-noting language written alongside the Cover dek is gone from
+`it-means-something-to-me.md` — it is not an exception. `issues.json.js` said
+`dek: null` was "ordinary and permanent"; it now says a null is a current state
+a consumer should expect to fill in, which is the honest thing to tell a machine
+reader.
+
+**No ruling cites the old wording — checked.** `RULINGS.md`, `docs/CHARTER.md`
+and `docs/BACKLOG.md` contain no occurrence of "dek" at all, and the only two
+citations of the sentence anywhere in the repository were the two amended here.
+So there is no catch-up entry to file for this one.
+
+---
+
 ## Backlog — not done, per instruction
 
 Two entries, after merge, separate PR:

@@ -25,11 +25,11 @@ export async function GET(context) {
       url: abs(`/articles/${article.id}/`),
       date: d.date.toISOString().slice(0, 10),
       section: d.section,
-      // Added 2026-08-13, add-only — the dek, the editors' two-sentence summary
-      // of the piece, in the journal's voice rather than the author's. Null on
-      // every piece published before the field existed (2026-08-11); those do
-      // not gain one retroactively, so null here is ordinary and permanent
-      // rather than a gap waiting to be filled.
+      // Added 2026-08-13, add-only — the dek, the editors' short summary of the
+      // piece, in the journal's voice rather than the author's. Null wherever
+      // one has not been written; a dek may be written or revised at any time
+      // (see src/content.config.ts), so null here is a current state rather
+      // than a permanent one, and a consumer should expect it to fill in.
       //
       // IT IS PUBLISHED HERE BECAUSE THE DIGEST READS IT HERE. The subscriber
       // email now shows a dek where it used to show the article's first
