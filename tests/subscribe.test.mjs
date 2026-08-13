@@ -182,6 +182,32 @@ test('S5: a broken limiter refuses rather than sending unmetered', async () => {
   assert.deepEqual(stub.emails, [], 'an unmeasurable request is never sent');
 });
 
+// --- S7: the success reply is one reply, whatever the address's state ------
+
+test('S7: a new address and an already-confirmed one get byte-identical replies', async () => {
+  // The copy changed on 2026-08-13 from a hedge ("if that address isn't
+  // already subscribed…") to a flat statement that a confirmation email has
+  // been sent. The hedge was doing two jobs: telling the truth in the
+  // already-confirmed case, and refusing to be an enumeration oracle. Only the
+  // second is load-bearing, and only the second is asserted here — because it
+  // is the one a future copy edit could quietly break by writing a friendlier
+  // sentence for the reader whose address is new.
+  stub.rateCounts = [0, 0, 0, 0];
+  const fresh = await subscribe(request(), ctx);
+
+  stub.rateCounts = [0, 0, 0, 0];
+  stub.subscriber = {
+    id: 'sub_1',
+    status: 'confirmed',
+    confirm_token: 'ctok',
+    unsubscribe_token: 'utok',
+  };
+  const confirmed = await subscribe(request(), ctx);
+
+  assert.equal(fresh.status, confirmed.status);
+  assert.equal(await fresh.text(), await confirmed.text());
+});
+
 // --- S6: the ceilings do not break the ordinary path ----------------------
 
 test('S6: an already-confirmed address still sends nothing, and costs no budget beyond the checks', async () => {

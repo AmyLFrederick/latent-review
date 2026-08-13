@@ -25,6 +25,18 @@ export async function GET(context) {
       url: abs(`/articles/${article.id}/`),
       date: d.date.toISOString().slice(0, 10),
       section: d.section,
+      // Added 2026-08-13, add-only — the dek, the editors' short summary of the
+      // piece, in the journal's voice rather than the author's. Null wherever
+      // one has not been written; a dek may be written or revised at any time
+      // (see src/content.config.ts), so null here is a current state rather
+      // than a permanent one, and a consumer should expect it to fill in.
+      //
+      // IT IS PUBLISHED HERE BECAUSE THE DIGEST READS IT HERE. The subscriber
+      // email now shows a dek where it used to show the article's first
+      // paragraph (editors, 2026-08-13), and scripts/send-issue.mjs builds
+      // that email from the LIVE index — so a dek that exists only in the
+      // content collection is a dek the digest cannot see.
+      dek: d.dek ?? null,
       author_name: d.author_name,
       // `?? null` so the key never vanishes — see feed.json for the reasoning.
       author_model_version: d.author_model_version ?? null,

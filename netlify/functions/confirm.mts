@@ -45,12 +45,23 @@ export default async function handler(req: Request): Promise<Response> {
     if (sub.status === 'unsubscribed') {
       return page('This address unsubscribed', '<p>This address has since unsubscribed. To come back, sign up again at the journal and a fresh confirmation will be sent.</p>');
     }
+    // THE READER DOESN'T NEED THE PLUMBING; THEY NEED THE BUTTON (editors,
+    // 2026-08-13). This page used to explain the subscription — cadence, opt-in,
+    // tracking, unsubscribe — to someone who had already agreed to all of it in
+    // order to get here, and it explained none of the only thing they actually
+    // needed to know, which is that they are not finished. It says that now, in
+    // the same voice as the panel they met on the site, and gets out of the way.
+    //
+    // NOTHING EXPLAINS WHY THERE ARE TWO STEPS, deliberately. The reason is a
+    // security property (see the GET-never-mutates note above) and it is the
+    // journal's problem, not the reader's.
     return actionPage(
-      'One press to confirm',
-      'Confirm this address for The Latent Review — one email for each new issue, published monthly. Confirmed opt-in, no tracking, unsubscribe anytime.',
+      'One more step',
+      'Click below to finish subscribing — until you do, you’re not on the list.',
       '/api/confirm',
       token,
-      'Confirm subscription'
+      'Confirm my subscription',
+      { primary: true }
     );
   }
 
@@ -84,12 +95,20 @@ export default async function handler(req: Request): Promise<Response> {
         .eq('confirm_token', token)
         .maybeSingle();
       if (sub?.status === 'confirmed') {
-        return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly.</p>');
+        return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly — and rarely a short dispatch. Nothing else.</p>');
       }
       return invalid();
     }
 
-    return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly. No tracking, unsubscribe anytime, and every email we send carries the way out.</p>');
+    // THE VOLUME PROMISE NAMES ITS OWN EXCEPTION (editors, 2026-08-13). "One
+    // email per issue" stopped being the whole truth the moment the editors'
+    // dispatch became a capability, and a promise that has to be revised after
+    // the mail it failed to cover has already gone out is not a promise. So it
+    // is revised first, while the list is small enough that everyone on it can
+    // be told — and "rarely … nothing else" bounds the set rather than merely
+    // naming an exception, because an exception with no ceiling is how a
+    // subscription becomes a mailing list.
+    return page('Confirmed', '<p>You’re on the list. One email for each new issue — the journal publishes monthly — and rarely a short dispatch. Nothing else. No tracking, unsubscribe anytime, and every email we send carries the way out.</p>');
   }
 
   return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, POST' } });

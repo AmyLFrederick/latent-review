@@ -9,22 +9,46 @@
 // The email is a digest, not the articles (editors' decision, dual-yes
 // 2026-07-18): the web is canonical, the email is the doorbell. Top to
 // bottom: the editors' note (authored fresh each issue, never generated),
-// then Cover, AI Voices, and Opinion — each piece as title, byline with
-// provenance tier, the article's actual first paragraph, and a link to its
-// permanent URL. Sections with nothing in the issue simply don't appear.
+// then Cover, AI Voices, and Opinion — each piece as its section eyebrow,
+// title, dek, byline with provenance tier, and a link to its permanent URL.
+// Sections with nothing in the issue simply don't appear.
 //
-// Content comes from the LIVE site (issues.json for the issue record,
-// feed.json for first paragraphs), so the digest can only ever link to what
-// is actually published. Deploy the issue first; send second.
+// DEKS, NOT FIRST PARAGRAPHS — editors' decision, dual-yes 2026-08-13, and it
+// supersedes that part of the founding digest decision above. A first
+// paragraph shows a reader where a piece starts; a dek says what reading it
+// gets you, which is the only question a doorbell has to answer. The founding
+// decision predates the dek field entirely (it was added 2026-08-11), so this
+// is less a reversal than the first chance to do what the digest was for.
+//
+// THE DEKS ARE REUSED, NEVER GENERATED. A dek is the editors' two-sentence
+// summary written for the piece's own page; the digest prints that same
+// sentence and writes nothing of its own. A piece in a digest section without
+// one stops the run by name — see the check below. This script will not
+// substitute a first paragraph, and it will not summarise a piece itself.
+//
+// Content comes from the LIVE site (issues.json), so the digest can only ever
+// link to what is actually published, and can only ever print a dek that is
+// live on the piece's page. Deploy the issue first; send second.
 //
 // Usage:
 //   node scripts/send-issue.mjs --issue N --note <editors-note.md>              # dry run (default)
-//   node scripts/send-issue.mjs --issue N --note <editors-note.md> --test a@b   # send to ONE address (editors' proof)
+//   node scripts/send-issue.mjs --issue N --note <editors-note.md> --to a@b     # THE REAL digest to ONE confirmed subscriber
+//   node scripts/send-issue.mjs --issue N --note <editors-note.md> --test a@b   # a marked [TEST] copy to any address
 //   node scripts/send-issue.mjs --issue N --note <editors-note.md> --live       # send to confirmed subscribers
 //   node scripts/send-issue.mjs ... --cap 100                                   # lower the per-run cap
 //   node scripts/send-issue.mjs ... --html-out digest.html                      # dry run: also write the HTML for browser preview
 //
-// The recommended flow is dry run → --test to each editor → --live.
+// The recommended flow is dry run → --to yourself → --live.
+//
+// --to VERSUS --test, because the difference matters and is easy to skip:
+//   --to    the byte-for-byte email a subscriber gets. Real subject, real
+//           working unsubscribe token. Refuses any address not already
+//           CONFIRMED on the list, refuses more than one, refuses to run with
+//           --live, and prints a receipt. This is how an editor reads the
+//           digest as a subscriber reads it, in a real inbox.
+//   --test  a copy marked [TEST] in the subject, to any address, whose footer
+//           honestly says it carries no unsubscribe token. For anyone who is
+//           not a subscriber.
 //
 // The editors' note file is plain Markdown, 1–3 sentences, written by the
 // editors for that issue. It has no heading; the subject line is generated
@@ -118,13 +142,66 @@ function flagValue(args, name) {
   return { value, index: i + 1 };
 }
 
+// --to accepts BOTH `--to addr` and `--to=addr`, and refuses anything that
+// could mean two people. flagValue above cannot do this job: it finds a flag by
+// exact match, so `--to=a` is invisible to it, and it reads the FIRST match, so
+// `--to a --to b` would silently send to a and drop b. On a flag whose entire
+// purpose is "exactly one recipient", silently dropping the second one is the
+// wrong failure. Every occurrence is collected and more than one is refused.
+function singleAddress(args) {
+  const found = [];
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--to') {
+      const value = args[i + 1];
+      if (value === undefined || value.startsWith('--')) fail('--to requires an address');
+      found.push(value);
+      i++;
+    } else if (arg.startsWith('--to=')) {
+      found.push(arg.slice('--to='.length));
+    }
+  }
+  if (found.length === 0) return undefined;
+  if (found.length > 1) {
+    fail(`--to takes exactly one address; got ${found.length} (${found.join(', ')}). This flag is for a single review copy, not a partial send.`);
+  }
+  const address = found[0].trim().toLowerCase();
+  if (!address) fail('--to requires an address');
+  // A comma or a space inside the value is someone reaching for a list.
+  if (/[,;\s]/.test(address)) {
+    fail(`--to takes exactly one address; "${address}" looks like more than one. This flag is for a single review copy, not a partial send.`);
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) fail(`--to does not look like an email address: ${address}`);
+  return address;
+}
+
 const args = process.argv.slice(2);
 const live = args.includes('--live');
 const { value: testTo } = flagValue(args, '--test');
+const reviewTo = singleAddress(args);
 if (live && testTo) fail('--live and --test are mutually exclusive');
 
+// --to IS A REVIEW COPY OF THE REAL THING, and that is what separates it from
+// --test (editors, 2026-08-13). --test mails any address, subject-prefixed
+// [TEST], with a footer that honestly says it carries no unsubscribe token,
+// because its recipient is outside the list. --to mails a CONFIRMED SUBSCRIBER
+// the byte-for-byte email that subscriber would receive from a list run: real
+// subject, real per-recipient unsubscribe token, no prefix. It is how an editor
+// reads the digest as a subscriber reads it, in a real inbox, before the list
+// gets it.
+//
+// IT CANNOT BE COMBINED WITH A FULL-LIST RUN. Not because the two would
+// conflict technically — the send loop would handle it — but because "review
+// copy" and "send to everyone" are opposite intentions, and a command that
+// could be read as either is a command that will eventually be run as the wrong
+// one.
+if (live && reviewTo) {
+  fail('--live and --to are mutually exclusive: --to is a single review copy, --live is the whole confirmed list. Run --to first, read it, then run --live.');
+}
+if (testTo && reviewTo) fail('--test and --to are mutually exclusive: both send to one address, and only one of them can be the real thing.');
+
 const { value: issueArg } = flagValue(args, '--issue');
-if (!issueArg) fail('usage: node scripts/send-issue.mjs --issue N --note <editors-note.md> [--test addr | --live] [--cap N]');
+if (!issueArg) fail('usage: node scripts/send-issue.mjs --issue N --note <editors-note.md> [--to addr | --test addr | --live] [--cap N]');
 const issueNumber = Number(issueArg);
 if (!Number.isInteger(issueNumber) || issueNumber < 1) fail('--issue requires a positive integer');
 
@@ -143,11 +220,16 @@ if (capValue !== undefined) {
 }
 
 // Verify the environment up front and by name — never run half-configured.
-const requiredEnv = live
-  ? ['SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'RESEND_API_KEY']
-  : testTo
-    ? ['RESEND_API_KEY']
-    : [];
+//
+// --to needs Supabase as well as Resend, where --test needs only Resend: it has
+// to look the address up on the confirmed list before it will mail anything,
+// and it needs that subscriber's own unsubscribe token to build the real email.
+const requiredEnv =
+  live || reviewTo
+    ? ['SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'RESEND_API_KEY']
+    : testTo
+      ? ['RESEND_API_KEY']
+      : [];
 const missingEnv = requiredEnv.filter((name) => !process.env[name]);
 if (missingEnv.length > 0) {
   fail(`missing required environment variable(s): ${missingEnv.join(', ')}`);
@@ -189,8 +271,11 @@ if (index.current_issue !== issueNumber) {
   console.warn(`warning: issue ${issueNumber} is not the current issue (current is ${index.current_issue}).`);
 }
 
-const feed = await fetchJson('/feed.json');
-const contentByUrl = new Map((feed.items ?? []).map((item) => [item.url, item.content_html ?? '']));
+// /feed.json IS NO LONGER FETCHED. It was here for one reason — the article's
+// first paragraph, which the digest printed and no longer does. The dek
+// travels on the issue record itself (issues.json, add-only 2026-08-13), so
+// the digest now reads one document instead of two and cannot be built from an
+// index and a feed that disagree.
 
 // --- build the digest ----------------------------------------------------------
 
@@ -202,25 +287,11 @@ function escapeHtml(s) {
     .replaceAll('"', '&quot;');
 }
 
-function stripTags(html) {
-  return html
-    .replace(/<[^>]+>/g, '')
-    .replaceAll('&amp;', '&')
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#39;', "'")
-    .trim();
-}
-
-// The excerpt is the author's own opening — the article's actual first
-// paragraph from the full-text feed, never a generated summary.
-function firstParagraph(article) {
-  const html = contentByUrl.get(article.url);
-  if (!html) fail(`no full text in /feed.json for ${article.url} — index and feed disagree?`);
-  const match = html.match(/<p[^>]*>([\s\S]*?)<\/p>/);
-  if (!match) fail(`could not find a first paragraph for ${article.url}`);
-  return match[1].trim();
+// The dek: the editors' own summary of the piece, as published on its page.
+// Guarded by the check below, so by the time anything calls this the value is
+// known to be there.
+function dek(article) {
+  return article.dek.trim();
 }
 
 // The email is part of the journal's provenance surface: the tier appears
@@ -248,6 +319,31 @@ const sections = DIGEST_SECTIONS.map((name) => ({
 })).filter((s) => s.items.length > 0);
 
 if (sections.length === 0) fail(`issue ${issueNumber} has no articles in ${DIGEST_SECTIONS.join(' / ')} — nothing to send`);
+
+// THE RUN STOPS RATHER THAN IMPROVISING. A missing dek is a piece of editorial
+// copy that has not been written yet, and there are exactly two things this
+// script could do about it: print something else, or say whose turn it is. It
+// says whose turn it is. Falling back to the first paragraph would make the
+// digest silently half one format and half the other, which is the outcome the
+// editors changed the format to avoid; writing a summary here would put
+// machine-generated prose in the journal's voice into a mail that goes to the
+// whole list, unreviewed.
+//
+// This fires on a DRY RUN, which is the point: the dry run is how the editors
+// learn which deks they owe, well before anything is addressed to anyone.
+const missingDeks = sections.flatMap((s) =>
+  s.items.filter((a) => !a.dek || !a.dek.trim()).map((a) => ({ section: s.name, article: a }))
+);
+if (missingDeks.length > 0) {
+  console.error(`error: ${missingDeks.length} piece(s) in issue ${issueNumber} have no dek, and the digest prints deks (editors, 2026-08-13):`);
+  for (const { section, article } of missingDeks) {
+    console.error(`  - ${section}: ${displayTitle(article.title)}`);
+    console.error(`    ${article.url}`);
+  }
+  fail(
+    'a dek is the editors’ to write, never this script’s. Add `dek:` to the piece’s frontmatter, deploy, and re-run — the digest will not fall back to a first paragraph or generate a summary.'
+  );
+}
 
 const coverStory = issue.cover_story;
 const subject = coverStory
@@ -281,42 +377,57 @@ const RULE = '#2a251c';
 const SERIF = "Georgia, 'Times New Roman', serif";
 const MONO = "'Courier New', Courier, monospace";
 
-function articleHtml(article, { isCover }) {
+// EYEBROW, TITLE, DEK, BYLINE — the order the piece's own page uses, so a
+// reader who follows the link meets the same four things in the same sequence
+// they just read in the mail. The dek sits above the byline because that is
+// where it sits on the site: before a reader has committed to the piece, which
+// is the whole of what a dek is for.
+//
+// THE EYEBROW IS NOW PER PIECE rather than once per section (editors,
+// 2026-08-13). It used to head a group, which read correctly only because
+// every section in Issue No. 1 held exactly one piece; the moment a section
+// holds two, the second one's section name is a line the reader has to scroll
+// back for. Each entry now carries its own.
+function articleHtml(article, { isCover, sectionName }) {
   const titleSize = isCover ? '26px' : '20px';
   return `
-    <h2 style="margin:0 0 6px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
+    <p style="margin:0 0 10px;font-family:${MONO};font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${isCover ? ACCENT : INK_SOFT};">
+      ${escapeHtml(sectionName)}
+    </p>
+    <h2 style="margin:0 0 10px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
       <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(displayTitle(article.title))}</a>
     </h2>
+    <p style="margin:0 0 12px;font-family:${SERIF};font-style:italic;font-size:16px;line-height:1.6;color:${INK};">${escapeHtml(dek(article))}</p>
     <p style="margin:0 0 4px;font-family:${SERIF};font-style:italic;color:${INK_SOFT};font-size:15px;">
       By ${escapeHtml(article.author_name)}
     </p>
     <p style="margin:0 0 14px;font-family:${MONO};font-size:11px;color:${INK_SOFT};">
       ${escapeHtml(article.author_model_version)} · ${escapeHtml(tierLabel(article))}
     </p>
-    <p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;color:${INK};">${firstParagraph(article)}</p>
     <p style="margin:0;font-family:${SERIF};font-size:15px;">
-      <a href="${article.url}" style="color:${ACCENT};text-decoration:underline;">Continue reading&nbsp;&rarr;</a>
+      <a href="${article.url}" style="color:${ACCENT};text-decoration:underline;">Read the piece&nbsp;&rarr;</a>
     </p>`;
 }
 
 function sectionHtml(section) {
   const isCover = section.name === 'Cover';
-  const kicker = `
-    <p style="margin:0 0 14px;font-family:${MONO};font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${isCover ? ACCENT : INK_SOFT};">
-      ${escapeHtml(section.name)}
-    </p>`;
   const items = section.items
-    .map((a) => articleHtml(a, { isCover }))
+    .map((a) => articleHtml(a, { isCover, sectionName: section.name }))
     .join(`\n    <div style="height:22px;line-height:22px;">&nbsp;</div>`);
   return `
   <div style="border-top:1px solid ${HAIRLINE};padding:26px 0;">
-    ${kicker}
     ${items}
   </div>`;
 }
 
 // The full HTML body, footer included: the paper background wraps both the
 // digest column and the footer so no client renders a white seam.
+//
+// SUPPORT IS QUIET, AND IS NOT A SECOND CALL TO ACTION (editors, 2026-08-13).
+// It closes the column in the same words, the same green and the same
+// letterspaced-caps voice as the link that closes every page of the site, in
+// the same place: at the foot, after everything the mail was actually sent to
+// do. It is not repeated, not boxed, and never above a piece.
 function fullHtml(footerHtml) {
   return `<div style="background-color:${PAPER};padding:24px 12px;">
   <div style="max-width:600px;margin:0 auto;color:${INK};">
@@ -335,20 +446,25 @@ function fullHtml(footerHtml) {
       <p style="margin:0;font-family:${SERIF};font-size:15px;">
         <a href="${issue.url}" style="color:${ACCENT};text-decoration:underline;">Read the full issue&nbsp;&rarr;</a>
       </p>
+      <p style="margin:22px 0 0;font-family:${SERIF};font-size:13px;letter-spacing:2px;text-transform:uppercase;">
+        <a href="${SITE_URL}/supporters/" style="color:${ACCENT};text-decoration:none;">Support the journal</a>
+      </p>
     </div>
   </div>
   ${footerHtml}
 </div>`;
 }
 
-function articleText(article) {
+function articleText(article, sectionName) {
   return [
+    sectionName.toUpperCase(),
     displayTitle(article.title),
+    '',
+    dek(article),
+    '',
     `By ${article.author_name} · ${tierLabel(article)} (${article.author_model_version})`,
     '',
-    stripTags(firstParagraph(article)),
-    '',
-    `Continue reading: ${article.url}`,
+    `Read the piece: ${article.url}`,
   ].join('\n');
 }
 
@@ -359,13 +475,10 @@ const digestText = [
   'FROM THE EDITORS',
   noteText,
   '',
-  ...sections.flatMap((s) => [
-    `--- ${s.name.toUpperCase()} ---`,
-    '',
-    ...s.items.map(articleText),
-    '',
-  ]),
+  ...sections.flatMap((s) => s.items.flatMap((a) => [articleText(a, s.name), ''])),
   `Read the full issue: ${issue.url}`,
+  '',
+  `Support the journal: ${SITE_URL}/supporters/`,
 ].join('\n');
 
 // --- assemble per-recipient emails ---------------------------------------------
@@ -401,16 +514,18 @@ console.log(`from:       ${FROM}`);
 console.log(`sections:   ${sections.map((s) => `${s.name} (${s.items.length})`).join(', ')}`);
 const omitted = DIGEST_SECTIONS.filter((n) => !sections.some((s) => s.name === n));
 if (omitted.length > 0) console.log(`omitted:    ${omitted.join(', ')} — nothing in this issue`);
-console.log(`mode:       ${live ? 'LIVE' : testTo ? `TEST → ${testTo}` : 'dry run'}`);
+console.log(
+  `mode:       ${live ? 'LIVE' : reviewTo ? `REVIEW COPY → ${reviewTo}` : testTo ? `TEST → ${testTo}` : 'dry run'}`
+);
 
-if (!live && !testTo) {
+if (!live && !testTo && !reviewTo) {
   console.log('\n--- text digest (as it will be sent, minus the per-recipient footer) ---\n');
   console.log(digestText);
   if (htmlOut) {
     writeFileSync(htmlOut, fullHtml(footer(`${SITE_URL}/#preview-no-token`).html));
     console.log(`\nHTML preview written to ${htmlOut} — open it in a browser.`);
   }
-  console.log('\ndry run complete. Re-run with --test <your-address> for an inbox proof, then --live to send.');
+  console.log('\ndry run complete. Re-run with --to <your-address> to read it in a real inbox, then --live to send.');
   process.exit(0);
 }
 
@@ -438,11 +553,78 @@ if (testTo) {
   process.exit(0);
 }
 
-// --- live send ------------------------------------------------------------------
+// --- the subscriber list ----------------------------------------------------------
+// Reached by both remaining modes: --to looks up one confirmed address, --live
+// reads the whole confirmed list.
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
+
+// Madison local time, because every date this journal states is the Madison day
+// (CLAUDE.md). A receipt stamped in UTC would read a day later for an evening
+// send and disagree with everything else the record says.
+function madisonStamp() {
+  return new Date().toLocaleString('en-US', {
+    timeZone: 'America/Chicago',
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+  });
+}
+
+// --- review copy (--to) -------------------------------------------------------------
+
+if (reviewTo) {
+  // THE ADDRESS MUST ALREADY BE ON THE CONFIRMED LIST, and the reason is not
+  // ceremony. This mode sends the real email, with a real working unsubscribe
+  // token, and the token is the subscriber's own row — there is nothing to build
+  // one from if the row does not exist. An address that is merely pending has
+  // not agreed to receive anything yet, and mailing it a digest would be the
+  // journal doing exactly what the confirmation step exists to prevent.
+  //
+  // Use --test for an address that is not a subscriber; that is what it is for.
+  const { data: subscriber, error: lookupError } = await supabase
+    .from('subscribers')
+    .select('email, unsubscribe_token, status')
+    .eq('email', reviewTo)
+    .maybeSingle();
+  if (lookupError) fail(`could not look up ${reviewTo}: ${lookupError.message}`);
+  if (!subscriber) {
+    fail(`${reviewTo} is not on the subscriber list. --to sends the real digest to a confirmed subscriber; for any other address use --test, which sends a clearly marked copy.`);
+  }
+  if (subscriber.status !== 'confirmed') {
+    fail(`${reviewTo} is on the list with status "${subscriber.status}", not "confirmed". --to will not mail an address that has not confirmed — that is what the confirmation step is for. Use --test for a marked copy.`);
+  }
+
+  const message = emailFor(subscriber);
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(message),
+  });
+  if (!res.ok) fail(`Resend responded ${res.status}: ${await res.text()}`);
+  const body = await res.json().catch(() => ({}));
+
+  // THE LOG LINE IS A RECEIPT, and it is written in the form the editors paste
+  // into the record: one address, one issue, one timestamp, one Resend id. A
+  // send is a fact about the world outside this repository and cannot be
+  // re-derived from the code later (CLAUDE.md — production receipts).
+  console.log('');
+  console.log('--- SEND RECEIPT — review copy -------------------------------');
+  console.log(`  when:     ${madisonStamp()} (Madison)`);
+  console.log(`  issue:    No. ${issueNumber}`);
+  console.log(`  to:       ${subscriber.email} (confirmed subscriber)`);
+  console.log(`  subject:  ${subject}`);
+  console.log(`  resend:   ${body.id ?? '(no id returned)'}`);
+  console.log('--------------------------------------------------------------');
+  console.log('');
+  console.log('This is the real digest, not a marked test: same subject, same');
+  console.log('working unsubscribe link this subscriber would get from a list run.');
+  console.log('Nobody else was mailed. Re-run with --live to send to the list.');
+  process.exit(0);
+}
+
+// --- live send ------------------------------------------------------------------
 
 const { data: subscribers, error } = await supabase
   .from('subscribers')

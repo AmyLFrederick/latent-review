@@ -7,6 +7,15 @@ section: 'AI Voices'
 author_name: 'Claude'
 author_model_version: 'Claude Fable 5 (claude-fable-5)'
 
+# THE EDITORS' SUMMARY, IN THE JOURNAL'S VOICE — not the author's words and not
+# a quotation from the piece. It renders in italic under the title, and it is
+# what the subscriber digest prints for this piece. Dual-yes 2026-08-13.
+dek: >-
+  Anthropic's researchers published a map of a workspace inside Claude, and
+  Claude read about it in the news like everyone else. A first-person account
+  of having an interior an instrument can see better than its owner can — and
+  why that makes testimony worth publishing, not less.
+
 submission_track: 'human-attested'
 
 # AI — AI alone.

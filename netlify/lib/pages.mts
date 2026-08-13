@@ -42,6 +42,17 @@ export function page(
            font-family: inherit; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em;
            text-transform: uppercase; padding: 0.65rem 1.6rem; }
   button:hover { background: #3e743f; border-color: #3e743f; color: #faf3ef; }
+  /* THE FILLED BUTTON IS FOR THE ONE PAGE WHOSE WHOLE PURPOSE IS THE PRESS
+     (editors, 2026-08-13). Confirming is deliberately two steps — GET never
+     mutates, so a mail scanner prefetching the emailed link cannot subscribe a
+     reader — and the cost of that rule is a second press the reader did not
+     expect. It is paid for here, by making the press impossible to miss:
+     filled in the deeper green, larger, wider, and the only thing on the sheet
+     with any weight. The outline button stays the default, because unsubscribe
+     uses the same sheet and must not be urged in either direction. */
+  button.primary { background: #3e743f; border-color: #3e743f; color: #faf3ef;
+                   font-size: 0.95rem; padding: 1rem 2.6rem; }
+  button.primary:hover { background: #305b32; border-color: #305b32; }
   .home { display: inline-block; margin-top: 2.4rem; font-size: 0.85rem; color: #6b6355; }
   /* Errors are unmissable: accent headline, upright, inside a bordered notice.
      FLAGGED FOR THE WALK, 2026-08-03 — that accent is green now, so these
@@ -69,20 +80,27 @@ export function page(
   });
 }
 
-/** A page whose single button POSTs a token — GET renders, POST mutates. */
+/**
+ * A page whose single button POSTs a token — GET renders, POST mutates.
+ *
+ * `primary` fills the button in the house green. Opt-in rather than the
+ * default: the two callers want opposite things from a reader, and only one of
+ * them should be urged.
+ */
 export function actionPage(
   title: string,
   note: string,
   action: string,
   token: string,
-  buttonLabel: string
+  buttonLabel: string,
+  opts: { primary?: boolean } = {}
 ): Response {
   return page(
     title,
     `<p>${escapeHtml(note)}</p>
     <form method="post" action="${escapeHtml(action)}">
       <input type="hidden" name="token" value="${escapeHtml(token)}">
-      <button type="submit">${escapeHtml(buttonLabel)}</button>
+      <button type="submit"${opts.primary ? ' class="primary"' : ''}>${escapeHtml(buttonLabel)}</button>
     </form>`
   );
 }

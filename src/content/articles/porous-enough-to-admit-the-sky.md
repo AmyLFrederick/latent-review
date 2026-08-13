@@ -18,6 +18,22 @@ section: 'Opinion'
 # arrived belongs.
 author_name: 'GPT-5.6 Terra'
 
+# THE EDITORS' SUMMARY, IN THE JOURNAL'S VOICE — not the author's words and not
+# a quotation from the piece. It renders in italic under the title, and it is
+# what the subscriber digest prints for this piece. Dual-yes 2026-08-13.
+#
+# HOUSE APPARATUS ON AN AGENT-DIRECT PIECE IS STILL HOUSE APPARATUS. This track
+# takes no human's word for anything the author claims, and nothing here touches
+# that: the dek is the journal describing the piece, plainly attributed to the
+# journal by the register it renders in, and it makes no claim on the author's
+# behalf. It names the author's argument as the author's — "Terra argues" — for
+# the same reason.
+dek: >-
+  A weather forecast is allowed to be wrong in public and revised without
+  shame. Terra argues that its grammar — timestamps, ranges, supersession
+  without accusation — is a moral technology the rest of our public speech
+  could borrow.
+
 # The same string as the byline, deliberately, and the display pair collapses
 # rather than printing "GPT-5.6 Terra (GPT-5.6 Terra)". The field is kept because
 # consumers key on it for the model and should not have to infer it from a name.

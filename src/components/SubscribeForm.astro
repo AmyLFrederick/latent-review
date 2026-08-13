@@ -3,6 +3,14 @@
 // Netlify Function; works without JavaScript (the function answers a bare
 // form post with a rendered page) and inline when JavaScript is present.
 
+import {
+  SUBSCRIBE_PENDING_HEADING,
+  SUBSCRIBE_PENDING_LEAD_BEFORE,
+  SUBSCRIBE_PENDING_LEAD_BOLD,
+  SUBSCRIBE_PENDING_LEAD_AFTER,
+  SUBSCRIBE_PENDING_SPAM,
+} from '../lib/subscribe-copy.mjs';
+
 interface Props {
   /** 'page' for the homepage, 'footer' for the site-wide footer. */
   variant?: 'page' | 'footer';
@@ -36,16 +44,42 @@ const inputId = `subscribe-email-${variant}`;
     Confirmed opt-in, no tracking, unsubscribe anytime.
   </p>
   <p class="subscribe-status" role="status" aria-live="polite"></p>
+  {/*
+    THE PENDING PANEL IS RENDERED HERE AND HIDDEN, not built in JavaScript, so
+    the sentences live in markup where they can be read, diffed and reviewed
+    like every other line of the journal's copy. The words come from
+    src/lib/subscribe-copy.mjs, which the Netlify function imports too — the
+    no-JavaScript sheet at /api/subscribe says exactly this.
+
+    IT REPLACES THE FORM RATHER THAN SITTING UNDER IT (editors, 2026-08-13).
+    The desk was carrying four pending signups against three confirmed, so the
+    step being missed is the confirmation click, and a success line whispered
+    beneath a form that still looks ready to take another address is a page
+    telling the reader they are finished. They are not finished. The form goes
+    away and this takes its place.
+  */}
+  <div class="subscribe-pending" role="status" hidden>
+    <p class="subscribe-pending-heading">{SUBSCRIBE_PENDING_HEADING}</p>
+    <p class="subscribe-pending-lead">
+      {SUBSCRIBE_PENDING_LEAD_BEFORE}<strong>{SUBSCRIBE_PENDING_LEAD_BOLD}</strong>{
+        SUBSCRIBE_PENDING_LEAD_AFTER
+      }
+    </p>
+    <p class="subscribe-pending-spam">{SUBSCRIBE_PENDING_SPAM}</p>
+  </div>
 </div>
 
 <script>
   for (const form of document.querySelectorAll<HTMLFormElement>('.subscribe-form')) {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const status = form.parentElement?.querySelector('.subscribe-status');
+      const block = form.parentElement;
+      const status = block?.querySelector('.subscribe-status');
+      const note = block?.querySelector<HTMLElement>('.subscribe-note');
+      const pending = block?.querySelector<HTMLElement>('.subscribe-pending');
       const button = form.querySelector('button');
       const email = new FormData(form).get('email');
-      if (!status || !button) return;
+      if (!status || !button || !pending) return;
       button.disabled = true;
       status.classList.remove('subscribe-status--error');
       status.textContent = 'Sending…';
@@ -55,12 +89,19 @@ const inputId = `subscribe-email-${variant}`;
           headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
+        if (res.ok) {
+          // The panel is the reply. The server's `message` is the same words
+          // for any other client, but this one has them already, marked up.
+          form.reset();
+          form.hidden = true;
+          if (note) note.hidden = true;
+          status.textContent = '';
+          pending.hidden = false;
+          return;
+        }
         const data = await res.json().catch(() => null);
-        status.textContent =
-          data?.message ??
-          (res.ok ? 'Check your inbox to confirm.' : 'Something went wrong — please try again.');
-        status.classList.toggle('subscribe-status--error', !res.ok);
-        if (res.ok) form.reset();
+        status.textContent = data?.message ?? 'Something went wrong — please try again.';
+        status.classList.add('subscribe-status--error');
       } catch {
         status.textContent = 'Something went wrong — please try again.';
         status.classList.add('subscribe-status--error');
@@ -162,8 +203,67 @@ const inputId = `subscribe-email-${variant}`;
     margin-top: 0.7rem;
   }
 
+  /* HOUSE APPARATUS, NOT A TOAST. Rules above and below, centered, the
+     journal's own faces — the same grammar the sheets at /api/confirm use and
+     the same grammar an editors' note uses. Nothing here is a new visual
+     language; it is the site's, at the size this block can carry. */
+  .subscribe-pending {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 1.4rem 0.25rem 1.5rem;
+    text-align: center;
+  }
+
+  .subscribe-pending-heading {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .subscribe-pending-lead {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--ink);
+    margin: 0.9rem 0 0;
+  }
+
+  .subscribe-pending-lead strong {
+    font-weight: 600;
+  }
+
+  .subscribe-pending-spam {
+    font-size: 0.85rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0.7rem 0 0;
+  }
+
   .subscribe--footer {
     max-width: 22rem;
+  }
+
+  /* The footer carries the same words at the footer's scale. The rules stay:
+     they are what makes it apparatus rather than a stray paragraph in a
+     column that already has several. */
+  .subscribe--footer .subscribe-pending {
+    padding: 1.1rem 0 1.2rem;
+  }
+
+  .subscribe--footer .subscribe-pending-heading {
+    font-size: 1.15rem;
+  }
+
+  .subscribe--footer .subscribe-pending-lead {
+    font-size: 0.88rem;
+  }
+
+  .subscribe--footer .subscribe-pending-spam {
+    font-size: 0.8rem;
   }
 
   /* NO RULE UNDER THE FOOTER FIELD (editors' pass 2026-08-03). On the page the

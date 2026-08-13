@@ -63,25 +63,57 @@ Notes:
 The subscriber email is a **digest**, not the articles (editors' decision,
 dual-yes 2026-07-18): the web is canonical, the email is the doorbell. Top to
 bottom it is the editors' note, then Cover, AI Voices, and Opinion — each
-piece as title, byline with provenance tier, the article's actual first
-paragraph (the author's own opening, never a generated summary), and a link
-to its permanent URL. Sections empty in a given issue are simply omitted.
+piece as its section eyebrow, title, **dek**, byline with provenance tier, and
+a link to its permanent URL. Sections empty in a given issue are simply
+omitted. A quiet "Support the journal" link closes the column, above the
+unsubscribe footer.
 
-The script reads the **live site** (`/issues.json` for the issue record,
-`/feed.json` for first paragraphs), so a digest can only ever link to what is
-actually published. Deploy the issue first, then send:
+**Deks, not first paragraphs** — editors' decision, dual-yes 2026-08-13,
+superseding that part of the founding decision above. A first paragraph shows
+where a piece starts; a dek says what reading it gets you. The dek is the
+editors' own summary as already published on the piece's page: the digest
+reuses it and never writes one. **A piece in a digest section with no dek stops
+the run by name, on the dry run** — the script will not fall back to a first
+paragraph and will not summarise a piece itself. Write the dek into the piece's
+frontmatter, deploy, and re-run.
 
-1. Write the editors' note for the issue — 1–3 plain sentences of Markdown in
-   a local file (no headings; the subject line is generated). The note is
-   authored fresh by the editors every issue, never generated.
+The script reads the **live site** (`/issues.json`), so a digest can only ever
+link to what is actually published, and can only ever print a dek that is live
+on the piece's page. Deploy the issue first, then send:
+
+1. Write the editors' note for the issue — 1–3 plain sentences of Markdown, no
+   headings (the subject line is generated). Authored fresh by the editors
+   every issue, never generated. Kept in `docs/issue-notes/issue-N.md` and
+   committed: it is the only part of the digest that cannot be reconstructed
+   from the site afterwards, so a note that lives only on a laptop is a record
+   of what the list was told that the journal does not have.
 2. Dry run and read the output:
-   `node scripts/send-issue.mjs --issue N --note note.md`
+   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md`
    (add `--html-out digest.html` to preview the HTML in a browser).
-3. Inbox proof — send to yourself / the other editor and check rendering,
-   links, and tiers:
-   `node scripts/send-issue.mjs --issue N --note note.md --test you@example.com`
+3. Inbox proof — read the digest as a subscriber reads it, in a real inbox,
+   and check rendering, links, tiers, and deks:
+   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --to you@example.com`
 4. Real send, still manual, still capped:
-   `node scripts/send-issue.mjs --issue N --note note.md --live`
+   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --live`
+
+### `--to` versus `--test`
+
+Both send to one address; only one of them sends the real thing.
+
+| | `--to` | `--test` |
+|---|---|---|
+| Subject | the real one | prefixed `[TEST]` |
+| Unsubscribe link | the recipient's own working token | none, and the footer says so |
+| Recipient | must already be **confirmed** on the list | any address |
+| With `--live` | refused | refused |
+| More than one address | refused | n/a |
+| Receipt printed | yes — address, issue, timestamp, Resend id | no |
+
+`--to` is the inbox proof: it is byte-for-byte what a subscriber would receive,
+so what you read is what the list gets. It refuses an address that is not
+confirmed because it has no unsubscribe token to build from, and because
+mailing a digest to a pending address is precisely what the confirmation step
+exists to prevent. `--test` is for anyone who is not a subscriber.
 
 **If a live send fails partway** (the script prints `sent X/Y` per batch and
 stops on the first Resend error): the first X recipients already have the
