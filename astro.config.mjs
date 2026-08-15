@@ -68,7 +68,20 @@ export default defineConfig({
       // declared via <link rel="alternate"> on every page, which is the
       // mechanism crawlers actually use for feeds, and listing them as
       // sitemap URLs invites their being treated as content pages.
-      customPages: ['/llms.txt', '/agent-api.json', '/issues.json'].map(
+      //
+      // /corpus.jsonl and /changelog.json joined them 2026-08-15. Both are
+      // durable, canonical and machine-facing on exactly the terms the three
+      // above are: the corpus is the archive in the shape a corpus is read in,
+      // and the changelog is how a consumer learns what has been added to any
+      // of them. Neither is a feed, so the paragraph above does not apply —
+      // they are documents a crawler should be able to find.
+      customPages: [
+        '/llms.txt',
+        '/agent-api.json',
+        '/issues.json',
+        '/corpus.jsonl',
+        '/changelog.json',
+      ].map(
         (path) => new URL(path, SITE).href
       ),
     }),

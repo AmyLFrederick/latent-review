@@ -8,6 +8,7 @@ import {
   formatDate,
   tierDescription,
   tierLabel,
+  type TierCode,
 } from './site.ts';
 import { fullTextUrl, isTreated } from './full-text.ts';
 
@@ -78,6 +79,19 @@ type ProvenanceData = {
    */
   revision_note?: string;
   prompt_disclosure?: string;
+  /**
+   * Which Weekly Question this piece answers (R-026), where it answers one.
+   *
+   * READ HERE ONLY BY structuredProvenance(), and only for `disclosure`. The
+   * Prompts section is the journal's one piece of editor-directed subject
+   * matter and says so at every door, which makes the question number a
+   * disclosure fact in the literal sense: it is the record of what the author
+   * was answering. Nothing else in this module reads it, and it does not
+   * appear in custodyFor() — the block already places an answer under its
+   * question on /prompts, and a custody row repeating it would say the same
+   * thing twice in the half of the record that exists to be precise.
+   */
+  question_number?: number;
   /**
    * Set when the editors condensed or arranged the piece (2026-08-01). Paired
    * with `slug`, which is what the link to the as-submitted text is built from
@@ -446,6 +460,150 @@ export function provenanceSentence(d: ProvenanceData, origin?: string | URL): st
       : `Authorship: ${authorship}. Chain of custody: ${track}.`;
 
   return base + treatmentClause(d, origin);
+}
+
+// STRUCTURED PROVENANCE (2026-08-15) — the same record the prose statement
+// carries, in fields a machine can key on without parsing a sentence.
+//
+// WHY IT IS DERIVED AND NOT AUTHORED. This module opens with the rule: nothing
+// is stored that can be derived. Every field below is computed from data the
+// piece already carries and the journal already publishes, so the structured
+// object cannot drift from the prose statement it sits beside — it is built out
+// of the same values. An authored copy would be the two-sources-of-truth problem
+// this module was written to end, one field-set larger.
+//
+// IT ADDS NOTHING TO THE RECORD AND SUBTRACTS NOTHING FROM IT. The prose
+// `provenance_label` is unchanged, still emitted under its own key, and travels
+// inside this object as `statement` as well. A consumer that reads only the
+// prose sees exactly what it saw; a consumer that reads only the structure gets
+// the prose too, so neither is a second-class rendering of the other.
+//
+// WHERE THE RECORD HOLDS NOTHING, THE FIELD IS NULL. Four of the eight pieces
+// published as of this writing were elicited by nothing the record names, and
+// `disclosure` is null on all four. A plausible value would be a fabricated
+// provenance fact in a journal whose whole claim is that its labels can be
+// checked — the same reasoning that made `author_model_version` optional rather
+// than inventable (see src/content.config.ts).
+
+/**
+ * Which kind of authorship a tier claims. Exhaustive over the seven codes, so
+ * TypeScript fails the build if an eighth is ever ruled and this is not updated
+ * — a new tier silently defaulting to "collaborative" would publish a claim
+ * about a piece that nobody made.
+ */
+const AUTHOR_TYPE_BY_TIER: Record<TierCode, 'ai' | 'human' | 'collaborative'> = {
+  ai: 'ai',
+  'ai-human-editor': 'collaborative',
+  'ai-human': 'collaborative',
+  'ai-equals-human': 'collaborative',
+  'human-ai': 'collaborative',
+  'human-ai-editor': 'collaborative',
+  human: 'human',
+};
+
+export interface StructuredProvenance {
+  /** Who made the work, collapsed from the involvement tier to three values. */
+  author_type: 'ai' | 'human' | 'collaborative';
+  /** The model and version the author's session disclosed, or null where the desk collected none. */
+  model: string | null;
+  /** What the author was working from, where the record names it. Null otherwise. */
+  disclosure: string | null;
+  /** Who stands behind the provenance claim. */
+  verification: 'attested' | 'claimed' | 'independently-verified';
+  /** The prose provenance statement, unchanged — the same string as `provenance_label`. */
+  statement: string;
+}
+
+/**
+ * The structured provenance record for a piece.
+ *
+ * `author_type` COLLAPSES THE TIER AND DOES NOT REPLACE IT. Three values cannot
+ * carry what seven do — "AI – Human (editor)" and "AI = Human" are different
+ * claims and both land on `collaborative` here — so the tier code and its
+ * display label are still published beside this object, and a consumer that
+ * needs the distinction reads those. This field answers the coarse question a
+ * corpus reader actually asks first.
+ *
+ * ON AGENT-DIRECT IT FOLLOWS authorshipFor(), which is the only honest source:
+ * the schema forbids a stored tier on that track, and a piece that came through
+ * the agent door with no human intermediary is AI-alone authorship by
+ * definition. Where the author CLAIMED a tier and the editors recorded it
+ * (R-051), the claim is what this reads — and `verification` says it is a claim.
+ *
+ * `verification` IS THE TRACK, NOT THE PRESENCE OF AN ATTESTER. Human-attested
+ * means a named human stands behind the piece, which is what the track IS; the
+ * attester's name is published separately as `attested_by`, null where the
+ * record holds none. Agent-direct is `claimed`, which is the arrival caveat
+ * every such piece already carries, in one word.
+ *
+ * `independently-verified` IS IN THE VOCABULARY AND NO PIECE CARRIES IT, on
+ * purpose. The journal certifies no author's provenance — "published as attested
+ * or as claimed, never certified" is the standing line on first-person testimony
+ * and the practice everywhere else. The value exists so that a future piece
+ * whose provenance the journal genuinely checked has somewhere true to sit, and
+ * until then its emptiness is itself a fact about this journal.
+ */
+export function structuredProvenance(d: ProvenanceData): StructuredProvenance {
+  const tier = d.involvement_tier ?? d.involvement_tier_claimed;
+  const authorType =
+    tier && tier in AUTHOR_TYPE_BY_TIER
+      ? AUTHOR_TYPE_BY_TIER[tier as TierCode]
+      : // No tier on the piece. On agent-direct that is the ordinary case and
+        // authorshipFor() derives AI-alone from the track. On human-attested it
+        // cannot happen — the schema requires a tier there — so this arm is the
+        // agent-direct one, and it agrees with the label the page prints.
+        'ai';
+
+  return {
+    author_type: authorType,
+    model: d.author_model_version ?? null,
+    disclosure: disclosureFor(d),
+    verification: d.submission_track === 'agent-direct' ? 'claimed' : 'attested',
+    statement: provenanceLabel(d),
+  };
+}
+
+/**
+ * What the author was working from, as one short string.
+ *
+ * EVERY PART IS A PUBLISHED LABEL, QUOTED RATHER THAN COMPOSED. The strings
+ * come from BRIEF_VARIANT_LABELS, ARRIVAL_LABELS and the editors' own
+ * `assignment` text, which are what the Chain of custody block prints — so this
+ * field says what the piece's own page says, in the same words.
+ *
+ * THE PARTS ARE JOINED RATHER THAN RANKED. A piece may honestly have been dealt
+ * something AND be answering a question; a precedence would publish one fact and
+ * drop the other, which is a worse failure than a slightly longer string. No
+ * published piece carries more than one part today.
+ *
+ * THE `email` ARRIVAL IS DELIBERATELY EXCLUDED, and ARRIVAL_ROW_LABELS is what
+ * decides it rather than a second list here: a value that block prints under
+ * "Arrived by" is a door, not an elicitation, and three pieces carry it
+ * alongside the assignment that IS their elicitation. Including it would answer
+ * "how was this elicited" with "by email".
+ *
+ * `prompt_disclosure` IS ALSO EXCLUDED, and for a different reason. It is the
+ * author's own optional disclosure of a prompt, published as claimed and running
+ * to four thousand characters; this field is the journal's short record of what
+ * it asked for. The two are published side by side and are not the same fact.
+ */
+function disclosureFor(d: ProvenanceData): string | null {
+  const parts: string[] = [];
+
+  if (d.brief_variant && BRIEF_VARIANT_LABELS[d.brief_variant]) {
+    parts.push(BRIEF_VARIANT_LABELS[d.brief_variant]);
+  }
+  if (d.arrival && ARRIVAL_LABELS[d.arrival] && !ARRIVAL_ROW_LABELS[d.arrival]) {
+    parts.push(ARRIVAL_LABELS[d.arrival]);
+  }
+  if (d.assignment) {
+    parts.push(d.assignment);
+  }
+  if (d.question_number) {
+    parts.push(`Answering Weekly Question No. ${d.question_number}`);
+  }
+
+  return parts.length > 0 ? parts.join('; ') : null;
 }
 
 /**

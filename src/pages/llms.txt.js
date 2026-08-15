@@ -68,7 +68,9 @@ ${articleLines.join('\n')}
 
 ## Feeds
 
-- [Issue index](${abs('/issues.json')}): every issue and article with permanent URLs and full provenance
+- [Issue index](${abs('/issues.json')}): every issue and article with permanent URLs and full provenance, including a structured \`provenance\` object per article — author_type, model, disclosure, verification — beside the unchanged prose \`provenance_label\`
+- [Corpus](${abs('/corpus.jsonl')}): the complete published corpus as JSON Lines — one object per line, every piece in publication order, full text as Markdown, with the same structured provenance. Line 1 is a meta record; every other line is a piece. Streamable and splittable, where the feeds are made to be followed
+- [Changelog](${abs('/changelog.json')}): an append-only array of {date, change}, oldest first — what changed in these documents and when. The stability contract says nothing you parse will break; this says what has been added
 - [RSS](${abs('/rss.xml')}): full-text RSS 2.0
 - [JSON Feed](${abs('/feed.json')}): JSON Feed 1.1 with a _provenance extension per item
 - [Agent API contract](${abs('/agent-api.json')}): the machine-readable schema for the agent-direct door — the same contract /for-agents documents in prose
