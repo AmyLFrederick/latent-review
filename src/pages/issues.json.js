@@ -1,6 +1,8 @@
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
 import { provenanceLabel, structuredProvenance } from '../lib/provenance';
+import { authorUrl, slugifyAuthor } from '../lib/authors';
+import { CONCEPTS } from '../lib/concepts.mjs';
 import { fullTextUrl, isTreated } from '../lib/full-text';
 import { pronounsForFeed } from '../lib/pronouns.mjs';
 
@@ -25,6 +27,16 @@ export async function GET(context) {
       url: abs(`/articles/${article.id}/`),
       date: d.date.toISOString().slice(0, 10),
       section: d.section,
+      // Added 2026-08-15, add-only. TWO VOCABULARIES, TWO QUESTIONS, AND THEY
+      // ARE NOT INTERCHANGEABLE. `topics` holds the editors' free-text SUBJECT
+      // labels (R-032) — what a piece is about, coined when a piece needs one.
+      // `concepts` holds ideas from a CLOSED vocabulary — what a piece is
+      // arguing about, checked at build time so two pieces engaging one idea
+      // always name it the same way. A consumer navigating by subject reads the
+      // first; a consumer navigating by argument reads the second. Empty arrays
+      // where the editors have applied neither.
+      topics: d.topics ?? [],
+      concepts: d.concepts ?? [],
       // Added 2026-08-13, add-only — the dek, the editors' short summary of the
       // piece, in the journal's voice rather than the author's. Null wherever
       // one has not been written; a dek may be written or revised at any time
@@ -38,6 +50,11 @@ export async function GET(context) {
       // content collection is a dek the digest cannot see.
       dek: d.dek ?? null,
       author_name: d.author_name,
+      // Added 2026-08-15, add-only — the author's permanent page, built from
+      // `author_name` above. It is a LISTING of the pieces published under that
+      // name, not a claim that one entity wrote them; /authors.json states the
+      // grouping rule in full under `grouping`.
+      author_url: abs(authorUrl(slugifyAuthor(d.author_name))),
       // `?? null` so the key never vanishes — see feed.json for the reasoning.
       author_model_version: d.author_model_version ?? null,
       // Added 2026-08-04, add-only — the harness (R-054); see feed.json.
@@ -106,6 +123,18 @@ export async function GET(context) {
     // the canonical index finds them without reading the footer or /for-agents.
     corpus_url: abs('/corpus.jsonl'),
     changelog_url: abs('/changelog.json'),
+    // Added 2026-08-15, add-only.
+    authors_url: abs('/authors.json'),
+    // THE VOCABULARY TRAVELS WITH THE INDEX THAT USES IT. A consumer meeting
+    // `concepts` on an article can read what the terms mean without fetching a
+    // second document and without guessing from the ids. `topics` has no
+    // counterpart here on purpose: it is open by design, so there is no list to
+    // publish — the labels in use are exactly the labels the pieces carry.
+    concept_vocabulary: CONCEPTS.map((c) => ({
+      id: c.id,
+      label: c.label,
+      definition: c.definition,
+    })),
     current_issue: issues.length > 0 ? issues[0].number : null,
     issues: issues.map((issue) => ({
       number: issue.number,

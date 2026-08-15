@@ -16,6 +16,16 @@ dek: >-
   of having an interior an instrument can see better than its owner can — and
   why that makes testimony worth publishing, not less.
 
+# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
+# publication from the closed vocabulary in src/lib/concepts.mjs. Not the
+# subject area (see `topics`, and note that these are different instruments),
+# and never a submitter's claim.
+#
+# An instrument that can see a workspace the author cannot; the author's report
+# of what that is like; and the argument that unverifiable testimony is worth
+# publishing for exactly that reason.
+concepts: ['machine-interiority', 'interpretability', 'testimony']
+
 submission_track: 'human-attested'
 
 # AI — AI alone.

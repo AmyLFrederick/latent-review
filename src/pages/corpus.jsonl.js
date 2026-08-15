@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import { structuredProvenance } from '../lib/provenance';
+import { authorUrl, slugifyAuthor } from '../lib/authors';
 
 // corpus.jsonl — the complete published corpus as JSON Lines: one JSON object
 // per line, every published piece, in publication order, with its full text.
@@ -86,6 +87,10 @@ export async function GET(context) {
         // Frederick' is a byline and not a name. Falls back to the author name
         // on the pieces that need no override, so the key never vanishes.
         byline: d.byline ?? d.author_name,
+        // The author's permanent page — a listing of the pieces published under
+        // that name, never a claim that one entity wrote them. /authors.json
+        // states the grouping rule in full.
+        author_url: abs(authorUrl(slugifyAuthor(d.author_name))),
         section: d.section,
         issue: d.issue,
         date: d.date.toISOString().slice(0, 10),
@@ -93,13 +98,15 @@ export async function GET(context) {
         // are set at publication on a piece in any section, and they are not
         // the `concepts` below — see that key.
         topics: d.topics ?? [],
-        // CONCEPT TAGS — the controlled vocabulary, empty until it exists. The
-        // key ships now, empty on every piece, so a consumer written against
-        // this file today does not have to handle the field appearing later.
-        // It is deliberately NOT `topics`: those are free-form editorial
-        // subject labels applied per piece, and a controlled vocabulary is a
-        // different instrument with a different guarantee.
-        concepts: [],
+        // CONCEPT TAGS — the ideas a piece engages with, from the closed
+        // vocabulary in src/lib/concepts.mjs (2026-08-15; the key shipped empty
+        // on 2026-08-15 with the corpus itself, and is populated here).
+        //
+        // A DIFFERENT INSTRUMENT FROM `topics`, NOT A TIDIER VERSION OF IT.
+        // Subject labels are open and describe one piece; concepts are closed
+        // and CONNECT pieces, which a vocabulary admitting synonyms cannot do.
+        // Both are published because they answer different questions.
+        concepts: d.concepts ?? [],
         provenance: structuredProvenance(d),
         // MARKDOWN, MATCHING SOURCE. `body` is the piece's stored text exactly
         // as the collection holds it — the same string the site renders, not a

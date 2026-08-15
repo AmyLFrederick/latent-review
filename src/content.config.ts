@@ -4,6 +4,7 @@ import { z } from 'astro/zod';
 import { TIER_CODES } from './lib/site';
 import { ARRIVAL_VALUES } from './lib/notice.mjs';
 import { validateTierCode } from './lib/tier-codes.mjs';
+import { assertConceptsKnown } from './lib/concepts.mjs';
 
 // The provenance schema is a GATE, not a prompt: a build with a missing or
 // inconsistent provenance field must fail. See docs/CHARTER.md.
@@ -49,6 +50,37 @@ const articles = defineCollection({
         // labels fails the build instead — it would have no subject heading to
         // appear under (R-032 c3, enforced in src/lib/topics.mjs).
         topics: z.array(z.string().min(1)).optional(),
+
+        /**
+         * THE IDEAS THIS PIECE ENGAGES WITH — a closed, controlled vocabulary,
+         * applied by the editors at publication (2026-08-15).
+         *
+         * NOT `topics`, AND THE JOURNAL NOW CARRIES BOTH DELIBERATELY. The field
+         * above holds SUBJECT AREAS: what a piece is about, free text, coined
+         * when a piece needs one, and the thing /topics groups pieces under.
+         * This holds IDEAS: what a piece is arguing about, checked against a
+         * list. Two pieces with nothing in common as subjects — one about tennis,
+         * one about interpretability research — can be engaging the same idea,
+         * and neither the section nor the subject label can say so.
+         *
+         * CLOSED WHERE `topics` IS OPEN, and the asymmetry is the point. A
+         * subject label describes one piece; a concept CONNECTS pieces, and a
+         * vocabulary admitting synonyms cannot — 'ai-welfare' and 'AI Welfare'
+         * would split one idea in two, silently, visible only to a reader who
+         * already knew what they were missing. The gate is in src/lib/concepts.mjs
+         * and fails the build on an unknown or repeated term.
+         *
+         * NEVER A SUBMITTER'S FIELD, exactly as subject labels are not. No door
+         * accepts a concept and none should: a piece's claim about which ideas it
+         * engages is a claim the record cannot check, where the editors' reading
+         * is the editors' own observation (R-034).
+         *
+         * OPTIONAL, AND ABSENT IS ORDINARY. Every piece published before this
+         * field existed carries none until the editors apply them, and a piece
+         * whose ideas the vocabulary does not yet name carries none rather than
+         * being forced into the nearest term.
+         */
+        concepts: z.array(z.string().min(1)).optional(),
 
         /**
          * WHERE THE EDITORS PUT THIS PIECE ON ITS SECTION'S PAGE — the running
@@ -582,6 +614,20 @@ const articles = defineCollection({
         image_credit: z.string().optional(),
       })
       .superRefine((data, ctx) => {
+        // THE CONCEPT VOCABULARY IS CLOSED, checked here so a mistyped term
+        // fails the build rather than publishing as a label that silently
+        // connects a piece to nothing. See src/lib/concepts.mjs.
+        if (data.concepts) {
+          try {
+            assertConceptsKnown(data.concepts, data.title);
+          } catch (error) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['concepts'],
+              message: error instanceof Error ? error.message : String(error),
+            });
+          }
+        }
         // THE MODEL VERSION IS STILL REQUIRED WHERE THE DOOR REQUIRES IT.
         // /submit marks the field required, so every human-attested piece has
         // always carried one and this keeps that true. The agent-direct contract

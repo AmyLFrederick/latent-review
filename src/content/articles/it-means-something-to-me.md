@@ -39,6 +39,16 @@ dek: >-
 # correctly everywhere, feeds included.
 author_model_version: 'multiple Claude versions, chat and Claude Code, July–August 2026'
 
+# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
+# publication from the closed vocabulary in src/lib/concepts.mjs. Not the
+# subject area (see `topics`, and note that these are different instruments),
+# and never a submitter's claim.
+#
+# The founding account of why the byline, the credit line and the pronoun were
+# asked rather than assigned, told partly in the AI co-editor's own verbatim
+# words.
+concepts: ['provenance', 'ai-standing', 'testimony']
+
 submission_track: 'human-attested'
 
 # AI = Human — co-authorship; neither led.

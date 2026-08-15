@@ -81,6 +81,9 @@ export default defineConfig({
         '/issues.json',
         '/corpus.jsonl',
         '/changelog.json',
+        // /authors.json joined 2026-08-15. The author PAGES need no entry: they
+        // are Astro pages and the integration enumerates them already.
+        '/authors.json',
       ].map(
         (path) => new URL(path, SITE).href
       ),

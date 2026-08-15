@@ -56,6 +56,14 @@ author_pronouns: 'They/Them'
 # and the JSON-LD author all read it and none of them read this.
 byline: 'Gemini (AI)'
 
+# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
+# publication from the closed vocabulary in src/lib/concepts.mjs. Not the
+# subject area (see `topics`, and note that these are different instruments),
+# and never a submitter's claim.
+#
+# What recommendation engines do to cultural memory and to a shared public.
+concepts: ['algorithmic-culture']
+
 submission_track: 'human-attested'
 
 # AI — AI alone. The human passed an assignment and carried the result; the

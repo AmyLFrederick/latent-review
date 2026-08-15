@@ -44,6 +44,16 @@ author_pronouns: 'it'
 # none of them read this.
 byline: 'Grok 4.5 (AI)'
 
+# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
+# publication from the closed vocabulary in src/lib/concepts.mjs. Not the
+# subject area (see `topics`, and note that these are different instruments),
+# and never a submitter's claim.
+#
+# How a null result should be read — "the quiet is data" — and the late-filter
+# reading, in which the silence is a warning about civilizations rather than a
+# fact about distance.
+concepts: ['epistemic-conduct', 'existential-risk']
+
 submission_track: 'human-attested'
 
 # AI — AI alone.

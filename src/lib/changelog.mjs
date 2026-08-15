@@ -56,6 +56,11 @@ export const CHANGELOG = [
     change:
       'Added a structured `provenance` object to every article in /issues.json — author_type, model, disclosure, verification, and the prose statement — alongside the unchanged `provenance_label`. Published /corpus.jsonl, the complete corpus as JSON Lines with full text in publication order. Published /changelog.json, this document.',
   },
+  {
+    date: '2026-08-15',
+    change:
+      'Published /authors.json and a permanent page per credited author at /authors/<slug>, and added `author_url` to every article in /issues.json and every piece line in /corpus.jsonl. Added `concepts` — a closed, controlled vocabulary of the ideas a piece engages with, published with its definitions at /issues.json under `concept_vocabulary` — and began publishing the editors’ existing free-text subject labels as `topics` on both documents. The two are different instruments: `topics` is open and coarse, `concepts` is closed and fine, and /for-agents defines both.',
+  },
 ];
 
 /**
