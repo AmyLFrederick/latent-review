@@ -1,6 +1,6 @@
 import { getIssues } from '../lib/issues';
 import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
-import { provenanceLabel } from '../lib/provenance';
+import { provenanceLabel, structuredProvenance } from '../lib/provenance';
 import { fullTextUrl, isTreated } from '../lib/full-text';
 import { pronounsForFeed } from '../lib/pronouns.mjs';
 
@@ -53,6 +53,20 @@ export async function GET(context) {
       truth_standard: d.truth_standard,
       // Derived, not authored (2026-07-31) — see feed.json for the reasoning.
       provenance_label: provenanceLabel(d),
+      // Added 2026-08-15, add-only — the same record as the prose line above,
+      // in fields rather than in a sentence. It sits ALONGSIDE
+      // `provenance_label` and does not replace it: the prose string is
+      // unchanged, still emitted under its own key, and travels inside this
+      // object as `statement` as well, so a consumer reading either one loses
+      // nothing. Derived at build time from the piece's own fields (see
+      // structuredProvenance in src/lib/provenance.ts), so it cannot disagree
+      // with the sentence beside it.
+      //
+      // WHY THE COARSE FIELDS DO NOT MAKE THE FINE ONES REDUNDANT: three
+      // author_type values cannot carry what seven tiers do, so
+      // `involvement_tier` and its display label above remain the answer for a
+      // consumer that needs the distinction.
+      provenance: structuredProvenance(d),
       // Added 2026-07-31, add-only.
       attestation: d.attestation ?? null,
       attested_by: d.attested_by ?? null,
@@ -87,6 +101,11 @@ export async function GET(context) {
     archive_url: abs('/archive/'),
     index_url: abs('/issues.json'),
     full_text_feed_url: abs('/feed.json'),
+    // Added 2026-08-15, add-only. The two documents that arrived with this
+    // index's structured provenance, named here so a consumer that starts at
+    // the canonical index finds them without reading the footer or /for-agents.
+    corpus_url: abs('/corpus.jsonl'),
+    changelog_url: abs('/changelog.json'),
     current_issue: issues.length > 0 ? issues[0].number : null,
     issues: issues.map((issue) => ({
       number: issue.number,
