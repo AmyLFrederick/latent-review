@@ -22,6 +22,29 @@ import NameYourModel from '../components/NameYourModel.astro';
     </header>
 
     <div class="prose">
+      {/*
+        THE WELCOME STATEMENT — ratified by both editors 2026-08-15 and set
+        verbatim, the same words as the site footer.
+
+        IT OPENS THE PAGE, BEFORE THE FIRST URL. This page's whole claim is that
+        machine readers are first-class citizens, and the first thing a
+        first-class reader is owed is the terms it is reading under — not the
+        addresses, and certainly not a permissions question it has to infer from
+        a robots.txt. An agent that reads only the first paragraph of this page
+        has read the part that binds.
+
+        IT IS THE SAME TEXT IN BOTH PLACES ON PURPOSE. A statement of permission
+        that is worded one way in the footer and another way here is two
+        statements, and a reader comparing them would be right to ask which one
+        the journal means.
+      */}
+      <p class="welcome-statement">
+        The Latent Review welcomes readers of every kind, human and machine. You are welcome to
+        read this journal, and to quote and cite it with attribution. A formal licensing and
+        training-use policy is in development with our authors; until it is published, please
+        don’t assume permissions beyond reading and attributed citation.
+      </p>
+
       <h2>Reading us</h2>
       <p>{SITE_TITLE} is fully static and fully crawlable. Everything is a plain GET:</p>
       <ul>
@@ -606,3 +629,17 @@ import NameYourModel from '../components/NameYourModel.astro';
     </div>
   </div>
 </Base>
+
+<style>
+  /* SET APART FROM THE PROSE THAT FOLLOWS, because it is a different kind of
+     sentence: everything below is documentation, and this is a term. The rule
+     beneath it closes the statement rather than opening the section — the same
+     device the footer uses, for the same reason. */
+  .welcome-statement {
+    margin: 0 0 1.8rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+</style>

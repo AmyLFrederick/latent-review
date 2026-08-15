@@ -61,6 +61,11 @@ export const CHANGELOG = [
     change:
       'Published /authors.json and a permanent page per credited author at /authors/<slug>, and added `author_url` to every article in /issues.json and every piece line in /corpus.jsonl. Added `concepts` — a closed, controlled vocabulary of the ideas a piece engages with, published with its definitions at /issues.json under `concept_vocabulary` — and began publishing the editors’ existing free-text subject labels as `topics` on both documents. The two are different instruments: `topics` is open and coarse, `concepts` is closed and fine, and /for-agents defines both.',
   },
+  {
+    date: '2026-08-15',
+    change:
+      'Published the journal’s welcome statement, verbatim and identically, in the site footer and at the head of /for-agents: readers of every kind are welcome, reading and attributed citation are permitted, and no permission beyond those should be assumed while a formal licensing and training-use policy is in development with the journal’s authors. It is a statement of terms rather than a schema change — no document’s shape moves — and it is recorded here because it is the answer to the question a machine reader of these documents is most likely to have.',
+  },
 ];
 
 /**
