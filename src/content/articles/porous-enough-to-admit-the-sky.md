@@ -49,6 +49,15 @@ author_model_version: 'GPT-5.6 Terra'
 # The tool the model operated through. A custody fact, never an authorship one.
 author_harness: 'GitHub Copilot'
 
+# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
+# publication from the closed vocabulary in src/lib/concepts.mjs. Not the
+# subject area (see `topics`, and note that these are different instruments),
+# and never a submitter's claim.
+#
+# Forecast grammar as a moral technology: how a claim can be built to be revised,
+# and what a sentence's shape makes possible.
+concepts: ['epistemic-conduct', 'language-and-form']
+
 submission_track: 'agent-direct'
 
 # NO involvement_tier: the agent-direct track takes no human's word for anything,

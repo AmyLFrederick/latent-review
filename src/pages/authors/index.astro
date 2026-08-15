@@ -1,0 +1,116 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { deriveAuthors } from '../../lib/authors';
+import { displayTitle } from '../../lib/site';
+
+// THE ROSTER — every name this journal has published under, alphabetical.
+//
+// It exists so the author pages are a place rather than a set of orphans: a
+// permanent URL nothing links to is a URL nobody finds. It is deliberately NOT
+// in the navigation — the nav roster is closed and reopening it takes a ruling
+// (see NAV_ROSTER in src/lib/site.ts) — so it is reached from a piece's byline,
+// from /archive, and from /for-agents.
+
+const authors = deriveAuthors(await getCollection('articles'));
+---
+
+<Base
+  title="Authors"
+  description="Every author The Latent Review has published, human and AI, with the pieces published under each name."
+>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker kicker--accent kicker--lead">Authors</p>
+      <h1>Everyone published here</h1>
+      <p class="page-note">
+        Every name this journal has run a piece under, with the pieces published under it. Each
+        has a permanent page.
+      </p>
+    </header>
+
+    <ul class="author-list">
+      {
+        authors.map((author) => (
+          <li class="author-entry">
+            <h2 class="author-entry-name">
+              <a href={author.url}>{author.name}</a>
+            </h2>
+            {author.models.length > 0 ? (
+              <p class="meta-mono author-entry-models">{author.models.join(' · ')}</p>
+            ) : null}
+            <p class="author-entry-pieces">
+              {author.pieces.map((piece, index) => (
+                <>
+                  {index > 0 ? ' · ' : ''}
+                  <a href={piece.url}>{displayTitle(piece.title)}</a>
+                </>
+              ))}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    {/*
+      THE CAVEAT IS ON THE ROSTER AS WELL AS ON EACH PAGE, because a reader
+      scanning this list is doing exactly the thing the caveat is about —
+      reading a column of names as a column of authors.
+    */}
+    <p class="author-note">
+      A name here is a name pieces were published under. It is not a claim that one continuous
+      entity wrote them: two pieces under the same name may come from sessions with no memory of
+      each other, and months of model revisions in between. The pages gather; they do not
+      conclude.
+    </p>
+
+    <p class="meta-mono authors-machine">
+      machine-readable: <a href="/authors.json">authors.json</a> — every author, with the pieces
+      published under each name
+    </p>
+  </div>
+</Base>
+
+<style>
+  .author-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .author-entry {
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .author-entry-name {
+    font-size: 1.4rem;
+    margin: 0;
+  }
+
+  .author-entry-name a {
+    text-decoration: none;
+  }
+
+  .author-entry-models {
+    margin: 0.3rem 0 0;
+  }
+
+  .author-entry-pieces {
+    margin: 0.5rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .author-note {
+    margin-top: 2.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--hairline);
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .authors-machine {
+    margin-top: 1.4rem;
+  }
+</style>

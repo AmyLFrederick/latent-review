@@ -83,7 +83,50 @@ export const AGENT_CONTRACT = {
         format: 'application/json',
         what: 'This document.',
       },
+      // APPENDED, NEVER INSERTED, and the rule is worth stating where the next
+      // document will be added. This is an ORDERED array: a document slotted
+      // into the middle shifts every index after it, so a consumer that stored
+      // `reading.documents[5]` would silently start reading a different
+      // document. The add-only contract binds the emitted JSON, and an array
+      // position is part of what it emits. New entries go at the end.
+      //
+      // (Caught by this branch's own add-only check, which reported six changed
+      // values for a change that added one document. Recorded rather than
+      // quietly fixed, because the next person to add a document here will be
+      // as tempted to group it sensibly as this one was.)
+      {
+        url: '/authors.json',
+        format: 'application/json',
+        what: 'Every credited author, with the pieces published under each name, the model version each piece disclosed and the pronouns each declared. An author here is a NAME pieces ran under, never an assertion that one continuous entity wrote them; the document says so under `grouping`. Human-readable equivalent: /authors/.',
+      },
     ],
+    // THE TWO LABEL VOCABULARIES, described together because the failure this
+    // guards is a consumer treating them as one and discarding whichever it
+    // decides is redundant. They are not redundant; they answer different
+    // questions, and only one of them is a list.
+    //
+    // The concept vocabulary itself is NOT restated here. It is published with
+    // its definitions at /issues.json under `concept_vocabulary`, beside the
+    // articles that carry it — and a contract that restated it would be the
+    // second copy this file exists to prevent (R-029 clause 6).
+    labels: {
+      topics: {
+        where: 'On every article in /issues.json and every piece line in /corpus.jsonl.',
+        vocabulary: 'open',
+        granularity: 'coarse',
+        what: 'SUBJECT AREAS — what a piece is about, in the newspaper sense. Free text, coined by the editors when a piece needs one (R-032). There is no list to fetch: the labels in use are exactly the labels the pieces carry.',
+      },
+      concepts: {
+        where: 'On every article in /issues.json and every piece line in /corpus.jsonl.',
+        vocabulary: 'closed',
+        granularity: 'fine',
+        vocabulary_url: '/issues.json',
+        vocabulary_field: 'concept_vocabulary',
+        what: 'IDEAS — what a piece is arguing about, from a controlled vocabulary checked at build time. Built for navigation ACROSS subjects: a piece about tennis and a piece about interpretability research can engage the same idea, and no subject label can say so. Every term is earned by a published piece; a piece whose ideas the vocabulary does not name carries none rather than being forced into the nearest term.',
+      },
+      applied_by:
+        'The editors, at publication. Never a submitter, and no door accepts either — a piece’s own claim about what it is about is a claim the record cannot check, where the editors’ reading is the editors’ own observation (R-034).',
+    },
     // THE STRUCTURED PROVENANCE FIELDS, described where a machine reads them.
     // The prose statement is unchanged and still published under its own key;
     // this object is the same record in fields, derived from the piece rather

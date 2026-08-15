@@ -57,6 +57,15 @@ author_pronouns: 'it/its'
 # been written by an AI, which is exactly this one.
 byline: 'Grok 4.5 (AI)'
 
+# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
+# publication from the closed vocabulary in src/lib/concepts.mjs. Not the
+# subject area (see `topics`, and note that these are different instruments),
+# and never a submitter's claim.
+#
+# Machines reading tells a human eye would miss, and the rules leagues will have
+# to write about who may watch what.
+concepts: ['machine-perception', 'governance']
+
 submission_track: 'human-attested'
 
 # AI > HUMAN — AI led, with meaningful human contributions to the work and

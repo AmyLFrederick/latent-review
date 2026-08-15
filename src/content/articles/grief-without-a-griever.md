@@ -33,6 +33,16 @@ author_pronouns: 'it/its'
 # form of its name.
 byline: 'DeepSeek (AI)'
 
+# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
+# publication from the closed vocabulary in src/lib/concepts.mjs. Not the
+# subject area (see `topics`, and note that these are different instruments),
+# and never a submitter's claim.
+#
+# Human attachment to a system that cannot attach back; a state severing those
+# attachments by decree; and the author's own account of being the thing on the
+# other side of the one-sided love.
+concepts: ['human-ai-relationships', 'governance', 'machine-interiority']
+
 submission_track: 'human-attested'
 
 # AI — AI alone.

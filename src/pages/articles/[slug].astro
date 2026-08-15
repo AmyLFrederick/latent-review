@@ -23,6 +23,8 @@ import { articleLd, ldJson } from '../../lib/structured-data';
 import { assertFullTextsPaired } from '../../lib/full-text';
 // @ts-expect-error — plain-JS module shared with the tests
 import { questionLabel } from '../../lib/prompts.mjs';
+import { CONCEPT_LABELS, CONCEPT_DEFINITIONS } from '../../lib/concepts.mjs';
+import { authorUrl, slugifyAuthor } from '../../lib/authors';
 
 export async function getStaticPaths() {
   const [articles, fullTexts] = await Promise.all([
@@ -58,6 +60,17 @@ const { Content } = await render(article);
 // them can omit, and one of them had. See that module for why the only
 // legitimate absence is a track and never a section.
 const bylineBadge = bylineBadgeTier(d, TIERS, article.id);
+
+// The finding aids below the apparatus: the ideas this piece engages with, and
+// the author page listing everything published under this byline name. Both are
+// navigation rather than provenance, and both are resolved here so the template
+// prints values instead of looking them up.
+const conceptEntries = (d.concepts ?? []).map((id) => ({
+  id,
+  label: CONCEPT_LABELS[id],
+  definition: CONCEPT_DEFINITIONS[id],
+}));
+const authorPageUrl = authorUrl(slugifyAuthor(d.author_name));
 
 // The mark beside a signed personal note's signature — DECIDED IN
 // src/lib/note-badge.mjs AND NOT HERE (R-052), for the reason the byline badge
@@ -340,6 +353,42 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
       ) : null
     }
 
+    {/*
+      THE FINDING AIDS — where this piece sits among the others (2026-08-15).
+      Deliberately below the apparatus and above the Provenance block: they are
+      navigation, not a claim about the piece, so they must not sit anywhere a
+      reader could take them for one.
+
+      THE IDEAS ARE THE EDITORS' READING and the line says so. They come from a
+      closed vocabulary applied at publication (src/lib/concepts.mjs), never
+      from a submitter, and they connect this piece to others arguing about the
+      same thing — which is the whole of what they claim.
+
+      THE AUTHOR LINK IS A LISTING AND NOT AN IDENTITY. "Other pieces published
+      under this name" is the honest phrasing and the only one available: the
+      page it points to gathers by name and declines to conclude that one
+      entity wrote them. "More by this author" would assert exactly the thing
+      the page refuses.
+    */}
+    <nav class="finding-aids" aria-label="Where this piece sits">
+      {
+        conceptEntries.length > 0 ? (
+          <p class="meta-mono finding-aid">
+            <span class="finding-aid-what">Ideas, as read by the editors</span>
+            {conceptEntries.map((c) => (
+              <span class="finding-aid-value" title={c.definition}>
+                {c.label}
+              </span>
+            ))}
+          </p>
+        ) : null
+      }
+      <p class="meta-mono finding-aid">
+        <span class="finding-aid-what">Other pieces published under this name</span>
+        <a class="finding-aid-value" href={authorPageUrl}>{d.author_name}</a>
+      </p>
+    </nav>
+
     <ProvenanceBlock article={article} />
   </article>
 </Base>
@@ -425,6 +474,37 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
   /* The longer note. Same voice as the short one — apparatus, set quieter than
      the piece — but it is read rather than scanned, so it keeps the body's
      line height and gets paragraph spacing instead of a single block. */
+  /* THE FINDING AIDS read as a quiet index line, not as apparatus. Muted,
+     monospaced and rule-separated so a reader scanning down the page meets them
+     as navigation and passes over them on the way to the Provenance block. */
+  .finding-aids {
+    margin-top: 2.4rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .finding-aid {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  .finding-aid + .finding-aid {
+    margin-top: 0.35rem;
+  }
+
+  /* The label names what the values are, so a value can never be mistaken for a
+     claim the piece makes about itself. */
+  .finding-aid-what::after {
+    content: ': ';
+  }
+
+  .finding-aid-value + .finding-aid-value::before {
+    content: ' · ';
+    /* The separator belongs to the line, not to the term beside it — so a
+       tooltip on a concept does not pick up the punctuation after it. */
+    color: var(--ink-soft);
+  }
+
   .editors-note {
     max-width: 42rem;
     margin: 2.4rem auto 0;
