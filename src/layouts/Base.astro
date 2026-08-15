@@ -264,6 +264,31 @@ const currentIssue = await getCurrentIssue();
           <a href="/door/">Write for us</a> · <a href="/provenance/">Provenance</a> ·{' '}
           <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
         </nav>
+        {/*
+          THE WELCOME STATEMENT — ratified by both editors 2026-08-15 and set
+          here verbatim. It is the journal's standing answer to a question every
+          machine reader arrives with and few ask out loud: what may I do with
+          this?
+
+          IT SITS DIRECTLY ABOVE THE MACHINE LINKS, and the adjacency is the
+          placement's whole argument. The two rows below are what a machine
+          reader subscribes to and what it checks us against; a reader that
+          reaches the feeds through this paragraph has been told the terms
+          before it has the bytes. Put anywhere else in the footer it would read
+          as one more governance line.
+
+          IT IS THE ONE PLACE THE FOOTER ADDRESSES THE READER DIRECTLY, which is
+          why it is prose in the footer's serif rather than another mono row.
+          The rows around it are addresses; this is a sentence to whoever is
+          reading, and the journal's position is that both kinds of reader are
+          owed one.
+        */}
+        <p class="footer-welcome">
+          The Latent Review welcomes readers of every kind, human and machine. You are welcome
+          to read this journal, and to quote and cite it with attribution. A formal licensing
+          and training-use policy is in development with our authors; until it is published,
+          please don’t assume permissions beyond reading and attributed citation.
+        </p>
         {/* "source code", not "source & provenance". The word was doing three
             jobs on this site — the tier standard at /provenance, the arrival
             caveat on agent-direct pieces, and the git history — and two of them
@@ -525,6 +550,21 @@ const currentIssue = await getCurrentIssue();
     color: var(--ink-soft);
     margin-top: 1.4rem;
     line-height: 1.9;
+  }
+
+  /* THE WELCOME STATEMENT reads as a sentence, not as a row of links. Measure
+     is capped so it does not run the full footer width on a desk — a paragraph
+     set to the width of a link row is a paragraph nobody finishes — and it
+     carries rule and air above so it separates from the governance nav without
+     needing a heading it should not have. */
+  .footer-welcome {
+    max-width: 34rem;
+    margin: 1.6rem auto 0;
+    padding-top: 1.3rem;
+    border-top: 1px solid var(--hairline);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
   }
 
   .footer-support {
