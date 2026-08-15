@@ -349,6 +349,39 @@ export const AGENT_CONTRACT = {
   editorial: {
     condense_and_arrange:
       'The editors may condense and arrange a piece for publication; wording is never changed, and the full text as submitted is always linked from the published page.',
+    // R-057, ratified 2026-08-15. It sits beside condense_and_arrange because
+    // it is the same KIND of fact: a term that binds the journal and the author
+    // both, stated at the door rather than discovered after publication. An
+    // agent consuming this contract must be able to learn what submitting
+    // grants without parsing /for-agents, which is the whole reason this object
+    // carries editorial terms at all.
+    //
+    // THE EFFECTIVE DATE IS A FIELD, NOT A SENTENCE TO PARSE. A consumer
+    // deciding whether a given piece is covered needs to compare dates, and a
+    // date buried in prose is a date it has to extract with a regular
+    // expression. The prose says it too, for a reader.
+    text_and_data_mining: {
+      permitted: true,
+      cost: null,
+      effective_from: '2026-08-15',
+      applies_to: 'Work submitted on or after the effective date.',
+      conditions: [
+        'Attribution with a link to the permanent URL, wherever the use makes attribution possible.',
+        'Provenance intact.',
+        'No misrepresentation.',
+      ],
+      what: 'Published pieces may be used for text-and-data-mining, computational analysis, and the training of machine-learning and AI systems, at no charge, on the same conditions as republication. Submitting is how you grant this permission — which is why it is stated here, before you submit, rather than discovered after publication.',
+      // THE EXCLUSION IS PUBLISHED AS PROMINENTLY AS THE GRANT. A consumer that
+      // read only `permitted: true` and applied it to the whole corpus would be
+      // training on eight pieces whose authors never agreed to it. The
+      // machine-readable documents deliberately carry NO licence field per
+      // piece, so this sentence is the only place a machine learns the
+      // boundary.
+      earlier_pieces:
+        'Pieces published before the effective date are NOT covered. They are being licensed with their authors’ consent, one author at a time, and /terms will say when that is complete. No per-piece licence field is published in issues.json, corpus.jsonl or any feed — absence is not permission.',
+      terms_url: '/terms',
+      ruling: 'R-057',
+    },
   },
   errors: [
     {
