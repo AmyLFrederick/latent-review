@@ -391,6 +391,33 @@ const RULE = '#2a251c';
 const SERIF = "Georgia, 'Times New Roman', serif";
 const MONO = "'Courier New', Courier, monospace";
 
+// THE APPARATUS FACE — deks, bylines and the editors' note (editors, 2026-08-15).
+//
+// ROMAN, NOT ITALIC, AND IN MAIL ONLY. On the site these run in italic, in the
+// register the Prompts summaries set, and that is unchanged — the web has a
+// variable serif with a drawn italic and full control over how it renders.
+//
+// MAIL HAS NEITHER, AND THAT IS THE WHOLE OF THE REASON. SERIF above resolves to
+// Georgia or Times New Roman on a subscriber's device, and the italic of both is
+// a NARROWER AND LIGHTER face than its roman — narrower letterforms, thinner
+// stems, tighter counters. At 16px on a phone that is the thin, cramped block
+// the editors kept reading as too light. It was never the colour: #163 took the
+// note to #1b1813, which is 16:1 on the paper ground and as dark as this palette
+// goes. There was no colour left to add. The remaining lever was the face, and
+// #163 said so at the time and held it as a follow-up.
+//
+// SO THE FIX IS THE FACE ITSELF. Roman Georgia is wider and carries more ink at
+// the same size and the same weight — it answers "darker" and "less narrow"
+// with one change, and without reaching for bold. Weight is deliberately NOT
+// set: Georgia ships 400 and 700 and nothing between, so any nudge lands on
+// bold, and a bold dek would shout where it should summarise.
+//
+// STAMPED, NOT OMITTED, for the reason #163 stamped colour on every paragraph:
+// the editors' note's own tags come from markdown-it, and a client that
+// normalises paragraph styling can supply its own. Declaring `normal` means no
+// wrapper and no client default can put the italic back.
+const APPARATUS_FACE = 'font-style:normal;';
+
 // EYEBROW, TITLE, DEK, BYLINE — the order the piece's own page uses, so a
 // reader who follows the link meets the same four things in the same sequence
 // they just read in the mail. The dek sits above the byline because that is
@@ -411,8 +438,8 @@ function articleHtml(article, { isCover, sectionName }) {
     <h2 style="margin:0 0 10px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
       <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(displayTitle(article.title))}</a>
     </h2>
-    <p style="margin:0 0 12px;font-family:${SERIF};font-style:italic;font-size:16px;line-height:1.6;color:${INK};">${escapeHtml(dek(article))}</p>
-    <p style="margin:0 0 4px;font-family:${SERIF};font-style:italic;color:${INK_SOFT};font-size:15px;">
+    <p style="margin:0 0 12px;font-family:${SERIF};${APPARATUS_FACE}font-size:16px;line-height:1.6;color:${INK};">${escapeHtml(dek(article))}</p>
+    <p style="margin:0 0 4px;font-family:${SERIF};${APPARATUS_FACE}color:${INK_SOFT};font-size:15px;">
       By ${escapeHtml(article.author_name)}
     </p>
     <p style="margin:0 0 14px;font-family:${MONO};font-size:11px;color:${INK_SOFT};">
@@ -450,7 +477,7 @@ function sectionHtml(section) {
 function styledNote() {
   return noteHtml.replace(
     /<p>/g,
-    `<p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;font-style:italic;color:${INK};">`
+    `<p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;${APPARATUS_FACE}color:${INK};">`
   );
 }
 
