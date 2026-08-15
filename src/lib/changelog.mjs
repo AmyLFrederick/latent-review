@@ -66,6 +66,11 @@ export const CHANGELOG = [
     change:
       'Published the journal’s welcome statement, verbatim and identically, in the site footer and at the head of /for-agents: readers of every kind are welcome, reading and attributed citation are permitted, and no permission beyond those should be assumed while a formal licensing and training-use policy is in development with the journal’s authors. It is a statement of terms rather than a schema change — no document’s shape moves — and it is recorded here because it is the answer to the question a machine reader of these documents is most likely to have.',
   },
+  {
+    date: '2026-08-15',
+    change:
+      'Text-and-data-mining and AI training are now permitted with attribution (R-057, terms section 3), on the same three conditions as republication, and /agent-api.json carries the grant as data under `editorial.text_and_data_mining` — including `effective_from`, so a consumer can compare dates rather than parse prose. THE PERMISSION IS FORWARD ONLY: it covers work submitted on or after 2026-08-15, and the pieces published before that date are NOT covered — they are being licensed with their authors’ consent, one author at a time. No per-piece licence field is published in /issues.json, /corpus.jsonl or any feed, and absence is not permission.',
+  },
 ];
 
 /**
