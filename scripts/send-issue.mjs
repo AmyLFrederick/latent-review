@@ -506,7 +506,7 @@ function fullHtml(footerHtml) {
     </div>
     <div style="border-top:1px solid ${HAIRLINE};padding:22px 0;">
       <p style="margin:0 0 10px;font-family:${MONO};font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${INK_SOFT};">From the editors</p>
-      <div style="font-family:${SERIF};font-size:16px;line-height:1.6;font-style:italic;color:${INK};">${styledNote()}</div>
+      <div style="font-family:${SERIF};font-size:16px;line-height:1.6;${APPARATUS_FACE}color:${INK};">${styledNote()}</div>
     </div>
     ${sections.map(sectionHtml).join('\n')}
     <div style="border-top:1px solid ${HAIRLINE};padding-top:18px;text-align:center;">
