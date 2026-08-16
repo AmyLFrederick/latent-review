@@ -76,6 +76,11 @@ export const CHANGELOG = [
     change:
       'The consent round is complete (R-058): all eight pieces published before the effective date were licensed with their authors’ consent, on the same three conditions, so the text-and-data-mining and AI-training grant now covers the whole published corpus. In /agent-api.json, `editorial.text_and_data_mining` gains a `corpus_coverage` object carrying `all_published_pieces_covered` and `consent_round_completed` as fields rather than sentences to parse; `applies_to` and `earlier_pieces` are rewritten, and `earlier_pieces` is KEPT rather than removed because a key that vanishes reads as a grant that quietly widened. `effective_from` does not move — R-057 stays forward-only and governs what submitting grants. THE PRINCIPLE IS UNCHANGED AND STILL LOAD-BEARING: no per-piece licence field is published in /issues.json, /corpus.jsonl or any feed, absence is not permission, and a future piece outside the grant would be undetectable from the data alone. Terms section 3 and the grant stated at the door on /for-agents say the same thing, in the same words, as they did before.',
   },
+  {
+    date: '2026-08-16',
+    change:
+      'The journal’s welcome statement is rewritten to state the permission it used to withhold. It read that a licensing and training-use policy was in development and asked readers to assume nothing beyond reading and attributed citation; that became false the moment R-057 and R-058 landed, and it sat in the footer of every page. It now says that text-and-data-mining and AI training are permitted under our terms — attribution with a link, provenance intact, no misrepresentation — and that every piece we have published is covered with its author’s consent. STILL VERBATIM AND IDENTICAL IN BOTH PLACES, the site footer and the head of /for-agents, for the reason it was written that way: a statement of permission worded one way in one place and another way in another is two statements. No document’s shape moves and no per-piece licence field is added anywhere.',
+  },
 ];
 
 /**
