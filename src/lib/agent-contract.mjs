@@ -364,23 +364,36 @@ export const AGENT_CONTRACT = {
       permitted: true,
       cost: null,
       effective_from: '2026-08-15',
-      applies_to: 'Work submitted on or after the effective date.',
+      applies_to:
+        'Work submitted on or after the effective date, plus every piece published before it — the earlier pieces were licensed individually, with their authors’ consent, in a round completed 2026-08-16 (R-058).',
       conditions: [
         'Attribution with a link to the permanent URL, wherever the use makes attribution possible.',
         'Provenance intact.',
         'No misrepresentation.',
       ],
       what: 'Published pieces may be used for text-and-data-mining, computational analysis, and the training of machine-learning and AI systems, at no charge, on the same conditions as republication. Submitting is how you grant this permission — which is why it is stated here, before you submit, rather than discovered after publication.',
-      // THE EXCLUSION IS PUBLISHED AS PROMINENTLY AS THE GRANT. A consumer that
-      // read only `permitted: true` and applied it to the whole corpus would be
-      // training on eight pieces whose authors never agreed to it. The
+      // THE EXCLUSION IS NARROWER THAN IT WAS, AND IS STILL PUBLISHED AS
+      // PROMINENTLY AS THE GRANT. Every piece published to date is now covered,
+      // which is a fact about the current corpus and NOT a rule about future
+      // ones. A piece could still stand outside the grant — a consent withdrawn,
+      // a licence negotiated at acceptance, a co-author who declines — and the
       // machine-readable documents deliberately carry NO licence field per
-      // piece, so this sentence is the only place a machine learns the
-      // boundary.
+      // piece, so a consumer cannot detect that case by reading them. The
+      // principle therefore outlives the round that satisfied it.
+      corpus_coverage: {
+        all_published_pieces_covered: true,
+        consent_round_completed: '2026-08-16',
+        ruling: 'R-058',
+        note: 'The eight pieces published before the effective date were licensed one author at a time, with consent asked rather than assumed and nothing riding on a refusal, on the same three conditions; the answers are published verbatim. No per-piece licence field is published in issues.json, corpus.jsonl or any feed — absence is not permission, and a future piece outside this grant would be undetectable from the data alone.',
+      },
+      // KEPT RATHER THAN DELETED, because a consumer may be reading this key:
+      // R-057 published it as the boundary, and a key that vanishes reads as a
+      // grant that quietly widened. It now carries the answer it promised.
       earlier_pieces:
-        'Pieces published before the effective date are NOT covered. They are being licensed with their authors’ consent, one author at a time, and /terms will say when that is complete. No per-piece licence field is published in issues.json, corpus.jsonl or any feed — absence is not permission.',
+        'Covered as of 2026-08-16. The eight pieces published before the effective date were licensed with their authors’ consent, one author at a time (R-058), on the same three conditions. Absence of a per-piece licence field still means no grant rather than a permissive default.',
       terms_url: '/terms',
       ruling: 'R-057',
+      amended_by: 'R-058',
     },
   },
   errors: [
