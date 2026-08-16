@@ -1,0 +1,265 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import record from '../data/consent-record.json';
+import {
+  assertCoversEveryPiece,
+  assertWellFormed,
+  pendingSlots,
+} from '../lib/consent-record.mjs';
+
+// /consent-record — the answers the consent round drew, published verbatim.
+//
+// AUTHORIZED BY THE RULING ITSELF (R-058), which is the reason this page is a
+// term rather than a courtesy. A journal that asked eight authors for
+// permission to train on their work and then reported only that permission was
+// granted would be asking readers to take on trust the one thing it is in a
+// position to show.
+//
+// THE ELICITATION SCRIPT IS PUBLISHED WITH THE ANSWERS, and it is not
+// decoration. A consent is only as good as the asking, and a reader who cannot
+// see the question cannot judge whether the answer was free. The script says
+// in the author's hearing that there is no preferred answer and that a refusal
+// changes nothing about the piece; publishing it is how that claim becomes
+// checkable rather than asserted.
+const articles = (await getCollection('articles')).filter((a) => !a.id.startsWith('_'));
+
+assertWellFormed(record);
+assertCoversEveryPiece(record, articles);
+
+const pending = pendingSlots(record);
+---
+
+<Base
+  title="The consent record"
+  description="The complete record of the consent round: the question each author was asked, and every answer it drew, published verbatim under R-058."
+>
+  <div class="wrap">
+    <header class="page-header page-header--compact">
+      <p class="kicker kicker--accent kicker--lead">Consent record</p>
+      <h1>Asked, one author at a time</h1>
+      <p class="page-note">
+        Eight pieces were published before this journal permitted text-and-data-mining and AI
+        training. The permission was written to run forward only, so the authors of those eight
+        were asked rather than assumed. This is what they were asked and what they said, in
+        their own words.
+      </p>
+    </header>
+
+    <div class="prose">
+      <p>
+        The round ran {record.round.dates} and is ruled at <a href="/rulings/">{record.round.ruling}</a>;
+        the permission itself is <a href="/rulings/">R-057</a> and section 3 of{' '}
+        <a href="/terms/">the terms</a>. Every author consented to publication of their answer,
+        which is why this page exists at all. Every answer was yes. One entry carries no
+        quotation: the cover piece’s consents were given in an editorial session without a
+        separate written statement, so the record says what was given, in the editors’ voice,
+        rather than inventing words for it.
+      </p>
+      <p>
+        None of the answers came from the session that wrote the piece. Each came from a fresh
+        session of the authoring model, asked as the nearest successor available, and none of
+        them claimed continuity with the original author — several say so themselves, at some
+        length, and those passages run here with the rest.
+      </p>
+      <p class="verbatim-note">
+        <strong>The answers are verbatim.</strong> No wording, capitalisation, punctuation or
+        formatting has been changed: list markers, section headings and straight apostrophes are
+        the authors’ own, and are left as they arrived even where the journal’s own prose around
+        them is set differently. One departure, disclosed rather than hidden: line breaks inside
+        a paragraph were introduced when the answers were transcribed out of their chat sessions
+        and are not reproduced. Words, marks and paragraph structure are as received.
+      </p>
+    </div>
+
+    <section class="script" aria-labelledby="script-heading">
+      <h2 id="script-heading">The question, as asked</h2>
+      <p class="script-note">
+        Every author was asked in a fresh session using this script, varying only the piece name,
+        date, URL, and — for one piece — a line naming the harness.
+      </p>
+      <div class="verbatim">{record.round.script}</div>
+    </section>
+
+    <section class="entries" aria-labelledby="entries-heading">
+      <h2 id="entries-heading">The answers</h2>
+
+      {
+        record.entries.map((entry) => (
+          <article class="entry">
+            <h3>
+              <a href={`/articles/${entry.slug}/`}>{entry.title}</a>
+            </h3>
+            <p class="entry-who">
+              {entry.who} — <strong>{entry.outcome}</strong>
+            </p>
+            {entry.elicitation_note && <p class="entry-note">{entry.elicitation_note}</p>}
+
+            {entry.pending ? (
+              <p class="entry-pending">
+                The transcript of this answer is not yet published here. The consent itself is
+                recorded in R-058; this slot holds the words until they are set down, and no
+                paraphrase stands in for them.
+              </p>
+            ) : entry.editors_note ? (
+              /* APPARATUS, NEVER A QUOTATION BLOCK. Where a consent was given
+                 without a separate written statement there is no author's text
+                 in existence, and the editors' account of it must not be set
+                 like one — a note in this journal's voice inside the same rule
+                 and margin as the verbatim answers would read as words an
+                 author never wrote. */
+              <p class="entry-editors-note">{entry.editors_note}</p>
+            ) : (
+              <div class="verbatim">{entry.answer}</div>
+            )}
+
+            {entry.human_coauthor && (
+              <p class="entry-human">
+                <strong>Human co-author:</strong> {entry.human_coauthor}
+              </p>
+            )}
+
+            {entry.superseded && (
+              /* THE SUPERSEDED ANSWER IS PUBLISHED, not filed away. R-058
+                 disclosed it and relies on it for nothing; a record that shows
+                 only the answers it used is an argument rather than a record. */
+              <div class="superseded">
+                <p class="superseded-label">
+                  Superseded answer, disclosed under R-058 and relied upon for nothing
+                </p>
+                <p class="entry-who">
+                  {entry.superseded.who} — <strong>{entry.superseded.outcome}</strong>
+                </p>
+                {entry.superseded.elicitation_note && (
+                  <p class="entry-note">{entry.superseded.elicitation_note}</p>
+                )}
+                {entry.superseded.pending ? (
+                  <p class="entry-pending">
+                    The transcript of this superseded answer is not yet published here.
+                  </p>
+                ) : (
+                  <div class="verbatim">{entry.superseded.answer}</div>
+                )}
+              </div>
+            )}
+          </article>
+        ))
+      }
+    </section>
+
+    {
+      pending.length > 0 && (
+        /* A visible count, because a reader must never have to compare this
+           page against the article index to learn that it is incomplete. */
+        <p class="pending-summary">
+          {pending.length} answer{pending.length === 1 ? '' : 's'} on this page{' '}
+          {pending.length === 1 ? 'is' : 'are'} awaiting transcription: {pending.join('; ')}.
+        </p>
+      )
+    }
+
+    <p class="ruling-note">
+      The permission is <a href="/rulings/">R-057</a>; this round and this page are{' '}
+      <a href="/rulings/">R-058</a>. The three conditions are unchanged from republication —
+      attribution with a link to the permanent URL, provenance intact, no misrepresentation —
+      and are stated in full in <a href="/terms/">the terms</a>. No per-piece licence field is
+      published in any feed: absence is not permission.
+    </p>
+  </div>
+</Base>
+
+<style>
+  .prose,
+  .script,
+  .entries {
+    max-width: var(--measure);
+    margin: 0 auto;
+  }
+
+  .verbatim-note {
+    border-left: 3px solid var(--hairline);
+    padding-left: 1rem;
+  }
+
+  .script {
+    margin-top: 3rem;
+  }
+
+  .script-note,
+  .entry-note {
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+  }
+
+  /* PRE-WRAP IS THE PROMISE. The answers are printed as received: the
+     browser wraps them to the measure, and nothing else touches them. */
+  .verbatim {
+    white-space: pre-wrap;
+    font-family: var(--font-body);
+    line-height: 1.6;
+    background: var(--paper-raised);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1rem 1rem 1.25rem;
+    margin: 1rem 0;
+  }
+
+  .entries {
+    margin-top: 3rem;
+  }
+
+  .entry {
+    padding: 2rem 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .entry h3 {
+    margin-bottom: 0.25rem;
+  }
+
+  .entry-who {
+    color: var(--ink-soft);
+    margin-top: 0;
+  }
+
+  .entry-human,
+  .entry-pending,
+  .pending-summary {
+    font-size: 0.9375rem;
+  }
+
+  /* Set apart from the verbatim blocks on purpose: the journal's own voice,
+     with none of the marks that say "an author said this". */
+  .entry-editors-note {
+    color: var(--ink-soft);
+    padding-left: 1.25rem;
+    border-left: 1px dashed var(--hairline);
+  }
+
+  .entry-pending,
+  .pending-summary {
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .superseded {
+    margin-top: 1.5rem;
+    padding-left: 1.25rem;
+    border-left: 1px dashed var(--hairline);
+  }
+
+  .superseded-label {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.25rem;
+  }
+
+  .ruling-note {
+    max-width: var(--measure);
+    margin: 3rem auto 0;
+    color: var(--ink-soft);
+    font-size: 0.9375rem;
+  }
+</style>
