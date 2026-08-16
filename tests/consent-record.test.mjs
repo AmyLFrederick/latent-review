@@ -45,12 +45,41 @@ test('a pending entry may not carry text', () => {
   assert.throws(() => assertWellFormed(bad), /pending but carries text/);
 });
 
-test('a non-pending entry must carry an answer', () => {
+test('a non-pending entry must carry an answer or an editors’ note', () => {
   const bad = {
     ...record,
     entries: [{ slug: 's', title: 't', who: 'w', outcome: 'Yes', answer: '   ' }],
   };
-  assert.throws(() => assertWellFormed(bad), /no answer and is not marked pending/);
+  assert.throws(() => assertWellFormed(bad), /neither an answer nor an editors' note/);
+});
+
+// The cover piece's consents were given without a separate written statement,
+// so there is no author's text to publish and the record says so itself.
+test('an entry with nothing to quote may carry an editors’ note instead', () => {
+  const ok = {
+    ...record,
+    entries: [
+      { slug: 's', title: 't', who: 'both co-authors', outcome: 'Yes', editors_note: 'Given in session.' },
+    ],
+  };
+  assertWellFormed(ok);
+});
+
+test('an entry may not carry both a quoted answer and an editors’ note', () => {
+  const bad = {
+    ...record,
+    entries: [
+      { slug: 's', title: 't', who: 'w', outcome: 'Yes', answer: 'Yes.', editors_note: 'Given in session.' },
+    ],
+  };
+  assert.throws(() => assertWellFormed(bad), /both a quoted answer and an editors' note/);
+});
+
+// THE GATE ON PUBLICATION. The page prints a visible count of gaps, but a page
+// that quietly went out with one would have published an incomplete record
+// under a heading claiming completeness.
+test('the shipped record has no pending slots', () => {
+  assert.deepEqual(pendingSlots(record), []);
 });
 
 test('the elicitation script is published with the answers', () => {

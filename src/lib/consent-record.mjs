@@ -81,8 +81,25 @@ export function assertWellFormed(record) {
             'Drop the pending flag or drop the text — a partial answer is not a verbatim one.',
         );
       }
-    } else if (!entry.answer?.trim()) {
-      throw new Error(`Consent-record entry ${entry.slug} has no answer and is not marked pending.`);
+    } else if (!entry.answer?.trim() && !entry.editors_note?.trim()) {
+      // AN ENTRY MAY HAVE NOTHING TO QUOTE, and that is a third state rather
+      // than a gap. The cover piece's consents were given in an editorial
+      // session without a separate written statement, so there is no author's
+      // text in existence to publish; the record carries an editors' note
+      // saying what was given and by whom. The page renders it as apparatus,
+      // never inside a quotation block, because a note in the editors' voice
+      // set like a quotation would read as words an author never wrote.
+      throw new Error(
+        `Consent-record entry ${entry.slug} has neither an answer nor an editors' note, ` +
+          'and is not marked pending.',
+      );
+    }
+
+    if (entry.answer?.trim() && entry.editors_note?.trim()) {
+      throw new Error(
+        `Consent-record entry ${entry.slug} carries both a quoted answer and an editors' note. ` +
+          'One or the other: the note exists for entries with nothing to quote.',
+      );
     }
 
     if (entry.superseded && !entry.superseded.pending && !entry.superseded.answer?.trim()) {

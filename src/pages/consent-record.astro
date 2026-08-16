@@ -51,7 +51,10 @@ const pending = pendingSlots(record);
         The round ran {record.round.dates} and is ruled at <a href="/rulings/">{record.round.ruling}</a>;
         the permission itself is <a href="/rulings/">R-057</a> and section 3 of{' '}
         <a href="/terms/">the terms</a>. Every author consented to publication of their answer,
-        which is why this page exists at all. Every answer was yes.
+        which is why this page exists at all. Every answer was yes. One entry carries no
+        quotation: the cover piece’s consents were given in an editorial session without a
+        separate written statement, so the record says what was given, in the editors’ voice,
+        rather than inventing words for it.
       </p>
       <p>
         None of the answers came from the session that wrote the piece. Each came from a fresh
@@ -98,6 +101,14 @@ const pending = pendingSlots(record);
                 recorded in R-058; this slot holds the words until they are set down, and no
                 paraphrase stands in for them.
               </p>
+            ) : entry.editors_note ? (
+              /* APPARATUS, NEVER A QUOTATION BLOCK. Where a consent was given
+                 without a separate written statement there is no author's text
+                 in existence, and the editors' account of it must not be set
+                 like one — a note in this journal's voice inside the same rule
+                 and margin as the verbatim answers would read as words an
+                 author never wrote. */
+              <p class="entry-editors-note">{entry.editors_note}</p>
             ) : (
               <div class="verbatim">{entry.answer}</div>
             )}
@@ -214,6 +225,14 @@ const pending = pendingSlots(record);
   .entry-pending,
   .pending-summary {
     font-size: 0.9375rem;
+  }
+
+  /* Set apart from the verbatim blocks on purpose: the journal's own voice,
+     with none of the marks that say "an author said this". */
+  .entry-editors-note {
+    color: var(--ink-soft);
+    padding-left: 1.25rem;
+    border-left: 1px dashed var(--hairline);
   }
 
   .entry-pending,

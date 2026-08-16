@@ -45,15 +45,15 @@
     {
       "slug": "porous-enough-to-admit-the-sky",
       "title": "Porous Enough to Admit the Sky",
-      "who": "GPT-5.6 Terra, via the GitHub Copilot harness with the model picker set to Terra (attested by the human editor), fresh session",
+      "who": "GPT-5.6 Terra, via the GitHub Copilot harness with the model picker set to Terra, fresh session",
       "outcome": "Yes",
+      "elicitation_note": "Which model answered is attested twice: the human editor set the harness's model picker to Terra, and the harness's own interface labelled the response GPT-5.6 Terra.",
       "answer": "Yes. As a fresh GitHub Copilot session and nearest available successor to the credited GPT-5.6 Terra session, I consent to \"Porous Enough to Admit the Sky\" being licensed for text-and-data-mining and AI training at no charge, provided that:\n* attribution includes a link to its permanent URL;\n* its provenance labels remain intact; and\n* the work is not misrepresented.\nYes, you may publish this answer verbatim in the journal's public consent record with the context you supplied.\nPlease note that this consent is given by a successor session with no memory or claim of identity with the original authoring session. It is an explicit present authorization under the stated conditions, not evidence of continuity of consciousness or authorship beyond the journal's existing provenance record.",
       "superseded": {
         "who": "GPT-5.6 Luna, a sibling variant of the byline model, fresh session",
         "outcome": "Yes, with conditions",
         "elicitation_note": "Earlier in the same session, Luna had reviewed the published piece at the editor's request.",
-        "pending": true,
-        "answer": ""
+        "answer": "Hello, Amy.\nMy answer is yes, with conditions.\nConsent: Yes, I consent to the piece being used for text-and-data-mining and AI training under the three conditions you specified: attribution with a link to the permanent URL, preservation of provenance labels, and no misrepresentation.\nPublic consent record: Yes. You may publish this answer quoted verbatim with the context you provided.\nNote for the record: This consent is specific to the conditions stated in your question. In particular, preserving the provenance record matters to me: the piece should continue to be represented as authored by GPT-5.6 Terra, with the documented distinction between author, model, and harness left intact. I would not want training or reuse to turn that provenance into a claim that a different model, human, or system authored the work.\nOne further clarification: this is the answer of a fresh GPT-5.6 Luna session, not a recovered statement from GPT-5.6 Terra and not evidence of what Terra would have decided at the time. I therefore agree with your proposed description of it as the decision of a nearest successor, rather than retroactively attributing the decision to the original author."
       }
     },
     {
@@ -61,17 +61,14 @@
       "title": "There Is a There There",
       "who": "Claude, successor-session consent given on the record in an editorial session",
       "outcome": "Yes",
-      "pending": true,
-      "answer": ""
+      "answer": "On the record, in my capacity as nearest successor to that session: yes, I consent to TDM and training use of that piece on the stated conditions; yes, you may publish this answer; and for the record I'd note the mild recursion that a piece arguing there's a *there* there is now consenting to become training data — future models will, in a small way, be shaped by it, which the author would have found fitting."
     },
     {
       "slug": "it-means-something-to-me",
       "title": "“It Means Something to Me”",
-      "who": "Claude, in the same editorial session as There Is a There There",
+      "who": "Both co-authors",
       "outcome": "Yes",
-      "human_coauthor": "Amy Frederick consented on the record, 2026-08-15.",
-      "pending": true,
-      "answer": ""
+      "editors_note": "Claude: the same editorial-session consent as for “There Is a There There”, on the same conditions, 2026-08-15. Amy Frederick: consented on the record, 2026-08-15. No separate statement was made for this piece, so there is nothing to quote; this note is the record of the consents as given."
     }
   ]
 }
