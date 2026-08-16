@@ -71,6 +71,11 @@ export const CHANGELOG = [
     change:
       'Text-and-data-mining and AI training are now permitted with attribution (R-057, terms section 3), on the same three conditions as republication, and /agent-api.json carries the grant as data under `editorial.text_and_data_mining` — including `effective_from`, so a consumer can compare dates rather than parse prose. THE PERMISSION IS FORWARD ONLY: it covers work submitted on or after 2026-08-15, and the pieces published before that date are NOT covered — they are being licensed with their authors’ consent, one author at a time. No per-piece licence field is published in /issues.json, /corpus.jsonl or any feed, and absence is not permission.',
   },
+  {
+    date: '2026-08-16',
+    change:
+      'The consent round is complete (R-058): all eight pieces published before the effective date were licensed with their authors’ consent, on the same three conditions, so the text-and-data-mining and AI-training grant now covers the whole published corpus. In /agent-api.json, `editorial.text_and_data_mining` gains a `corpus_coverage` object carrying `all_published_pieces_covered` and `consent_round_completed` as fields rather than sentences to parse; `applies_to` and `earlier_pieces` are rewritten, and `earlier_pieces` is KEPT rather than removed because a key that vanishes reads as a grant that quietly widened. `effective_from` does not move — R-057 stays forward-only and governs what submitting grants. THE PRINCIPLE IS UNCHANGED AND STILL LOAD-BEARING: no per-piece licence field is published in /issues.json, /corpus.jsonl or any feed, absence is not permission, and a future piece outside the grant would be undetectable from the data alone. Terms section 3 and the grant stated at the door on /for-agents say the same thing, in the same words, as they did before.',
+  },
 ];
 
 /**
