@@ -8,8 +8,11 @@
 //      first and ">" only ever points right. It is load-bearing: reversed, the
 //      marks read as a ranking of machines against people rather than as a
 //      ratio of contribution on one piece.
-//   3. THE MAPPING IS TOTAL. Every tier resolves to a mark or to a flagged
-//      exception, and every PUBLISHED piece resolves to a mark.
+//   3. THE MAPPING IS TOTAL, UNCONDITIONALLY. All seven tiers resolve, and so
+//      does every published piece that declares one. The two editor tiers carry
+//      the mark of the party that wrote — editing does not enter the mark — and
+//      a separate test holds that the editor stays named where the mark drops
+//      them.
 //   4. THE MARKS SAY NOTHING ABOUT VERIFICATION. A claimed tier and an attested
 //      one produce the same mark, as R-051 requires of the badge.
 //   5. NOTHING IS HAND-SET. No piece carries a `mark` in its frontmatter.
@@ -24,13 +27,15 @@ import {
   MARK_MEANINGS,
   MARK_BY_TIER,
   MARK_ORDER,
-  UNMARKED_TIERS,
+  EDITOR_TIERS,
+  BALANCED_ASCII_FORM,
   markFor,
   markForPiece,
   markKey,
 } from '../src/lib/notation.ts';
 import { structuredProvenance } from '../src/lib/provenance.ts';
-import { TIER_CODES, TIERS } from '../src/lib/site.ts';
+import { TIER_CODES, TIERS, tierLabel } from '../src/lib/site.ts';
+import { tierNotation } from '../src/lib/tier-badges.mjs';
 import { AGENT_CONTRACT } from '../src/lib/agent-contract.mjs';
 
 const repoPath = (rel) => fileURLToPath(new URL(`../${rel}`, import.meta.url));
@@ -97,6 +102,38 @@ test('the meanings are the ratified wording', () => {
 test('every mark has a meaning and every meaning has a mark', () => {
   assert.deepEqual(Object.keys(MARKS).sort(), Object.keys(MARK_MEANINGS).sort());
   assert.deepEqual([...MARK_ORDER], Object.keys(MARKS));
+});
+
+test('the ASCII equals is an equivalent form, and the feeds still emit the canonical one', () => {
+  // Editors, 2026-08-18. Documentation only: no detection, no fallback image,
+  // and above all no swap in the emitted field — a consumer keys on 🤖🟰👤.
+  assert.equal(BALANCED_ASCII_FORM, `${ROBOT}=${BUST}`);
+  // `base` is declared further down; node:test runs callbacks after the module
+  // has fully evaluated, so it is initialised by the time this reads it.
+  assert.equal(structuredProvenance({
+    ...base,
+    submission_track: 'human-attested',
+    involvement_tier: 'ai-equals-human',
+  }).mark, MARKS.balanced);
+  assert.match(
+    AGENT_CONTRACT.reading.provenance_fields.fields.mark.equivalent_form,
+    /ALWAYS EMITS THE CANONICAL FORM/
+  );
+  // Published in both places the editors named.
+  for (const file of ['src/pages/provenance.astro', 'src/pages/for-agents.astro']) {
+    const text = readFileSync(repoPath(file), 'utf8').replace(/\s+/g, ' ');
+    assert.match(text, /🟰 is the canonical equals/, `${file} omits the equivalent form`);
+  }
+  // And the last resort below the equivalent form: where no emoji renders at
+  // all, the tier name carries the meaning. Pinned verbatim — it is the sentence
+  // that keeps the notation from depending on a font to mean anything.
+  const key = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8').replace(/\s+/g, ' ');
+  assert.ok(
+    key.includes(
+      'In plain-text contexts where emoji cannot render, the mark’s meaning is carried by its plain-language tier name'
+    ) && key.includes('the glyphs are the notation’s convenient form, never its only form'),
+    'the key does not carry the plain-text sentence'
+  );
 });
 
 // --- 2. The direction rule --------------------------------------------------
@@ -181,13 +218,13 @@ test('the mapping covers the seven tiers exactly — no gaps, no strangers', () 
   assert.deepEqual(Object.keys(MARK_BY_TIER).sort(), [...TIER_CODES].sort());
 });
 
-test('every mapped tier resolves to one of the five marks', () => {
+test('every tier resolves to one of the five marks — no exceptions', () => {
+  // UNCONDITIONAL since the editors' final ruling of 2026-08-18. There is no
+  // flagged-exception branch to fall through to: a tier that stops resolving is
+  // a failure, full stop.
   for (const code of TIER_CODES) {
     const resolved = markFor(code);
-    if (resolved === null) {
-      assert.ok(UNMARKED_TIERS.includes(code), `${code} resolves to nothing and is not flagged`);
-      continue;
-    }
+    assert.notEqual(resolved, null, `${code} resolves to no mark`);
     assert.ok(
       Object.values(MARKS).includes(resolved.mark),
       `${code} resolves to "${resolved.mark}", which is not one of the five`
@@ -196,11 +233,30 @@ test('every mapped tier resolves to one of the five marks', () => {
   }
 });
 
-test('the flagged exceptions are the two editor tiers, and only those', () => {
-  // Named rather than counted. A later ruling that gives these a mark should
-  // fail here and be read as the decision it is, not pass because the count
-  // happened to stay the same.
-  assert.deepEqual([...UNMARKED_TIERS], ['ai-human-editor', 'human-ai-editor']);
+test('editing does not enter the mark — the editor tiers carry the writer’s mark', () => {
+  // The editors' final ruling, and the substance of it rather than the mapping
+  // line: `ai-human-editor` must come out IDENTICAL to `ai`, because the human
+  // who edited is not part of what the mark answers. Asserted against the plain
+  // tiers rather than against a literal, so the pair cannot drift apart.
+  assert.equal(markFor('ai-human-editor').mark, markFor('ai').mark);
+  assert.equal(markFor('human-ai-editor').mark, markFor('human').mark);
+  assert.equal(markFor('ai-human-editor').mark, MARKS['ai-alone']);
+  assert.equal(markFor('human-ai-editor').mark, MARKS['human-alone']);
+  assert.deepEqual([...EDITOR_TIERS], ['ai-human-editor', 'human-ai-editor']);
+});
+
+test('the editing party stays disclosed where the mark drops it', () => {
+  // The mark is the byline; the badge is the credits. The collapse is only
+  // honest while the editor is still named a line away, so this asserts the
+  // three surfaces that name them: the tier label, the badge notation, and the
+  // page that explains why the mark does not.
+  for (const code of EDITOR_TIERS) {
+    assert.match(tierLabel(code), /\(editor\)/, `${code}'s label does not name the editor`);
+    assert.match(tierNotation(code), /ᵉ/, `${code}'s badge notation drops the editor mark`);
+  }
+  const page = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8').replace(/\s+/g, ' ');
+  assert.match(page, /editing does not enter the mark/i);
+  assert.match(page, /The mark is the byline; the badge is the credits\./);
 });
 
 test('a chained code, an unknown code and no code all resolve to nothing', () => {
@@ -241,21 +297,21 @@ function publishedArticles() {
     });
 }
 
-test('every published piece resolves to a mark, or to a named exception', () => {
-  // THE TOTALITY CHECK the editors asked for. It is written to be noisy in the
-  // right way: a piece that stops resolving names itself and names its tier, so
-  // the next reader can tell a new tier from a typo without opening the file.
+test('every published piece that declares a tier resolves to a mark', () => {
+  // THE TOTALITY CHECK the editors asked for, and UNCONDITIONAL since their
+  // final ruling: the only piece that may resolve to nothing is one carrying no
+  // tier in either field. It is written to be noisy in the right way — a piece
+  // that stops resolving names itself and names its tier, so the next reader can
+  // tell a new tier from a typo without opening the file.
   for (const piece of publishedArticles()) {
+    const tier = piece.involvement_tier ?? piece.involvement_tier_claimed ?? null;
     const resolved = markForPiece(piece);
-    if (resolved !== null) {
-      assert.ok(Object.values(MARKS).includes(resolved.mark));
+    if (tier === null) {
+      assert.equal(resolved, null, `${piece.slug} carries no tier but resolved to a mark`);
       continue;
     }
-    const tier = piece.involvement_tier ?? piece.involvement_tier_claimed ?? null;
-    assert.ok(
-      tier === null || UNMARKED_TIERS.includes(tier),
-      `${piece.slug} declares "${tier}" and resolves to no mark, which is not a flagged exception`
-    );
+    assert.notEqual(resolved, null, `${piece.slug} declares "${tier}" and resolves to no mark`);
+    assert.ok(Object.values(MARKS).includes(resolved.mark));
   }
 });
 
@@ -297,7 +353,7 @@ test('a claimed tier and an attested tier of the same code carry the same mark',
   assert.notEqual(attested.verification, claimed.verification);
 });
 
-test('the structured object carries null where the page draws no mark', () => {
+test('the structured object carries null only where a piece has no tier', () => {
   // An agent-direct piece whose author claimed no tier. `author_type` derives
   // `ai` from the track and is documented as a derivation; `mark` is documented
   // as the displayed mark, and the byline draws none — so it is null, and the
@@ -306,12 +362,15 @@ test('the structured object carries null where the page draws no mark', () => {
   assert.equal(unclaimed.mark, null);
   assert.equal(unclaimed.author_type, 'ai');
 
+  // An edited piece is NOT one of them: it carries the writer's mark, while
+  // `author_type` still reports the collaboration. The two fields answer
+  // different questions and are meant to differ here.
   const edited = structuredProvenance({
     ...base,
     submission_track: 'human-attested',
     involvement_tier: 'ai-human-editor',
   });
-  assert.equal(edited.mark, null);
+  assert.equal(edited.mark, MARKS['ai-alone']);
   assert.equal(edited.author_type, 'collaborative');
 });
 
@@ -342,8 +401,9 @@ test('the agent contract documents the mark, its enum and its null case', () => 
   assert.ok(field, 'the contract does not describe the mark field');
   // Every value the feeds can emit is in the published enum, and nothing else.
   assert.deepEqual(field.enum, [...Object.values(MARKS), null]);
-  assert.match(field.null_when, /ai-human-editor/);
-  assert.match(field.null_when, /human-ai-editor/);
+  assert.match(field.null_when, /no involvement tier at all/);
+  assert.match(field.editing, /ai-human-editor/);
+  assert.match(field.editing, /human-ai-editor/);
   assert.ok(field.scope.includes('Marks describe authorship of the words.'));
 });
 

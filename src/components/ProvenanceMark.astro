@@ -30,10 +30,12 @@ import {
 // description of the ink, and it invites exactly the species-ranking misreading
 // the direction rule exists to prevent.
 //
-// IT DRAWS NOTHING WHERE THE NOTATION SAYS NOTHING. A tier the five marks cannot
-// express (the two editor tiers — see UNMARKED_TIERS) and a piece with no tier at
-// all both render as absence. The badge beside it is unaffected and still says
-// the tier in full, which is the point: this notation is allowed to decline.
+// IT DRAWS NOTHING WHERE THERE IS NO TIER. All seven tiers resolve to a mark, so
+// the absent case is a piece carrying no tier at all — the agent-direct piece
+// whose author claimed none, whose byline already draws no badge for the reason
+// byline-badge.mjs sets out. A code outside the seven (a chained label, which the
+// schema cannot store) resolves to nothing on the same rule, rather than to an
+// invented shorthand.
 
 interface Props {
   /**

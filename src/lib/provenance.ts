@@ -515,9 +515,14 @@ export interface StructuredProvenance {
    * beside a quoted piece can print this and be printing what the journal
    * prints; a consumer computing over the corpus wants one of the other two.
    *
+   * EVERY TIER RESOLVES, INCLUDING THE TWO EDITOR TIERS, which carry the mark of
+   * the party that wrote — editing does not enter the mark (editors,
+   * 2026-08-18). The editing party is still named in `involvement_tier` and in
+   * `statement`, both published beside this field.
+   *
    * NULL IS THE DISPLAYED ABSENCE, NOT A COARSER `author_type`. It is null on a
-   * tier the five marks decline to express and on a piece carrying no tier at
-   * all — the two cases where the page draws no mark either. The asymmetry with
+   * piece carrying no tier at all — the case where the page draws no mark
+   * either, and never a tier this notation could not say. The asymmetry with
    * `author_type`, which derives `ai` from the agent-direct track where no tier
    * was claimed, is deliberate and is the difference between the two fields:
    * that one is documented as a derivation, this one as the mark. A field

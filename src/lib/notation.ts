@@ -16,7 +16,12 @@
 // all seven — five marks over seven tiers is a COLLAPSE, in the same family as
 // `author_type` in src/lib/provenance.ts, which renders the same seven as three.
 // A collapse is lossy by construction, so what matters is that it loses the
-// same thing every time and says out loud what it lost. See UNMARKED_TIERS.
+// same thing every time and says out loud what it lost.
+//
+// WHAT IT LOSES IS EDITING, AND ONLY EDITING (editors, 2026-08-18). The two
+// editor tiers take the mark of the party that wrote — 🤖 and 👤 — because the
+// scope rule below governs and editing does not enter the mark. Every one of the
+// seven resolves. See MARK_BY_TIER and EDITOR_TIERS.
 //
 // THE DIRECTION RULE, and it is load-bearing rather than decorative:
 //
@@ -111,6 +116,28 @@ export const MARKS = Object.freeze({
 export type MarkKey = keyof typeof MARKS;
 
 /**
+ * The balanced mark written with a plain ASCII equals — 🤖=👤 (editors,
+ * 2026-08-18).
+ *
+ * AN ACCEPTED EQUIVALENT FORM, NOT A FALLBACK THE CODE CHOOSES. 🟰 is the
+ * canonical mark and is what every surface here draws and every feed emits; this
+ * exists because U+1F7F0 is Unicode 14 and an older device or a plain-text
+ * pipeline may not have it, and an adopter in that position should know they can
+ * write `=` and still be writing the same mark. The notation already sets one
+ * operator in plain ASCII — there is no emoji greater-than — so this is the
+ * existing convention extended rather than a new allowance.
+ *
+ * NOTHING DETECTS ANYTHING. There is no rendering test, no capability sniff and
+ * no fallback image; the equivalence is published in the documentation and the
+ * reader or adopter applies it. A page that swapped forms based on what it
+ * guessed about a device would be making the record depend on the browser.
+ *
+ * DERIVED FROM THE CANONICAL MARK so the two cannot drift into being different
+ * marks — which is the whole risk of an equivalent form written out by hand.
+ */
+export const BALANCED_ASCII_FORM = MARKS.balanced.replace(HEAVY_EQUALS, '=');
+
+/**
  * The plain-language meaning of each mark, in the editors' ratified words.
  *
  * THE MEANING IS THE RECORD AND THE GLYPH IS THE CONVENIENCE, which is not a
@@ -137,65 +164,68 @@ export const MARK_MEANINGS: Readonly<Record<MarkKey, string>> = Object.freeze({
  * src/lib/provenance.ts for the same reason given there: a new tier silently
  * inheriting a mark would publish a claim about a piece that nobody made.
  *
- * FIVE OF THE SEVEN MAP EXACTLY. `ai`, `ai-human`, `ai-equals-human`,
- * `human-ai` and `human` are the five marks in the tier table's own words — the
- * notation was designed over them and the descriptions line up phrase for
- * phrase ("AI led, with meaningful human contributions" / "AI-led, human
- * contributed").
+ * FIVE MAP EXACTLY AND TWO MAP BY THE SCOPE RULE, so all seven resolve. `ai`,
+ * `ai-human`, `ai-equals-human`, `human-ai` and `human` are the five marks in
+ * the tier table's own words — the notation was designed over them and the
+ * descriptions line up phrase for phrase ("AI led, with meaningful human
+ * contributions" / "AI-led, human contributed").
  *
- * TWO ARE NULL, AND THAT IS A FLAG RATHER THAN AN OVERSIGHT. See UNMARKED_TIERS.
+ * THE TWO EDITOR TIERS TAKE THE MARK OF THE PARTY THAT WROTE (editors' final
+ * ruling, 2026-08-18). `ai-human-editor` is 🤖 and `human-ai-editor` is 👤,
+ * because the scope rule governs: EDITING DOES NOT ENTER THE MARK. That is
+ * standard publishing practice — a book is not co-authored by its editor — and
+ * it is R-046's own contributing-versus-editing line read to its conclusion
+ * rather than treated as a gap in this notation.
+ *
+ * THE MARK IS THE BYLINE; THE BADGE IS THE CREDITS. Nothing is lost by the
+ * collapse, and that is what makes it honest rather than lossy in the way that
+ * matters: the editing party stays fully disclosed one line away, in the badge
+ * (`AI–Hᵉ`), in the tier name, in the description, in the Provenance block and
+ * in `involvement_tier` on every machine surface. The mark answers who wrote it;
+ * the record answers who else touched it.
+ *
+ * THIS SETTLES A QUESTION THAT WAS OPEN FOR ONE DAY, and the earlier answer is
+ * recorded because the reasoning is worth keeping: a first pass left these two
+ * unmarked on the grounds that 🤖 would drop a named human hand from the record.
+ * The editors' answer is that it does not drop it — it puts it where editorial
+ * hands belong. Every tier now resolves, and the sixth-mark question R-045 would
+ * have governed never arises.
  */
-export const MARK_BY_TIER: Readonly<Record<TierCode, MarkKey | null>> = Object.freeze({
+export const MARK_BY_TIER: Readonly<Record<TierCode, MarkKey>> = Object.freeze({
   ai: 'ai-alone',
-  'ai-human-editor': null,
+  'ai-human-editor': 'ai-alone',
   'ai-human': 'ai-led',
   'ai-equals-human': 'balanced',
   'human-ai': 'human-led',
-  'human-ai-editor': null,
+  'human-ai-editor': 'human-alone',
   human: 'human-alone',
 });
 
 /**
- * The two tiers the five marks cannot say, named here so the gap is a published
- * fact rather than a null a reader has to infer something from.
+ * The tiers whose mark is reached by the scope rule rather than by their own
+ * description — named so the collapse is a published fact rather than something
+ * a reader has to notice by comparing two tables.
  *
- * THE STANDARD DISTINGUISHES CONTRIBUTING FROM EDITING AND THE MARKS DO NOT.
- * R-046 made that distinction an operator: `>` introduces a party that
- * CONTRIBUTED, `–` a party that EDITED, and the seven tiers carry both.
- * "AI – Human (editor)" says a human edited AI's work and says, precisely, that
- * the human did not contribute to it. The five marks have no third operator, so
- * every available answer is wrong in a different direction:
- *
- *   🤖>👤 would assert a contribution the tier exists to deny.
- *   🤖    would drop a named human hand from the record entirely.
- *   a sixth mark is forbidden — R-045 closes the set and puts the burden on
- *         growth, and the notation's whole argument is that five can be held in
- *         a reader's head.
- *
- * SO THE PIECE CARRIES NO MARK AND KEEPS ITS BADGE. Nothing is lost: the badge,
- * the tier name, its description and the Provenance block all still say `AI –
- * Human (editor)` in full, which is more than a mark could have said anyway. An
- * absent mark beside a present badge reads as what it is — this notation
- * declining to answer — where a forced mark would read as an answer.
- *
- * NO PUBLISHED PIECE CARRIES EITHER TIER as of 2026-08-18, so this is a rule
- * waiting for a case rather than a hole in the record. tests/notation.test.mjs
- * asserts both halves: that these two are unmarked, and that every piece
- * actually published resolves to a mark.
+ * NOT AN EXCEPTION LIST. Every tier here resolves to a mark like any other; what
+ * these two share is that the mark drops a party the tier names, which is the
+ * scope rule doing exactly what it says. The surfaces that teach the notation
+ * read this to say so out loud.
  */
-export const UNMARKED_TIERS: readonly TierCode[] = Object.freeze(
-  (Object.keys(MARK_BY_TIER) as TierCode[]).filter((code) => MARK_BY_TIER[code] === null)
-);
+export const EDITOR_TIERS: readonly TierCode[] = Object.freeze([
+  'ai-human-editor',
+  'human-ai-editor',
+]);
 
 /**
- * Why a tier is unmarked, in one sentence, for the surfaces that show it.
+ * What the scope rule does to those two, in one sentence, for the surfaces that
+ * explain it.
  *
  * One string rather than a phrase written at each call site, on the rule the
  * rest of this repository follows: a sentence restated is a sentence that can
  * come apart.
  */
-export const UNMARKED_REASON =
-  'The compact notation has no mark for a party that edited rather than contributed; the badge and the tier name carry the distinction in full.';
+export const EDITOR_TIER_NOTE =
+  'Editing does not enter the mark, so these carry the mark of the party that wrote; the editing party stays named in the badge, the tier and the provenance record.';
 
 export interface Mark {
   /** The glyph string, e.g. "🤖>👤". */
@@ -209,12 +239,11 @@ export interface Mark {
 /**
  * The mark for a tier code, or null.
  *
- * NULL IS THREE DIFFERENT HONEST ANSWERS and the caller does not need to tell
- * them apart: a tier the notation declines to mark (the two editor tiers), a
+ * ALL SEVEN TIERS RESOLVE, so null means the code is not one of the seven: a
  * chained code (R-035's grammar composes labels the five marks cannot express,
  * exactly as it composes labels the seven badges cannot — tierNotation() returns
- * null there too and this agrees with it), and no code at all. Every one of them
- * means the same thing at every call site: draw no mark, publish no mark field.
+ * null there too and this agrees with it), or no code at all. Both mean the same
+ * thing at every call site: draw no mark, publish no mark field.
  *
  * IT NEVER FALLS BACK. `TIER_LABELS[code] ?? 'Not declared'` is the failure this
  * repository has already made once and written up in two modules; a mark is a
@@ -224,7 +253,6 @@ export function markFor(code: string | null | undefined): Mark | null {
   if (typeof code !== 'string' || code.length === 0) return null;
   if (!(code in MARK_BY_TIER)) return null;
   const key = MARK_BY_TIER[code as TierCode];
-  if (key === null) return null;
   return { mark: MARKS[key], meaning: MARK_MEANINGS[key], key };
 }
 

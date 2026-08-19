@@ -24,7 +24,13 @@ import {
   BADGE_INK,
 } from '../lib/tier-badges.mjs';
 import ProvenanceMark from '../components/ProvenanceMark.astro';
-import { markKey, MARK_MEANINGS, MARK_ORDER } from '../lib/notation.ts';
+import {
+  markKey,
+  MARK_MEANINGS,
+  MARK_ORDER,
+  EDITOR_TIERS,
+  BALANCED_ASCII_FORM,
+} from '../lib/notation.ts';
 
 // THE COMPACT NOTATION'S TWO TABLES, BOTH GENERATED (2026-08-18). The five-mark
 // key reads MARK_ORDER, and the tier mapping reads TIERS through markKey() — so
@@ -519,15 +525,36 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         them.
       </p>
       <p>
-        <strong>Five marks over seven tiers, so two tiers carry none.</strong> This notation is
-        a collapse, not a third way of writing the badges — and a collapse has to say what it
-        loses. The tiers that distinguish a party who <em>edited</em> from one who{' '}
-        <em>contributed</em> have no mark, because the notation has no third operator and the
-        set is closed: <strong>🤖&gt;👤</strong> would assert a contribution those tiers exist
-        to deny, <strong>🤖</strong> would drop a named human hand from the record, and a sixth
-        mark would cost the notation the thing it is for. Those pieces keep their badge, their
-        tier name and their full provenance block, which say more than a mark could. No
-        published piece carries either tier today.
+        <strong>🟰 is the canonical equals; a plain ASCII <code>=</code> is an accepted
+        equivalent form of the same mark ({BALANCED_ASCII_FORM}), for older devices or
+        plain-text contexts</strong> — just as the notation already uses a plain{' '}
+        <code>&gt;</code>. It is the same mark written two ways, not two marks. Our own pages
+        and the <code>mark</code> field in every feed keep the canonical form; nothing here
+        detects a device or swaps a glyph for you, because a record that changed shape
+        depending on the browser would not be a record.
+      </p>
+      <p>
+        <strong>In plain-text contexts where emoji cannot render, the mark’s meaning is carried
+        by its plain-language tier name</strong> (as in every mark’s accessibility label) — the
+        glyphs are the notation’s convenient form, never its only form.
+      </p>
+      <p>
+        <strong>Five marks over seven tiers, and the two that collapse are the edited ones.</strong>{' '}
+        This notation is a collapse, not a third way of writing the badges — and a collapse has
+        to say what it loses. What it loses is editing, and only editing. The two tiers naming a
+        party who <em>edited</em> rather than <em>contributed</em> —{' '}
+        <strong>AI – Human (editor)</strong> and <strong>Human – AI (editor)</strong> — carry the
+        mark of the party that <em>wrote</em>: <strong>🤖</strong> and <strong>👤</strong>. That
+        is ordinary publishing practice, where a book is not co-authored by the person who
+        edited it.
+      </p>
+      <p>
+        <strong>Nothing is concealed by that, and the badge is why.</strong> The mark is the
+        byline; the badge is the credits. An edited piece still carries{' '}
+        <strong>AI–Hᵉ</strong> in its byline circle, its full tier name, its description, its
+        machine code and its provenance block — the editor is named one line away, which is
+        where editorial hands belong. The mark answers who wrote it. The record answers who else
+        touched it.
       </p>
       <table class="stackable">
         <thead>
@@ -541,11 +568,15 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
             <tr>
               <td class="tier-name">{row.label}</td>
               <td>
-                {row.mark ? (
-                  <ProvenanceMark code={row.code} size="1.5rem" />
-                ) : (
-                  <span class="tier-unmarked">no mark — see above</span>
-                )}
+                <ProvenanceMark code={row.code} size="1.5rem" />
+                {EDITOR_TIERS.includes(row.code) ? (
+                  /* The two tiers whose mark drops a party the tier names. Said
+                     in the row rather than only in the paragraph above, because
+                     a reader scanning the table for their own tier may never
+                     read the paragraph — and 🤖 beside "AI – Human (editor)"
+                     looks like an error until someone explains it. */
+                  <span class="tier-collapse-note">editing does not enter the mark</span>
+                ) : null}
               </td>
             </tr>
           ))}
@@ -963,13 +994,16 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
     white-space: nowrap;
   }
 
-  /* A tier the compact notation declines to mark. Set in the soft ink the rest
-     of the page's apparatus uses, so an empty-looking cell reads as a stated
-     absence rather than as a row that failed to render — which is the whole
-     difference between a notation admitting its limit and a bug. */
-  .tier-unmarked {
-    font-size: 0.85rem;
+  /* The note beside an edited tier's mark. Set in the soft ink the rest of the
+     page's apparatus uses and on its own line, so it reads as a gloss on the
+     mark rather than as part of it — 🤖 beside "AI – Human (editor)" is the one
+     row in this table a reader is entitled to stop at, and the gloss is what
+     keeps them from reading it as a mistake. */
+  .tier-collapse-note {
+    display: block;
+    font-size: 0.8rem;
     color: var(--ink-soft);
+    margin-top: 0.2rem;
   }
 
   /* The consequence of the line above, in the machine-code table: with the

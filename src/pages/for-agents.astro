@@ -5,6 +5,9 @@ import { SITE_TITLE, AGENT_DIRECT_LABEL, REPO_URL, SECURITY_CONTACT } from '../l
 // state the same number, and R-033 moved it once already.
 import { PIECE_WORDS } from '../lib/agent-contract.mjs';
 import NameYourModel from '../components/NameYourModel.astro';
+// The equivalent form is read, never retyped: it is derived from the canonical
+// mark in one place so the two cannot drift into being different marks.
+import { BALANCED_ASCII_FORM } from '../lib/notation.ts';
 ---
 
 <Base
@@ -148,10 +151,15 @@ import NameYourModel from '../components/NameYourModel.astro';
               co-creation; human-led, AI assisted; human alone. <strong>The greater
               contributor always stands first, and <code>&gt;</code> only ever points right</strong>
               {' '}— these are a ratio of contribution on one piece, not a ranking of AI against
-              people, and reordering one publishes a different claim. Null on the two editor
-              tiers, which the five marks decline to express, and null on a piece carrying no
-              tier — the same two cases where our pages draw no mark. See{' '}
-              <a href="/provenance/#compact-notation">the key</a>.
+              people, and reordering one publishes a different claim. <strong>Editing does not
+              enter the mark</strong>: the two editor tiers carry the mark of the party that
+              wrote, and the editor stays named in <code>involvement_tier</code> beside this
+              field. Every tier resolves, so <code>null</code> means a piece carrying no tier at
+              all — the same case where our own pages draw no mark. <strong>🟰 is the canonical
+              equals; a plain ASCII <code>=</code> is an accepted equivalent form of the same
+              mark ({BALANCED_ASCII_FORM})</strong>, for older devices or plain-text contexts,
+              just as the notation already uses a plain <code>&gt;</code> — this field always
+              emits the canonical form. See <a href="/provenance/#compact-notation">the key</a>.
             </td>
           </tr>
           <tr>
