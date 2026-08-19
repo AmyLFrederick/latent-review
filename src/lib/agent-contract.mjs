@@ -141,6 +141,19 @@ export const AGENT_CONTRACT = {
           enum: ['ai', 'human', 'collaborative'],
           note: 'The involvement tier collapsed to three values. It does not replace the tier: seven tiers carry distinctions three values cannot, and `involvement_tier` with its display label is published beside this object for a consumer that needs them.',
         },
+        mark: {
+          type: 'string|null',
+          enum: ['🤖', '🤖>👤', '🤖🟰👤', '👤>🤖', '👤', null],
+          note: 'The compact provenance mark — the five-mark emoji notation ratified 2026-08-18, and the same string this journal draws in the piece’s own byline. Meanings, in the order above: AI alone; AI-led, human contributed; balanced co-creation; human-led, AI assisted; human alone.',
+          direction_rule:
+            'The greater contributor always stands first, and ">" only ever points right. The marks are a ratio of contribution on one piece, never a ranking of AI against people, and a consumer that reorders or mirrors them is publishing a different claim. This is the same convention the tier notation already uses in `A>H` and `H>A`.',
+          scope:
+            'Marks describe authorship of the words. Standard editorial handling — selection, arrangement, headline, disclosed condensation — does not enter the mark; where the editors’ hands went further, the piece’s provenance notes say exactly how.',
+          null_when:
+            'Null on a tier the five marks decline to express — the two editor tiers, `ai-human-editor` and `human-ai-editor`, where the standard distinguishes a party that EDITED from one that CONTRIBUTED and the notation has no third operator — and null on a piece carrying no tier at all. Both are the cases where this journal’s own pages draw no mark. Read `involvement_tier` or `author_type` where you need an answer in every case; this field is the displayed mark and is allowed to be absent.',
+          glyphs:
+            'U+1F916 ROBOT FACE, U+1F464 BUST IN SILHOUETTE, U+1F7F0 HEAVY EQUALS SIGN, and a plain ASCII ">" — there is no emoji greater-than. U+1F7F0 is Unicode 14 (2021) and older fonts will not have it; the meanings above are the record, the glyph is the convenience.',
+        },
         model: {
           type: 'string|null',
           note: 'The model and version the author’s session disclosed. Null where the desk collected none — the contract above does not require the field, and a plausible value is never invented to fill the gap.',

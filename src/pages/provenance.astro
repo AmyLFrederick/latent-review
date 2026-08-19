@@ -23,6 +23,15 @@ import {
   RING_HUMAN,
   BADGE_INK,
 } from '../lib/tier-badges.mjs';
+import ProvenanceMark from '../components/ProvenanceMark.astro';
+import { markKey, MARK_MEANINGS, MARK_ORDER } from '../lib/notation.ts';
+
+// THE COMPACT NOTATION'S TWO TABLES, BOTH GENERATED (2026-08-18). The five-mark
+// key reads MARK_ORDER, and the tier mapping reads TIERS through markKey() — so
+// neither can be headed as one thing and filled with another, which is the same
+// reason R-050 gives for generating the badge columns rather than typing them.
+const markRows = MARK_ORDER.map((key) => ({ key, meaning: MARK_MEANINGS[key] }));
+const tierMarkRows = markKey();
 
 // R-014: this page is the canonical statement of the involvement-tier
 // system as an open standard. R-015 revised the standard to v2. The tier
@@ -443,6 +452,114 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         a number appears only where a kind repeats in a chain.
       </p>
 
+      {/*
+        THE COMPACT NOTATION (ratified 2026-08-18). It sits after the machine
+        codes and before the licence, which is where it belongs in the order a
+        reader meets things: the badges are the mark, the codes are what a
+        machine stores, and this is the form that survives a plain-text field.
+
+        THE MARKS IN THE TABLES ARE THE COMPONENT, not pasted characters. Each
+        one carries its meaning as an accessible name, exactly as it does in a
+        byline — a key that taught the notation in glyphs a listener could not
+        hear would be teaching half of it.
+      */}
+      <h2 id="compact-notation">Compact notation</h2>
+      <p>
+        <strong>Five marks, for the places a circle cannot go.</strong> A search result, a
+        plain-text field, a social card, a terminal, a line of chat. The badges above are the
+        journal’s mark and the tier names are the standard; this is the same involvement axis
+        written so it survives being pasted. <strong>Added 2026-08-18.</strong>
+      </p>
+      <table class="stackable">
+        <thead>
+          <tr>
+            <th>Mark</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          {markRows.map((row) => (
+            <tr>
+              <td><ProvenanceMark markName={row.key} size="1.5rem" /></td>
+              <td>{row.meaning}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>
+        <strong>The greater contributor always stands first, and <code>&gt;</code> only ever
+        points right.</strong> This rule is load-bearing rather than tidy. Without it the two
+        relational marks invite the reading the glyphs suggest — a ranking of machines against
+        people — when what they record is a <strong>ratio of contribution on one piece</strong>:
+        the side that did more is written first, and that is the whole of the difference between
+        🤖&gt;👤 and 👤&gt;🤖. A mark drawn pointing left says something this standard does not
+        say. It is the same convention the notation above already uses in{' '}
+        <strong>A&gt;H</strong> and <strong>H&gt;A</strong>, so it is one rule met twice rather
+        than two rules.
+      </p>
+      <p>
+        <strong>Marks describe authorship of the words.</strong> Standard editorial handling —
+        selection, arrangement, headline, disclosed condensation — does not enter the mark;
+        where the editors’ hands went further, the piece’s provenance notes say exactly how.
+      </p>
+      <p>
+        <strong>The marks are ordinary emoji</strong> — whatever 🤖 and 👤 look like on your
+        device is the correct rendering; the character is the mark, not any particular drawing
+        of it.
+      </p>
+      <p>
+        <strong>The meaning is the record; the glyph is the convenience.</strong> The marks are{' '}
+        <code>U+1F916</code> ROBOT FACE, <code>U+1F464</code> BUST IN SILHOUETTE,{' '}
+        <code>U+1F7F0</code> HEAVY EQUALS SIGN, and a plain ASCII <code>&gt;</code> — there is
+        no emoji greater-than. The heavy equals sign is Unicode 14, from 2021, and an older
+        device will draw it as a box. That is the honest state of it, and it is why every mark
+        on this site carries its meaning in words as an accessible name and a tooltip: a reader
+        who gets no glyph still gets everything the glyph was for. Do the same if you adopt
+        them.
+      </p>
+      <p>
+        <strong>Five marks over seven tiers, so two tiers carry none.</strong> This notation is
+        a collapse, not a third way of writing the badges — and a collapse has to say what it
+        loses. The tiers that distinguish a party who <em>edited</em> from one who{' '}
+        <em>contributed</em> have no mark, because the notation has no third operator and the
+        set is closed: <strong>🤖&gt;👤</strong> would assert a contribution those tiers exist
+        to deny, <strong>🤖</strong> would drop a named human hand from the record, and a sixth
+        mark would cost the notation the thing it is for. Those pieces keep their badge, their
+        tier name and their full provenance block, which say more than a mark could. No
+        published piece carries either tier today.
+      </p>
+      <table class="stackable">
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Mark</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tierMarkRows.map((row) => (
+            <tr>
+              <td class="tier-name">{row.label}</td>
+              <td>
+                {row.mark ? (
+                  <ProvenanceMark code={row.code} size="1.5rem" />
+                ) : (
+                  <span class="tier-unmarked">no mark — see above</span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>
+        The mark is <strong>derived from the tier</strong> and never set by hand, here or in any
+        feed: a per-piece mark standing beside the tier would be a second authorship claim with
+        nothing keeping the two in agreement. Machines read it as{' '}
+        <code>provenance.mark</code> in <a href="/issues.json"><code>issues.json</code></a> and{' '}
+        <a href="/corpus.jsonl"><code>corpus.jsonl</code></a>, described in{' '}
+        <a href="/for-agents">For Agents</a>; it is <code>null</code> on the two tiers above and
+        on a piece with no tier, which are the same two cases where these pages draw nothing.
+      </p>
+
       <h2 id="license">License</h2>
       <p>
         The involvement-tier system — the tier names, their definitions, the
@@ -815,6 +932,15 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
      scrolled sideways by 42px at 320px. Measured, not predicted. */
   .tier-name {
     white-space: nowrap;
+  }
+
+  /* A tier the compact notation declines to mark. Set in the soft ink the rest
+     of the page's apparatus uses, so an empty-looking cell reads as a stated
+     absence rather than as a row that failed to render — which is the whole
+     difference between a notation admitting its limit and a bug. */
+  .tier-unmarked {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
   }
 
   /* The consequence of the line above, in the machine-code table: with the
