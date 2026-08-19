@@ -2,10 +2,8 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import { SITE_TITLE, TIERS, formatDate, displayTitle } from '../../../lib/site';
-import TierBadge from '../../../components/TierBadge.astro';
 import ProvenanceMark from '../../../components/ProvenanceMark.astro';
-// @ts-expect-error — plain-JS module shared with the tests
-import { badgeArticleSize } from '../../../lib/tier-badges.mjs';
+import { MARK_SIZE_BYLINE } from '../../../lib/notation.ts';
 // @ts-expect-error — plain-JS module shared with the tests
 import { bylineBadgeTier } from '../../../lib/byline-badge.mjs';
 import { assertFullTextsPaired } from '../../../lib/full-text';
@@ -48,8 +46,10 @@ const { entry, article } = Astro.props;
 const d = article.data;
 const { Content } = await render(entry);
 
-// The same badge the published piece carries, from the same module. See the
-// note at the byline below.
+// The same tier the published piece carries, resolved by the same module. It
+// no longer draws a badge — no journal page does since 2026-08-18 — but the
+// resolver still validates the tier at build time and still supplies the
+// accessible-name suffix R-051 requires. See the note at the byline below.
 const bylineBadge = bylineBadgeTier(d, TIERS, article.id);
 
 // THE PAGE HEADS WITH THE TITLE THE PIECE ARRIVED UNDER (R-037). It used to head
@@ -81,32 +81,27 @@ const submittedTitleShown = displayTitle(submittedTitle);
       <p class="kicker">As submitted</p>
       <h1>{submittedTitleShown}</h1>
       {/*
-        THE BADGE BELONGS HERE TOO, and its absence was the second half of what
-        the editors found (2026-08-04). This page prints a byline and had never
-        printed a mark beside it — not a section that forgot but a whole
-        template that did, on every piece it ever rendered. The rule was in the
-        article template, so it governed the article template.
+        THE MARK BELONGS HERE TOO, and its absence was the second half of what
+        the editors found (2026-08-04, when the mark was still a badge). This
+        page prints a byline and had never printed a provenance mark beside it —
+        not a section that forgot but a whole template that did, on every piece
+        it ever rendered. The rule was in the article template, so it governed
+        the article template.
 
         IT ASKS THE SAME MODULE AND GETS THE SAME ANSWER. Nothing about the
-        badge is decided here; that is the point of src/lib/byline-badge.mjs. A
-        third byline surface would ask it too.
+        piece's tier is decided here; that is the point of
+        src/lib/byline-badge.mjs. A third byline surface would ask it too.
       */}
       <p class="article-byline">
-        {bylineBadge ? (
-          <TierBadge
-            tier={bylineBadge.tier}
-            size={badgeArticleSize()}
-            labelSuffix={bylineBadge.labelSuffix}
-          />
-        ) : null}
         {/*
-          THE COMPACT MARK RIDES WITH THE BADGE (2026-08-18). This is the byline
-          surface that once had no badge because a template decided for itself
-          what a byline carries; it does not decide for itself again. The tier a
-          piece declares is the same tier on both pages — this page shows the
-          text as it arrived, not a different provenance.
+          THE MARK, AND NO BADGE (editors, 2026-08-18) — the same arrangement as
+          the piece's own page, for the same reason it is the same on every
+          journal surface. This is the byline that once had no mark at all
+          because a template decided for itself what a byline carries; it does
+          not decide for itself again. The tier a piece declares is the same tier
+          on both pages, and so is the way this journal now shows it.
         */}
-        <ProvenanceMark piece={d} />
+        <ProvenanceMark piece={d} size={MARK_SIZE_BYLINE} labelSuffix={bylineBadge?.labelSuffix} />
         {/*
           `author_name`, NOT `byline`, and the pronouns follow the same rule.
           This page shows the piece as it arrived, so it prints the machine

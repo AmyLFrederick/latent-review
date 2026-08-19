@@ -12,10 +12,8 @@ import {
   formatDate,
 } from '../../lib/site';
 import { pronounsDisplay } from '../../lib/pronouns.mjs';
-import TierBadge from '../../components/TierBadge.astro';
 import ProvenanceMark from '../../components/ProvenanceMark.astro';
-// @ts-expect-error — plain-JS module shared with the tests
-import { badgeArticleSize, badgeNoteSize } from '../../lib/tier-badges.mjs';
+import { MARK_SIZE_BYLINE, MARK_SIZE_NOTE } from '../../lib/notation.ts';
 // @ts-expect-error — plain-JS module shared with the tests
 import { bylineBadgeTier } from '../../lib/byline-badge.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -177,49 +175,34 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         a name — "Amy Louise / Frederick" across two lines reads as two people.
         See bylineWithProtectedNames; the names themselves are never parsed.
       */}
-      {/*
-        THE BADGE OPENS THE BYLINE (editors, 2026-08-03), replacing the floated
-        placement on the line below. Provenance and authorship now read as one
-        statement — the mark, then who made it — instead of the mark sitting
-        beside a date it had nothing to do with.
-
-        AN AGENT-DIRECT PIECE MAY NOW CARRY ONE TOO (R-051). Its tier is the
-        author's own claim, recorded by the editors from the attestation, and
-        the mark is IDENTICAL — same ring, same notation, same size. What differs
-        is the accessible name, which says the tier is as claimed, and the
-        Provenance block below, which says who claimed it and where it was read
-        from. The suffix comes from bylineBadgeTier rather than being composed
-        here, so a surface cannot draw the badge and forget the sentence.
-
-        An agent-direct piece whose author claimed no tier still opens the byline
-        with "By" and no badge; the mark is absent rather than guessed, and the
-        line is built to look deliberate either way.
-
-        The "By" is joined to what follows — the ruled break points are after
-        the comma and after "and", and a line ending on a lone "By" is neither.
-      */}
       <p class="article-byline">
-        {bylineBadge ? (
-          <TierBadge
-            tier={bylineBadge.tier}
-            size={badgeArticleSize()}
-            labelSuffix={bylineBadge.labelSuffix}
-          />
-        ) : null}
         {/*
-          THE COMPACT MARK, BESIDE THE BADGE AND NEVER INSTEAD OF IT
-          (2026-08-18). Two renderings of one tier: the badge names it in full to
-          anyone who follows it to /provenance, the mark says the shape of it at
-          a glance and travels into places a circle cannot go. It is resolved
-          from the piece rather than from `bylineBadge`, so the two are derived
-          from the same record independently and a mismatch is a test failure
-          rather than a copied mistake.
+        THE MARK IS THE BYLINE'S PROVENANCE, AND THE ONLY ONE (editors,
+        2026-08-18). The compact mark became the primary display; the circular
+        badge no longer appears on journal pages at all. It is not retired — it
+        remains the standard's mark, taught and drawn in full at /provenance,
+        and every adopter's licence to use it is untouched. What changed is that
+        this journal's own pages set the mark instead.
 
-          IT MAY BE ABSENT WHERE THE BADGE IS PRESENT, on the two editor tiers
-          the five marks cannot express. The line is built to look deliberate
-          either way, exactly as it is for a byline with no badge at all.
-        */}
-        <ProvenanceMark piece={d} />
+        WHY THE MARK AND NOT THE BADGE. It is script-free: 🤖 and 👤 read
+        identically to a reader in Beijing, Berlin or Madison, where the badge's
+        notation is Latin-script and English-bound — `AI>H` abbreviates two
+        English words, and a reader with neither is reading a cipher.
+
+        WHAT THE BADGE USED TO CARRY HERE AND DOES NOT ANY MORE. The editor
+        distinction: an edited piece marks 🤖 exactly as an unedited one does,
+        and the editor is named in the Provenance block below, which prints the
+        tier's notation, its full name and its description. Nothing about the
+        piece has become unsayable; one line of the page stopped saying it, and
+        another line further down still does.
+
+        THE ACCESSIBLE NAME KEEPS EVERYTHING IT CARRIED. R-051's claim sentence
+        rode on the badge's accessible name and now rides on the mark's, from
+        the same resolver — `bylineBadgeTier` still decides, and a surface that
+        drew the mark and dropped the sentence would state a claim as an
+        attestation, which is the failure that ruling names.
+      */}
+        <ProvenanceMark piece={d} size={MARK_SIZE_BYLINE} labelSuffix={bylineBadge?.labelSuffix} />
         {/*
           THE PRONOUNS RIDE THE RENDERED NAME, whatever that name turned out to
           be. `byline` overrides `author_name` where the author line needs words
@@ -357,19 +340,25 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
             <p>{para}</p>
           ))}
           <p class="personal-note-signature">
-            <TierBadge
-              tier={noteBadge.tier}
-              size={badgeNoteSize()}
+            {/*
+              THE NOTE'S OWN MARK, FOR THE NOTE'S OWN MAKING (R-052), LEADING ITS
+              OWN BADGE for the reason the byline's does. A piece may carry two
+              badges that describe different work, and it carries two marks for
+              the same reason — the article's in the byline, the note's here. The
+              code comes from the NOTE's tier and never from the piece's, which
+              is the whole of what R-052 turns on.
+
+              THE NOTE'S BADGE IS GONE WITH THE BYLINE'S (2026-08-18) and its
+              scoping sentence is not. R-052 requires the accessible name to say
+              what the mark is the tier OF, because a listener has no position to
+              read it from; that sentence came from the badge and now comes from
+              the mark, out of the same resolver.
+            */}
+            <ProvenanceMark
+              code={noteBadge.tier.code}
+              size={MARK_SIZE_NOTE}
               labelSuffix={noteBadge.labelSuffix}
             />
-            {/*
-              THE NOTE'S OWN MARK, FOR THE NOTE'S OWN MAKING (R-052, 2026-08-18).
-              A piece may carry two badges that describe different work, and it
-              may now carry two marks for the same reason — the article's in the
-              byline, the note's here. The code comes from the NOTE's tier and
-              never from the piece's, which is the whole of what R-052 turns on.
-            */}
-            <ProvenanceMark code={noteBadge.tier.code} />
             <span>{d.personal_note.signature}</span>
           </p>
         </aside>

@@ -53,13 +53,27 @@ interface Props {
    */
   markName?: MarkKey;
   /**
+   * Appended to the accessible name.
+   *
+   * IT MOVED HERE FROM THE BADGE ON 2026-08-18, and the move is load-bearing
+   * rather than tidy. The badge no longer appears on journal pages, and it was
+   * the badge's accessible name that carried two sentences the record depends
+   * on: R-051's, saying a tier is the author's CLAIM and not an attestation, and
+   * R-052's, naming what a signed note's mark is the tier OF. Both rulings say
+   * in as many words that a surface drawing the mark and dropping the sentence
+   * would state the wrong thing to a listener. This is now that surface, so this
+   * is now where the sentence rides — supplied by the same resolver that used to
+   * hand it to the badge, never composed at a call site.
+   */
+  labelSuffix?: string;
+  /**
    * Rendered size. The default is the byline's; the key sets its own so the five
    * marks read as a specimen rather than as apparatus.
    */
   size?: string;
 }
 
-const { piece, code, markName, size } = Astro.props;
+const { piece, code, markName, labelSuffix = '', size } = Astro.props;
 
 const resolved: Mark | null =
   markName !== undefined
@@ -77,8 +91,8 @@ const resolved: Mark | null =
       class="provenance-mark"
       style={size ? `--mark-size:${size}` : undefined}
       role="img"
-      aria-label={`Compact provenance mark: ${resolved.meaning}.`}
-      title={`Compact provenance mark: ${resolved.meaning}.`}
+      aria-label={`Compact provenance mark: ${resolved.meaning}.${labelSuffix}`}
+      title={`Compact provenance mark: ${resolved.meaning}.${labelSuffix}`}
       translate="no"
     >
       {resolved.mark}

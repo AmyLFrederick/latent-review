@@ -19,7 +19,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -29,6 +29,8 @@ import {
   MARK_ORDER,
   EDITOR_TIERS,
   BALANCED_ASCII_FORM,
+  MARK_SIZE_BYLINE,
+  MARK_SIZE_NOTE,
   markFor,
   markForPiece,
   markKey,
@@ -453,4 +455,115 @@ test('every drawn mark carries its meaning in words', () => {
   assert.match(component, /title=/);
   assert.match(component, /role="img"/);
   assert.match(component, /resolved\.meaning/);
+});
+
+// --- 8. The mark replaces the badge on journal pages (editors, 2026-08-18) --
+//
+// TWO HALVES, AND THEY PULL AGAINST EACH OTHER, which is why both are here: the
+// mark must be on every journal byline, and the badge must be GONE from them and
+// still present at /provenance. A change that satisfied one and not the other
+// would be either a byline with no provenance at all or a standard with no page
+// that shows it.
+
+/** Every surface that draws a byline or a signature mark. */
+const MARK_SURFACES = [
+  'src/pages/articles/[slug].astro',
+  'src/pages/articles/[slug]/as-submitted.astro',
+];
+
+test('every rendered byline carries the mark and no badge', () => {
+  // Asserted against the BUILT HTML, because what a reader meets is the
+  // document — a template can be right and a component can still emit a circle.
+  const dist = repoPath('dist/articles');
+  if (!existsSync(dist)) return; // `npm test` may run before a build; the source checks below always run.
+
+  let checked = 0;
+  for (const slug of readdirSync(dist)) {
+    const file = `${dist}/${slug}/index.html`;
+    if (!existsSync(file)) continue;
+    const html = readFileSync(file, 'utf8');
+    assert.ok(
+      !html.includes('tier-badge'),
+      `${slug}: a journal page still draws a badge — the mark replaced it`
+    );
+    const byline = html.match(/<p class="article-byline"[^>]*>([\s\S]*?)<\/p>/)?.[1];
+    if (!byline) continue;
+    // Every published piece declares or claims a tier today, so every byline
+    // carries a mark. A piece with neither would legitimately carry none — see
+    // byline-badge.mjs — and this asserts the state of the record as built.
+    assert.ok(byline.includes('provenance-mark'), `${slug}: the byline carries no mark`);
+    checked += 1;
+  }
+  assert.ok(checked > 0, 'no built byline was checked — the selector has drifted');
+});
+
+test('the byline surfaces draw the mark, and no longer draw a badge', () => {
+  for (const file of MARK_SURFACES) {
+    const src = readFileSync(repoPath(file), 'utf8');
+    assert.match(src, /<ProvenanceMark/, `${file} draws no mark`);
+    assert.ok(!/<TierBadge/.test(src), `${file} still draws a badge on a journal page`);
+  }
+});
+
+test('the badge is not withdrawn — /provenance still draws it', () => {
+  // THE HALF THAT IS EASY TO LOSE. The badge is the standard's mark, licensed
+  // CC BY 4.0 and specified for adopters; removing it from the journal's pages
+  // is a house choice, and removing it from the page that TEACHES it would be
+  // withdrawing it from the standard.
+  const page = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  assert.match(page, /<TierBadge/, '/provenance no longer draws the badge');
+  assert.match(page, /BADGE_STYLES|coAuthorshipOrderings/, '/provenance stopped teaching both styles');
+});
+
+test('the mark carries the sentences the badge used to carry', () => {
+  // R-051 (a claimed tier says so) and R-052 (a note's mark names what it marks)
+  // both put their sentence in the BADGE's accessible name, and both say that a
+  // surface drawing the mark without it states the wrong thing to a listener.
+  // The badge is gone from these surfaces; the sentences are not.
+  const component = readFileSync(repoPath('src/components/ProvenanceMark.astro'), 'utf8');
+  assert.match(component, /labelSuffix/, 'the mark cannot carry an accessible-name suffix');
+  assert.match(component, /aria-label=\{`Compact provenance mark: \$\{resolved\.meaning\}\.\$\{labelSuffix\}`\}/);
+
+  const article = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  // The byline's claimed-tier sentence, and the note's scoping sentence, each
+  // supplied by the resolver rather than composed at the call site.
+  assert.match(article, /<ProvenanceMark piece=\{d\}[^>]*labelSuffix=\{bylineBadge\?\.labelSuffix\}/);
+  assert.match(article, /labelSuffix=\{noteBadge\.labelSuffix\}/);
+  const asSubmitted = readFileSync(repoPath('src/pages/articles/[slug]/as-submitted.astro'), 'utf8');
+  assert.match(asSubmitted, /labelSuffix=\{bylineBadge\?\.labelSuffix\}/);
+});
+
+test('a claimed tier still says so to a listener, in the built page', () => {
+  const dist = repoPath('dist/articles');
+  if (!existsSync(dist)) return;
+  // "The Beauty of the Latent Space" is agent-direct with a claimed tier (R-051).
+  const file = `${dist}/the-beauty-of-the-latent-space/index.html`;
+  if (!existsSync(file)) return;
+  const html = readFileSync(file, 'utf8');
+  const mark = html.match(/aria-label="Compact provenance mark:[^"]*"/)?.[0] ?? '';
+  assert.match(mark, /as claimed by the author/, 'the claimed tier is stated as an attestation');
+});
+
+test('the mark is set at the size of a lead element', () => {
+  // It stood at 1.15rem when it sat beside a badge. It stands alone now.
+  assert.ok(parseFloat(MARK_SIZE_BYLINE) > 1.15, 'the mark was not enlarged when it took the lead');
+  assert.ok(
+    parseFloat(MARK_SIZE_NOTE) < parseFloat(MARK_SIZE_BYLINE),
+    'the note mark is not quieter than the byline mark'
+  );
+});
+
+test('the page teaching both teaches the marks first, and says why', () => {
+  const page = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  const key = page.indexOf('id="compact-notation"');
+  const badges = page.indexOf('<h3>The badges</h3>');
+  assert.notEqual(key, -1, '/provenance lost the compact-notation anchor');
+  assert.notEqual(badges, -1, '/provenance lost the badge section heading');
+  assert.ok(key < badges, 'the badge standard precedes the compact-notation key');
+  const flat = page.replace(/\s+/g, ' ');
+  assert.match(flat, /this journal prints the marks/);
+  assert.match(flat, /Latin-script and English-bound/);
+  // And it says the badges are not withdrawn, which is the sentence an adopter
+  // reading this page needs most.
+  assert.match(flat, /Nothing about the badges is withdrawn/);
 });

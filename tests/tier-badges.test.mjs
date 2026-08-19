@@ -295,15 +295,16 @@ test('the placements are named, never typed in at the call site', () => {
   // A literal size on a call site is how one placement gets left behind the
   // next time the editors resize the mark — which is exactly what "at every
   // placement" was written to prevent.
+  // THE ARTICLE TEMPLATE NO LONGER DRAWS A BADGE AT ALL (editors, 2026-08-18):
+  // the compact mark replaced it on every journal page. The rule this test was
+  // written for survives with one placement left to enforce it on — the chart —
+  // and the article template is now asserted the other way, that it names no
+  // badge size because it draws no badge.
   const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
-  // It asked for BADGE_SIZE_ARTICLE by name until 2026-08-04, which was right
-  // while the house form was the letter form and became a badge a quarter too
-  // small the moment it was not. A placement now asks by PLACEMENT and lets the
-  // form supply the number.
-  assert.match(page, /size=\{badgeArticleSize\(\)\}/);
+  assert.ok(!/<TierBadge/.test(page), 'a journal page draws a badge again');
   assert.ok(
-    !/BADGE_SIZE_ARTICLE\b/.test(page),
-    'the byline names one form’s article size instead of asking for the placement’s'
+    !/BADGE_SIZE_ARTICLE\b|badgeArticleSize\(/.test(page),
+    'the article template still reaches for a badge size'
   );
 
   // THE CHART IS THE ONE PLACEMENT THAT NAMES A SIZE, and it still does not TYPE
