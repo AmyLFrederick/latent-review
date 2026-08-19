@@ -157,6 +157,24 @@ test('the scope rule is published verbatim in the public key', () => {
   }
 });
 
+test('the key claims the document and disclaims the characters', () => {
+  // Editors, 2026-08-18, verified against copyright guidance. The badges are
+  // drawings this journal made; the marks are Unicode's characters drawn by the
+  // reader's platform, in sequences too short for anyone to own. A CC BY claim
+  // over them would tell an adopter they need permission they do not need, so
+  // the grant lands on the documentation and this sentence says where the line
+  // is. Pinned verbatim because it is a statement about rights.
+  const page = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8').replace(/\s+/g, ' ');
+  assert.ok(
+    page.includes(
+      'We claim no ownership of these characters or their combinations — only of this document describing what we mean by them.'
+    ),
+    'the key does not carry the ownership disclaimer'
+  );
+  // And the licence section says the same thing where an adopter goes looking.
+  assert.match(page, /Use the marks freely — no permission, no attribution, nothing to ask\./);
+});
+
 // --- 3. Totality ------------------------------------------------------------
 
 test('the mapping covers the seven tiers exactly — no gaps, no strangers', () => {

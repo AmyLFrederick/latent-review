@@ -94,12 +94,17 @@ The page's dated note ("Added 2026-08-18") is written either way and stands.
 
 ## 4. Open questions — none of them blocked the build
 
-1. **Does the CC BY 4.0 grant cover the compact notation?** R-014 licenses the
-   tier system; R-050 deliberately placed the AI form inside the grant so an
-   adopter could not fork it. The same argument applies here and I did **not**
-   act on it: the licence section is untouched, so the notation is currently
-   published without a stated licence. This is your call, and the R-TBD draft
-   has a clause for it either way.
+1. ~~**Does the CC BY 4.0 grant cover the compact notation?**~~ **RESOLVED by the
+   editors 2026-08-18**, verified against copyright guidance, and the answer is
+   better than the R-050-shaped one I had drafted: the **documentation** joins
+   the standard under CC BY 4.0; the **marks do not**, because the characters are
+   Unicode's, the renderings are the platform vendors', and short mark sequences
+   are likely not copyrightable by anyone. Anyone may use the marks with no
+   permission and no attribution; attribution applies to the standard's text.
+   Built: a licence paragraph at `/provenance` and the sentence *"We claim no
+   ownership of these characters or their combinations — only of this document
+   describing what we mean by them"* in the key, both pinned by test. The R-TBD
+   text carries the clause.
 2. **The changelog entry is dated `2026-08-19`** — today, Madison. The rule is
    the day the change reached `main`. If the merge slips past midnight Madison
    time, that date needs a bump before merging.
@@ -143,7 +148,7 @@ Ruled 2026-08-18 by both editors, with review by the journal's informal editoria
 
 **The ratified text:**
 
-> The standard gains a compact notation: five marks over the involvement axis — 🤖 AI alone; 🤖>👤 AI-led, human contributed; 🤖🟰👤 balanced co-creation; 👤>🤖 human-led, AI assisted; 👤 human alone. The greater contributor always stands first and ">" only ever points right. Marks describe authorship of the words. Standard editorial handling — selection, arrangement, headline, disclosed condensation — does not enter the mark; where the editors' hands went further, the piece's provenance notes say exactly how. Marks are derived from the involvement tier and never set per piece; they encode involvement only and never verification. The badge set is unchanged at seven and no eighth badge is minted.
+> The standard gains a compact notation: five marks over the involvement axis — 🤖 AI alone; 🤖>👤 AI-led, human contributed; 🤖🟰👤 balanced co-creation; 👤>🤖 human-led, AI assisted; 👤 human alone. The greater contributor always stands first and ">" only ever points right. Marks describe authorship of the words. Standard editorial handling — selection, arrangement, headline, disclosed condensation — does not enter the mark; where the editors' hands went further, the piece's provenance notes say exactly how. Marks are derived from the involvement tier and never set per piece; they encode involvement only and never verification. The notation's documentation — the key, the meanings, the direction rule and the scope rule — joins the badge standard under CC BY 4.0; the marks themselves are ordinary Unicode text the journal neither owns nor restricts, free to use with no permission and no attribution. The badge set is unchanged at seven and no eighth badge is minted.
 
 **It is a collapse, not a third badge style, and R-045 is why that distinction had to be ruled on.** R-050 could say the set did not grow because each of the seven badges can be written in either of its two forms — one set, two spellings. Five marks cannot write seven tiers. This is the same kind of instrument as `author_type`, which renders the same seven as three for a machine, except that this one is shown to readers. A lossy rendering of the standard, placed in a reader-facing position, is a change to the standard and is ruled rather than shipped.
 
@@ -159,14 +164,13 @@ Ruled 2026-08-18 by both editors, with review by the journal's informal editoria
 
 **The meaning is the record; the glyph is the convenience.** U+1F7F0 HEAVY EQUALS SIGN is Unicode 14, from 2021, and an older device will render a box. Every mark the journal draws therefore carries its meaning in words as an accessible name and a tooltip, and adopters are told to do the same. A notation whose whole argument is that it survives being pasted must survive not being drawn.
 
+**The licence lands on the document and not on the marks, and the difference is copyright rather than policy.** R-050 placed the AI badge form inside the CC BY 4.0 grant so an adopter could not fork it, and the same instinct applied here would be a mistake: the badges are drawings this journal made, where these four characters belong to Unicode, are drawn by whichever platform the reader is on, and are arranged in sequences too short for anyone to own. A grant over public property is worse than no grant, because it tells an adopter they need permission they do not need. So what is licensed is the part this journal wrote — the key, the meanings, the direction rule, the scope rule — and the marks are free to anyone for anything, with nothing to ask and no one to credit. The page says so in its own words: *we claim no ownership of these characters or their combinations — only of this document describing what we mean by them.*
+
 **The badge set is unchanged.** Seven badges, seven machine codes, two display styles, and now a five-mark compact notation that sits over the same axis and says less. Nothing in the record moved: no tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece.
 ```
 
-### Two clauses the editors may want to add before this lands
+### One clause the editors may still want
 
-1. **Licence.** If the compact notation is inside the CC BY 4.0 grant — which is
-   the R-050 argument, applied again — say so, and the licence section at
-   `/provenance` gains a sentence. If it is deliberately outside, say that
-   instead; silence is the one answer that will be read both ways.
-2. **Whether the scope rule swallows the editor tiers** (§2). If yes, the ruling
-   should say so in its own words rather than leaving a mapping to a module.
+**Whether the scope rule swallows the editor tiers** (§2). If it does, the ruling
+should say so in its own words rather than leaving the decision to a mapping in a
+module.
