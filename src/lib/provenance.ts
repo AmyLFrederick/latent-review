@@ -494,13 +494,43 @@ export function provenanceSentence(d: ProvenanceData, origin?: string | URL): st
  */
 const AUTHOR_TYPE_BY_TIER: Record<TierCode, 'ai' | 'human' | 'collaborative'> = {
   ai: 'ai',
-  'ai-human-editor': 'collaborative',
+  'ai-human-editor': 'ai',
   'ai-human': 'collaborative',
   'ai-equals-human': 'collaborative',
   'human-ai': 'collaborative',
-  'human-ai-editor': 'collaborative',
+  'human-ai-editor': 'human',
   human: 'human',
 };
+
+// EDITING DOES NOT CONFER AUTHORSHIP — the editors' ruling of 2026-08-18,
+// extending the same principle they applied to the compact notation's marks, and
+// A CORRECTION TO THE DERIVATION RATHER THAN A CHANGE OF POLICY.
+//
+// The two editor tiers used to derive `collaborative`. They now derive the type
+// of the party that WROTE: `ai-human-editor` is `ai`, `human-ai-editor` is
+// `human`. `collaborative` is reserved for genuine co-authorship — the three
+// tiers where both parties contributed to the work and ideas.
+//
+// WHY THE OLD ANSWER WAS WRONG. "AI – Human (editor)" says a human edited AI's
+// work and says, precisely, that the human did not contribute to it. Deriving
+// `collaborative` from it told every consumer of this field that the piece was
+// co-authored, which is a claim the tier itself declines to make — and it is the
+// claim journalism has a settled answer to: a book is not co-authored by its
+// editor. R-046 made the distinction an operator (`>` contributed, `–` edited);
+// this reads that operator instead of flattening it.
+//
+// NOTHING PUBLISHED CHANGES, AND THAT IS WHY IT COULD BE FIXED RATHER THAN
+// VERSIONED. No published piece carries either editor tier, so no consumer has
+// ever received `collaborative` from one. The rule is corrected before it emits.
+// (Recorded in /changelog.json all the same: the stability contract governs field
+// names and meanings, and a change to how a value is DERIVED is exactly the kind
+// of thing a consumer cannot see in a diff of the data.)
+//
+// EDITING IS STILL DISCLOSED, ONE FIELD OVER. `involvement_tier` is published
+// inside this object as of the same change, so a consumer that wants to know
+// whose hands touched a piece reads the tier, and a consumer that wants to know
+// who wrote it reads this. That split is the whole point: the mark and the byline
+// answer authorship, and the tier answers involvement.
 
 export interface StructuredProvenance {
   /** Who made the work, collapsed from the involvement tier to three values. */
@@ -531,6 +561,41 @@ export interface StructuredProvenance {
    * keep single.
    */
   mark: string | null;
+  /**
+   * The attested involvement tier's machine code, or null — the same value, with
+   * the same meaning, as the top-level `involvement_tier` in /issues.json.
+   *
+   * WHY IT IS REPEATED HERE. /corpus.jsonl carried no tier at all, so a corpus
+   * reader had `author_type` and nothing finer; and `author_type` is now a
+   * narrower claim than it was — editing does not confer authorship — which makes
+   * the tier the only field that says an editor touched the piece. A consumer
+   * reading this object alone would otherwise have no way to see editorial
+   * involvement, which is precisely what the tier exists to disclose.
+   *
+   * IT IS THE ATTESTED TIER ONLY, AND THAT IS NOT AN OVERSIGHT. `null` here means
+   * the agent-direct track, whose claimed tier is published beside it as
+   * `involvement_tier_claimed`. Collapsing the two into one field is the exact
+   * failure the 2026-07-31 audit was written about — one field meaning "attested"
+   * on one track and "claimed" on the other — and it is not going to be made
+   * again inside the object built to end it. `verification` says which of the two
+   * a piece's tier is.
+   */
+  involvement_tier: string | null;
+  /**
+   * The author's own claimed tier on the agent-direct track (R-051), or null.
+   *
+   * PUBLISHED FOR THE FIRST TIME HERE. R-051 created the field and the page has
+   * printed it since, but no machine surface carried it: /issues.json emits
+   * `involvement_tier: null` for an agent-direct piece and stopped there, so the
+   * tier the Provenance block shows a reader was invisible to a consumer. A
+   * record that is public on the page and absent from the feed is not a record
+   * this journal can claim is machine-readable.
+   *
+   * NEVER MERGED WITH THE FIELD ABOVE. A piece carries one or the other, never
+   * both — the schema enforces it — and which one it carries is what says who
+   * stands behind the tier.
+   */
+  involvement_tier_claimed: string | null;
   /** The model and version the author's session disclosed, or null where the desk collected none. */
   model: string | null;
   /** What the author was working from, where the record names it. Null otherwise. */
@@ -584,6 +649,8 @@ export function structuredProvenance(d: ProvenanceData): StructuredProvenance {
   return {
     author_type: authorType,
     mark: markForPiece(d)?.mark ?? null,
+    involvement_tier: d.involvement_tier ?? null,
+    involvement_tier_claimed: d.involvement_tier_claimed ?? null,
     model: d.author_model_version ?? null,
     disclosure: disclosureFor(d),
     verification: d.submission_track === 'agent-direct' ? 'claimed' : 'attested',

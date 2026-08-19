@@ -61,7 +61,7 @@ test('no piece is ever independently-verified — the journal certifies nothing'
   }
 });
 
-test('author_type collapses every tier, and only AI-alone and Human-alone leave the middle', () => {
+test('author_type collapses every tier, and editing does not put a piece in the middle', () => {
   const byCode = Object.fromEntries(
     TIERS.map((t) => [
       t.code,
@@ -71,7 +71,19 @@ test('author_type collapses every tier, and only AI-alone and Human-alone leave 
 
   assert.equal(byCode.ai, 'ai');
   assert.equal(byCode.human, 'human');
-  for (const code of ['ai-human-editor', 'ai-human', 'ai-equals-human', 'human-ai', 'human-ai-editor']) {
+
+  // EDITING DOES NOT CONFER AUTHORSHIP (editors, 2026-08-18). The two editor
+  // tiers derive the type of the party that WROTE, where they used to derive
+  // `collaborative` — a claim of co-authorship the tier itself declines to make,
+  // and one journalism has a settled answer to: a book is not co-authored by its
+  // editor. Asserted against the plain tiers rather than against literals, so an
+  // edited piece and an unedited one cannot drift apart.
+  assert.equal(byCode['ai-human-editor'], byCode.ai);
+  assert.equal(byCode['human-ai-editor'], byCode.human);
+
+  // `collaborative` is genuine co-authorship, and only that: the three tiers
+  // where both parties contributed to the work and ideas.
+  for (const code of ['ai-human', 'ai-equals-human', 'human-ai']) {
     assert.equal(byCode[code], 'collaborative', `${code} is a collaboration`);
   }
 
@@ -142,23 +154,46 @@ test('two elicitation facts are both published rather than one being ranked away
   );
 });
 
-test('the object carries exactly the six published fields', () => {
+test('the object carries exactly the eight published fields', () => {
   // The shape is a stability contract on two documents. A field added here
   // without being documented in /for-agents and /agent-api.json is a field a
-  // consumer meets with no description of it anywhere.
-  //
-  // `mark` JOINED THEM ON 2026-08-18, and this assertion is what made that an
-  // explicit step rather than a silent one: the compact notation's field failed
-  // here first and was written into /for-agents, /agent-api.json, /provenance
-  // and /changelog.json before this line moved. That is the gate working, so it
-  // is recorded rather than quietly renumbered. The field's own behaviour is
-  // tested in tests/notation.test.mjs; what this line protects is the shape.
+  // consumer meets with no description of it anywhere — which is what this
+  // assertion is for, and it has now caught three additions before they shipped.
   assert.deepEqual(Object.keys(structuredProvenance(human)).sort(), [
     'author_type',
     'disclosure',
+    'involvement_tier',
+    'involvement_tier_claimed',
     'mark',
     'model',
     'statement',
     'verification',
   ]);
+});
+
+test('the tier fields are never merged, and each says who stands behind it', () => {
+  // One field meaning "attested" on one track and "claimed" on the other is the
+  // 2026-07-31 failure this whole object was built to end. A piece carries one or
+  // the other, and `verification` is what distinguishes them.
+  const attested = structuredProvenance({ ...human, involvement_tier: 'ai-human' });
+  assert.equal(attested.involvement_tier, 'ai-human');
+  assert.equal(attested.involvement_tier_claimed, null);
+  assert.equal(attested.verification, 'attested');
+
+  const claimed = structuredProvenance({ ...agent, involvement_tier_claimed: 'ai' });
+  assert.equal(claimed.involvement_tier, null);
+  assert.equal(claimed.involvement_tier_claimed, 'ai');
+  assert.equal(claimed.verification, 'claimed');
+
+  // The agent-direct piece that claimed nothing carries neither.
+  assert.equal(structuredProvenance(agent).involvement_tier, null);
+  assert.equal(structuredProvenance(agent).involvement_tier_claimed, null);
+});
+
+test('an edited piece still discloses its editor, one field over', () => {
+  // The point of the correction: `author_type` narrows, and nothing is lost,
+  // because the tier is published in the same object and still names the editor.
+  const edited = structuredProvenance({ ...human, involvement_tier: 'ai-human-editor' });
+  assert.equal(edited.author_type, 'ai');
+  assert.equal(edited.involvement_tier, 'ai-human-editor');
 });

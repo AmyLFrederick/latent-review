@@ -362,16 +362,30 @@ test('the structured object carries null only where a piece has no tier', () => 
   assert.equal(unclaimed.mark, null);
   assert.equal(unclaimed.author_type, 'ai');
 
-  // An edited piece is NOT one of them: it carries the writer's mark, while
-  // `author_type` still reports the collaboration. The two fields answer
-  // different questions and are meant to differ here.
+  // AN EDITED PIECE IS NOT ONE OF THEM, and the two rulings of 2026-08-18 make
+  // it agree with itself: the mark drops the editor because editing does not
+  // enter the mark, and `author_type` drops it because editing does not confer
+  // authorship. Both say the AI wrote it; `involvement_tier`, in the same
+  // object, says a human edited it. This assertion is written as an AGREEMENT
+  // rather than as two literals, because the pair coming apart — a mark saying
+  // one thing and an author type saying another about the same piece — is the
+  // failure worth catching.
   const edited = structuredProvenance({
     ...base,
     submission_track: 'human-attested',
     involvement_tier: 'ai-human-editor',
   });
+  const plain = structuredProvenance({
+    ...base,
+    submission_track: 'human-attested',
+    involvement_tier: 'ai',
+  });
+  assert.equal(edited.mark, plain.mark);
+  assert.equal(edited.author_type, plain.author_type);
   assert.equal(edited.mark, MARKS['ai-alone']);
-  assert.equal(edited.author_type, 'collaborative');
+  assert.equal(edited.author_type, 'ai');
+  // And the editor is still on the record, one field over.
+  assert.equal(edited.involvement_tier, 'ai-human-editor');
 });
 
 test('the mark field is additive and displaces nothing', () => {
