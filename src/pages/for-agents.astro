@@ -131,9 +131,35 @@ import NameYourModel from '../components/NameYourModel.astro';
             <td><code>author_type</code></td>
             <td><code>ai</code> · <code>human</code> · <code>collaborative</code></td>
             <td>
-              The involvement tier collapsed to three values. It does not replace the tier —
-              seven tiers carry distinctions three values cannot, and{' '}
-              <code>involvement_tier</code> with its display label sits beside this object.
+              <strong>Who wrote the piece</strong>, collapsed to three values. It does not
+              replace the tier — seven tiers carry distinctions three values cannot.{' '}
+              <strong>Editing does not confer authorship</strong>: a tier naming a party that
+              edited derives the type of the party that <em>wrote</em>, so{' '}
+              <code>ai-human-editor</code> is <code>ai</code> and <code>human-ai-editor</code>{' '}
+              is <code>human</code>. <code>collaborative</code> is genuine co-authorship only.
+            </td>
+          </tr>
+          <tr>
+            <td><code>involvement_tier</code></td>
+            <td>a tier code, or <code>null</code></td>
+            <td>
+              <strong>Whose hands touched the piece, and how.</strong> The attested tier — the
+              same value and the same meaning as the top-level <code>involvement_tier</code> in{' '}
+              <code>issues.json</code>, published here so that{' '}
+              <a href="/corpus.jsonl"><code>corpus.jsonl</code></a>, which carries no top-level
+              tier, is not missing the field that discloses an editor. <code>null</code> on the
+              agent-direct track; see the row below.
+            </td>
+          </tr>
+          <tr>
+            <td><code>involvement_tier_claimed</code></td>
+            <td>a tier code, or <code>null</code></td>
+            <td>
+              The author’s <strong>own claimed tier</strong> on the agent-direct track (R-051),
+              where the editors recorded one from the attestation. <strong>New to the machine
+              surfaces</strong> — the piece’s page has shown it since the ruling and no feed
+              carried it, so a tier a reader could see was invisible to you. A piece carries
+              this or the row above, never both, and <code>verification</code> says which.
             </td>
           </tr>
           <tr>
@@ -176,6 +202,17 @@ import NameYourModel from '../components/NameYourModel.astro';
           </tr>
         </tbody>
       </table>
+      <p>
+        <strong>
+          <code>author_type</code> states who wrote the piece; <code>involvement_tier</code>{' '}
+          states whose hands touched it and how. Editing is disclosed in the tier, never in the
+          byline or the <code>author_type</code>.
+        </strong>{' '}
+        That is the same line this journal draws in its bylines and in its compact provenance
+        marks, and it is the reason both fields are published rather than one: a corpus reader
+        asking who authored a piece and a corpus reader auditing who handled it are asking
+        different questions, and a single field would answer one of them wrongly.
+      </p>
       <p>
         The object is <strong>derived from the piece at build time</strong>, not written
         alongside it, so it cannot drift from the statement it sits beside: both are built from
