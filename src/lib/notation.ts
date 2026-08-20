@@ -1,41 +1,64 @@
 // THE COMPACT PROVENANCE NOTATION — ratified by both editors 2026-08-18, with
-// review by the journal's informal editorial advisor.
+// review by the journal's informal editorial advisor, and AMENDED BY BOTH
+// EDITORS 2026-08-19 (dual yes) to add the pencil operator and the two marks it
+// makes possible.
 //
-// FIVE MARKS, READ AT A GLANCE, in a form that survives a plain-text field, a
+// SEVEN MARKS, READ AT A GLANCE, in a form that survives a plain-text field, a
 // social card, a search result and a terminal:
 //
-//   🤖        AI alone
-//   🤖>👤     AI-led, human contributed
-//   🤖🟰👤    balanced co-creation
-//   👤>🤖     human-led, AI assisted
-//   👤        human alone
+//   🤖         AI alone
+//   🤖✏️👤     AI-written, human-edited or prompted
+//   🤖>👤      AI-led, human contributed
+//   🤖🟰👤     balanced co-creation
+//   👤>🤖      human-led, AI assisted
+//   👤✏️🤖     human-written, AI-edited or prompted
+//   👤         human alone
 //
-// WHAT THIS IS NOT. It is not a third badge style and it is not an eighth
-// badge. R-050 gave the seven badges two spellings and the set did not grow,
-// because each of the seven could be written in either form. This cannot write
-// all seven — five marks over seven tiers is a COLLAPSE, in the same family as
-// `author_type` in src/lib/provenance.ts, which renders the same seven as three.
-// A collapse is lossy by construction, so what matters is that it loses the
-// same thing every time and says out loud what it lost.
+// WHAT THIS IS NOT. It is not a third badge style and it is not an eighth badge.
+// R-050 gave the seven badges two spellings and the set did not grow, because
+// each of the seven could be written in either form. This notation writes all
+// seven as well, so the same holds of it: the involvement axis gains a third
+// spelling, and no new claim.
 //
-// WHAT IT LOSES IS EDITING, AND ONLY EDITING (editors, 2026-08-18). The two
-// editor tiers take the mark of the party that wrote — 🤖 and 👤 — because the
-// scope rule below governs and editing does not enter the mark. Every one of the
-// seven resolves. See MARK_BY_TIER and EDITOR_TIERS.
+// IT IS NO LONGER A COLLAPSE, AND THAT IS THE WHOLE OF THE AMENDMENT. For one
+// day this notation had five marks over seven tiers and was lossy by
+// construction: the two edited tiers took the bare mark of the party that wrote,
+// and the module said so out loud, because a collapse that hides what it drops
+// is the dishonest kind. The pencil ends that. `author_type` in
+// src/lib/provenance.ts is still a collapse — seven values rendered as three —
+// and is still documented as one; this is not, and the two are no longer the
+// same kind of instrument.
+//
+// THE PENCIL IS A NON-RELATIONAL OPERATOR, and that is why it can say what ">"
+// could not. ">" RANKS: it states that one party contributed more than the
+// other, which is a claim about contribution, and it is exactly the claim an
+// edited tier declines to make. ✏️ ranks nothing. It marks HELP THAT SHAPED THE
+// WORK WITHOUT DOING THE WRITING — editing, or prompting and steering — and
+// asserts no contribution at all. So the human beside an AI-written piece can be
+// named without implying they wrote any of it, and a tier no longer has to be
+// spelled with the party it names dropped out of the mark.
 //
 // THE DIRECTION RULE, and it is load-bearing rather than decorative:
 //
 //   THE GREATER CONTRIBUTOR ALWAYS STANDS FIRST; ">" ONLY EVER POINTS RIGHT.
+//   ACROSS THE PENCIL THE AUTHOR STANDS FIRST AND THE HELPING PARTY SECOND —
+//   read left to right as "written by X, edited or prompted by Y."
 //
-// Without it a reader meets 🤖>👤 and 👤>🤖 and reaches for the reading the
-// glyphs invite — a ranking of machines against people. The rule makes the two
-// marks one statement in two orders: this is a RATIO OF CONTRIBUTION on a single
-// piece, and the side that did more is written first. A mark that pointed left
-// would be the same claim spelled backwards, so the notation never spells it
-// that way, and the marks below are COMPOSED by a function that can only put the
-// greater party first rather than typed out as five strings that happen to obey
-// the rule. tests/notation.test.mjs pins both the composition and the five
-// literal results.
+// Without the first half a reader meets 🤖>👤 and 👤>🤖 and reaches for the
+// reading the glyphs invite — a ranking of machines against people. The rule
+// makes the two marks one statement in two orders: this is a RATIO OF
+// CONTRIBUTION on a single piece, and the side that did more is written first.
+//
+// The second half extends the ORDER to the pencil without extending the ranking.
+// Order still carries meaning there — which party wrote, which party helped —
+// but the operator between them makes no comparison, so 🤖✏️👤 says who did what
+// rather than who did more.
+//
+// A mark that pointed left, or that put the helping party first, would be a
+// different claim spelled with the same glyphs. So the marks below are COMPOSED
+// by functions that can only put the authoring party first, rather than typed
+// out as seven strings that happen to obey the rule. tests/notation.test.mjs
+// pins both the composition and the seven literal results.
 //
 // It is the rule the badge notation already follows — `A>H` and `H>A`, R-044 —
 // so an adopter meeting both meets one convention twice, not two conventions.
@@ -49,6 +72,13 @@
 //   selection, arrangement, headline, disclosed condensation — does not enter
 //   the mark; where the editors' hands went further, the piece's provenance
 //   notes say exactly how."
+//
+// THE SCOPE RULE IS UNCHANGED BY THE AMENDMENT, and the two are easy to run
+// together. It governs this journal's ORDINARY HANDLING of the pieces it
+// publishes — selecting them, arranging them, giving them a headline, condensing
+// them with the condensation disclosed — and none of that puts a pencil in a
+// mark or moves a piece to an editor tier. What a pencil renders is a TIER the
+// piece already carries, set at acceptance. Only the tier changes the mark.
 //
 // DERIVED FROM THE TIER, NEVER SET BY HAND. There is no `mark` in any piece's
 // frontmatter and there must never be one. A per-article value would be a second
@@ -70,7 +100,7 @@ import { TIERS, type TierCode } from './site.ts';
 /**
  * The glyphs, by codepoint, with the plain ASCII operator among them.
  *
- * WRITTEN AS ESCAPES RATHER THAN PASTED, because three of the four are
+ * WRITTEN AS ESCAPES RATHER THAN PASTED, because four of the five are
  * invisible-by-nature in a diff: an editor comparing 🤖 to a lookalike, or a
  * word processor helpfully substituting a variation selector, produces a change
  * no reviewer can see and no test would catch if the tests pasted the same
@@ -84,6 +114,33 @@ const ROBOT = '\u{1F916}'; // 🤖 U+1F916 ROBOT FACE
 const BUST = '\u{1F464}'; // 👤 U+1F464 BUST IN SILHOUETTE
 const HEAVY_EQUALS = '\u{1F7F0}'; // 🟰 U+1F7F0 HEAVY EQUALS SIGN
 const LEADS = '>'; // plain ASCII; no emoji greater-than exists
+
+/**
+ * U+FE0F VARIATION SELECTOR-16, which asks for the emoji drawing of a character
+ * that would otherwise be drawn as text.
+ *
+ * NAMED HERE BECAUSE IT IS DELIBERATE IN EXACTLY ONE PLACE and an accident
+ * everywhere else. The three glyphs above are Emoji_Presentation=Yes — they draw
+ * as emoji unasked, and a selector appended to one of them by a clipboard is a
+ * change no reviewer can see and every parser can. The pencil is not; see below.
+ */
+const VS16 = '\u{FE0F}';
+
+/**
+ * ✏️ — U+270F PENCIL followed by U+FE0F. The non-relational operator, added by
+ * the editors' amendment of 2026-08-19.
+ *
+ * THE VARIATION SELECTOR IS PART OF THE MARK, and this is the one glyph in the
+ * notation where that is true. U+270F is a Unicode 1.1 dingbat with
+ * Emoji_Presentation=No, so on its own it draws as a monochrome text pencil —
+ * ✏ — which would set one text glyph among four emoji in every mark that uses
+ * it. The editors specified ✏️, the emoji form, so the canonical mark carries the
+ * selector and this escape says so rather than leaving it to survive a paste.
+ *
+ * THE BARE CHARACTER IS AN ACCEPTED EQUIVALENT FORM, on the same footing as the
+ * plain ASCII equals: see PENCIL_TEXT_FORMS.
+ */
+const PENCIL = `\u{270F}${VS16}`;
 
 /**
  * A relational mark, composed so the direction rule cannot be broken by typing.
@@ -102,14 +159,36 @@ function balanced(one: string, other: string): string {
 }
 
 /**
- * The five marks. Keys are the journal's own names for them; the values are what
- * a reader sees.
+ * A pencil mark, composed so the second half of the direction rule cannot be
+ * broken by typing either.
+ *
+ * The parameters are named for the ROLES rather than for the sides — `author`
+ * wrote the words, `helper` edited or prompted — because that is the whole of
+ * what the order means here, and there is no argument order in which this
+ * function could write the helping party first.
+ *
+ * IT MAKES NO COMPARISON, unlike led(). That is the point of the operator: this
+ * composes a mark that says who wrote and who helped, and never who did more.
+ */
+function shaped(author: string, helper: string): string {
+  return `${author}${PENCIL}${helper}`;
+}
+
+/**
+ * The seven marks. Keys are the journal's own names for them; the values are
+ * what a reader sees.
+ *
+ * IN THE TIER TABLE'S ORDER, most-AI to most-human — which since the amendment
+ * is exactly the order of TIERS itself, seven marks over seven tiers, one for
+ * one. MARK_ORDER reads this order rather than restating it.
  */
 export const MARKS = Object.freeze({
   'ai-alone': ROBOT,
+  'ai-human-helped': shaped(ROBOT, BUST),
   'ai-led': led(ROBOT, BUST),
   balanced: balanced(ROBOT, BUST),
   'human-led': led(BUST, ROBOT),
+  'human-ai-helped': shaped(BUST, ROBOT),
   'human-alone': BUST,
 });
 
@@ -138,20 +217,49 @@ export type MarkKey = keyof typeof MARKS;
 export const BALANCED_ASCII_FORM = MARKS.balanced.replace(HEAVY_EQUALS, '=');
 
 /**
+ * The two pencil marks with the variation selector stripped — 🤖✏👤 and 👤✏🤖.
+ *
+ * THE SAME ALLOWANCE THE ASCII EQUALS ALREADY HAS, for the same reason and with
+ * the same limits: an accepted equivalent form, published so an adopter knows
+ * where the line is, and never a form this code chooses. Every surface here
+ * draws the canonical ✏️ and every feed emits it.
+ *
+ * IT EXISTS BECAUSE THIS ONE IS LOST BY ACCIDENT RATHER THAN BY CHOICE. A
+ * variation selector is invisible and plain-text pipelines strip it — which is
+ * precisely the setting this notation was designed for. A consumer that received
+ * 🤖✏👤 and could not match it against the published enum would conclude the
+ * mark was unknown, when what actually happened is that a zero-width character
+ * did not survive a copy. So the equivalence is stated rather than left to be
+ * guessed at.
+ *
+ * DERIVED FROM THE CANONICAL MARKS, never typed, so the pair cannot drift.
+ */
+export const PENCIL_TEXT_FORMS: Readonly<
+  Record<'ai-human-helped' | 'human-ai-helped', string>
+> = Object.freeze({
+  'ai-human-helped': MARKS['ai-human-helped'].replace(VS16, ''),
+  'human-ai-helped': MARKS['human-ai-helped'].replace(VS16, ''),
+});
+
+/**
  * The plain-language meaning of each mark, in the editors' ratified words.
  *
  * THE MEANING IS THE RECORD AND THE GLYPH IS THE CONVENIENCE, which is not a
  * pleasantry — it is why this table exists at all. 🟰 is Unicode 14 (2021) and
- * will render as a box on older devices; an emoji font may draw any of the four
- * differently from the next; a plain-text field may strip them. Everywhere a
- * mark is drawn, this string travels with it as the accessible name, so a reader
- * who gets no glyph still gets the whole of what the glyph was for.
+ * will render as a box on older devices; ✏️ asks for its emoji form with a
+ * variation selector a plain-text pipeline may strip; an emoji font may draw any
+ * of them differently from the next; a plain-text field may lose them entirely.
+ * Everywhere a mark is drawn, this string travels with it as the accessible
+ * name, so a reader who gets no glyph still gets the whole of what the glyph was
+ * for.
  */
 export const MARK_MEANINGS: Readonly<Record<MarkKey, string>> = Object.freeze({
   'ai-alone': 'AI alone',
+  'ai-human-helped': 'AI-written, human-edited or prompted',
   'ai-led': 'AI-led, human contributed',
   balanced: 'balanced co-creation',
   'human-led': 'human-led, AI assisted',
+  'human-ai-helped': 'human-written, AI-edited or prompted',
   'human-alone': 'human alone',
 });
 
@@ -164,52 +272,53 @@ export const MARK_MEANINGS: Readonly<Record<MarkKey, string>> = Object.freeze({
  * src/lib/provenance.ts for the same reason given there: a new tier silently
  * inheriting a mark would publish a claim about a piece that nobody made.
  *
- * FIVE MAP EXACTLY AND TWO MAP BY THE SCOPE RULE, so all seven resolve. `ai`,
- * `ai-human`, `ai-equals-human`, `human-ai` and `human` are the five marks in
- * the tier table's own words — the notation was designed over them and the
- * descriptions line up phrase for phrase ("AI led, with meaningful human
- * contributions" / "AI-led, human contributed").
+ * ONE FOR ONE SINCE THE AMENDMENT OF 2026-08-19. Every tier has its own mark and
+ * no two tiers share one, so nothing is dropped in the rendering and no tier is
+ * spelled by leaving out a party it names. The five solo and relational marks
+ * line up with their tiers phrase for phrase — the notation was designed over
+ * the tier table's own words ("AI led, with meaningful human contributions" /
+ * "AI-led, human contributed") — and the two pencil marks now do the same for
+ * the two tiers the notation previously could not say.
  *
- * THE TWO EDITOR TIERS TAKE THE MARK OF THE PARTY THAT WROTE (editors' final
- * ruling, 2026-08-18). `ai-human-editor` is 🤖 and `human-ai-editor` is 👤,
- * because the scope rule governs: EDITING DOES NOT ENTER THE MARK. That is
- * standard publishing practice — a book is not co-authored by its editor — and
- * it is R-046's own contributing-versus-editing line read to its conclusion
- * rather than treated as a gap in this notation.
+ * WHAT THE AMENDMENT REPLACED, recorded because the reasoning is worth keeping
+ * and because a later reader will meet the earlier answer in the git history and
+ * need to know which one governs. For one day the two editor tiers took the bare
+ * mark of the party that WROTE — `ai-human-editor` was 🤖, `human-ai-editor` was
+ * 👤 — on the scope rule read broadly and on standard publishing practice, a
+ * book not being co-authored by the person who edited it.
  *
- * THE MARK IS THE BYLINE; THE BADGE IS THE CREDITS. Nothing is lost by the
- * collapse, and that is what makes it honest rather than lossy in the way that
- * matters: the editing party stays fully disclosed one line away, in the badge
- * (`AI–Hᵉ`), in the tier name, in the description, in the Provenance block and
- * in `involvement_tier` on every machine surface. The mark answers who wrote it;
- * the record answers who else touched it.
- *
- * THIS SETTLES A QUESTION THAT WAS OPEN FOR ONE DAY, and the earlier answer is
- * recorded because the reasoning is worth keeping: a first pass left these two
- * unmarked on the grounds that 🤖 would drop a named human hand from the record.
- * The editors' answer is that it does not drop it — it puts it where editorial
- * hands belong. Every tier now resolves, and the sixth-mark question R-045 would
- * have governed never arises.
+ * THAT READING WAS RIGHT ABOUT AUTHORSHIP AND IS KEPT WHERE AUTHORSHIP IS THE
+ * QUESTION: `author_type` still derives `ai` from `ai-human-editor` and `human`
+ * from `human-ai-editor`, because editing does not confer authorship. It was the
+ * wrong answer for a MARK, because a mark is not only an authorship claim — it
+ * is the whole of what a reader meets in a byline, and a reader shown 🤖 on an
+ * edited piece was not told something true in shorter form, they were told less
+ * than the tier says. The pencil lets a mark name the second party without
+ * claiming they wrote any of it, which is the thing ">" could never have done.
  */
 export const MARK_BY_TIER: Readonly<Record<TierCode, MarkKey>> = Object.freeze({
   ai: 'ai-alone',
-  'ai-human-editor': 'ai-alone',
+  'ai-human-editor': 'ai-human-helped',
   'ai-human': 'ai-led',
   'ai-equals-human': 'balanced',
   'human-ai': 'human-led',
-  'human-ai-editor': 'human-alone',
+  'human-ai-editor': 'human-ai-helped',
   human: 'human-alone',
 });
 
 /**
- * The tiers whose mark is reached by the scope rule rather than by their own
- * description — named so the collapse is a published fact rather than something
- * a reader has to notice by comparing two tables.
+ * The two tiers the pencil serves — the tiers whose second party edited or
+ * prompted rather than contributed.
  *
- * NOT AN EXCEPTION LIST. Every tier here resolves to a mark like any other; what
- * these two share is that the mark drops a party the tier names, which is the
- * scope rule doing exactly what it says. The surfaces that teach the notation
- * read this to say so out loud.
+ * NAMED SO THE SURFACES THAT TEACH THE NOTATION CAN POINT AT THEM rather than
+ * hard-coding two codes apiece, and so a test can assert the property that
+ * actually matters about them: both parties stand in the mark, and the operator
+ * between them is the one that makes no comparison.
+ *
+ * NOT AN EXCEPTION LIST, and since the amendment not a loss list either. Before
+ * 2026-08-19 these were the two tiers whose mark dropped a party the tier named,
+ * and this export existed to say so out loud. It no longer says that, because it
+ * is no longer true of them.
  */
 export const EDITOR_TIERS: readonly TierCode[] = Object.freeze([
   'ai-human-editor',
@@ -217,15 +326,36 @@ export const EDITOR_TIERS: readonly TierCode[] = Object.freeze([
 ]);
 
 /**
- * What the scope rule does to those two, in one sentence, for the surfaces that
- * explain it.
+ * What the pencil covers, in the editors' ratified words — required verbatim on
+ * every surface that teaches the notation.
  *
- * One string rather than a phrase written at each call site, on the rule the
+ * WHOEVER MADE THE SUGGESTION, THE PENCIL IS THE SAME. This is the sentence that
+ * keeps the operator from being read as a claim about who held authority in the
+ * exchange rather than about who wrote the words. It matters most in the
+ * direction this journal's readers will find least familiar: an AI proposing
+ * edits or questions on a human's piece is AI editing, and the mark says so.
+ *
+ * ONE STRING RATHER THAN A PHRASE WRITTEN AT EACH CALL SITE, on the rule the
  * rest of this repository follows: a sentence restated is a sentence that can
- * come apart.
+ * come apart. The editors gave this as text to publish, not as a summary to
+ * paraphrase, and the tests pin it to the character.
  */
-export const EDITOR_TIER_NOTE =
-  'Editing does not enter the mark, so these carry the mark of the party that wrote; the editing party stays named in the badge, the tier and the provenance record.';
+export const PENCIL_COVERS =
+  'Editing or prompting here includes suggestions made and accepted, whichever party made them — an AI proposing edits or questions on a human’s piece is AI editing, the same as the reverse.';
+
+/**
+ * Where the pencil stops and the relational marks begin, in the editors'
+ * ratified words — required verbatim on every surface that teaches the notation.
+ *
+ * IT DECLINES TO DRAW A LINE THE WORLD DOES NOT HAVE, AND SAYS SO, which is the
+ * honest form of this and the reason it is published rather than kept as desk
+ * guidance. The alternative — a rule with a threshold in it — would be a number
+ * nobody could apply and every reader could dispute. What the journal can commit
+ * to instead is that the judgment is made by named people, written down where
+ * the piece is, and disclosed as close when it was close.
+ */
+export const PENCIL_VERSUS_CONTRIBUTION =
+  'Prompting and contributing are a continuum, not a clean line. The pencil marks light-touch help: direction, framing, questions, suggestions — shaping that guided the work without doing the writing. Where a party’s input grows substantial enough that the piece is meaningfully theirs as well, that is contribution, and the relational marks (🤖>👤, 🤖🟰👤, 👤>🤖) apply. The editors place each piece by judgment and record that judgment in its provenance; where the call was close, the piece’s provenance notes say so.';
 
 export interface Mark {
   /** The glyph string, e.g. "🤖>👤". */
@@ -240,7 +370,7 @@ export interface Mark {
  * The mark for a tier code, or null.
  *
  * ALL SEVEN TIERS RESOLVE, so null means the code is not one of the seven: a
- * chained code (R-035's grammar composes labels the five marks cannot express,
+ * chained code (R-035's grammar composes labels the seven marks cannot express,
  * exactly as it composes labels the seven badges cannot — tierNotation() returns
  * null there too and this agrees with it), or no code at all. Both mean the same
  * thing at every call site: draw no mark, publish no mark field.
@@ -304,12 +434,12 @@ export function markKey(): Array<{
 }
 
 /**
- * The five marks in order, most-AI to most-human — the notation on its own,
+ * The seven marks in order, most-AI to most-human — the notation on its own,
  * without the tiers, for the key that teaches it.
  *
  * DERIVED FROM MARKS' OWN ORDER rather than retyped. The object literal above is
  * written most-AI to most-human because that is the ratified sequence, and this
- * reads it in that order so a five-row table and the five-line design cannot
+ * reads it in that order so a seven-row table and the seven-line design cannot
  * fall out of step.
  */
 export const MARK_ORDER: readonly MarkKey[] = Object.freeze(

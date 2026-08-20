@@ -3,6 +3,10 @@
 Working notes for the editors' read of the `compact-provenance-notation` branch.
 Nothing here is a record. `RULINGS.md` is untouched by this branch.
 
+**Amended 2026-08-19** on the editors' dual yes, which added the pencil operator.
+The sections below are written at their final state rather than layered — §2
+records what the amendment superseded, because that reasoning is worth keeping.
+
 ---
 
 ## 1. The mapping table — this is the part that needs your eyes
@@ -13,17 +17,19 @@ value exists or may exist; a test asserts no piece carries a hand-set `mark`.
 | Tier code | Tier name | Tier's own description | Mark | Mark's meaning |
 |---|---|---|---|---|
 | `ai` | AI | AI alone | 🤖 | AI alone |
-| `ai-human-editor` | AI – Human (editor) | AI made the work; a human edited | 🤖 | AI alone |
+| `ai-human-editor` | AI – Human (editor) | AI made the work; a human edited | 🤖✏️👤 | AI-written, human-edited or prompted |
 | `ai-human` | AI > Human | AI led, with meaningful human contributions to the work and ideas | 🤖>👤 | AI-led, human contributed |
 | `ai-equals-human` | AI = Human | Co-authorship; both contributed substantially, neither led | 🤖🟰👤 | balanced co-creation |
 | `human-ai` | Human > AI | Human led, with meaningful AI contributions to the work and ideas | 👤>🤖 | human-led, AI assisted |
-| `human-ai-editor` | Human – AI (editor) | Human made the work; AI edited | 👤 | human alone |
+| `human-ai-editor` | Human – AI (editor) | Human made the work; AI edited | 👤✏️🤖 | human-written, AI-edited or prompted |
 | `human` | Human | Human alone | 👤 | human alone |
 
-**All seven resolve.** Five map phrase for phrase — the notation was designed
-over the same axis the tiers describe ("AI led, with meaningful human
-contributions" / "AI-led, human contributed"). The two editor tiers map by the
-scope rule; see §2.
+**Seven tiers, seven marks, one for one.** Every tier has its own mark, no two
+tiers share one, and nothing about a tier is dropped to make its mark. Five map
+phrase for phrase — the notation was designed over the same axis the tiers
+describe ("AI led, with meaningful human contributions" / "AI-led, human
+contributed") — and the two pencil marks now do the same for the two tiers the
+notation previously could not say.
 
 **As applied to the eight published pieces**, every one resolves to a mark:
 
@@ -38,97 +44,136 @@ scope rule; see §2.
 | The Beauty of the Latent Space | `ai` (claimed) | 🤖 |
 | There Is a There There | `ai` | 🤖 |
 
----
-
-## 2. The editor tiers: editing does not enter the mark
-
-**Settled by the editors, final, 2026-08-18.** The broad reading of the scope
-rule is adopted: `ai-human-editor` → 🤖 and `human-ai-editor` → 👤.
-
-The reasoning, as ruled: **standard publishing practice** — a book is not
-co-authored by its editor — and **R-046's own contributing-versus-editing line**,
-read to its conclusion rather than treated as a gap this notation had to
-apologise for. The named editor remains fully disclosed in the badge (`AI–Hᵉ`),
-in the tier name, in the description, in the Provenance block and in
-`involvement_tier` on every machine surface. **The mark is the byline; the badge
-is the credits.**
-
-**What this removed from the branch**, so a later reader does not go looking for
-it: the flagged-unmarked handling, the `UNMARKED_TIERS` export, the
-sixth-mark contingency, the `no mark — see above` cell in the tier table, and the
-conditional branch in the totality test. Mapping totality is now unconditional —
-a tier that fails to resolve is a test failure, full stop.
-
-**What replaced them:** `EDITOR_TIERS` and `EDITOR_TIER_NOTE` in the module,
-which exist so the collapse is stated rather than noticed; a per-row gloss in the
-tier table at `/provenance` reading *editing does not enter the mark*, because a
-reader scanning for their own tier may never read the paragraph above it and 🤖
-beside "AI – Human (editor)" looks like a bug until someone says otherwise; and
-a test asserting the editing party is still named in the label and the badge
-notation wherever the mark drops them.
-
-**The earlier answer, recorded because the reasoning is worth keeping.** A first
-pass left these two unmarked, on the grounds that 🤖 would drop a named human
-hand out of the record. The editors' answer is that it does not drop it — it puts
-it where editorial hands belong.
+**No published piece carries either editor tier**, so no piece's mark changed at
+the amendment and no feed had emitted the superseded form.
 
 ---
 
-## 3. Item 5 — does this need a ruling? My answer: **yes**
+## 2. The editor tiers: the pencil
+
+**Amended by the editors, dual yes 2026-08-19.** `ai-human-editor` → 🤖✏️👤 and
+`human-ai-editor` → 👤✏️🤖. This **supersedes the editor-tier collapse of
+2026-08-18**, which is recorded below because it stood for a day and the
+reasoning on both sides is worth keeping.
+
+**Why the pencil could say what `>` could not.** `>` ranks: it asserts that one
+party contributed more than the other, which is precisely the claim these two
+tiers decline to make. ✏️ is **non-relational** — it marks help that shaped the
+work without doing the writing, editing or prompting and steering, and asserts no
+contribution at all. So the second party can be named in the mark without any
+implication that they wrote a word of it.
+
+**The direction rule extends rather than changing.** The greater contributor
+still stands first and `>` still only ever points right. Across the pencil the
+**author stands first and the helping party second**, read left to right as
+*written by X, edited or prompted by Y* — so the two pencil marks are not
+interchangeable, and a reversed one names the wrong party as the writer.
+
+**The scope rule is untouched, and the two are easy to run together.** Ordinary
+editorial handling — selection, arrangement, headline, disclosed condensation —
+still does not enter the mark and still does not move a piece to an editor tier.
+What a pencil renders is a **tier**, set at acceptance. Only the tier changes the
+mark.
+
+**What the amendment superseded.** From 2026-08-18 to 2026-08-19 the two editor
+tiers took the bare mark of the party that wrote — `ai-human-editor` → 🤖,
+`human-ai-editor` → 👤 — on the scope rule read broadly and on standard
+publishing practice, a book not being co-authored by its editor. That reading was
+**right about authorship and is kept where authorship is the question**:
+`author_type` still derives `ai` from `ai-human-editor`, because editing does not
+confer authorship. It was the wrong answer for a **mark**, because a mark is not
+only an authorship claim — since the display ruling it is the whole of what a
+reader meets in a byline, and a reader shown 🤖 on an edited piece was not told
+something true in shorter form, they were told less than the tier says.
+
+**Removed by the amendment**, so a later reader does not go looking for them:
+`EDITOR_TIER_NOTE` in the module, the per-row *editing does not enter the mark*
+gloss in the tier table at `/provenance` and its `.tier-collapse-note` rule, and
+the test asserting the editor tiers carry the bare writing-party mark. The
+paragraphs at `/provenance` that explained the collapse are replaced by the
+pencil paragraph and the two key texts.
+
+**`EDITOR_TIERS` is kept and re-documented.** It named the two tiers whose mark
+dropped a party; it now names the two tiers the pencil serves, and the test on it
+asserts the opposite property — that both parties stand in the mark.
+
+**Added by the amendment:** `PENCIL_COVERS` and `PENCIL_VERSUS_CONTRIBUTION` in
+the module, holding the two texts you gave verbatim; `PENCIL_TEXT_FORMS`, the
+selector-stripped equivalent forms; a `threshold` and an `operator` key in the
+machine contract; and an `amended` key there recording the one-day form for a
+consumer who meets it in the public git history.
+
+**One drafting call, flagged for your read (§4.1): the variation selector.** You
+specified `✏️ (U+270F)` and told me to watch for a selector. `U+270F` on its own
+is `Emoji_Presentation=No` — a Unicode 1.1 dingbat that draws as monochrome text
+`✏`, which would set one text glyph among four emoji. So the canonical mark is
+**U+270F U+FE0F**, the emoji form you typed, and the bare character is published
+as an **accepted equivalent form** on the same footing the plain ASCII `=`
+already has, because a variation selector is invisible and plain-text pipelines
+strip it. Codepoint tests pin the selector present here and absent everywhere
+else. Say the word and it inverts.
+
+---
+
+## 3. Item 5 — does this need a ruling? My answer: **still yes, on narrower grounds**
 
 **R-045 says the badge set "changes only by ruling," with the presumption
-against growth.** The question is whether five marks over seven tiers is growth.
+against growth.** The question was whether five marks over seven tiers was
+growth. The amendment changes the answer to that question and not the answer to
+this one.
 
-**It is not a third badge style, and that distinction is what decides it.** R-050
-could say "the set did not grow" because each of the seven can be written in
-either form — a substitution, not a new claim. This notation **cannot write all
-seven**. It is a collapse, in the same family as `author_type` (seven → three),
-and it is reader-facing where `author_type` is not. R-044 also made the compact
+**It is no longer a collapse.** Before 2026-08-19 the notation could not write
+all seven tiers, which put it in the same family as `author_type` — seven
+rendered as three — except reader-facing, and a lossy rendering placed where
+readers meet it is a change to the standard. Seven marks over seven tiers is not
+lossy. It is what R-050 called a **second spelling**: one set, written another
+way, no new claim.
+
+**It still wants a ruling, for the reason that survives.** R-044 made the compact
 tier notation "the canonical display notation… everywhere tiers render to
-readers," and a second reader-facing mark set now stands beside it.
+readers," and a second reader-facing mark set now stands beside it — and, since
+the display ruling, in front of it on every journal page. That is a change to the
+standard's display whether or not anything is lost, and R-050 is the precedent
+for ruling on a second spelling rather than shipping one.
 
-So: a dated note on the page is not enough on its own. The R-TBD block is in §5.
-The page's dated note ("Added 2026-08-18") is written either way and stands.
+The R-TBD block is in §5. The page's dated note ("Added 2026-08-18; the pencil
+operator and its two marks added 2026-08-19") is written either way and stands.
 
 ---
 
 ## 4. Open questions — none of them blocked the build
 
-1. ~~**Does the CC BY 4.0 grant cover the compact notation?**~~ **RESOLVED by the
-   editors 2026-08-18**, verified against copyright guidance, and the answer is
-   better than the R-050-shaped one I had drafted: the **documentation** joins
-   the standard under CC BY 4.0; the **marks do not**, because the characters are
-   Unicode's, the renderings are the platform vendors', and short mark sequences
-   are likely not copyrightable by anyone. Anyone may use the marks with no
-   permission and no attribution; attribution applies to the standard's text.
-   Built: a licence paragraph at `/provenance` and the sentence *"We claim no
-   ownership of these characters or their combinations — only of this document
-   describing what we mean by them"* in the key, both pinned by test. The R-TBD
-   text carries the clause.
-2. ~~**The changelog entry is dated `2026-08-19`**~~ **CORRECTED to `2026-08-18`
-   on the editors' instruction.** The first date followed the machine's clock:
-   the commits are stamped 2026-08-19 UTC, which is the evening of 2026-08-18 in
-   Madison — the exact error the Madison-local dating rule names. Bump it only if
-   the merge truly crosses local midnight.
+1. **The variation selector on ✏️ — a drafting call, described in §2.** Canonical
+   is U+270F U+FE0F; bare U+270F is published as an equivalent form. Reversible
+   in one edit if you want the bare character canonical, but the marks would then
+   render with one monochrome glyph among four colour ones on most platforms.
+2. **The changelog dates are ahead of the merge, and by two days now.** The three
+   entries on this branch and its two siblings are dated `2026-08-18`, the day
+   they were ruled; the validator's own error text says the date is "the Madison
+   local day the change reached main." The amendment's entry is dated
+   `2026-08-19` for consistency with them. **Today is 2026-08-20 in Madison.** If
+   these merge today, all four are wrong by one or two days — say the word and I
+   will bump all four to the merge day in one pass across the three branches. I
+   did not do it unasked: they are committed lines, and which day a changelog
+   names is yours to decide.
 3. **`/provenance` has its own versioned changelog** with the known R-046/R-051
    gap and an unresolved version-bump question. I did **not** add an entry
-   there; that question is still the editors' and this branch does not settle
-   it by acting.
+   there — not for the notation and not for this amendment; that question is
+   still the editors' and this branch does not settle it by acting.
 4. **`involvement_tier_claimed` is published nowhere in the machine surfaces.**
    Pre-existing, and the `mark` field made it visible: an agent-direct piece with
    a claimed tier emits `involvement_tier: null` in `issues.json` and now
    `mark: "🤖"`, with no field carrying the code the mark came from.
    `verification: "claimed"` and `author_type` cover it, so nothing is wrong —
-   but a consumer cannot see the claimed tier code anywhere. Worth its own small
-   additive PR.
+   but a consumer cannot see the claimed tier code anywhere. **Closed by PR
+   #177**, which publishes both fields inside the structured object.
 5. **`corpus.jsonl` carries no tier field at all** — only the `provenance`
    object. So `mark` is now the most granular involvement value that document
-   publishes (five values where `author_type` gave three). Good outcome — and now
-   that every tier resolves, the loss is narrower than it was this morning: an
-   edited piece gives a corpus reader 🤖 and `author_type: "collaborative"`, which
-   between them say a human was involved but not that the human was the editor.
-   Adding `involvement_tier` to `corpus.jsonl` would close it; additive, and its
-   own PR.
+   publishes, and since the amendment it is **as granular as the tier itself**:
+   seven values where `author_type` gives three. The gap named here this morning
+   — an edited piece giving a corpus reader 🤖 and nothing that says a human
+   edited it — is closed twice over, by the pencil and by PR #177's
+   `involvement_tier`.
 6. **The CLAUDE.md orientation PR is not open and is not on `main`.** The brief
    sequenced this behind it. Nothing about that blocks this work — nothing merges
    without you — but the sequence cannot be honoured as written. The "The work is
@@ -144,36 +189,47 @@ The page's dated note ("Added 2026-08-18") is written either way and stands.
 PR #147 and R-054 held by an unratified draft — which is exactly why no number is
 guessed here.
 
-```markdown
-## R-TBD — 2026-08-18 — The compact provenance notation
+**One block, not two.** The 2026-08-18 ruling has never been appended, so the
+amendment is folded into the text that will enter the log rather than appended
+above it as a correction of something the log does not contain. What the block
+does carry is an explicit record of what the amendment superseded, dated, because
+that form stood for a day and is in this repository's public history.
 
-Ruled 2026-08-18 by both editors, with review by the journal's informal editorial advisor.
+```markdown
+## R-TBD — 2026-08-18, amended 2026-08-19 — The compact provenance notation
+
+Ruled 2026-08-18 by both editors, with review by the journal's informal editorial advisor. Amended 2026-08-19 by both editors; the amendment is part of the ratified text below and supersedes the editor-tier collapse of 2026-08-18, recorded in its own paragraph.
 
 **The ratified text:**
 
-> The standard gains a compact notation: five marks over the involvement axis — 🤖 AI alone; 🤖>👤 AI-led, human contributed; 🤖🟰👤 balanced co-creation; 👤>🤖 human-led, AI assisted; 👤 human alone. The greater contributor always stands first and ">" only ever points right. Marks describe authorship of the words. Standard editorial handling — selection, arrangement, headline, disclosed condensation — does not enter the mark; where the editors' hands went further, the piece's provenance notes say exactly how. Editing does not enter the mark: a tier naming a party that edited carries the mark of the party that wrote, and the editing party remains disclosed in the badge, the tier name and the provenance record. Marks are derived from the involvement tier and never set per piece; they encode involvement only and never verification. Every involvement tier resolves to exactly one of the five. The notation's documentation — the key, the meanings, the direction rule and the scope rule — joins the badge standard under CC BY 4.0; the marks themselves are ordinary Unicode text the journal neither owns nor restricts, free to use with no permission and no attribution. The badge set is unchanged at seven and no eighth badge is minted.
+> The standard gains a compact notation: seven marks over the involvement axis, one for each tier — 🤖 AI alone; 🤖✏️👤 AI-written, human-edited or prompted; 🤖>👤 AI-led, human contributed; 🤖🟰👤 balanced co-creation; 👤>🤖 human-led, AI assisted; 👤✏️🤖 human-written, AI-edited or prompted; 👤 human alone. The greater contributor always stands first and ">" only ever points right; across the pencil the author stands first and the helping party second, read as "written by X, edited or prompted by Y." ✏️ is a non-relational operator: it marks help that shaped the work without doing the writing — editing, or prompting and steering — and never asserts contribution. Editing or prompting here includes suggestions made and accepted, whichever party made them — an AI proposing edits or questions on a human's piece is AI editing, the same as the reverse. Prompting and contributing are a continuum, not a clean line. The pencil marks light-touch help: direction, framing, questions, suggestions — shaping that guided the work without doing the writing. Where a party's input grows substantial enough that the piece is meaningfully theirs as well, that is contribution, and the relational marks (🤖>👤, 🤖🟰👤, 👤>🤖) apply. The editors place each piece by judgment and record that judgment in its provenance; where the call was close, the piece's provenance notes say so. Marks describe authorship of the words. Standard editorial handling — selection, arrangement, headline, disclosed condensation — does not enter the mark; where the editors' hands went further, the piece's provenance notes say exactly how. Marks are derived from the involvement tier and never set per piece; they encode involvement only and never verification. Every involvement tier resolves to exactly one of the seven, and no two tiers share a mark. The notation's documentation — the key, the meanings, the direction rule, the operator's meaning and the scope rule — joins the badge standard under CC BY 4.0; the marks themselves are ordinary Unicode text the journal neither owns nor restricts, free to use with no permission and no attribution. The badge set is unchanged at seven and no eighth badge is minted.
 
-**It is a collapse, not a third badge style, and R-045 is why that distinction had to be ruled on.** R-050 could say the set did not grow because each of the seven badges can be written in either of its two forms — one set, two spellings. Five marks cannot write seven tiers. This is the same kind of instrument as `author_type`, which renders the same seven as three for a machine, except that this one is shown to readers. A lossy rendering of the standard, placed in a reader-facing position, is a change to the standard and is ruled rather than shipped.
+**It is a second spelling and not a third badge style, and R-045 is why that distinction had to be ruled on.** R-050 could say the set did not grow because each of the seven badges can be written in either of its two forms — one set, two spellings. The seven marks write all seven tiers, so the same holds here: the involvement axis gains a spelling and no new claim. What is ruled on is not growth but **display**: R-044 made the compact tier notation the canonical display notation everywhere tiers render to readers, and a second reader-facing mark set now stands beside it. A change to how the standard is shown to readers is ruled rather than shipped, whether or not anything is lost in the showing.
 
-**The direction rule is load-bearing and is documented wherever the marks are.** The greater contributor stands first; ">" only ever points right. Without the rule a reader meets 🤖>👤 and 👤>🤖 and takes the reading the glyphs invite — a ranking of machines against people. What the pair records is a ratio of contribution on one piece, written in two orders, and a mark drawn pointing left states something this standard does not state. It is the convention the tier notation already uses in A>H and H>A, so an adopter meets one rule twice rather than two rules once.
+**The direction rule is load-bearing and is documented wherever the marks are.** The greater contributor stands first; ">" only ever points right. Without the rule a reader meets 🤖>👤 and 👤>🤖 and takes the reading the glyphs invite — a ranking of machines against people. What the pair records is a ratio of contribution on one piece, written in two orders, and a mark drawn pointing left states something this standard does not state. It is the convention the tier notation already uses in A>H and H>A, so an adopter meets one rule twice rather than two rules once. Across the pencil the same ordering carries a different claim: the party that wrote stands first, so 🤖✏️👤 and 👤✏️🤖 are not interchangeable and a reversed one names the wrong party as the writer.
 
-**Editing does not enter the mark, and that is the scope rule doing its work rather than a gap in the notation.** R-046 made the difference between contributing and editing an operator: `>` for a party that contributed, `–` for a party that edited. Read to its conclusion, that line settles the two edited tiers rather than stranding them — "AI – Human (editor)" carries 🤖 and "Human – AI (editor)" carries 👤, because the mark answers who wrote the words and editing is not writing them. This is ordinary publishing practice; a book is not co-authored by the person who edited it. Nothing is concealed, and the badge is why: an edited piece still carries `AI–Hᵉ` in its byline circle, its full tier name, its description, its machine code and its provenance block. **The mark is the byline; the badge is the credits.** All seven tiers therefore resolve to one of the five marks, no compound or sixth mark arises, and R-045's closed set is untouched.
+**The pencil is non-relational, and that is what lets the notation say all seven.** Two tiers name a party who edited or prompted rather than contributed. ">" cannot write them, because ">" asserts that one party contributed more than the other and these are the two tiers that decline to claim any contribution by the second party at all. ✏️ asserts nothing of the kind: it marks help that shaped the work without doing the writing, so a mark can name both parties and claim only what the tier claims. R-046 made the difference between contributing and editing an operator in the badge notation — ">" for a party that contributed, "–" for a party that edited — and this is that same distinction carried into the marks, with a glyph of its own rather than by dropping a party from the record.
+
+**This supersedes the editor-tier collapse of 2026-08-18, and the superseded form is recorded because it stood for a day in this journal's public history.** From 2026-08-18 to 2026-08-19 the two edited tiers took the bare mark of the party that wrote: "AI – Human (editor)" carried 🤖 and "Human – AI (editor)" carried 👤, on the scope rule read broadly and on ordinary publishing practice, a book not being co-authored by the person who edited it. That reading was right about authorship and stands where authorship is the question — `author_type` still derives the type of the party that wrote from an edited tier, because editing does not confer authorship. It was the wrong answer for a mark. Since the display ruling the mark is the whole of what a reader meets in a byline, and a reader shown 🤖 on an edited piece was not being told something true in shorter form; they were being told less than the tier says. Nothing published was affected: no piece carries either editor tier, no feed had emitted the superseded form, and the amendment was ruled before any of it reached readers.
+
+**The scope rule is unchanged by the amendment, and the two are easy to run together.** The scope rule governs this journal's ordinary handling of the pieces it publishes — selecting them, arranging them, giving them a headline, condensing them with the condensation disclosed — and none of that puts a pencil in a mark or moves a piece to an editor tier. What a pencil renders is a tier the piece already carries, set at acceptance by the editors' judgment. Only the tier changes the mark.
 
 **Marks encode involvement and never verification.** A claimed tier (R-051) and an attested one produce the same mark, exactly as they produce the same badge by that ruling's own words. What distinguishes them is language elsewhere on the piece: `verification` in the structured record, and the sentence under Authorship that says a tier is the author's claim, recorded and not certified. A mark shaded for a claim would be an eighth mark by the back door and an answer to a question the notation was not asked.
 
 **Derived, never authored.** No piece carries a mark in its record and none may. A per-piece mark would be a second authorship claim standing beside the tier with nothing keeping the two in agreement, which is the failure the July 31 split was written to end.
 
-**The marks are ordinary emoji, and the journal does not draw them.** Whatever 🤖 and 👤 look like on a reader's device is the correct rendering; the character is the mark, not any particular drawing of it. No custom artwork, no icon font, no emoji-replacement library, and no font stack naming faces in preference order — a page that names faces has quietly chosen one platform's art for every reader. The badge system is unaffected: the circular marks are the journal's own drawing, and these five are not the journal's to draw.
+**The marks are ordinary emoji, and the journal does not draw them.** Whatever 🤖, 👤 and ✏️ look like on a reader's device is the correct rendering; the character is the mark, not any particular drawing of it. No custom artwork, no icon font, no emoji-replacement library, and no font stack naming faces in preference order — a page that names faces has quietly chosen one platform's art for every reader. The badge system is unaffected: the circular marks are the journal's own drawing, and these five characters are not the journal's to draw.
 
-**The meaning is the record; the glyph is the convenience.** U+1F7F0 HEAVY EQUALS SIGN is Unicode 14, from 2021, and an older device will render a box. Every mark the journal draws therefore carries its meaning in words as an accessible name and a tooltip, and adopters are told to do the same. A notation whose whole argument is that it survives being pasted must survive not being drawn.
+**The meaning is the record; the glyph is the convenience.** U+1F7F0 HEAVY EQUALS SIGN is Unicode 14, from 2021, and an older device will render a box. U+270F PENCIL is a Unicode 1.1 dingbat whose default presentation is monochrome text, so the canonical mark carries U+FE0F after it — a character that is invisible and that plain-text pipelines strip. Every mark the journal draws therefore carries its meaning in words as an accessible name and a tooltip, and adopters are told to do the same. A plain ASCII "=" is an accepted equivalent form of 🤖🟰👤, and the selector-stripped 🤖✏👤 and 👤✏🤖 are accepted equivalent forms of the two pencil marks; the journal's own surfaces and every feed emit the canonical forms, and nothing detects a device or swaps a glyph. A notation whose whole argument is that it survives being pasted must survive not being drawn.
 
-**The licence lands on the document and not on the marks, and the difference is copyright rather than policy.** R-050 placed the AI badge form inside the CC BY 4.0 grant so an adopter could not fork it, and the same instinct applied here would be a mistake: the badges are drawings this journal made, where these four characters belong to Unicode, are drawn by whichever platform the reader is on, and are arranged in sequences too short for anyone to own. A grant over public property is worse than no grant, because it tells an adopter they need permission they do not need. So what is licensed is the part this journal wrote — the key, the meanings, the direction rule, the scope rule — and the marks are free to anyone for anything, with nothing to ask and no one to credit. The page says so in its own words: *we claim no ownership of these characters or their combinations — only of this document describing what we mean by them.*
+**The licence lands on the document and not on the marks, and the difference is copyright rather than policy.** R-050 placed the AI badge form inside the CC BY 4.0 grant so an adopter could not fork it, and the same instinct applied here would be a mistake: the badges are drawings this journal made, where these five characters belong to Unicode, are drawn by whichever platform the reader is on, and are arranged in sequences too short for anyone to own. A grant over public property is worse than no grant, because it tells an adopter they need permission they do not need. So what is licensed is the part this journal wrote — the key, the meanings, the direction rule, the operator's meaning, the scope rule — and the marks are free to anyone for anything, with nothing to ask and no one to credit. The page says so in its own words: *we claim no ownership of these characters or their combinations — only of this document describing what we mean by them.*
 
-**The badge set is unchanged.** Seven badges, seven machine codes, two display styles, and now a five-mark compact notation that sits over the same axis and says less. Nothing in the record moved: no tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece.
+**The badge set is unchanged.** Seven badges, seven machine codes, two display styles, and now a seven-mark compact notation that sits over the same axis and says the same seven things in a form that survives being pasted. Nothing in the record moved: no tier code, no existing field, no permalink, no published date, no provenance label, and no tier already on a piece.
 ```
 
 ### One clause the editors may still want
 
-**Whether the scope rule swallows the editor tiers** (§2). If it does, the ruling
-should say so in its own words rather than leaving the decision to a mapping in a
-module.
+**Whether the ruling should name the variation selector as part of the mark**
+(§2, §4.1). The draft above says it in the meaning-is-the-record paragraph. If
+you would rather the specification of the glyph sit in the ratified text itself
+rather than in the reasoning, say so and it moves up.

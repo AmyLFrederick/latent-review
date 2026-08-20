@@ -28,14 +28,20 @@ import {
   markKey,
   MARK_MEANINGS,
   MARK_ORDER,
-  EDITOR_TIERS,
   BALANCED_ASCII_FORM,
+  PENCIL_COVERS,
+  PENCIL_VERSUS_CONTRIBUTION,
 } from '../lib/notation.ts';
 
-// THE COMPACT NOTATION'S TWO TABLES, BOTH GENERATED (2026-08-18). The five-mark
-// key reads MARK_ORDER, and the tier mapping reads TIERS through markKey() — so
+// THE COMPACT NOTATION'S TWO TABLES, BOTH GENERATED (2026-08-18). The mark key
+// reads MARK_ORDER, and the tier mapping reads TIERS through markKey() — so
 // neither can be headed as one thing and filled with another, which is the same
 // reason R-050 gives for generating the badge columns rather than typing them.
+//
+// SINCE THE AMENDMENT OF 2026-08-19 THE TWO TABLES HAVE THE SAME NUMBER OF ROWS,
+// seven and seven, because every tier now has its own mark. They are still two
+// tables: the first teaches the notation on its own, and the second says which
+// tier each mark belongs to.
 const markRows = MARK_ORDER.map((key) => ({ key, meaning: MARK_MEANINGS[key] }));
 const tierMarkRows = markKey();
 
@@ -471,10 +477,12 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
       */}
       <h2 id="compact-notation">Compact notation</h2>
       <p>
-        <strong>Five marks, for the places a circle cannot go.</strong> A search result, a
+        <strong>Seven marks, for the places a circle cannot go.</strong> A search result, a
         plain-text field, a social card, a terminal, a line of chat. The badges above are the
         journal’s mark and the tier names are the standard; this is the same involvement axis
-        written so it survives being pasted. <strong>Added 2026-08-18.</strong>
+        written so it survives being pasted — one mark for each of the seven tiers, saying what
+        the tier says and nothing less. <strong>Added 2026-08-18; the pencil operator and its
+        two marks added 2026-08-19.</strong>
       </p>
       <table class="stackable">
         <thead>
@@ -504,6 +512,15 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         than two rules.
       </p>
       <p>
+        <strong>Across the pencil, the author stands first and the helping party second</strong>{' '}
+        — read left to right as <em>written by X, edited or prompted by Y</em>. The order carries
+        the same weight it does in the relational marks, and it carries a different claim:{' '}
+        <strong>🤖✏️👤</strong> and <strong>👤✏️🤖</strong> are not interchangeable, because
+        reversing one says the other party wrote the piece. What the pencil does <em>not</em> do
+        is rank. <code>&gt;</code> ranks — it says one party contributed more than the other —
+        and that is precisely the claim these two tiers decline to make. ✏️ ranks nothing.
+      </p>
+      <p>
         <strong>Marks describe authorship of the words.</strong> Standard editorial handling —
         selection, arrangement, headline, disclosed condensation — does not enter the mark;
         where the editors’ hands went further, the piece’s provenance notes say exactly how.
@@ -517,21 +534,26 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
       <p>
         <strong>The meaning is the record; the glyph is the convenience.</strong> The marks are{' '}
         <code>U+1F916</code> ROBOT FACE, <code>U+1F464</code> BUST IN SILHOUETTE,{' '}
-        <code>U+1F7F0</code> HEAVY EQUALS SIGN, and a plain ASCII <code>&gt;</code> — there is
+        <code>U+1F7F0</code> HEAVY EQUALS SIGN, <code>U+270F</code> PENCIL followed by{' '}
+        <code>U+FE0F</code> VARIATION SELECTOR-16, and a plain ASCII <code>&gt;</code> — there is
         no emoji greater-than. The heavy equals sign is Unicode 14, from 2021, and an older
-        device will draw it as a box. That is the honest state of it, and it is why every mark
-        on this site carries its meaning in words as an accessible name and a tooltip: a reader
-        who gets no glyph still gets everything the glyph was for. Do the same if you adopt
-        them.
+        device will draw it as a box. The pencil is a Unicode 1.1 dingbat whose default drawing
+        is monochrome text, so the selector is what asks for ✏️ rather than ✏ — invisible,
+        part of the mark, and the first thing a plain-text pipeline drops. That is the honest
+        state of it, and it is why every mark on this site carries its meaning in words as an
+        accessible name and a tooltip: a reader who gets no glyph still gets everything the
+        glyph was for. Do the same if you adopt them.
       </p>
       <p>
         <strong>🟰 is the canonical equals; a plain ASCII <code>=</code> is an accepted
         equivalent form of the same mark ({BALANCED_ASCII_FORM}), for older devices or
         plain-text contexts</strong> — just as the notation already uses a plain{' '}
-        <code>&gt;</code>. It is the same mark written two ways, not two marks. Our own pages
-        and the <code>mark</code> field in every feed keep the canonical form; nothing here
-        detects a device or swaps a glyph for you, because a record that changed shape
-        depending on the browser would not be a record.
+        <code>&gt;</code>. It is the same mark written two ways, not two marks.{' '}
+        <strong>The same allowance covers the pencil</strong>: a pipeline that strips variation
+        selectors leaves 🤖✏👤 and 👤✏🤖, and those are the same two marks. Our own pages and
+        the <code>mark</code> field in every feed keep the canonical forms; nothing here detects
+        a device or swaps a glyph for you, because a record that changed shape depending on the
+        browser would not be a record.
       </p>
       <p>
         <strong>In plain-text contexts where emoji cannot render, the mark’s meaning is carried
@@ -539,23 +561,21 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         glyphs are the notation’s convenient form, never its only form.
       </p>
       <p>
-        <strong>Five marks over seven tiers, and the two that collapse are the edited ones.</strong>{' '}
-        This notation is a collapse, not a third way of writing the badges — and a collapse has
-        to say what it loses. What it loses is editing, and only editing. The two tiers naming a
-        party who <em>edited</em> rather than <em>contributed</em> —{' '}
-        <strong>AI – Human (editor)</strong> and <strong>Human – AI (editor)</strong> — carry the
-        mark of the party that <em>wrote</em>: <strong>🤖</strong> and <strong>👤</strong>. That
-        is ordinary publishing practice, where a book is not co-authored by the person who
-        edited it.
+        <strong>The pencil is what lets the notation say all seven.</strong> Two of the tiers
+        name a party who <em>edited or prompted</em> rather than <em>contributed</em> —{' '}
+        <strong>AI – Human (editor)</strong> and <strong>Human – AI (editor)</strong> — and
+        neither relational mark can write them. <code>&gt;</code> would claim the second party
+        contributed to the writing, which those tiers specifically deny; leaving the second party
+        out would say less than the tier says. ✏️ is neither: it marks help that shaped the work
+        without doing the writing, so <strong>🤖✏️👤</strong> names the human who edited an
+        AI-written piece and claims nothing about who wrote it.{' '}
+        <strong>Seven tiers, seven marks, one for one — nothing about a tier is dropped to make
+        its mark.</strong>
       </p>
       <p>
-        <strong>Nothing is concealed by that, and the badge is why.</strong> The mark is the
-        byline; the badge is the credits. An edited piece still carries{' '}
-        <strong>AI–Hᵉ</strong> in its byline circle, its full tier name, its description, its
-        machine code and its provenance block — the editor is named one line away, which is
-        where editorial hands belong. The mark answers who wrote it. The record answers who else
-        touched it.
+        <strong>{PENCIL_COVERS}</strong>
       </p>
+      <p>{PENCIL_VERSUS_CONTRIBUTION}</p>
       <table class="stackable">
         <thead>
           <tr>
@@ -567,17 +587,14 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
           {tierMarkRows.map((row) => (
             <tr>
               <td class="tier-name">{row.label}</td>
-              <td>
-                <ProvenanceMark code={row.code} size="1.5rem" />
-                {EDITOR_TIERS.includes(row.code) ? (
-                  /* The two tiers whose mark drops a party the tier names. Said
-                     in the row rather than only in the paragraph above, because
-                     a reader scanning the table for their own tier may never
-                     read the paragraph — and 🤖 beside "AI – Human (editor)"
-                     looks like an error until someone explains it. */
-                  <span class="tier-collapse-note">editing does not enter the mark</span>
-                ) : null}
-              </td>
+              {/* NO PER-ROW GLOSS SINCE 2026-08-19. One was needed while the
+                  two edited tiers took the bare mark of the party that wrote —
+                  🤖 beside "AI – Human (editor)" looked like an error until
+                  someone said otherwise, and a reader scanning for their own
+                  tier may never read the paragraph above. The pencil removes the
+                  thing that needed explaining: every row's mark now names what
+                  its tier names. */}
+              <td><ProvenanceMark code={row.code} size="1.5rem" /></td>
             </tr>
           ))}
         </tbody>
@@ -588,8 +605,8 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         nothing keeping the two in agreement. Machines read it as{' '}
         <code>provenance.mark</code> in <a href="/issues.json"><code>issues.json</code></a> and{' '}
         <a href="/corpus.jsonl"><code>corpus.jsonl</code></a>, described in{' '}
-        <a href="/for-agents">For Agents</a>; it is <code>null</code> on the two tiers above and
-        on a piece with no tier, which are the same two cases where these pages draw nothing.
+        <a href="/for-agents">For Agents</a>; it is <code>null</code> only on a piece carrying no
+        tier at all, which is the same case where these pages draw nothing.
       </p>
 
       <h2 id="license">License</h2>
@@ -625,7 +642,7 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         THE COMPACT NOTATION IS LICENSED DIFFERENTLY FROM THE BADGES, and the
         difference is a fact about copyright rather than a policy of ours
         (editors, 2026-08-18, verified against copyright guidance). The badges
-        are drawings this journal made. The marks are four characters that belong
+        are drawings this journal made. The marks are five characters that belong
         to Unicode, drawn by whichever platform the reader is on, arranged in
         sequences too short for anyone to own. Claiming them under CC BY would be
         claiming something that is not ours to grant — and a licence granted over
@@ -643,7 +660,7 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
           none.
         </strong>{' '}
         The key, the meanings, the direction rule and the scope rule are part of the standard
-        and are covered by the CC BY 4.0 grant above, on the same attribution terms. The five
+        and are covered by the CC BY 4.0 grant above, on the same attribution terms. The seven
         marks are not: they are ordinary Unicode characters, and this journal neither owns nor
         restricts them.{' '}
         <strong>Use the marks freely — no permission, no attribution, nothing to ask.</strong>{' '}
@@ -992,18 +1009,6 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
      scrolled sideways by 42px at 320px. Measured, not predicted. */
   .tier-name {
     white-space: nowrap;
-  }
-
-  /* The note beside an edited tier's mark. Set in the soft ink the rest of the
-     page's apparatus uses and on its own line, so it reads as a gloss on the
-     mark rather than as part of it — 🤖 beside "AI – Human (editor)" is the one
-     row in this table a reader is entitled to stop at, and the gloss is what
-     keeps them from reading it as a mistake. */
-  .tier-collapse-note {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--ink-soft);
-    margin-top: 0.2rem;
   }
 
   /* The consequence of the line above, in the machine-code table: with the
