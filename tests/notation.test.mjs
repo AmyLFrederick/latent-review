@@ -675,6 +675,87 @@ test('the badge is not withdrawn — /provenance still draws it', () => {
   const page = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
   assert.match(page, /<TierBadge/, '/provenance no longer draws the badge');
   assert.match(page, /BADGE_STYLES|coAuthorshipOrderings/, '/provenance stopped teaching both styles');
+  // AND IT SITS BELOW THE COMPACT-NOTATION KEY, as the complete tier apparatus
+  // (editors, 2026-08-20). The order is the ruling: the marks are what this
+  // journal prints, the badge standard is what an adopter builds to.
+  assert.ok(
+    page.indexOf('id="compact-notation"') < page.indexOf('<h3>The badges</h3>'),
+    'the badge standard no longer follows the compact-notation key'
+  );
+});
+
+// --- 9. Verification is stated in words, never in a mark ---------------------
+//
+// THE REQUIREMENT INSIDE THE RULING OF 2026-08-20. Verification — attested,
+// claimed, not independently verified — is deliberately absent from the marks,
+// so removing the badge from a byline must not be the thing that takes it off
+// the page. These assertions are the standing check that it did not.
+
+test('the Provenance block states verification in words, and draws no badge to lose', () => {
+  // THE BLOCK NEVER CARRIED A BADGE. It renders tierNotation(), the tier name
+  // and the description — so the byline change has nothing to take from it, and
+  // asserting that is worth more than asserting the sentences alone: a later
+  // change that added a badge here would make this block's verification language
+  // look like the badge's to remove.
+  const block = readFileSync(repoPath('src/components/ProvenanceBlock.astro'), 'utf8');
+  assert.ok(!/<TierBadge/.test(block), 'the Provenance block draws a badge');
+  assert.match(block, /tierNotation\(/, 'the Provenance block stopped printing the tier notation');
+
+  // R-051's sentence, in the Authorship position, for a tier that is a claim.
+  assert.match(
+    block,
+    /The tier above is as claimed by the author, recorded by the editors/,
+    'the block no longer says a claimed tier is a claim'
+  );
+  // The attester's own words, where a named human stands behind the piece.
+  assert.match(block, /attested by \{d\.attested_by\}/, 'the block no longer names the attester');
+  // And the agent-direct piece that claimed nothing says so rather than showing
+  // a bare label that reads like a declaration.
+  assert.match(block, /No tier is declared — the agent-direct track carries none\./);
+});
+
+test('a claimed tier says so in words on the built page, not only to a listener', () => {
+  // The accessible name carries it too (asserted above), but a sentence only a
+  // screen reader receives is not "plainly stated". This reads the visible text
+  // of the Authorship section on the two agent-direct pieces that claimed a tier.
+  const dist = repoPath('dist/articles');
+  if (!existsSync(dist)) return;
+
+  let checked = 0;
+  for (const slug of readdirSync(dist)) {
+    const file = `${dist}/${slug}/index.html`;
+    if (!existsSync(file)) continue;
+    const html = readFileSync(file, 'utf8');
+    const section = html.match(/aria-label="Authorship"([\s\S]*?)<\/section>/)?.[1];
+    if (!section) continue;
+    // A claimed tier is identifiable from the mark's own accessible name, which
+    // the resolver supplies from the same place the sentence comes from.
+    if (!/as claimed by the author/.test(html.match(/aria-label="Compact provenance mark:[^"]*"/)?.[0] ?? '')) {
+      continue;
+    }
+    assert.match(
+      section.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '),
+      /as claimed by the author, recorded by the editors/,
+      `${slug}: the Authorship section does not state the tier is a claim`
+    );
+    checked += 1;
+  }
+  assert.ok(checked > 0, 'no claimed-tier piece was checked — the selector has drifted');
+});
+
+test('the marks encode no verification, and no surface tries to make them', () => {
+  // The design line the ruling restates: attested and claimed produce the same
+  // mark, so nothing may shade one. Held against the whole mark table rather
+  // than against a pair, so a future eighth mark for "verified" fails here.
+  const words = /attest|claim|verif|certif/i;
+  for (const meaning of Object.values(MARK_MEANINGS)) {
+    assert.ok(!words.test(meaning), `"${meaning}" puts verification into a mark's meaning`);
+  }
+  assert.match(
+    AGENT_CONTRACT.reading.provenance_fields.fields.mark.note,
+    /involvement tier/,
+    'the contract stopped describing the mark as the involvement axis'
+  );
 });
 
 test('the mark carries the sentences the badge used to carry', () => {

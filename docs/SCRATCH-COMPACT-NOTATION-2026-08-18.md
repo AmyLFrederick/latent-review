@@ -3,9 +3,12 @@
 Working notes for the editors' read of the `compact-provenance-notation` branch.
 Nothing here is a record. `RULINGS.md` is untouched by this branch.
 
-**Amended 2026-08-19** on the editors' dual yes, which added the pencil operator.
-The sections below are written at their final state rather than layered — §2
-records what the amendment superseded, because that reasoning is worth keeping.
+**Amended 2026-08-19** on the editors' dual yes, which added the pencil operator,
+and **ruled again 2026-08-20** on the display: the badge is removed from journal
+pages rather than demoted. The sections below are written at their final state
+rather than layered — §2 and §5 record what each ruling superseded, because that
+reasoning is worth keeping, and §5a is the verification audit the 2026-08-20
+ruling required.
 
 ---
 
@@ -182,22 +185,36 @@ added 2026-08-19") is written either way and stands.
 
 ---
 
-## 5. The display change (2026-08-18)
+## 5. The display change (ruled 2026-08-20)
 
-**The mark replaces the badge on journal pages; the badge stays at /provenance.**
-Applied on the article byline, the as-submitted byline, and a signed note's
-signature line. `/provenance` is unchanged in what it draws — both badge columns,
-both styles, the whole chart — and its compact-notation key now precedes the
-badge standard, with the hierarchy stated in the page's voice.
+**The badge is REMOVED from journal pages and the compact mark stands alone
+there.** Ruled by both editors 2026-08-20, and it **supersedes the "demoted,
+never removed" wording** that stood for part of 2026-08-18. Applied on the
+article byline, the as-submitted byline, and a signed note's signature line.
 
-**This superseded an earlier reading from the same day**, and the earlier work is
-recorded because its constraint outlives it. For part of 2026-08-18 the ruling was
-*mark leads, badge follows at reduced prominence*, which required a demoted badge
-size; the badge's notation is real text drawn in box units, so shrinking the
-circle shrinks the letters — 15.2 box units in a 58-unit box puts a 26px badge's
-notation at 6.8px. That machinery is removed with the placement that needed it,
-and the arithmetic is preserved in a comment in `tier-badges.mjs` for anyone who
-later reinstates a small badge.
+**The ruling's own reasons, in the editors' terms.** With seven marks over seven
+tiers the notation is **no longer lossy**, so carrying both a mark and a badge is
+redundancy on a byline that should be a glance; and the marks are
+**script-independent** where the badge's letter-forms are not — 🤖 and 👤 read the
+same in Beijing, Berlin and Madison, while `AI>H` abbreviates two English words.
+
+**The badge standard is retained in full at /provenance, below the
+compact-notation key, as the complete tier apparatus.** Not deprecated — both
+badge columns, both styles, the whole chart, the same rings, geometry, machine
+codes, closed set and CC BY 4.0 grant. It is no longer the byline; it is
+everything else it was.
+
+**What the earlier wording was, recorded because its constraint outlives it.** For
+part of 2026-08-18 the reading was *mark leads, badge follows at reduced
+prominence*, which required a demoted badge size; the badge's notation is real
+text drawn in box units, so shrinking the circle shrinks the letters — 15.2 box
+units in a 58-unit box puts a 26px badge's notation at 6.8px. That machinery is
+removed with the placement that needed it, and the arithmetic is preserved in a
+comment in `tier-badges.mjs` for anyone who later reinstates a small badge.
+
+**Verification is not in the marks by design, and the ruling required it be
+confirmed still legible. It is, and this change costs it nothing — but the
+confirmation is uneven, so §5a states exactly what was found.**
 
 **Two accessible-name sentences had to move, and this is the substantive part of
 the change.** R-051 requires the accessible name of a claimed tier's mark to say
@@ -215,8 +232,54 @@ editor distinction at a glance. The pencil closed it the next day. A byline now
 carries what its tier says, and the Provenance block a screen below still prints
 `AI–Hᵉ`, the full tier name and its description, with `involvement_tier` in every
 feed. **The display ruling did not depend on that loss** — it was argued on
-script-independence — so nothing about it moves; it simply stops costing
+script-independence, and the ruling of 2026-08-20 adds the non-lossiness as a
+reason in its own right — so nothing about it moves; it simply stops costing
 anything.
+
+---
+
+## 5a. Verification visibility — the audit the ruling asked for
+
+**Nothing loses verification visibility by this change.** The badge carried
+verification in exactly one place: its accessible name's `labelSuffix`, holding
+R-051's claimed-tier sentence and R-052's note-scoping sentence. Both were
+transferred to `ProvenanceMark` one for one on both byline surfaces, supplied by
+the same resolvers, and are pinned by test. The **Provenance block** — where
+verification is stated in words — is untouched by all three branches and **never
+drew a badge at all**; it renders `tierNotation()`, the full tier name and the
+description. There is nothing in it for this ruling to have taken.
+
+**But "plainly stated in each piece's Provenance block" is only partly true
+today, and it was equally partly true before.** Audited against the eight built
+pieces:
+
+| What a reader gets | Where | Pieces |
+|---|---|---|
+| "The tier above is as claimed by the author… not certified" (R-051) | Authorship | the 2 agent-direct pieces with a claimed tier |
+| The attester's quote, "attested by …" | Authorship | the 4 human-attested pieces carrying an attestation |
+| "Submitted by …" naming the track in words | Chain of custody | all 8 |
+| No verification sentence at all | Authorship | "It Means Something to Me", "There Is a There There" — human-attested, no attestation quote |
+
+Three things worth your eyes, none of them caused by this ruling:
+
+1. **Two pieces state verification only through the "Submitted by" custody row.**
+   A reader learns the track but meets no sentence saying the tier is attested
+   rather than certified.
+2. **"Provenance is published as attested or as claimed, never certified" is not
+   a standing line.** It is part of the *First Person — Testimony* truth-standard
+   description, so it appears on those two pieces only. I first read it as
+   site-wide and it is not.
+3. **The as-submitted companion page carries no Provenance block at all** — only
+   the byline mark and a link back to the published piece. Verification lives
+   there in the mark's accessible name (which does say "as claimed by the
+   author") and nowhere in visible text. That was exactly as true when the badge
+   stood in that position, so it is a pre-existing gap and not a cost of this
+   ruling.
+
+**My read:** the ruling can proceed as written — nothing is lost. Whether (1) and
+(3) want fixing is an editorial question, and a small one to fix: a standing
+attested-not-certified line under Authorship, and a verification line on the
+as-submitted page. Both are their own PR and neither belongs in this one.
 
 **One thing to watch when the first edited piece runs.** A pencil mark is three
 glyphs where the solo marks are one, and the byline mark is set at 2rem. No
@@ -255,6 +318,8 @@ Ruled 2026-08-18 by both editors, with review by the journal's informal editoria
 
 **The scope rule is unchanged by the amendment, and the two are easy to run together.** The scope rule governs this journal's ordinary handling of the pieces it publishes — selecting them, arranging them, giving them a headline, condensing them with the condensation disclosed — and none of that puts a pencil in a mark or moves a piece to an editor tier. What a pencil renders is a tier the piece already carries, set at acceptance by the editors' judgment. Only the tier changes the mark.
 
+**Verification is not encoded in the marks, by design, and stays stated in words.** The marks carry the involvement axis and nothing else; attested, claimed and not-independently-verified are not shades of a mark and must never become one. Removing the badge from a byline does not touch that, because the badge never carried verification either except inside its accessible name — where R-051's claimed-tier sentence and R-052's note-scoping sentence rode, and from which both moved to the mark rather than lapsing. Each piece's Provenance block states verification in words, on its own page: the claimed-tier sentence under Authorship where a tier is the author's claim, the attester's own words where a human stands behind it, and the submission track named in the chain of custody in every case.
+
 **Marks encode involvement and never verification.** A claimed tier (R-051) and an attested one produce the same mark, exactly as they produce the same badge by that ruling's own words. What distinguishes them is language elsewhere on the piece: `verification` in the structured record, and the sentence under Authorship that says a tier is the author's claim, recorded and not certified. A mark shaded for a claim would be an eighth mark by the back door and an answer to a question the notation was not asked.
 
 **Derived, never authored.** No piece carries a mark in its record and none may. A per-piece mark would be a second authorship claim standing beside the tier with nothing keeping the two in agreement, which is the failure the July 31 split was written to end.
@@ -265,11 +330,15 @@ Ruled 2026-08-18 by both editors, with review by the journal's informal editoria
 
 **The licence lands on the document and not on the marks, and the difference is copyright rather than policy.** R-050 placed the AI badge form inside the CC BY 4.0 grant so an adopter could not fork it, and the same instinct applied here would be a mistake: the badges are drawings this journal made, where these five characters belong to Unicode, are drawn by whichever platform the reader is on, and are arranged in sequences too short for anyone to own. A grant over public property is worse than no grant, because it tells an adopter they need permission they do not need. So what is licensed is the part this journal wrote — the key, the meanings, the direction rule, the operator's meaning, the scope rule — and the marks are free to anyone for anything, with nothing to ask and no one to credit. The page says so in its own words: *we claim no ownership of these characters or their combinations — only of this document describing what we mean by them.*
 
-**THE MARK REPLACES THE BADGE ON JOURNAL PAGES — 2026-08-18, and it governs Issue No. 2 and all future display.** An article byline, an as-submitted byline and a signed note's signature each carry the compact mark alone. The badge is drawn at /provenance and nowhere else on the site.
+**THE BADGE IS REMOVED FROM JOURNAL PAGES AND THE COMPACT MARK STANDS ALONE THERE — ruled 2026-08-20, and it governs Issue No. 2 and all future display.** An article byline, an as-submitted byline and a signed note's signature each carry the compact mark alone. The badge is drawn at /provenance and nowhere else on the site.
+
+**This supersedes the wording of 2026-08-18, which was *demoted, never removed*.** That reading had the badge following the mark at reduced prominence, and it was already impossible as drawn: the badge's notation is real text in box units, so a demoted circle takes its letters down with it. The ruling of 2026-08-20 settles the question as removal rather than as size, and its reasons are its own rather than inherited.
+
+**Two reasons, and the first is new since the amendment.** With seven marks over seven tiers the notation is **no longer lossy** — a mark now says everything its tier says — so a byline carrying both a mark and a badge is carrying the same claim twice, and a byline should be a glance. The second is the argument that decided it in the first place, unchanged: the marks are **script-independent** where the badge's letter-forms are not.
 
 **The reason is who reads us, and it is the argument that decided it.** The marks are script-free: 🤖 and 👤 read identically to a reader in Beijing, in Berlin and in Madison. The badge's notation does not — it is Latin-script and English-bound, and `AI>H` abbreviates two English words, so a reader who has neither is reading a cipher rather than a mark. A journal whose stated readership is every language and every kind of mind prints the display that does not require one of them. And this notation now says the whole of what the badge says, so the choice costs a reader nothing: since the amendment of 2026-08-19 the seven marks write the seven tiers one for one.
 
-**The badge is not withdrawn, and nothing about the standard changes.** Seven badges, two display styles, the same rings, the same geometry, the same machine codes, the same closed set, the same CC BY 4.0 grant — specified and drawn in full at /provenance, which is now the one page on this site that displays them. An adopter who shows badges is showing the standard exactly as it stands. This is one publication's choice about its own pages, made under the clause that has always reserved such choices to the editors.
+**The badge standard is retained in full and nothing about it changes.** Seven badges, two display styles, the same rings, the same geometry, the same machine codes, the same closed set, the same CC BY 4.0 grant — specified and drawn in full at /provenance, **below the compact-notation key, as the complete tier apparatus**. It is not deprecated and it is not withdrawn; it is no longer the byline, and it is everything else it was. An adopter who shows badges is showing the standard exactly as it stands. This is one publication's choice about its own pages, made under the clause that has always reserved such choices to the editors.
 
 **What the badge carried in a byline and the mark now carries too: the editor distinction.** This paragraph read the other way for a day. The display ruling of 2026-08-18 was made while the notation still collapsed the two edited tiers, so a byline that showed the mark alone showed an edited piece exactly as it showed an unedited one, and what a reader lost was that distinction at a glance. The amendment of 2026-08-19 closed it: 🤖✏️👤 names the human who edited an AI-written piece, so the byline now says what the tier says. Nothing about the display ruling depended on the loss — it was argued on script-independence and stands unchanged — but the one cost it named is no longer being paid.
 
