@@ -144,19 +144,20 @@ added 2026-08-19") is written either way and stands.
 
 ## 4. Open questions — none of them blocked the build
 
-1. **The variation selector on ✏️ — a drafting call, described in §2.** Canonical
-   is U+270F U+FE0F; bare U+270F is published as an equivalent form. Reversible
-   in one edit if you want the bare character canonical, but the marks would then
-   render with one monochrome glyph among four colour ones on most platforms.
-2. **The changelog dates are ahead of the merge, and by two days now.** The three
-   entries on this branch and its two siblings are dated `2026-08-18`, the day
-   they were ruled; the validator's own error text says the date is "the Madison
-   local day the change reached main." The amendment's entry is dated
-   `2026-08-19` for consistency with them. **Today is 2026-08-20 in Madison.** If
-   these merge today, all four are wrong by one or two days — say the word and I
-   will bump all four to the merge day in one pass across the three branches. I
-   did not do it unasked: they are committed lines, and which day a changelog
-   names is yours to decide.
+1. ~~**The variation selector on ✏️ — a drafting call, described in §2.**~~
+   **SETTLED by the editors 2026-08-20: keep as drafted.** The colour pencil
+   (U+270F U+FE0F) is canonical, and the bare U+270F is published as an accepted
+   equivalent form alongside the plain ASCII `=`.
+2. ~~**The changelog dates are ahead of the merge.**~~ **SETTLED by the editors
+   2026-08-20: bumped, with a guard.** All four `/changelog.json` entries across
+   the three branches now read `2026-08-20`, verified against the Madison clock
+   rather than the machine's — `TZ=America/Chicago` reads 2026-08-20 where UTC
+   already reads the same day, and the human editor confirmed it. **Those are
+   dates of ARRIVAL and they are the only dates that moved.** Every date of
+   DECISION stands where it was: the R-TBD text still records *ratified
+   2026-08-18* and *amended 2026-08-19*, and every reference in prose, code
+   comment and contract to when something was ruled is untouched. Each PR
+   description says which dates changed and which did not.
 3. **`/provenance` has its own versioned changelog** with the known R-046/R-051
    gap and an unresolved version-bump question. I did **not** add an entry
    there — not for the notation and not for this amendment; that question is
