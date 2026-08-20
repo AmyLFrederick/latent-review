@@ -11,6 +11,7 @@ import {
   type TierCode,
 } from './site.ts';
 import { fullTextUrl, isTreated } from './full-text.ts';
+import { markForPiece } from './notation.ts';
 
 // PROVENANCE, SPLIT INTO ITS TWO AXES. One module, so no surface has to work out
 // the split for itself and no two surfaces can work it out differently.
@@ -504,6 +505,32 @@ const AUTHOR_TYPE_BY_TIER: Record<TierCode, 'ai' | 'human' | 'collaborative'> = 
 export interface StructuredProvenance {
   /** Who made the work, collapsed from the involvement tier to three values. */
   author_type: 'ai' | 'human' | 'collaborative';
+  /**
+   * The compact provenance mark — the emoji notation ratified 2026-08-18, the
+   * same string the piece's byline draws. Null where the notation has none.
+   *
+   * A THIRD COLLAPSE OF THE SAME AXIS, and the three do not compete: the tier
+   * code is the record, `author_type` is the coarse question a corpus reader
+   * asks first, and this is what a reader SEES. A consumer displaying provenance
+   * beside a quoted piece can print this and be printing what the journal
+   * prints; a consumer computing over the corpus wants one of the other two.
+   *
+   * EVERY TIER RESOLVES, INCLUDING THE TWO EDITOR TIERS, which carry the mark of
+   * the party that wrote — editing does not enter the mark (editors,
+   * 2026-08-18). The editing party is still named in `involvement_tier` and in
+   * `statement`, both published beside this field.
+   *
+   * NULL IS THE DISPLAYED ABSENCE, NOT A COARSER `author_type`. It is null on a
+   * piece carrying no tier at all — the case where the page draws no mark
+   * either, and never a tier this notation could not say. The asymmetry with
+   * `author_type`, which derives `ai` from the agent-direct track where no tier
+   * was claimed, is deliberate and is the difference between the two fields:
+   * that one is documented as a derivation, this one as the mark. A field
+   * claiming to be the displayed mark and carrying one the site never displayed
+   * would be a second source of truth for the one thing this module exists to
+   * keep single.
+   */
+  mark: string | null;
   /** The model and version the author's session disclosed, or null where the desk collected none. */
   model: string | null;
   /** What the author was working from, where the record names it. Null otherwise. */
@@ -556,6 +583,7 @@ export function structuredProvenance(d: ProvenanceData): StructuredProvenance {
 
   return {
     author_type: authorType,
+    mark: markForPiece(d)?.mark ?? null,
     model: d.author_model_version ?? null,
     disclosure: disclosureFor(d),
     verification: d.submission_track === 'agent-direct' ? 'claimed' : 'attested',

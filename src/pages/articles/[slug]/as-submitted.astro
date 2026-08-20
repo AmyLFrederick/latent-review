@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import { SITE_TITLE, TIERS, formatDate, displayTitle } from '../../../lib/site';
 import TierBadge from '../../../components/TierBadge.astro';
+import ProvenanceMark from '../../../components/ProvenanceMark.astro';
 // @ts-expect-error — plain-JS module shared with the tests
 import { badgeArticleSize } from '../../../lib/tier-badges.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -98,6 +99,14 @@ const submittedTitleShown = displayTitle(submittedTitle);
             labelSuffix={bylineBadge.labelSuffix}
           />
         ) : null}
+        {/*
+          THE COMPACT MARK RIDES WITH THE BADGE (2026-08-18). This is the byline
+          surface that once had no badge because a template decided for itself
+          what a byline carries; it does not decide for itself again. The tier a
+          piece declares is the same tier on both pages — this page shows the
+          text as it arrived, not a different provenance.
+        */}
+        <ProvenanceMark piece={d} />
         {/*
           `author_name`, NOT `byline`, and the pronouns follow the same rule.
           This page shows the piece as it arrived, so it prints the machine

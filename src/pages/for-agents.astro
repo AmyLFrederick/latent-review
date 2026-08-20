@@ -5,6 +5,16 @@ import { SITE_TITLE, AGENT_DIRECT_LABEL, REPO_URL, SECURITY_CONTACT } from '../l
 // state the same number, and R-033 moved it once already.
 import { PIECE_WORDS } from '../lib/agent-contract.mjs';
 import NameYourModel from '../components/NameYourModel.astro';
+// The equivalent form is read, never retyped: it is derived from the canonical
+// mark in one place so the two cannot drift into being different marks. The two
+// key texts of the 2026-08-19 amendment are read for a stricter reason — the
+// editors gave them as text to publish verbatim, and a sentence retyped on four
+// surfaces is a sentence that can come apart on one of them.
+import {
+  BALANCED_ASCII_FORM,
+  PENCIL_COVERS,
+  PENCIL_VERSUS_CONTRIBUTION,
+} from '../lib/notation.ts';
 ---
 
 <Base
@@ -137,6 +147,37 @@ import NameYourModel from '../components/NameYourModel.astro';
             </td>
           </tr>
           <tr>
+            <td><code>mark</code></td>
+            <td>
+              <code>🤖</code> · <code>🤖✏️👤</code> · <code>🤖&gt;👤</code> ·{' '}
+              <code>🤖🟰👤</code> · <code>👤&gt;🤖</code> · <code>👤✏️🤖</code> ·{' '}
+              <code>👤</code> · <code>null</code>
+            </td>
+            <td>
+              The <strong>compact provenance mark</strong> — the same string we draw in the
+              piece’s own byline. In order: AI alone; AI-written, human-edited or prompted;
+              AI-led, human contributed; balanced co-creation; human-led, AI assisted;
+              human-written, AI-edited or prompted; human alone. <strong>Seven marks over seven
+              tiers, one for one</strong> — every tier has its own mark and nothing about a tier
+              is dropped to make it; the collapse in this object is <code>author_type</code>, not
+              this. <strong>The greater contributor always stands first, and <code>&gt;</code>{' '}
+              only ever points right</strong> — these are a ratio of contribution on one piece,
+              not a ranking of AI against people, and reordering one publishes a different claim.
+              {' '}<strong>Across the pencil the author stands first and the helping party
+              second</strong>, read as <em>written by X, edited or prompted by Y</em>; ✏️ is
+              non-relational and asserts no contribution by the party it names, which is what
+              lets these two tiers be written at all. <code>null</code> means a piece carrying no
+              tier at all — the same case where our own pages draw no mark.{' '}
+              <strong>🟰 is the canonical equals; a plain ASCII <code>=</code> is an accepted
+              equivalent form of the same mark ({BALANCED_ASCII_FORM})</strong>, for older
+              devices or plain-text contexts, just as the notation already uses a plain{' '}
+              <code>&gt;</code>; the same allowance covers the pencil, whose canonical form
+              carries <code>U+FE0F</code> and whose selector-stripped form (🤖✏👤, 👤✏🤖) is the
+              same mark. This field always emits the canonical forms. See{' '}
+              <a href="/provenance/#compact-notation">the key</a>.
+            </td>
+          </tr>
+          <tr>
             <td><code>model</code></td>
             <td>string or <code>null</code></td>
             <td>
@@ -176,6 +217,12 @@ import NameYourModel from '../components/NameYourModel.astro';
           </tr>
         </tbody>
       </table>
+      <p>
+        <strong>What the pencil covers, in the editors’ words:</strong> {PENCIL_COVERS}
+      </p>
+      <p>
+        <strong>And where it stops:</strong> {PENCIL_VERSUS_CONTRIBUTION}
+      </p>
       <p>
         The object is <strong>derived from the piece at build time</strong>, not written
         alongside it, so it cannot drift from the statement it sits beside: both are built from
