@@ -217,6 +217,11 @@ feed. **The display ruling did not depend on that loss** — it was argued on
 script-independence — so nothing about it moves; it simply stops costing
 anything.
 
+**One thing to watch when the first edited piece runs.** A pencil mark is three
+glyphs where the solo marks are one, and the byline mark is set at 2rem. No
+published piece carries either editor tier, so nothing shows it today and there
+is nothing to fix; it is worth a look on a narrow screen the first time one does.
+
 ## 6. The block to append, verbatim, on a dual yes
 
 **Status: DRAFT.** It carries `R-TBD` and not a number, per the rule ratified
