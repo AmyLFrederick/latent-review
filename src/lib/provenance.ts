@@ -529,8 +529,20 @@ const AUTHOR_TYPE_BY_TIER: Record<TierCode, 'ai' | 'human' | 'collaborative'> = 
 // EDITING IS STILL DISCLOSED, ONE FIELD OVER. `involvement_tier` is published
 // inside this object as of the same change, so a consumer that wants to know
 // whose hands touched a piece reads the tier, and a consumer that wants to know
-// who wrote it reads this. That split is the whole point: the mark and the byline
-// answer authorship, and the tier answers involvement.
+// who wrote it reads this. That split is the whole point, and it is a split
+// between QUESTIONS rather than between surfaces: this field answers authorship,
+// and the tier answers involvement.
+//
+// THE COMPACT MARK ANSWERS BOTH, WHICH IS NOT A CONTRADICTION (editors'
+// amendment, 2026-08-19). When these two rulings were made on the same night the
+// mark could only say who wrote — the two editor tiers took the bare mark of that
+// party — and the division was easy to describe as byline-versus-record. The
+// pencil operator ended that: 🤖✏️👤 names the human who edited an AI-written
+// piece, so the byline now discloses editing too. What it does NOT do is assert
+// that the second party wrote anything, because ✏️ is non-relational and makes no
+// claim of contribution. So the mark can name an editor and this field can still
+// derive `ai`, and the two are saying different true things rather than
+// disagreeing. See src/lib/notation.ts.
 
 export interface StructuredProvenance {
   /** Who made the work, collapsed from the involvement tier to three values. */

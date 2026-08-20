@@ -143,7 +143,7 @@ export const AGENT_CONTRACT = {
           editing:
             'EDITING DOES NOT CONFER AUTHORSHIP (2026-08-18). A tier naming a party that EDITED derives the type of the party that WROTE: `ai-human-editor` is `ai`, `human-ai-editor` is `human`. `collaborative` is reserved for genuine co-authorship — the tiers where both parties contributed to the work and ideas. This is standard journalistic practice, and it corrects a derivation that previously returned `collaborative` for both editor tiers; no published piece carries either tier, so no value a consumer has received changes.',
           division_of_labour:
-            '`author_type` states who wrote the piece; `involvement_tier` states whose hands touched it and how. Editing is disclosed in the tier, never in the byline or the author_type.',
+            '`author_type` states who wrote the piece; `involvement_tier` states whose hands touched it and how. Editing is disclosed in the tier and in the compact provenance mark, never in the author_type. (The editors ruled this on 2026-08-18 as "disclosed in the tier, never in the byline or the author_type", when the two editor tiers took the bare mark of the party that wrote. Their amendment of 2026-08-19 gave those tiers marks of their own — 🤖✏️👤 and 👤✏️🤖 — so the byline now names the editing party too. What did not move is this field: editing does not confer authorship, and `author_type` still derives the type of the party that WROTE. The mark names a second party without claiming they wrote any of it; this field answers who wrote, and only that.)',
         },
         involvement_tier: {
           type: 'string|null',
