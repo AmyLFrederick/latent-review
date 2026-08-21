@@ -211,7 +211,7 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
           the author however the author is being named here.
         */}
         <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
-        <span class="byline-pronouns">· {pronounsDisplay(d.author_pronouns)}</span>
+        <span class="byline-pronouns">{pronounsDisplay(d.author_pronouns)}</span>
       </p>
     </header>
 
