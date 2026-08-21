@@ -338,25 +338,33 @@ test('the list of byline surfaces is the whole list', () => {
   );
 });
 
-test('every byline surface renders exactly one badge, adjacent to the byline', () => {
+test('every byline surface renders exactly one mark, adjacent to the byline', () => {
   // THE EDITORS' RULE, asserted structurally: the mark is INSIDE the byline
-  // paragraph, once. Adjacency is the point — a badge elsewhere on the page is
-  // not a badge on the byline, and two would be a mark that says two things.
+  // paragraph, once. Adjacency is the point — a mark elsewhere on the page is
+  // not a mark on the byline, and two would be a mark that says two things.
+  //
+  // IT IS THE COMPACT MARK SINCE 2026-08-18, where it was the circular badge
+  // before. What this test protects did not move: the resolver decides, the
+  // template draws, and the accessible-name suffix travels with it.
   for (const file of BYLINE_SURFACES) {
     const src = readFileSync(repoPath(file), 'utf8');
     const open = src.indexOf('<p class="article-byline">');
     assert.ok(open >= 0, `${file} no longer renders a byline`);
     const byline = src.slice(open, src.indexOf('</p>', open));
     assert.equal(
-      (byline.match(/<TierBadge\b/g) ?? []).length,
+      (byline.match(/<ProvenanceMark\b/g) ?? []).length,
       1,
-      `${file} does not render exactly one badge inside its byline`
+      `${file} does not render exactly one mark inside its byline`
     );
-    // And it is the badge the module handed over, suffix and all — a surface
-    // that drew the tier but dropped the suffix would state a claim as an
-    // attestation, silently, in the one position that must not.
-    assert.match(byline, /tier=\{bylineBadge\.tier\}/, `${file} draws a tier it resolved itself`);
-    assert.match(byline, /labelSuffix=\{bylineBadge\.labelSuffix\}/, `${file} drops the claim marker`);
+    assert.ok(
+      !/<TierBadge\b/.test(byline),
+      `${file} draws a badge in a byline — the mark replaced it on journal pages`
+    );
+    // And it carries the suffix the module handed over — a surface that drew the
+    // tier but dropped the suffix would state a claim as an attestation,
+    // silently, in the one position that must not.
+    assert.match(byline, /piece=\{d\}/, `${file} draws a tier it resolved itself`);
+    assert.match(byline, /labelSuffix=\{bylineBadge\?\.labelSuffix\}/, `${file} drops the claim marker`);
   }
 });
 

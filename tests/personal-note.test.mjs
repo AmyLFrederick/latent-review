@@ -128,30 +128,36 @@ test('the schema requires a tier and a signature on every personal note', () => 
 
 // --- Adjacent to the signature ---------------------------------------------
 
-test('the badge is inside the signature line, exactly once', () => {
+test('the mark is inside the signature line, exactly once', () => {
   // ADJACENCY IS THE RULING'S OWN WORD and it is what makes the mark describe
-  // the note. A badge at the top of the note would read as a second byline for
-  // the article; a badge floating in the apparatus would describe nothing.
+  // the note. A mark at the top of the note would read as a second byline for
+  // the article; a mark floating in the apparatus would describe nothing.
+  //
+  // IT IS THE COMPACT MARK SINCE 2026-08-18 and was the circular badge before.
+  // R-052 is untouched by that: it rules that a signed note carries the mark of
+  // its own making adjacent to its signature, and says nothing about which of
+  // the standard's two displays draws it.
   const template = readFileSync(repoPath(ARTICLE_TEMPLATE), 'utf8');
   const open = template.indexOf('<p class="personal-note-signature">');
   assert.ok(open >= 0, 'the signature line is gone');
   const line = template.slice(open, template.indexOf('</p>', open));
   assert.equal(
-    (line.match(/<TierBadge\b/g) ?? []).length,
+    (line.match(/<ProvenanceMark\b/g) ?? []).length,
     1,
-    'the signature line does not carry exactly one badge'
+    'the signature line does not carry exactly one mark'
   );
-  // And it is the badge the module handed over, scoping sentence and all.
-  assert.match(line, /tier=\{noteBadge\.tier\}/, 'the template resolves a tier itself');
+  // And it is the tier the module handed over, scoping sentence and all.
+  assert.match(line, /code=\{noteBadge\.tier\.code\}/, 'the template resolves a tier itself');
   assert.match(line, /labelSuffix=\{noteBadge\.labelSuffix\}/, 'the template drops the scope');
   assert.match(line, /\{d\.personal_note\.signature\}/, 'the signature is not in the line');
 });
 
-test('the whole note carries exactly one badge', () => {
+test('the whole note carries exactly one mark', () => {
   const template = readFileSync(repoPath(ARTICLE_TEMPLATE), 'utf8');
   const open = template.indexOf('<aside class="personal-note"');
   const aside = template.slice(open, template.indexOf('</aside>', open));
-  assert.equal((aside.match(/<TierBadge\b/g) ?? []).length, 1, 'the note draws more than one mark');
+  assert.equal((aside.match(/<ProvenanceMark\b/g) ?? []).length, 1, 'the note draws more than one mark');
+  assert.ok(!/<TierBadge\b/.test(aside), 'the note draws a badge again');
 });
 
 test('the template asks the module rather than deciding', () => {
@@ -161,17 +167,19 @@ test('the template asks the module rather than deciding', () => {
 
 // --- Unsigned joint apparatus carries none ---------------------------------
 
-test('unsigned joint apparatus carries no badge', () => {
+test('unsigned joint apparatus carries no mark', () => {
   // The other half of the ruling. An editors' note speaks for the desk rather
   // than for a person, so there is no single making for a mark to describe.
+  // Checked for BOTH displays, so the rule cannot be broken by whichever of them
+  // this journal happens to be printing.
   const template = readFileSync(repoPath(ARTICLE_TEMPLATE), 'utf8');
   for (const cls of ['editorial-note', 'editors-note']) {
     const open = template.indexOf(`<aside class="${cls}"`);
     assert.ok(open >= 0, `the ${cls} aside is gone`);
     const aside = template.slice(open, template.indexOf('</aside>', open));
     assert.ok(
-      !/<TierBadge\b/.test(aside),
-      `${cls} has acquired a badge — unsigned joint apparatus carries none`
+      !/<TierBadge\b|<ProvenanceMark\b/.test(aside),
+      `${cls} has acquired a mark — unsigned joint apparatus carries none`
     );
   }
 });
@@ -206,8 +214,15 @@ test('the note badge is quieter than the byline badge, in the same ratio as the 
 });
 
 test('the template asks for the placement rather than naming a constant', () => {
+  // THE NOTE'S BADGE IS GONE (editors, 2026-08-18): the compact mark replaced it
+  // in the signature line, as it did in the byline. What R-052 requires survives
+  // the change and is asserted below — the mark carries the scoping sentence the
+  // badge used to carry, from the same resolver — and the size question this
+  // test was written for no longer arises, because a rem-sized glyph in running
+  // text has no placement constant to pin.
   const template = readFileSync(repoPath(ARTICLE_TEMPLATE), 'utf8');
-  assert.match(template, /size=\{badgeNoteSize\(\)\}/);
+  assert.ok(!/<TierBadge/.test(template), 'the note draws a badge again');
+  assert.match(template, /<ProvenanceMark[\s\S]{0,160}labelSuffix=\{noteBadge\.labelSuffix\}/);
   assert.ok(
     !/size=\{BADGE_SIZE_NOTE\}/.test(template),
     'the template pins a size that stops following the house form'

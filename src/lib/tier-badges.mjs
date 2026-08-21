@@ -361,6 +361,33 @@ export function badgeNoteSize(style = HOUSE_BADGE_FORM) {
   return style === 'ai' ? BADGE_SIZE_NOTE_AI : BADGE_SIZE_NOTE;
 }
 
+// --- WHERE THE BADGE IS DRAWN, AS OF 2026-08-18 -----------------------------
+//
+// AT /provenance, AND NOWHERE ELSE ON THE SITE. The compact provenance mark
+// replaced it on every journal page — the article byline, the as-submitted
+// byline, a signed note's signature — and the badge remains what it has been
+// since R-045: the standard's own mark, taught and drawn in full on the page
+// that publishes the standard, licensed to any adopter who wants it.
+//
+// NOTHING IN THIS MODULE WAS DELETED FOR THAT. The seven badges, both display
+// styles, the ring rule, the geometry and every placement size are unchanged and
+// still exported; badgeArticleSize() and badgeNoteSize() still describe the
+// placements the standard defines, and an adopter following /provenance draws
+// exactly what they drew yesterday. What changed is which of them THIS journal
+// calls, and that is one page's decision rather than a change to the standard.
+//
+// A SECONDARY, DEMOTED SIZE BRIEFLY EXISTED HERE and is gone with the placement
+// that needed it: for part of 2026-08-18 the ruling was that the mark leads and
+// the badge follows at reduced size, and the badge then left the journal pages
+// altogether. It is recorded rather than silently removed because the constraint
+// it was built around is still true and will matter to anyone who reinstates a
+// small badge: the notation is REAL TEXT drawn in box units, so shrinking the
+// circle shrinks the letters — in the AI form, 15.2 box units in a 58-unit box,
+// which puts a 26px badge's notation at 6.8px. /provenance tells adopters that
+// legibility of the notation is the only requirement the standard places on
+// them, and a house that shrank its own badge past reading would be running a
+// standard it exempts itself from.
+
 /**
  * AN UNKNOWN STYLE THROWS, where an unknown CODE returns undefined. The
  * asymmetry is deliberate: a caller passing a code it got from the record may

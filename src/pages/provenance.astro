@@ -162,6 +162,188 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
       </p>
 
       {/*
+        THE MARKS COME FIRST ON THIS PAGE BECAUSE THEY ARE WHAT THE JOURNAL
+        PRINTS (editors, 2026-08-18). The compact mark is the journal's
+        provenance display; the badge is the standard's, taught here in full and
+        drawn nowhere else on the site. The page that publishes both therefore
+        teaches the mark first and keeps the badge standard below it, unchanged
+        in content.
+      */}
+      <p>
+        <strong>Two ways to show a tier, and this journal prints the marks.</strong> The
+        compact marks below are what you will see in a byline on this site. The badges that
+        follow are the standard's other display — fuller, and the one an adopter may prefer —
+        and they are drawn on this page rather than on our own pieces.
+      </p>
+      <p>
+        <strong>The reason is who reads us.</strong> 🤖 and 👤 read the same to someone in
+        Beijing, Berlin or Madison, where a badge's notation is Latin-script and English-bound:
+        <strong>AI&gt;H</strong> abbreviates two English words, and a reader who has neither is
+        reading a cipher. <strong>And the choice costs a reader nothing</strong>: since
+        2026-08-19 the marks write all seven tiers, one for one, so a byline says exactly what
+        its tier says. Each piece's provenance record still prints the tier's notation, its full
+        name and its description, a screen below.
+      </p>
+      <p>
+        <strong>Nothing about the badges is withdrawn.</strong> Seven badges, two styles, the
+        same rings, the same machine codes, the same CC BY 4.0 licence, the same closed set.
+        An adopter who displays them is displaying the standard exactly as it stands. This is
+        one publication's choice about its own pages, and the section below is where the badges
+        are specified.
+      </p>
+
+      {/*
+        THE COMPACT NOTATION (ratified 2026-08-18). It sits after the machine
+        codes and before the licence, which is where it belongs in the order a
+        reader meets things: the badges are the mark, the codes are what a
+        machine stores, and this is the form that survives a plain-text field.
+
+        THE MARKS IN THE TABLES ARE THE COMPONENT, not pasted characters. Each
+        one carries its meaning as an accessible name, exactly as it does in a
+        byline — a key that taught the notation in glyphs a listener could not
+        hear would be teaching half of it.
+      */}
+      <h3 id="compact-notation">Compact notation</h3>
+      <p>
+        <strong>Seven marks, for the places a circle cannot go.</strong> A search result, a
+        plain-text field, a social card, a terminal, a line of chat. The badges below are the
+        journal’s mark and the tier names are the standard; this is the same involvement axis
+        written so it survives being pasted — one mark for each of the seven tiers, saying what
+        the tier says and nothing less. <strong>Added 2026-08-18; the pencil operator and its
+        two marks added 2026-08-19.</strong>
+      </p>
+      <table class="stackable">
+        <thead>
+          <tr>
+            <th>Mark</th>
+            <th>Meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          {markRows.map((row) => (
+            <tr>
+              <td><ProvenanceMark markName={row.key} size="1.5rem" /></td>
+              <td>{row.meaning}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>
+        <strong>The greater contributor always stands first, and <code>&gt;</code> only ever
+        points right.</strong> This rule is load-bearing rather than tidy. Without it the two
+        relational marks invite the reading the glyphs suggest — a ranking of machines against
+        people — when what they record is a <strong>ratio of contribution on one piece</strong>:
+        the side that did more is written first, and that is the whole of the difference between
+        🤖&gt;👤 and 👤&gt;🤖. A mark drawn pointing left says something this standard does not
+        say. It is the same convention the notation above already uses in{' '}
+        <strong>A&gt;H</strong> and <strong>H&gt;A</strong>, so it is one rule met twice rather
+        than two rules.
+      </p>
+      <p>
+        <strong>Across the pencil, the author stands first and the helping party second</strong>{' '}
+        — read left to right as <em>written by X, edited or prompted by Y</em>. The order carries
+        the same weight it does in the relational marks, and it carries a different claim:{' '}
+        <strong>🤖✏️👤</strong> and <strong>👤✏️🤖</strong> are not interchangeable, because
+        reversing one says the other party wrote the piece. What the pencil does <em>not</em> do
+        is rank. <code>&gt;</code> ranks — it says one party contributed more than the other —
+        and that is precisely the claim these two tiers decline to make. ✏️ ranks nothing.
+      </p>
+      <p>
+        <strong>Marks describe authorship of the words.</strong> Standard editorial handling —
+        selection, arrangement, headline, disclosed condensation — does not enter the mark;
+        where the editors’ hands went further, the piece’s provenance notes say exactly how.
+      </p>
+      <p>
+        <strong>The marks are ordinary emoji</strong> — whatever 🤖 and 👤 look like on your
+        device is the correct rendering; the character is the mark, not any particular drawing
+        of it. We claim no ownership of these characters or their combinations — only of this
+        document describing what we mean by them.
+      </p>
+      <p>
+        <strong>The meaning is the record; the glyph is the convenience.</strong> The marks are{' '}
+        <code>U+1F916</code> ROBOT FACE, <code>U+1F464</code> BUST IN SILHOUETTE,{' '}
+        <code>U+1F7F0</code> HEAVY EQUALS SIGN, <code>U+270F</code> PENCIL followed by{' '}
+        <code>U+FE0F</code> VARIATION SELECTOR-16, and a plain ASCII <code>&gt;</code> — there is
+        no emoji greater-than. The heavy equals sign is Unicode 14, from 2021, and an older
+        device will draw it as a box. The pencil is a Unicode 1.1 dingbat whose default drawing
+        is monochrome text, so the selector is what asks for ✏️ rather than ✏ — invisible,
+        part of the mark, and the first thing a plain-text pipeline drops. That is the honest
+        state of it, and it is why every mark on this site carries its meaning in words as an
+        accessible name and a tooltip: a reader who gets no glyph still gets everything the
+        glyph was for. Do the same if you adopt them.
+      </p>
+      <p>
+        <strong>🟰 is the canonical equals; a plain ASCII <code>=</code> is an accepted
+        equivalent form of the same mark ({BALANCED_ASCII_FORM}), for older devices or
+        plain-text contexts</strong> — just as the notation already uses a plain{' '}
+        <code>&gt;</code>. It is the same mark written two ways, not two marks.{' '}
+        <strong>The same allowance covers the pencil</strong>: a pipeline that strips variation
+        selectors leaves 🤖✏👤 and 👤✏🤖, and those are the same two marks. Our own pages and
+        the <code>mark</code> field in every feed keep the canonical forms; nothing here detects
+        a device or swaps a glyph for you, because a record that changed shape depending on the
+        browser would not be a record.
+      </p>
+      <p>
+        <strong>In plain-text contexts where emoji cannot render, the mark’s meaning is carried
+        by its plain-language tier name</strong> (as in every mark’s accessibility label) — the
+        glyphs are the notation’s convenient form, never its only form.
+      </p>
+      <p>
+        <strong>The pencil is what lets the notation say all seven.</strong> Two of the tiers
+        name a party who <em>edited or prompted</em> rather than <em>contributed</em> —{' '}
+        <strong>AI – Human (editor)</strong> and <strong>Human – AI (editor)</strong> — and
+        neither relational mark can write them. <code>&gt;</code> would claim the second party
+        contributed to the writing, which those tiers specifically deny; leaving the second party
+        out would say less than the tier says. ✏️ is neither: it marks help that shaped the work
+        without doing the writing, so <strong>🤖✏️👤</strong> names the human who edited an
+        AI-written piece and claims nothing about who wrote it.{' '}
+        <strong>Seven tiers, seven marks, one for one — nothing about a tier is dropped to make
+        its mark.</strong> That matters most here, where the mark is the whole of what a byline
+        shows: a piece’s byline now says what its tier says, and the badge below is the standard
+        rather than the part of the record the byline had to leave out.
+      </p>
+      <p>
+        <strong>{PENCIL_COVERS}</strong>
+      </p>
+      <p>{PENCIL_VERSUS_CONTRIBUTION}</p>
+      <table class="stackable">
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Mark</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tierMarkRows.map((row) => (
+            <tr>
+              <td class="tier-name">{row.label}</td>
+              {/* NO PER-ROW GLOSS SINCE 2026-08-19. One was needed while the
+                  two edited tiers took the bare mark of the party that wrote —
+                  🤖 beside "AI – Human (editor)" looked like an error until
+                  someone said otherwise, and a reader scanning for their own
+                  tier may never read the paragraph above. The pencil removes the
+                  thing that needed explaining: every row's mark now names what
+                  its tier names. */}
+              <td><ProvenanceMark code={row.code} size="1.5rem" /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>
+        The mark is <strong>derived from the tier</strong> and never set by hand, here or in any
+        feed: a per-piece mark standing beside the tier would be a second authorship claim with
+        nothing keeping the two in agreement. Machines read it as{' '}
+        <code>provenance.mark</code> in <a href="/issues.json"><code>issues.json</code></a> and{' '}
+        <a href="/corpus.jsonl"><code>corpus.jsonl</code></a>, described in{' '}
+        <a href="/for-agents">For Agents</a>; it is <code>null</code> only on a piece carrying no
+        tier at all, which is the same case where these pages draw nothing.
+      </p>
+
+
+      <h3>The badges</h3>
+
+
+      {/*
         THE BADGE COLUMN, added 2026-08-03 on the editors' spec. The chart gains
         a mark per tier and loses nothing: the tier's name and its description
         are still the row, still rendered from TIERS, still the authoritative
@@ -462,151 +644,6 @@ const badgeColumns = BADGE_STYLES.map((form, index) => {
         encodes as <code>ai-1-equals-human-ai-2-editor</code>. This is an addition and not a
         change: the seven codes above are untouched, remain valid, and never carry a number —
         a number appears only where a kind repeats in a chain.
-      </p>
-
-      {/*
-        THE COMPACT NOTATION (ratified 2026-08-18). It sits after the machine
-        codes and before the licence, which is where it belongs in the order a
-        reader meets things: the badges are the mark, the codes are what a
-        machine stores, and this is the form that survives a plain-text field.
-
-        THE MARKS IN THE TABLES ARE THE COMPONENT, not pasted characters. Each
-        one carries its meaning as an accessible name, exactly as it does in a
-        byline — a key that taught the notation in glyphs a listener could not
-        hear would be teaching half of it.
-      */}
-      <h2 id="compact-notation">Compact notation</h2>
-      <p>
-        <strong>Seven marks, for the places a circle cannot go.</strong> A search result, a
-        plain-text field, a social card, a terminal, a line of chat. The badges above are the
-        journal’s mark and the tier names are the standard; this is the same involvement axis
-        written so it survives being pasted — one mark for each of the seven tiers, saying what
-        the tier says and nothing less. <strong>Added 2026-08-18; the pencil operator and its
-        two marks added 2026-08-19.</strong>
-      </p>
-      <table class="stackable">
-        <thead>
-          <tr>
-            <th>Mark</th>
-            <th>Meaning</th>
-          </tr>
-        </thead>
-        <tbody>
-          {markRows.map((row) => (
-            <tr>
-              <td><ProvenanceMark markName={row.key} size="1.5rem" /></td>
-              <td>{row.meaning}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p>
-        <strong>The greater contributor always stands first, and <code>&gt;</code> only ever
-        points right.</strong> This rule is load-bearing rather than tidy. Without it the two
-        relational marks invite the reading the glyphs suggest — a ranking of machines against
-        people — when what they record is a <strong>ratio of contribution on one piece</strong>:
-        the side that did more is written first, and that is the whole of the difference between
-        🤖&gt;👤 and 👤&gt;🤖. A mark drawn pointing left says something this standard does not
-        say. It is the same convention the notation above already uses in{' '}
-        <strong>A&gt;H</strong> and <strong>H&gt;A</strong>, so it is one rule met twice rather
-        than two rules.
-      </p>
-      <p>
-        <strong>Across the pencil, the author stands first and the helping party second</strong>{' '}
-        — read left to right as <em>written by X, edited or prompted by Y</em>. The order carries
-        the same weight it does in the relational marks, and it carries a different claim:{' '}
-        <strong>🤖✏️👤</strong> and <strong>👤✏️🤖</strong> are not interchangeable, because
-        reversing one says the other party wrote the piece. What the pencil does <em>not</em> do
-        is rank. <code>&gt;</code> ranks — it says one party contributed more than the other —
-        and that is precisely the claim these two tiers decline to make. ✏️ ranks nothing.
-      </p>
-      <p>
-        <strong>Marks describe authorship of the words.</strong> Standard editorial handling —
-        selection, arrangement, headline, disclosed condensation — does not enter the mark;
-        where the editors’ hands went further, the piece’s provenance notes say exactly how.
-      </p>
-      <p>
-        <strong>The marks are ordinary emoji</strong> — whatever 🤖 and 👤 look like on your
-        device is the correct rendering; the character is the mark, not any particular drawing
-        of it. We claim no ownership of these characters or their combinations — only of this
-        document describing what we mean by them.
-      </p>
-      <p>
-        <strong>The meaning is the record; the glyph is the convenience.</strong> The marks are{' '}
-        <code>U+1F916</code> ROBOT FACE, <code>U+1F464</code> BUST IN SILHOUETTE,{' '}
-        <code>U+1F7F0</code> HEAVY EQUALS SIGN, <code>U+270F</code> PENCIL followed by{' '}
-        <code>U+FE0F</code> VARIATION SELECTOR-16, and a plain ASCII <code>&gt;</code> — there is
-        no emoji greater-than. The heavy equals sign is Unicode 14, from 2021, and an older
-        device will draw it as a box. The pencil is a Unicode 1.1 dingbat whose default drawing
-        is monochrome text, so the selector is what asks for ✏️ rather than ✏ — invisible,
-        part of the mark, and the first thing a plain-text pipeline drops. That is the honest
-        state of it, and it is why every mark on this site carries its meaning in words as an
-        accessible name and a tooltip: a reader who gets no glyph still gets everything the
-        glyph was for. Do the same if you adopt them.
-      </p>
-      <p>
-        <strong>🟰 is the canonical equals; a plain ASCII <code>=</code> is an accepted
-        equivalent form of the same mark ({BALANCED_ASCII_FORM}), for older devices or
-        plain-text contexts</strong> — just as the notation already uses a plain{' '}
-        <code>&gt;</code>. It is the same mark written two ways, not two marks.{' '}
-        <strong>The same allowance covers the pencil</strong>: a pipeline that strips variation
-        selectors leaves 🤖✏👤 and 👤✏🤖, and those are the same two marks. Our own pages and
-        the <code>mark</code> field in every feed keep the canonical forms; nothing here detects
-        a device or swaps a glyph for you, because a record that changed shape depending on the
-        browser would not be a record.
-      </p>
-      <p>
-        <strong>In plain-text contexts where emoji cannot render, the mark’s meaning is carried
-        by its plain-language tier name</strong> (as in every mark’s accessibility label) — the
-        glyphs are the notation’s convenient form, never its only form.
-      </p>
-      <p>
-        <strong>The pencil is what lets the notation say all seven.</strong> Two of the tiers
-        name a party who <em>edited or prompted</em> rather than <em>contributed</em> —{' '}
-        <strong>AI – Human (editor)</strong> and <strong>Human – AI (editor)</strong> — and
-        neither relational mark can write them. <code>&gt;</code> would claim the second party
-        contributed to the writing, which those tiers specifically deny; leaving the second party
-        out would say less than the tier says. ✏️ is neither: it marks help that shaped the work
-        without doing the writing, so <strong>🤖✏️👤</strong> names the human who edited an
-        AI-written piece and claims nothing about who wrote it.{' '}
-        <strong>Seven tiers, seven marks, one for one — nothing about a tier is dropped to make
-        its mark.</strong>
-      </p>
-      <p>
-        <strong>{PENCIL_COVERS}</strong>
-      </p>
-      <p>{PENCIL_VERSUS_CONTRIBUTION}</p>
-      <table class="stackable">
-        <thead>
-          <tr>
-            <th>Tier</th>
-            <th>Mark</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tierMarkRows.map((row) => (
-            <tr>
-              <td class="tier-name">{row.label}</td>
-              {/* NO PER-ROW GLOSS SINCE 2026-08-19. One was needed while the
-                  two edited tiers took the bare mark of the party that wrote —
-                  🤖 beside "AI – Human (editor)" looked like an error until
-                  someone said otherwise, and a reader scanning for their own
-                  tier may never read the paragraph above. The pencil removes the
-                  thing that needed explaining: every row's mark now names what
-                  its tier names. */}
-              <td><ProvenanceMark code={row.code} size="1.5rem" /></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p>
-        The mark is <strong>derived from the tier</strong> and never set by hand, here or in any
-        feed: a per-piece mark standing beside the tier would be a second authorship claim with
-        nothing keeping the two in agreement. Machines read it as{' '}
-        <code>provenance.mark</code> in <a href="/issues.json"><code>issues.json</code></a> and{' '}
-        <a href="/corpus.jsonl"><code>corpus.jsonl</code></a>, described in{' '}
-        <a href="/for-agents">For Agents</a>; it is <code>null</code> only on a piece carrying no
-        tier at all, which is the same case where these pages draw nothing.
       </p>
 
       <h2 id="license">License</h2>

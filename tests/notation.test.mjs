@@ -25,7 +25,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -35,6 +35,8 @@ import {
   MARK_ORDER,
   EDITOR_TIERS,
   BALANCED_ASCII_FORM,
+  MARK_SIZE_BYLINE,
+  MARK_SIZE_NOTE,
   PENCIL_TEXT_FORMS,
   PENCIL_COVERS,
   PENCIL_VERSUS_CONTRIBUTION,
@@ -514,14 +516,36 @@ test('the structured object carries null only where a piece has no tier', () => 
   assert.equal(unclaimed.mark, null);
   assert.equal(unclaimed.author_type, 'ai');
 
-  // An edited piece is NOT one of them, and since the amendment its mark names
-  // both parties rather than only the writer.
+  // AN EDITED PIECE IS NOT ONE OF THEM, and the three fields it produces are the
+  // point of this assertion: after the amendment of 2026-08-19 they do not all
+  // say the same thing, and they are not supposed to.
+  //
+  //   `mark` names BOTH parties — 🤖✏️👤 — because the pencil can name a party
+  //   without claiming they wrote anything.
+  //   `author_type` names ONLY the writer, because editing does not confer
+  //   authorship (the ruling of 2026-08-18, unchanged by the amendment).
+  //   `involvement_tier` carries the tier itself, as it always did.
+  //
+  // The failure worth catching is not disagreement between them; it is either
+  // one drifting from what it says it is. So the mark is asserted to differ from
+  // the unedited piece's — that difference IS the amendment — while the author
+  // type is asserted to match it, which is the earlier ruling still holding.
   const edited = structuredProvenance({
     ...base,
     submission_track: 'human-attested',
     involvement_tier: 'ai-human-editor',
   });
+  const plain = structuredProvenance({
+    ...base,
+    submission_track: 'human-attested',
+    involvement_tier: 'ai',
+  });
+  assert.notEqual(edited.mark, plain.mark);
   assert.equal(edited.mark, MARKS['ai-human-helped']);
+  assert.equal(edited.author_type, plain.author_type);
+  assert.equal(edited.author_type, 'ai');
+  // And the tier is on the record beside both.
+  assert.equal(edited.involvement_tier, 'ai-human-editor');
 });
 
 test('the mark field is additive and displaces nothing', () => {
@@ -593,4 +617,196 @@ test('every drawn mark carries its meaning in words', () => {
   assert.match(component, /title=/);
   assert.match(component, /role="img"/);
   assert.match(component, /resolved\.meaning/);
+});
+
+// --- 8. The mark replaces the badge on journal pages (editors, 2026-08-18) --
+//
+// TWO HALVES, AND THEY PULL AGAINST EACH OTHER, which is why both are here: the
+// mark must be on every journal byline, and the badge must be GONE from them and
+// still present at /provenance. A change that satisfied one and not the other
+// would be either a byline with no provenance at all or a standard with no page
+// that shows it.
+
+/** Every surface that draws a byline or a signature mark. */
+const MARK_SURFACES = [
+  'src/pages/articles/[slug].astro',
+  'src/pages/articles/[slug]/as-submitted.astro',
+];
+
+test('every rendered byline carries the mark and no badge', () => {
+  // Asserted against the BUILT HTML, because what a reader meets is the
+  // document — a template can be right and a component can still emit a circle.
+  const dist = repoPath('dist/articles');
+  if (!existsSync(dist)) return; // `npm test` may run before a build; the source checks below always run.
+
+  let checked = 0;
+  for (const slug of readdirSync(dist)) {
+    const file = `${dist}/${slug}/index.html`;
+    if (!existsSync(file)) continue;
+    const html = readFileSync(file, 'utf8');
+    assert.ok(
+      !html.includes('tier-badge'),
+      `${slug}: a journal page still draws a badge — the mark replaced it`
+    );
+    const byline = html.match(/<p class="article-byline"[^>]*>([\s\S]*?)<\/p>/)?.[1];
+    if (!byline) continue;
+    // Every published piece declares or claims a tier today, so every byline
+    // carries a mark. A piece with neither would legitimately carry none — see
+    // byline-badge.mjs — and this asserts the state of the record as built.
+    assert.ok(byline.includes('provenance-mark'), `${slug}: the byline carries no mark`);
+    checked += 1;
+  }
+  assert.ok(checked > 0, 'no built byline was checked — the selector has drifted');
+});
+
+test('the byline surfaces draw the mark, and no longer draw a badge', () => {
+  for (const file of MARK_SURFACES) {
+    const src = readFileSync(repoPath(file), 'utf8');
+    assert.match(src, /<ProvenanceMark/, `${file} draws no mark`);
+    assert.ok(!/<TierBadge/.test(src), `${file} still draws a badge on a journal page`);
+  }
+});
+
+test('the badge is not withdrawn — /provenance still draws it', () => {
+  // THE HALF THAT IS EASY TO LOSE. The badge is the standard's mark, licensed
+  // CC BY 4.0 and specified for adopters; removing it from the journal's pages
+  // is a house choice, and removing it from the page that TEACHES it would be
+  // withdrawing it from the standard.
+  const page = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  assert.match(page, /<TierBadge/, '/provenance no longer draws the badge');
+  assert.match(page, /BADGE_STYLES|coAuthorshipOrderings/, '/provenance stopped teaching both styles');
+  // AND IT SITS BELOW THE COMPACT-NOTATION KEY, as the complete tier apparatus
+  // (editors, 2026-08-20). The order is the ruling: the marks are what this
+  // journal prints, the badge standard is what an adopter builds to.
+  assert.ok(
+    page.indexOf('id="compact-notation"') < page.indexOf('<h3>The badges</h3>'),
+    'the badge standard no longer follows the compact-notation key'
+  );
+});
+
+// --- 9. Verification is stated in words, never in a mark ---------------------
+//
+// THE REQUIREMENT INSIDE THE RULING OF 2026-08-20. Verification — attested,
+// claimed, not independently verified — is deliberately absent from the marks,
+// so removing the badge from a byline must not be the thing that takes it off
+// the page. These assertions are the standing check that it did not.
+
+test('the Provenance block states verification in words, and draws no badge to lose', () => {
+  // THE BLOCK NEVER CARRIED A BADGE. It renders tierNotation(), the tier name
+  // and the description — so the byline change has nothing to take from it, and
+  // asserting that is worth more than asserting the sentences alone: a later
+  // change that added a badge here would make this block's verification language
+  // look like the badge's to remove.
+  const block = readFileSync(repoPath('src/components/ProvenanceBlock.astro'), 'utf8');
+  assert.ok(!/<TierBadge/.test(block), 'the Provenance block draws a badge');
+  assert.match(block, /tierNotation\(/, 'the Provenance block stopped printing the tier notation');
+
+  // R-051's sentence, in the Authorship position, for a tier that is a claim.
+  assert.match(
+    block,
+    /The tier above is as claimed by the author, recorded by the editors/,
+    'the block no longer says a claimed tier is a claim'
+  );
+  // The attester's own words, where a named human stands behind the piece.
+  assert.match(block, /attested by \{d\.attested_by\}/, 'the block no longer names the attester');
+  // And the agent-direct piece that claimed nothing says so rather than showing
+  // a bare label that reads like a declaration.
+  assert.match(block, /No tier is declared — the agent-direct track carries none\./);
+});
+
+test('a claimed tier says so in words on the built page, not only to a listener', () => {
+  // The accessible name carries it too (asserted above), but a sentence only a
+  // screen reader receives is not "plainly stated". This reads the visible text
+  // of the Authorship section on the two agent-direct pieces that claimed a tier.
+  const dist = repoPath('dist/articles');
+  if (!existsSync(dist)) return;
+
+  let checked = 0;
+  for (const slug of readdirSync(dist)) {
+    const file = `${dist}/${slug}/index.html`;
+    if (!existsSync(file)) continue;
+    const html = readFileSync(file, 'utf8');
+    const section = html.match(/aria-label="Authorship"([\s\S]*?)<\/section>/)?.[1];
+    if (!section) continue;
+    // A claimed tier is identifiable from the mark's own accessible name, which
+    // the resolver supplies from the same place the sentence comes from.
+    if (!/as claimed by the author/.test(html.match(/aria-label="Compact provenance mark:[^"]*"/)?.[0] ?? '')) {
+      continue;
+    }
+    assert.match(
+      section.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '),
+      /as claimed by the author, recorded by the editors/,
+      `${slug}: the Authorship section does not state the tier is a claim`
+    );
+    checked += 1;
+  }
+  assert.ok(checked > 0, 'no claimed-tier piece was checked — the selector has drifted');
+});
+
+test('the marks encode no verification, and no surface tries to make them', () => {
+  // The design line the ruling restates: attested and claimed produce the same
+  // mark, so nothing may shade one. Held against the whole mark table rather
+  // than against a pair, so a future eighth mark for "verified" fails here.
+  const words = /attest|claim|verif|certif/i;
+  for (const meaning of Object.values(MARK_MEANINGS)) {
+    assert.ok(!words.test(meaning), `"${meaning}" puts verification into a mark's meaning`);
+  }
+  assert.match(
+    AGENT_CONTRACT.reading.provenance_fields.fields.mark.note,
+    /involvement tier/,
+    'the contract stopped describing the mark as the involvement axis'
+  );
+});
+
+test('the mark carries the sentences the badge used to carry', () => {
+  // R-051 (a claimed tier says so) and R-052 (a note's mark names what it marks)
+  // both put their sentence in the BADGE's accessible name, and both say that a
+  // surface drawing the mark without it states the wrong thing to a listener.
+  // The badge is gone from these surfaces; the sentences are not.
+  const component = readFileSync(repoPath('src/components/ProvenanceMark.astro'), 'utf8');
+  assert.match(component, /labelSuffix/, 'the mark cannot carry an accessible-name suffix');
+  assert.match(component, /aria-label=\{`Compact provenance mark: \$\{resolved\.meaning\}\.\$\{labelSuffix\}`\}/);
+
+  const article = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  // The byline's claimed-tier sentence, and the note's scoping sentence, each
+  // supplied by the resolver rather than composed at the call site.
+  assert.match(article, /<ProvenanceMark piece=\{d\}[^>]*labelSuffix=\{bylineBadge\?\.labelSuffix\}/);
+  assert.match(article, /labelSuffix=\{noteBadge\.labelSuffix\}/);
+  const asSubmitted = readFileSync(repoPath('src/pages/articles/[slug]/as-submitted.astro'), 'utf8');
+  assert.match(asSubmitted, /labelSuffix=\{bylineBadge\?\.labelSuffix\}/);
+});
+
+test('a claimed tier still says so to a listener, in the built page', () => {
+  const dist = repoPath('dist/articles');
+  if (!existsSync(dist)) return;
+  // "The Beauty of the Latent Space" is agent-direct with a claimed tier (R-051).
+  const file = `${dist}/the-beauty-of-the-latent-space/index.html`;
+  if (!existsSync(file)) return;
+  const html = readFileSync(file, 'utf8');
+  const mark = html.match(/aria-label="Compact provenance mark:[^"]*"/)?.[0] ?? '';
+  assert.match(mark, /as claimed by the author/, 'the claimed tier is stated as an attestation');
+});
+
+test('the mark is set at the size of a lead element', () => {
+  // It stood at 1.15rem when it sat beside a badge. It stands alone now.
+  assert.ok(parseFloat(MARK_SIZE_BYLINE) > 1.15, 'the mark was not enlarged when it took the lead');
+  assert.ok(
+    parseFloat(MARK_SIZE_NOTE) < parseFloat(MARK_SIZE_BYLINE),
+    'the note mark is not quieter than the byline mark'
+  );
+});
+
+test('the page teaching both teaches the marks first, and says why', () => {
+  const page = readFileSync(repoPath('src/pages/provenance.astro'), 'utf8');
+  const key = page.indexOf('id="compact-notation"');
+  const badges = page.indexOf('<h3>The badges</h3>');
+  assert.notEqual(key, -1, '/provenance lost the compact-notation anchor');
+  assert.notEqual(badges, -1, '/provenance lost the badge section heading');
+  assert.ok(key < badges, 'the badge standard precedes the compact-notation key');
+  const flat = page.replace(/\s+/g, ' ');
+  assert.match(flat, /this journal prints the marks/);
+  assert.match(flat, /Latin-script and English-bound/);
+  // And it says the badges are not withdrawn, which is the sentence an adopter
+  // reading this page needs most.
+  assert.match(flat, /Nothing about the badges is withdrawn/);
 });

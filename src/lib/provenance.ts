@@ -548,19 +548,26 @@ export interface StructuredProvenance {
   /** Who made the work, collapsed from the involvement tier to three values. */
   author_type: 'ai' | 'human' | 'collaborative';
   /**
-   * The compact provenance mark — the emoji notation ratified 2026-08-18, the
-   * same string the piece's byline draws. Null where the notation has none.
+   * The compact provenance mark — the emoji notation ratified 2026-08-18 and
+   * amended 2026-08-19, the same string the piece's byline draws. Null where the
+   * notation has none.
    *
-   * A THIRD COLLAPSE OF THE SAME AXIS, and the three do not compete: the tier
+   * A THIRD RENDERING OF THE SAME AXIS, and the three do not compete: the tier
    * code is the record, `author_type` is the coarse question a corpus reader
    * asks first, and this is what a reader SEES. A consumer displaying provenance
    * beside a quoted piece can print this and be printing what the journal
    * prints; a consumer computing over the corpus wants one of the other two.
    *
-   * EVERY TIER RESOLVES, INCLUDING THE TWO EDITOR TIERS, which carry the mark of
-   * the party that wrote — editing does not enter the mark (editors,
-   * 2026-08-18). The editing party is still named in `involvement_tier` and in
-   * `statement`, both published beside this field.
+   * ONLY ONE OF THE THREE IS A COLLAPSE, since the amendment. `author_type`
+   * renders seven values as three and is documented as doing so. This one is
+   * seven for seven: every tier has its own mark and no two tiers share one, so
+   * a reader who has only the mark has everything the tier says.
+   *
+   * EVERY TIER RESOLVES, INCLUDING THE TWO EDITOR TIERS, which since 2026-08-19
+   * carry marks of their own — 🤖✏️👤 and 👤✏️🤖 — naming the editing party with
+   * an operator that asserts no contribution by them. For one day they took the
+   * bare mark of the party that wrote; that is superseded, and `author_type` is
+   * where the writing party is still reported alone.
    *
    * NULL IS THE DISPLAYED ABSENCE, NOT A COARSER `author_type`. It is null on a
    * piece carrying no tier at all — the case where the page draws no mark

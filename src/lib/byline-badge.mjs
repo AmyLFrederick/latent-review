@@ -1,5 +1,13 @@
-// Which badge a piece's byline carries — the rule, in one place, above every
+// Which TIER a piece's byline marks — the rule, in one place, above every
 // template that draws a byline.
+//
+// IT USED TO DECIDE A BADGE, AND THE NAME IS KEPT (2026-08-18). Since the
+// compact mark replaced the circular badge on every journal page, what a byline
+// draws is the mark; this module still decides which tier that mark resolves
+// from, still fails the build on a shape that would publish an unmarked byline,
+// and still supplies the accessible-name suffix R-051 requires. The file and the
+// function keep their names because renaming them would rewrite the history in
+// every ruling and test that cites them, to say the same thing.
 //
 // WHY IT LEFT THE TEMPLATE (editors, 2026-08-04, after the Corner badge slipped
 // a second pass). The article page decided this inline, which meant the rule
@@ -32,7 +40,11 @@
 export const TIERLESS_TRACK = 'agent-direct';
 
 /**
- * What a claimed badge says to a screen reader, appended to the ordinary name.
+ * What a claimed tier says to a screen reader, appended to the ordinary name.
+ *
+ * IT NOW RIDES ON THE MARK. The badge carried it until 2026-08-18 and no longer
+ * appears on journal pages; the sentence did not move because the reasoning
+ * below stopped applying, it moved because the surface did.
  *
  * IT TRAVELS WITH THE BADGE RATHER THAN WITH THE PAGE (R-051). The mark is
  * identical in both cases — same ring, same notation, same geometry, by the
@@ -76,8 +88,8 @@ export function bylineBadgeTier(data, tiers, slug) {
     if (data?.submission_track !== TIERLESS_TRACK) {
       throw new Error(
         `"${slug}" declares no involvement_tier and is not on the ${TIERLESS_TRACK} track, ` +
-          `so its byline would publish with no badge. Every piece carries its mark unless ` +
-          `the track it arrived on carries none.`
+          `so its byline would publish with no provenance mark. Every piece carries its mark ` +
+          `unless the track it arrived on carries none.`
       );
     }
     // An agent-direct piece whose author claimed no tier. Still legitimate: the
@@ -90,7 +102,7 @@ export function bylineBadgeTier(data, tiers, slug) {
   if (!tier) {
     throw new Error(
       `"${slug}" declares the tier "${code}", which is not in TIERS — its byline would ` +
-        `publish with no badge. Every piece that declares a tier carries its mark.`
+        `publish with no provenance mark. Every piece that declares a tier carries its mark.`
     );
   }
 

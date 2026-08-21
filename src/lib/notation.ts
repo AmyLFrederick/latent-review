@@ -217,6 +217,26 @@ export type MarkKey = keyof typeof MARKS;
 export const BALANCED_ASCII_FORM = MARKS.balanced.replace(HEAVY_EQUALS, '=');
 
 /**
+ * THE MARK'S SIZE WHERE IT LEADS (editors, dual yes 2026-08-18).
+ *
+ * The byline and a signed note's signature both put the mark first and the badge
+ * after it, so the mark is set at the size of a lead element rather than of
+ * apparatus — 2rem against the byline's own 1.05rem, and against the 1.15rem the
+ * mark took when it sat second.
+ *
+ * THE NOTE'S IS DERIVED FROM THE BYLINE'S BY THE RATIO THE BADGE ALREADY USES
+ * (30/35 ≈ 0.857, see BADGE_SIZE_NOTE), so a mark keeps the same relation to the
+ * words beside it in both places. A note is apparatus and reads in a quieter
+ * voice; a mark that ignored that would be the loudest thing in it.
+ *
+ * IN rem, NOT px, because these sit in running text and should move with a
+ * reader's type size — which is the whole difference between a glyph in a line
+ * and a badge, whose diameter is fixed so its ring cannot thin into a hairline.
+ */
+export const MARK_SIZE_BYLINE = '2rem';
+export const MARK_SIZE_NOTE = '1.7rem';
+
+/**
  * The two pencil marks with the variation selector stripped — 🤖✏👤 and 👤✏🤖.
  *
  * THE SAME ALLOWANCE THE ASCII EQUALS ALREADY HAS, for the same reason and with
