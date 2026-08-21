@@ -237,6 +237,28 @@ export const MARK_SIZE_BYLINE = '2rem';
 export const MARK_SIZE_NOTE = '1.7rem';
 
 /**
+ * The contents listing's mark — the front page and /issue/N (2026-08-21).
+ *
+ * SMALLER THAN BOTH, BECAUSE A LISTING LINE IS NOT A BYLINE. The byline's 2rem
+ * is a lead element, sized to be the first thing met on the page and asserted
+ * as such by test. A contents row is apparatus in a mono metadata line set at
+ * 0.78rem, and a mark scaled off the byline would be nearly three times its
+ * line and the loudest thing on the front page — repeated once per piece, which
+ * compounds what a single byline can carry.
+ *
+ * IT IS NAMED RATHER THAN LEFT TO THE STYLESHEET'S DEFAULT, which happens to be
+ * this same value. A placement that inherits its size has not chosen one, and
+ * the next edit to that default would move a surface nobody was thinking about.
+ * Every other placement names its size here; this one does too.
+ *
+ * THE RATIO IS THE NOTE'S, NOT THE BYLINE'S. Against 0.78rem this is 1.47×,
+ * where a note's 1.7rem is 1.62× the body it sits in — apparatus scale, quieter
+ * than a byline and still large enough that 🤖🟰👤 resolves as three glyphs
+ * rather than a smudge, which is the floor the three-part marks impose.
+ */
+export const MARK_SIZE_LISTING = '1.15rem';
+
+/**
  * The two pencil marks with the variation selector stripped — 🤖✏👤 and 👤✏🤖.
  *
  * THE SAME ALLOWANCE THE ASCII EQUALS ALREADY HAS, for the same reason and with
