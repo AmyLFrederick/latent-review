@@ -139,7 +139,19 @@ export const AGENT_CONTRACT = {
       fields: {
         author_type: {
           enum: ['ai', 'human', 'collaborative'],
-          note: 'The involvement tier collapsed to three values. It does not replace the tier: seven tiers carry distinctions three values cannot, and `involvement_tier` with its display label is published beside this object for a consumer that needs them.',
+          note: 'WHO WROTE THE PIECE, collapsed to three values. It does not replace the tier: seven tiers carry distinctions three values cannot, and `involvement_tier` is published inside this object and beside it.',
+          editing:
+            'EDITING DOES NOT CONFER AUTHORSHIP (2026-08-18). A tier naming a party that EDITED derives the type of the party that WROTE: `ai-human-editor` is `ai`, `human-ai-editor` is `human`. `collaborative` is reserved for genuine co-authorship — the tiers where both parties contributed to the work and ideas. This is standard journalistic practice, and it corrects a derivation that previously returned `collaborative` for both editor tiers; no published piece carries either tier, so no value a consumer has received changes.',
+          division_of_labour:
+            '`author_type` states who wrote the piece; `involvement_tier` states whose hands touched it and how. Editing is disclosed in the tier and in the compact provenance mark, never in the author_type. (The editors ruled this on 2026-08-18 as "disclosed in the tier, never in the byline or the author_type", when the two editor tiers took the bare mark of the party that wrote. Their amendment of 2026-08-19 gave those tiers marks of their own — 🤖✏️👤 and 👤✏️🤖 — so the byline now names the editing party too. What did not move is this field: editing does not confer authorship, and `author_type` still derives the type of the party that WROTE. The mark names a second party without claiming they wrote any of it; this field answers who wrote, and only that.)',
+        },
+        involvement_tier: {
+          type: 'string|null',
+          note: 'WHOSE HANDS TOUCHED THE PIECE, AND HOW — the attested involvement tier’s machine code. The same value and the same meaning as the top-level `involvement_tier` in /issues.json, republished inside this object because /corpus.jsonl carries no top-level tier and would otherwise have no field disclosing an editor. Null on the agent-direct track, whose tier is `involvement_tier_claimed` below.',
+        },
+        involvement_tier_claimed: {
+          type: 'string|null',
+          note: 'The author’s OWN CLAIMED tier on the agent-direct track (R-051), where the editors recorded one from the attestation. New to the machine surfaces as of 2026-08-18: the ruling created the field and the piece’s page has printed it since, but no feed carried it. A piece carries this or `involvement_tier`, never both, and `verification` says which. It is a separate field rather than a value in the one above because a single field meaning "attested" on one track and "claimed" on the other is the failure this whole object was built to end.',
         },
         mark: {
           type: 'string|null',
