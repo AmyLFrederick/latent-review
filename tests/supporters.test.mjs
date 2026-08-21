@@ -16,6 +16,7 @@ import {
   SUPPORTER_WINDOW_SPAN,
   SUPPORTER_LINKS,
   SUPPORT_MONTHLY_URL,
+  SUPPORT_ANNUAL_URL,
 } from '../src/lib/supporters.mjs';
 
 const at = (iso) => new Date(iso);
@@ -131,6 +132,28 @@ test('the monthly link is a real https URL', () => {
   assert.ok(
     SUPPORT_MONTHLY_URL.startsWith('https://'),
     `the monthly link must be an https URL; found "${SUPPORT_MONTHLY_URL}"`
+  );
+});
+
+test('the annual link is absent or a real https URL, never something in between', () => {
+  // ANNUAL IS ALLOWED TO BE null AND MONTHLY IS NOT, and the asymmetry is the
+  // point rather than an oversight. Monthly has been offered since the ladder
+  // shipped, so its link going missing is a regression. Annual was added on
+  // 2026-08-21 with its Stripe preset not yet created, so null is its correct
+  // starting value and the row simply does not render.
+  //
+  // What this refuses is the middle: a value that is neither absent nor a
+  // usable link — '', 'TODO', a bare domain — which renders a row with an
+  // action that goes nowhere, on the one page whose job is to be actionable.
+  if (SUPPORT_ANNUAL_URL === null) return;
+  assert.equal(
+    typeof SUPPORT_ANNUAL_URL,
+    'string',
+    'the annual link must be null or a string; anything else renders a broken action'
+  );
+  assert.ok(
+    SUPPORT_ANNUAL_URL.startsWith('https://'),
+    `the annual link must be an https URL; found "${SUPPORT_ANNUAL_URL}"`
   );
 });
 
