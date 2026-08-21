@@ -1,6 +1,9 @@
 ---
-import { sectionUrl, displayTitle } from '../lib/site';
+import { sectionUrl, displayTitle, TIERS } from '../lib/site';
 import { pronounsDisplay } from '../lib/pronouns.mjs';
+import ProvenanceMark from './ProvenanceMark.astro';
+import { MARK_SIZE_LISTING } from '../lib/notation.ts';
+import { bylineBadgeTier } from '../lib/byline-badge.mjs';
 import type { Issue } from '../lib/issues';
 
 // The body of an issue: the contents, and nothing else. Rendered identically on
@@ -72,6 +75,33 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
               <p class="meta-mono contents-meta">
                 <a href={sectionUrl(article.data.section)}>{article.data.section}</a> · By{' '}
                 {article.data.author_name}
+                {/*
+                  THE MARK, AFTER THE NAME AND BEFORE THE PRONOUNS (editors,
+                  2026-08-21). The front page showed no provenance at all while
+                  every article page led with it, so a reader met the journal's
+                  central claim only after choosing what to read.
+
+                  IT IS RESOLVED, NOT DECIDED HERE. `bylineBadgeTier` is the
+                  same resolver the article byline and the as-submitted byline
+                  ask, and it supplies the same `labelSuffix` — so R-051's
+                  claimed-tier sentence reaches a listener on this line exactly
+                  as it does on the piece's own. A listing that drew the mark
+                  and dropped the sentence would state a claim as an
+                  attestation, which is the failure that ruling names. It also
+                  throws for a piece that declares no tier off the tierless
+                  track, so this list cannot quietly publish a byline with no
+                  provenance either.
+
+                  SAME SEPARATOR AS THE REST OF THE LINE, so the row still reads
+                  as one sentence of apparatus rather than as a metadata line
+                  with a picture in it.
+                */}
+                {' · '}
+                <ProvenanceMark
+                  piece={article.data}
+                  size={MARK_SIZE_LISTING}
+                  labelSuffix={bylineBadgeTier(article.data, TIERS, article.id)?.labelSuffix}
+                />
                 {/* Already a mono metadata line, so no .byline-pronouns here —
                     the register this class exists to produce is the register
                     .contents-meta is already in. Adding it would shrink the

@@ -659,6 +659,50 @@ test('every rendered byline carries the mark and no badge', () => {
   assert.ok(checked > 0, 'no built byline was checked — the selector has drifted');
 });
 
+test('the contents listing marks every piece, with the article page’s own accessible name', () => {
+  // THE FRONT PAGE IS A BYLINE SURFACE TOO (editors, 2026-08-21). It showed no
+  // provenance at all while every article page led with it, so a reader met the
+  // journal's central claim only after choosing what to read.
+  //
+  // THE ACCESSIBLE NAME IS COMPARED, NOT JUST THE GLYPH, and that is the half
+  // worth testing. Two surfaces can draw the same emoji and say different
+  // things to a listener: R-051 requires a claimed tier's name to disclose that
+  // it is a claim, and the suffix carrying that sentence comes from a resolver
+  // a listing could easily forget to ask. Byte equality with the piece's own
+  // byline is the only check that catches a listing that drew the mark and
+  // dropped the sentence.
+  const listings = ['dist/index.html', 'dist/issue/1/index.html'];
+  let rowsChecked = 0;
+
+  for (const listing of listings) {
+    const path = repoPath(listing);
+    if (!existsSync(path)) continue; // `npm test` may run before a build.
+    const html = readFileSync(path, 'utf8');
+    const items = html.match(/<li class="contents-item"[\s\S]*?<\/li>/g) ?? [];
+    assert.ok(items.length > 0, `${listing}: no contents rows found — the selector has drifted`);
+
+    for (const item of items) {
+      const slug = item.match(/\/articles\/([^/"]+)\//)?.[1];
+      assert.ok(slug, `${listing}: a contents row links to no piece`);
+      const label = item.match(/class="provenance-mark"[^>]*?aria-label="([^"]*)"/)?.[1];
+      assert.ok(label, `${listing}: "${slug}" is listed with no provenance mark`);
+
+      const article = readFileSync(repoPath(`dist/articles/${slug}/index.html`), 'utf8');
+      const byline = article.slice(article.indexOf('article-byline'));
+      const own = byline.match(/class="provenance-mark"[^>]*?aria-label="([^"]*)"/)?.[1];
+      assert.equal(
+        label,
+        own,
+        `${listing}: "${slug}" is announced differently here than on its own page — ` +
+          `a listing that drops the accessible-name suffix states a claim as an attestation`
+      );
+      rowsChecked += 1;
+    }
+  }
+
+  assert.ok(rowsChecked > 0, 'no listing row was checked — the build is missing or the markup moved');
+});
+
 test('the byline surfaces draw the mark, and no longer draw a badge', () => {
   for (const file of MARK_SURFACES) {
     const src = readFileSync(repoPath(file), 'utf8');
