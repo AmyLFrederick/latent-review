@@ -1,0 +1,87 @@
+---
+import {
+  markForPiece,
+  markFor,
+  MARKS,
+  MARK_MEANINGS,
+  type Mark,
+  type MarkKey,
+} from '../lib/notation.ts';
+
+// THE COMPACT PROVENANCE MARK, beside the badge it abbreviates (2026-08-18).
+//
+// ONE MARK, ONE COMPONENT, for the reason src/lib/byline-badge.mjs gives for the
+// badge: there is more than one surface that draws a byline, and a rule each
+// template restates is a rule each template can omit — which has already
+// happened once here, when /articles/<slug>/as-submitted printed a byline and no
+// badge for weeks. This component and markForPiece() are asked; nothing is
+// decided in a template.
+//
+// THE GLYPH IS NOT THE RECORD, and this component is where that stops being a
+// slogan. The whole mark is one `role="img"` carrying the meaning as its
+// accessible name and as a `title`, so:
+//
+//   a screen reader says "AI-led, human contributed" and never spells emoji;
+//   a hover says the same thing to a sighted reader who has not met the key;
+//   a device with no 🟰 (Unicode 14, 2021) shows a box and the name still holds.
+//
+// Reading the glyphs aloud would be actively worse than silence — "robot face,
+// greater-than sign, bust in silhouette" is not the notation, it is a
+// description of the ink, and it invites exactly the species-ranking misreading
+// the direction rule exists to prevent.
+//
+// IT DRAWS NOTHING WHERE THERE IS NO TIER. All seven tiers resolve to a mark, so
+// the absent case is a piece carrying no tier at all — the agent-direct piece
+// whose author claimed none, whose byline already draws no badge for the reason
+// byline-badge.mjs sets out. A code outside the seven (a chained label, which the
+// schema cannot store) resolves to nothing on the same rule, rather than to an
+// invented shorthand.
+
+interface Props {
+  /**
+   * The piece, from which the tier is resolved — attested or claimed, identically
+   * (R-051). Pass this in the ordinary case.
+   */
+  piece?: { involvement_tier?: string; involvement_tier_claimed?: string };
+  /** A tier code directly, for the tier table at /provenance, which marks tiers rather than pieces. */
+  code?: string;
+  /**
+   * A mark by name, for the mark key at /provenance — the one surface that
+   * teaches the notation on its own rather than as the mark OF something. Every
+   * other caller names a piece or a tier, because everywhere else a mark that is
+   * not a mark of some particular making is a mark of nothing.
+   */
+  markName?: MarkKey;
+  /**
+   * Rendered size. The default is the byline's; the key sets its own so the
+   * seven marks read as a specimen rather than as apparatus.
+   */
+  size?: string;
+}
+
+const { piece, code, markName, size } = Astro.props;
+
+const resolved: Mark | null =
+  markName !== undefined
+    ? { mark: MARKS[markName], meaning: MARK_MEANINGS[markName], key: markName }
+    : code !== undefined
+      ? markFor(code)
+      : piece
+        ? markForPiece(piece)
+        : null;
+---
+
+{
+  resolved ? (
+    <span
+      class="provenance-mark"
+      style={size ? `--mark-size:${size}` : undefined}
+      role="img"
+      aria-label={`Compact provenance mark: ${resolved.meaning}.`}
+      title={`Compact provenance mark: ${resolved.meaning}.`}
+      translate="no"
+    >
+      {resolved.mark}
+    </span>
+  ) : null
+}

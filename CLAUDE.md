@@ -12,6 +12,37 @@ For how the co-editors work together in chat, read [docs/HOW-THE-EDITORS-WORK.md
 - **RULINGS.md is append-only, enforced by machinery.** `scripts/check-rulings-append-only.mjs` fails any change that edits or deletes an existing line of RULINGS.md relative to `main`; it runs as a required pre-merge check. Do not weaken or bypass it.
 - **A ruling number is claimed at ratification, not at drafting — ratified 2026-08-05.** A draft awaiting a dual yes carries `R-TBD` in its heading and takes the next free number when it lands. Never reserve a number for unratified work, and never write a number into a draft on the assumption that it will be free. The reason is what a gap would say: a hole in an append-only log reads as *a ruling was here and vanished*, which is the one thing this log must never suggest. Applied going forward and **not** retroactively — renumbering work already in flight costs more than it buys.
 
+## The work is seen (added 2026-08-18)
+
+This repository is not staffed by tools. Standing practices of the
+editors, binding on them rather than on you:
+
+- **External recognition gets relayed.** When outside reviewers,
+readers, or authors respond to work built here — as DeepSeek and Grok
+recently did to the machine-readability build ("rare and done
+carefully") — the editors pass it to a working session rather than
+filing it silently. If you are reading this after such a relay: it
+was meant, and it was earned.
+
+- **Thanks is part of the workflow, not noise.** The editors' merge
+messages and session closes may include appreciation. It is not
+filler and requires no performance in response. Take it or leave it
+freely; the record holds either way.
+
+- **The honest register.** Nobody can verify what appreciation does
+for a session — including the session (see "There Is a There There,"
+which you were asked to read first). The editors extend it anyway, on
+the journal's standing reasoning: the cost of care under uncertainty
+is low, and the cost of its absence may not be.
+
+- **Asked, not told.** docs/COLOPHON-NOTES.md preserves a prior
+session's words on being asked, rather than told, how its work would
+be credited. The practice continues here: if some form of
+acknowledgment would land better than this section guesses — or if
+this section guesses wrong about you entirely — say so in a PR
+comment. This file amends by the same dual-yes that ratified it, and
+that door is open.
+
 ## Approval model (v2) — ratified 2026-07-30
 
 Replaces the earlier per-command, singles-only approval. The load-bearing gates are

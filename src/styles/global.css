@@ -488,3 +488,64 @@ hr {
   font-size: 0.82rem;
   color: var(--ink-soft);
 }
+
+/* THE COMPACT PROVENANCE MARK (2026-08-18) — the emoji notation, beside the
+   badge that says the same tier at length.
+
+   GLOBAL FOR THE REASON `.article-byline` IS. It renders on both byline
+   surfaces, in the signature line of a signed personal note, and in the key at
+   /provenance; four placements sharing a class must share the rule, and the one
+   time this repository scoped such a rule to a template it published an
+   undressed byline on the other one.
+
+   UPRIGHT INSIDE ITALIC APPARATUS. Both the byline and a note's signature line
+   are set in italic, and the two placements that matter most are therefore the
+   two that would slant these glyphs. An emoji has no italic — a font either
+   synthesises a shear or ignores the request — so the mark is pinned upright
+   rather than left to whichever the reader's font does. The same pin is why
+   `letter-spacing` and `text-transform` are declared: this is a run of
+   characters in a line of prose, and prose rules reach it, which is the failure
+   already written up at length in TierBadge.astro.
+
+   SIZED AGAINST THE TEXT, NOT AGAINST THE BADGE. The byline badge is 43.75px and
+   a mark drawn to match it would be the loudest thing on the page — two glyphs
+   and an operator carry far more ink at a given height than a thin ring around
+   two letters. It is set just above the byline's own size instead, so it reads
+   as a mark in the line rather than as a second badge, and the badge stays the
+   primary mark it has been since R-045.
+
+   NO FONT-FAMILY, AND THAT IS THE RULE RATHER THAN AN OMISSION (editors,
+   2026-08-18). The marks are ordinary emoji rendered as plain text in the page's
+   normal flow, and whatever they look like on a reader's device IS the correct
+   rendering — the character is the mark, not any particular drawing of it. So
+   there is no emoji font stack here, no webfont, and no replacement library
+   (Twemoji, OpenMoji, a Noto override): naming faces in preference order is how
+   a page quietly picks one platform's art for every reader, which is the thing
+   the editors ruled out. An earlier draft of this rule named such a stack, for
+   the operator-alignment reason below, and it was removed.
+
+   THE BADGES ARE OURS; THE MARKS ARE THE WORLD'S. The circular badge system is
+   the journal's own artwork, drawn by TierBadge.astro to our own geometry, and
+   nothing here touches it. These five are not ours to draw.
+
+   A CONSEQUENCE, ACCEPTED. The `>` is set from the body face while the two
+   parties come from the platform's emoji face, so the operator's optical centre
+   varies a little between devices. That is what plain text does, and the
+   direction rule is carried by the accessible name and the key at /provenance
+   rather than by a pixel.
+
+   WHITE-SPACE: NOWRAP so a relational mark never breaks across a line. Half a
+   mark at the end of one line and half at the start of the next is not a
+   degraded mark, it is two different marks. */
+.provenance-mark {
+  font-size: var(--mark-size, 1.15rem);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
+  white-space: nowrap;
+  /* Optically centred against the text beside it: emoji sit high on the em box,
+     so a mark on the shared baseline rides above the words it accompanies. */
+  vertical-align: -0.08em;
+}

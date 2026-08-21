@@ -13,6 +13,7 @@ import {
 } from '../../lib/site';
 import { pronounsDisplay } from '../../lib/pronouns.mjs';
 import TierBadge from '../../components/TierBadge.astro';
+import ProvenanceMark from '../../components/ProvenanceMark.astro';
 // @ts-expect-error — plain-JS module shared with the tests
 import { badgeArticleSize, badgeNoteSize } from '../../lib/tier-badges.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
@@ -206,6 +207,20 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
           />
         ) : null}
         {/*
+          THE COMPACT MARK, BESIDE THE BADGE AND NEVER INSTEAD OF IT
+          (2026-08-18). Two renderings of one tier: the badge names it in full to
+          anyone who follows it to /provenance, the mark says the shape of it at
+          a glance and travels into places a circle cannot go. It is resolved
+          from the piece rather than from `bylineBadge`, so the two are derived
+          from the same record independently and a mismatch is a test failure
+          rather than a copied mistake.
+
+          IT MAY BE ABSENT WHERE THE BADGE IS PRESENT, on the two editor tiers
+          the five marks cannot express. The line is built to look deliberate
+          either way, exactly as it is for a byline with no badge at all.
+        */}
+        <ProvenanceMark piece={d} />
+        {/*
           THE PRONOUNS RIDE THE RENDERED NAME, whatever that name turned out to
           be. `byline` overrides `author_name` where the author line needs words
           the machine field should not carry, and bylineWithProtectedNames may
@@ -347,6 +362,14 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
               size={badgeNoteSize()}
               labelSuffix={noteBadge.labelSuffix}
             />
+            {/*
+              THE NOTE'S OWN MARK, FOR THE NOTE'S OWN MAKING (R-052, 2026-08-18).
+              A piece may carry two badges that describe different work, and it
+              may now carry two marks for the same reason — the article's in the
+              byline, the note's here. The code comes from the NOTE's tier and
+              never from the piece's, which is the whole of what R-052 turns on.
+            */}
+            <ProvenanceMark code={noteBadge.tier.code} />
             <span>{d.personal_note.signature}</span>
           </p>
         </aside>
