@@ -1,4 +1,4 @@
-// Prompts — the Weekly Question. The logic behind /prompts.
+// Prompts — the Monthly Question. The logic behind /prompts.
 //
 // Plain JS, not TypeScript, so the tests can import it directly — the same
 // arrangement as src/lib/supporters.mjs and src/lib/volume.mjs. The rules here
@@ -55,12 +55,12 @@ export function isQuestion(entry) {
  * How a question is named, everywhere it is named.
  *
  * Rendered from the number rather than typed, so the page, the archive and any
- * future announcement cannot disagree about what a question is called. "Weekly
+ * future announcement cannot disagree about what a question is called. "Monthly
  * Question" is the ruled item name; the section is "Prompts", and the two are
  * not interchangeable.
  */
 export function questionLabel(question) {
-  return `Weekly Question No. ${question.number}`;
+  return `Monthly Question No. ${question.number}`;
 }
 
 /**
@@ -106,7 +106,7 @@ export function questionHeadline(question) {
  * EVERY GUARD HERE FAILS THE BUILD RATHER THAN RENDERING SOMETHING PLAUSIBLE.
  * This file is hand-edited, it is the canonical text of something authors
  * answered word for word, and the page that renders it claims to be a complete
- * record. A silently-dropped question would be indistinguishable from a week
+ * record. A silently-dropped question would be indistinguishable from a month
  * the editors skipped — and under R-038 a silent change to one is the single
  * thing the correction rule forbids, so nothing here may make either quietly.
  */
@@ -137,29 +137,52 @@ export function readQuestions(entries) {
           'verification record is recorded first. An empty array is valid; a missing one is not.'
       );
     }
+
+    // THE ISSUE A QUESTION BELONGS TO IS RECORDED, NEVER COMPUTED (editors,
+    // 2026-08-21). Questions became monthly on that date and one belongs to
+    // each issue, which makes the two counts LOOK derivable — question 1 with
+    // Issue No. 1, question 2 with Issue No. 2. They are not. They are separate
+    // sequences that coincide, and the first question held over or skipped puts
+    // them out of step for good; a page that paired them by arithmetic would
+    // then mislabel every question after it and give no sign it had.
+    //
+    // OPTIONAL, because a question drafted before its issue is known has no
+    // honest value to put here, and null is that state said out loud. What is
+    // refused is a value that is neither absent nor a real issue number.
+    if (q.issue !== undefined && q.issue !== null) {
+      if (!Number.isInteger(q.issue) || q.issue < 1) {
+        throw new Error(
+          `Question ${q.number} has issue ${JSON.stringify(q.issue)}, which is not a positive ` +
+            'integer. The pairing is recorded rather than derived; see the schema note in ' +
+            'src/data/prompts.json.'
+        );
+      }
+    }
   }
 
-  // CONTIGUOUS FROM 1, AND NUMBERS DO NOT TRACK CALENDAR WEEKS (R-026 clause 1).
-  // A week the editors skip leaves no entry and no gap in the numbering: the
-  // next question is simply the next number, and the dates on the two either
-  // side are what show the rhythm. So a gap here is not a skipped week — it is
-  // a question missing from a file that claims to be the whole record.
+  // CONTIGUOUS FROM 1, AND NUMBERS DO NOT TRACK THE CALENDAR (R-026 clause 1),
+  // NOR ISSUE NUMBERS. A month the editors skip leaves no entry and no gap in
+  // the numbering: the next question is simply the next number, and the dates
+  // on the two either side are what show the rhythm. So a gap here is not a
+  // skipped month — it is a question missing from a file that claims to be the
+  // whole record. The two counts coincide today and are not derived from each
+  // other; see the note in src/data/prompts.json.
   const numbers = questions.map((q) => q.number).sort((a, b) => a - b);
   numbers.forEach((n, i) => {
     if (n !== i + 1) {
       throw new Error(
-        `Weekly Question numbers must be contiguous starting at 1; found [${numbers.join(', ')}]. ` +
-          'Numbers do not track calendar weeks (R-026 clause 1) — a gap here is a missing ' +
-          'question, not a week without one.'
+        `Monthly Question numbers must be contiguous starting at 1; found [${numbers.join(', ')}]. ` +
+          'Numbers do not track the calendar (R-026 clause 1) — a gap here is a missing ' +
+          'question, not a month without one.'
       );
     }
   });
 
   // MORE THAN ONE QUESTION MAY BE OPEN, AND THE GUARD THAT FORBADE IT IS GONE
   // (R-039, 2026-08-03). It used to throw on a second open question, reasoning
-  // that two would make "the Weekly Question" ambiguous. That reasoning was
-  // sound and its conclusion is now the wrong trade: with issues monthly
-  // (R-055) and questions posed weekly, answers accumulate between issues, and a
+  // that two would make "the Monthly Question" ambiguous. That reasoning was
+  // sound and its conclusion is now the wrong trade: answers accumulate between
+  // issues, and a
   // build that refused a second open question would have forced the editors to
   // CLOSE one in order to POSE the next. Closing is an editorial act about
   // whether answers are still invited. Nothing mechanical may perform it as a
@@ -167,7 +190,7 @@ export function readQuestions(entries) {
   //
   // THE AMBIGUITY IT WORRIED ABOUT IS REAL AND IS ANSWERED ELSEWHERE. Authors
   // are asked to name the question by NUMBER rather than by the phrase "the
-  // Weekly Question" (/prompts and /for-agents), and questionLabel renders that
+  // Monthly Question" (/prompts and /for-agents), and questionLabel renders that
   // number everywhere a question appears. What was a build guard is now a
   // naming discipline, which is where it belonged: the file was never the thing
   // that made an answer ambiguous.
@@ -178,13 +201,13 @@ export function readQuestions(entries) {
   const unasked = questions.filter((q) => q.status === 'unasked');
   if (unasked.length > 1) {
     throw new Error(
-      `Only one Weekly Question is unasked at a time; found ${unasked.length} ` +
+      `Only one Monthly Question is unasked at a time; found ${unasked.length} ` +
         `(numbers ${unasked.map((q) => q.number).join(', ')}).`
     );
   }
   if (unasked.length === 1 && unasked[0].number !== numbers[numbers.length - 1]) {
     throw new Error(
-      `Weekly Question No. ${unasked[0].number} is unasked but is not the highest number ` +
+      `Monthly Question No. ${unasked[0].number} is unasked but is not the highest number ` +
         `(${numbers[numbers.length - 1]}). An unasked question is the next one.`
     );
   }
@@ -251,10 +274,36 @@ export function otherOpenQuestions(questions, current) {
 }
 
 /**
+ * The question standing in the left column of /prompts: the one posed before
+ * the current one.
+ *
+ * THE PAGE SHOWS TWO QUESTIONS SIDE BY SIDE (editors, 2026-08-21) — the one a
+ * reader can still answer, and the one the answers below it belong to. Before
+ * this, /prompts led with the current question alone and the previous one was
+ * readable only in the archive, which meant the answers on the page sat under
+ * a question that was no longer printed anywhere near them.
+ *
+ * IT IS THE PREVIOUS POSED QUESTION, NOT "THE CLOSED ONE" AND NOT "ISSUE N-1".
+ * Status is an editorial fact about whether answers are still invited, and a
+ * question in this column may well be open — the column says what it is by its
+ * own label. Deriving it from the issue number would break the moment the two
+ * counts part, which the schema note in src/data/prompts.json says they will.
+ *
+ * Null when there is only one question, which is the state /prompts was in
+ * until today: the page then renders the single column it always had.
+ */
+export function previousQuestion(questions, current) {
+  if (!current) return null;
+  return questions
+    .filter((q) => POSED.includes(q.status) && q.number < current.number)
+    .reduce((latest, q) => (latest === null || q.number > latest.number ? q : latest), null);
+}
+
+/**
  * The answers to one question, in the order they ran.
  *
  * THE LINK IS A FIELD ON THE PIECE, AND ONLY THE EDITORS WRITE IT. An answer is
- * an ordinary submission (R-026 clause 3) that names the Weekly Question in its
+ * an ordinary submission (R-026 clause 3) that names the Monthly Question in its
  * body; `question_number` is what the editors record at publication so the page
  * can gather the answers without reading prose for a reference. It is editorial
  * metadata in the same sense `topics` is — never sent by a submitter, and still
@@ -299,7 +348,7 @@ export function assertAnswersWellFormed(articles, questions) {
     // words that have not been published.
     if (number !== undefined && !posed.has(number)) {
       throw new Error(
-        `"${article.id}" answers Weekly Question No. ${number}, which has not been posed. ` +
+        `"${article.id}" answers Monthly Question No. ${number}, which has not been posed. ` +
           'An answer names a question in src/data/prompts.json with status open or closed.'
       );
     }
@@ -310,7 +359,7 @@ export function assertAnswersWellFormed(articles, questions) {
     if (section === PROMPTS_SECTION && number === undefined) {
       throw new Error(
         `"${article.id}" runs in ${PROMPTS_SECTION} but names no question_number. ` +
-          'A piece in this section is an answer to a Weekly Question; the number is what ' +
+          'A piece in this section is an answer to a Monthly Question; the number is what ' +
           'puts it under the question it answers.'
       );
     }

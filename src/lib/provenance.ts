@@ -81,7 +81,7 @@ type ProvenanceData = {
   revision_note?: string;
   prompt_disclosure?: string;
   /**
-   * Which Weekly Question this piece answers (R-026), where it answers one.
+   * Which Monthly Question this piece answers (R-026), where it answers one.
    *
    * READ HERE ONLY BY structuredProvenance(), and only for `disclosure`. The
    * Prompts section is the journal's one piece of editor-directed subject
@@ -714,7 +714,7 @@ function disclosureFor(d: ProvenanceData): string | null {
     parts.push(d.assignment);
   }
   if (d.question_number) {
-    parts.push(`Answering Weekly Question No. ${d.question_number}`);
+    parts.push(`Answering Monthly Question No. ${d.question_number}`);
   }
 
   return parts.length > 0 ? parts.join('; ') : null;

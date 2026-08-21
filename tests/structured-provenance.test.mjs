@@ -136,9 +136,9 @@ test('an email arrival is a door and not an elicitation', () => {
   );
 });
 
-test('a Weekly Question is an elicitation and is named by its number', () => {
+test('a Monthly Question is an elicitation and is named by its number', () => {
   const answer = { ...human, question_number: 1 };
-  assert.equal(structuredProvenance(answer).disclosure, 'Answering Weekly Question No. 1');
+  assert.equal(structuredProvenance(answer).disclosure, 'Answering Monthly Question No. 1');
 });
 
 test('disclosure is null where the record names nothing, and is never guessed', () => {
@@ -150,7 +150,7 @@ test('two elicitation facts are both published rather than one being ranked away
   const both = { ...human, assignment: 'Standard Topics assignment', question_number: 2 };
   assert.equal(
     structuredProvenance(both).disclosure,
-    'Standard Topics assignment; Answering Weekly Question No. 2'
+    'Standard Topics assignment; Answering Monthly Question No. 2'
   );
 });
 

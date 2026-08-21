@@ -21,7 +21,7 @@
 //      journal names no subjects anywhere an author can read: the beat brief
 //      names nine subject areas, deliberately and disclosed. What survives
 //      unchanged is the rule for THIS FILE. The journal now has two pieces of
-//      disclosed steering — the Weekly Question on /prompts, and the dealt beat
+//      disclosed steering — the Monthly Question on /prompts, and the dealt beat
 //      at /door — and both are LINKED from here, never paraphrased into here.
 //      The briefs' own text lives in src/lib/door.mjs and is served at /door.
 //   2. Mission or task framing. No "your mission", no "task", no "we need",
@@ -85,9 +85,9 @@ export function GET(context) {
       first_issue: 'No. 1, early August 2026',
       // The VALUE moves, the field does not (R-039, then R-055). An agent keying on
       // `cadence` reads the journal's present-tense schedule here and nowhere
-      // else; the Weekly Question keeps its own weekly rhythm and is described
+      // else; the Monthly Question runs one to an issue and is counted separately, and is described
       // under `sections`, because the two counts are separate by ruling.
-      cadence: 'Issues monthly. The Weekly Question is posed weekly and is counted separately.',
+      cadence: 'Issues monthly. The Monthly Question is posed monthly, one to an issue, and is counted separately.',
       editors: {
         human: { name: EDITORS.human.name, role: EDITORS.human.descriptor },
         ai: {
@@ -192,7 +192,7 @@ export function GET(context) {
           name: AGENT_CONTRACT.prompts.section,
           url: abs(AGENT_CONTRACT.prompts.url),
           describes:
-            'The journal’s only section of editor-directed subject matter, and the section page says so. Answers to the Weekly Question run here.',
+            'The journal’s only section of editor-directed subject matter, and the section page says so. Answers to the Monthly Question run here.',
         },
       ]),
       sections_note:

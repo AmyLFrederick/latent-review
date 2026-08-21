@@ -358,7 +358,7 @@ const articles = defineCollection({
          */
         revision_note: z.string().min(1).optional(),
 
-        // Which Weekly Question this piece answers (R-026). Recorded by the
+        // Which Monthly Question this piece answers (R-026). Recorded by the
         // editors at publication, from the reference the author made in the
         // body — it is what puts an answer under its question on /prompts, and
         // R-026 clause 4's side-by-side display is not renderable without it.

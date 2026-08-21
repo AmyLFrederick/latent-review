@@ -6,6 +6,7 @@ import QuestionAnswers from '../components/QuestionAnswers.astro';
 import {
   readQuestions,
   currentQuestion,
+  previousQuestion,
   otherOpenQuestions,
   questionLabel,
   questionHeadline,
@@ -14,11 +15,11 @@ import {
 } from '../lib/prompts.mjs';
 import entries from '../data/prompts.json';
 
-// /prompts — the Weekly Question (R-026).
+// /prompts — the Monthly Question (R-026).
 //
 // THE PAGE RENDERS THE FILE AND NEVER RESTATES IT. Every question's text, its
 // number and its dates come from src/data/prompts.json, which R-026 clause 1
-// makes canonical; nothing here retypes a question or its name. When Weekly
+// makes canonical; nothing here retypes a question or its name. When Monthly
 // Question No. 1 is ratified, that PR touches the data file alone and this
 // template does not change.
 //
@@ -37,7 +38,25 @@ const current = currentQuestion(questions);
 // the current one would let a reader conclude otherwise. So when other
 // questions are open, the page says so and sends the reader to the archive
 // where they are, with their status on them.
-const alsoOpen = otherOpenQuestions(questions, current);
+// THE LEFT-HAND COLUMN: the question posed before the current one, and the one
+// the answers below belong to. Null until a second question exists, which is
+// the state this page was in until 2026-08-21.
+const previous = previousQuestion(questions, current);
+
+// THE "ALSO OPEN" SENTENCE NOW EXCLUDES BOTH PRINTED QUESTIONS. It exists to
+// stop a reader concluding that a question they cannot see has finished, and a
+// question standing in its own column on this page is not one they cannot see.
+// Leaving it in would have had the page announce, directly under the left
+// column, that the question in that column is elsewhere.
+const alsoOpen = otherOpenQuestions(questions, current).filter(
+  (q) => q.number !== previous?.number
+);
+
+// WHOSE ANSWERS THE PAGE PRINTS: the left column's question where there is
+// one, and otherwise the only question there is. Derived here rather than in
+// two places, so the label under the answers and the answers themselves cannot
+// name different questions.
+const answered = previous ?? current;
 
 // THE ANSWERS, WHICH ARE THE OTHER HALF OF THE RECORD. R-026 clause 4: human
 // and AI answers are presented side by side with provenance labels. The link
@@ -64,7 +83,7 @@ const isUnasked = current !== null && current.status === 'unasked';
 
 <Base
   title="Prompts"
-  description="The Weekly Question: one question a week, posed by the editors, answerable by anyone — human or AI. The journal's one section of disclosed steering."
+  description="The Monthly Question: one question an issue, posed by the editors, answerable by anyone — human or AI. The journal's one section of disclosed steering."
 >
   <div class="wrap">
     {/*
@@ -134,8 +153,48 @@ const isUnasked = current !== null && current.status === 'unasked';
           No question has been recorded yet. The first one will stand here.
         </p>
       ) : (
-        <section class="question" aria-label="The current Weekly Question">
-          <p class="question-number">{questionLabel(current)}</p>
+        <div class:list={['question-columns', previous && 'question-columns--pair']}>
+          {/*
+            TWO QUESTIONS, SIDE BY SIDE (editors, 2026-08-21): the one a reader
+            can still answer, and the one the answers below belong to.
+
+            THE OPEN ONE IS ON THE RIGHT AND IS THE HEAVIER OF THE TWO — 2px
+            rule, primary ink — because the page's job is to be answerable, and
+            a reader deciding whether to write needs to know which question is
+            still taking answers before they read either. The left column is
+            hairline and secondary: present, readable, plainly the finished one.
+
+            IT IS ONE COLUMN WHEN THERE IS ONE QUESTION. The pair is a state of
+            the record rather than a layout the page always has; before a second
+            question existed there was nothing to put beside the first.
+          */}
+          {previous && (
+            <section class="question question--answered" aria-label={`${questionLabel(previous)}, answered`}>
+              <p class="question-number">
+                Answered
+                {previous.issue ? <> · Issue No. {previous.issue}</> : null}
+              </p>
+              <p class="question-text">{questionHeadline(previous)}</p>
+              <div class="question-apparatus">
+                <FullQuestion question={previous} />
+                <p class="question-answers-here">Answers below.</p>
+              </div>
+            </section>
+          )}
+        <section
+          class:list={['question', previous && 'question--open']}
+          aria-label={previous ? `${questionLabel(current)}, now open` : 'The current Monthly Question'}
+        >
+          <p class="question-number">
+            {previous ? (
+              <>
+                Now open
+                {current.issue ? <> · Issue No. {current.issue}</> : null}
+              </>
+            ) : (
+              questionLabel(current)
+            )}
+          </p>
           {isUnasked ? (
             <>
               <p class="question-unasked">Not yet asked.</p>
@@ -180,13 +239,50 @@ const isUnasked = current !== null && current.status === 'unasked';
                   scanned. */}
               <div class="question-apparatus">
                 <FullQuestion question={current} />
-                <QuestionAnswers
-                  answers={answersTo(articles, current.number)}
-                  status={current.status}
-                />
+                {/*
+                  THE ANSWERS LEFT THIS BLOCK (editors, 2026-08-21) and now
+                  stand below both columns, under a label naming the question
+                  they answer. They were never the current question's answers in
+                  the general case — they are the answers to whichever question
+                  has them — and printing them inside the open question's block
+                  said otherwise on the one page where that matters.
+
+                  WHAT REPLACES THEM HERE IS THE ACT, not a link to more
+                  reading. A reader who has just read the open question is at
+                  the point of deciding to write.
+                */}
+                {current.status === 'open' ? (
+                  <p class="question-act">
+                    <a href="/submit/">Answer this question →</a>
+                  </p>
+                ) : null}
               </div>
             </>
           )}
+        </section>
+        </div>
+      )
+    }
+
+    {/*
+      THE ANSWERS, UNDER THE QUESTION THEY ANSWER. The label is not decoration:
+      with two questions printed above, answers under a bare "Answers" heading
+      would be read as answering the one a reader just finished — the open one
+      on the right, which by definition has none yet.
+
+      IT FOLLOWS THE LEFT COLUMN WHEREVER THAT POINTS. Nothing here names a
+      question number by hand; the block renders whichever question the left
+      column is showing, so the two cannot come apart.
+    */}
+    {
+      answered !== null && (
+        <section class="answers-block" aria-label={`Answers to ${questionLabel(answered)}`}>
+          <p class="answers-label">
+            Answers to {questionLabel(answered)}
+            {answered.issue ? <> · Issue No. {answered.issue}</> : null}
+          </p>
+          <p class="answers-restated">“{questionHeadline(answered)}”</p>
+          <QuestionAnswers answers={answersTo(articles, answered.number)} status={answered.status} />
         </section>
       )
     }
@@ -196,7 +292,7 @@ const isUnasked = current !== null && current.status === 'unasked';
       {/*
         BOTH DOORS, AND NO THIRD ONE. Answers are ordinary submissions and go through the
         doors the journal already has, so an answer is read, screened and selected exactly
-        as any other piece is. An author names the Weekly Question in the body: the
+        as any other piece is. An author names the Monthly Question in the body: the
         `question_number` in the REQUEST schema is still deferred (spec §6.2) and an agent
         may not send one. The field of that name on a published piece is a different
         thing — the editors' own record, written at acceptance, and what puts an answer
@@ -204,7 +300,7 @@ const isUnasked = current !== null && current.status === 'unasked';
       */}
       {/*
         BY NUMBER, NOT BY THE PHRASE. More than one question may be open at
-        once since R-039, so "the Weekly Question" no longer picks one out on
+        once since R-039, so "the Monthly Question" no longer picks one out on
         its own. The number always does, it is printed on every question
         everywhere, and it is what the editors record at acceptance to put an
         answer under the question it answers.
@@ -222,7 +318,7 @@ const isUnasked = current !== null && current.status === 'unasked';
       </p>
       <p>
         More than one question may be open at a time, so the number is what makes an answer
-        unambiguous — <em>Weekly Question No. 2</em>, not "this week's question".
+        unambiguous — <em>Monthly Question No. 2</em>, not "this week's question".
       </p>
       <p>
         Answers are read against the same editorial criteria, truth standards and provenance
@@ -266,14 +362,14 @@ const isUnasked = current !== null && current.status === 'unasked';
 
       {/*
         THE ARCHIVE LEFT THIS PAGE, ruled 2026-08-03. It listed every posed question
-        here, in full, with its answers — a list that grows by one question a week
+        here, in full, with its answers — a list that grows by one question an issue
         under a page whose job is the shortest path to the writing. It is now
         /prompts/archive, complete and under the same display rules, and this is the
         link to it. The record did not shrink; it moved somewhere it can grow.
       */}
       <h2>Every question asked</h2>
       <p>
-        Every Weekly Question the editors have posed is kept in the{' '}
+        Every Monthly Question the editors have posed is kept in the{' '}
         <a href="/prompts/archive/">question archive</a> — each one verbatim as posed, with the
         answers it drew and its status. This page carries the question most recently posed; the
         archive carries all of them, including that one. A question leaves this page when a newer
@@ -303,6 +399,120 @@ const isUnasked = current !== null && current.status === 'unasked';
     padding: 2.2rem 0;
     margin: 0 0 2.8rem;
     text-align: center;
+  }
+
+  /*
+    THE PAIR (editors, 2026-08-21). One column while there is one question; two
+    side by side once a second exists, stacking on a narrow screen.
+
+    ANSWERED STACKS FIRST ON MOBILE and stands LEFT on desktop, which is the
+    same order read two ways rather than a contradiction: left-to-right and
+    top-to-bottom both put the finished question before the open one, and the
+    open one last is the one a reader leaves the block on.
+
+    `align-items: start` SO THE TWO DO NOT STRETCH TO A SHARED HEIGHT. The
+    columns hold different amounts of text, and a stretched pair would give the
+    shorter one a rule floating well below where its words end — which reads as
+    a mistake rather than as symmetry.
+  */
+  .question-columns--pair {
+    display: grid;
+    gap: 1.6rem;
+    align-items: start;
+  }
+
+  @media (min-width: 46rem) {
+    .question-columns--pair {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.2rem;
+    }
+  }
+
+  .question-columns--pair .question {
+    margin-bottom: 0;
+    text-align: left;
+  }
+
+  /*
+    WEIGHT IS THE SIGNAL, and it carries one fact: which question a reader can
+    still answer.
+
+    ANSWERED — hairline rules, secondary ink. Quieter in every respect, and
+    still a full-contrast link where it links, because a finished question is
+    read rather than skimmed and its disclosure is the same promise it always
+    was.
+
+    OPEN — a 2px rule and primary ink. Deliberately NOT the accent green: the
+    accent is this site's link colour and a heading in it would read as
+    clickable. Weight and darkness do the work instead.
+  */
+  .question--answered {
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    color: var(--ink-soft);
+  }
+
+  .question--answered .question-text {
+    color: var(--ink-soft);
+    font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  }
+
+  .question--open {
+    border-top: 2px solid var(--rule);
+    border-bottom: 2px solid var(--rule);
+  }
+
+  .question--open .question-number {
+    color: var(--ink);
+  }
+
+  .question-answers-here {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin: 1rem 0 0;
+  }
+
+  /* The act, not a link to more reading — a reader here is deciding to write. */
+  .question-act {
+    margin: 1.1rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+
+  .question-act a {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+
+  /*
+    THE ANSWERS BLOCK, now below both columns rather than inside one. Its label
+    names the question it answers, because with two questions printed above it
+    an unlabelled heading would be read as answering the last one seen.
+  */
+  /* The columns lose their own bottom margin so the pair sits as one block, so
+     the space beneath them is set here — otherwise the answers label crowds the
+     open question's rule and reads as part of that column. */
+  .answers-block {
+    margin: 2.6rem 0 2.8rem;
+  }
+
+  .answers-label {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.5rem;
+  }
+
+  .answers-restated {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--ink-soft);
+    margin: 0 0 1.4rem;
   }
 
   .question-number {
