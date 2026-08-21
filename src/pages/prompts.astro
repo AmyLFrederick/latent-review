@@ -462,20 +462,28 @@ const isUnasked = current !== null && current.status === 'unasked';
   }
 
   /*
-    BOTH QUESTIONS ARE SET AT THE SAME SIZE AND WEIGHT (editors, 2026-08-21).
-    The answered one was rendered a step smaller for part of a day, and that was
-    the wrong instrument: a smaller headline does not say "this one is finished",
-    it says "this one mattered less", and both are questions this journal
-    actually asked. Nothing here sets font-size or font-weight now, so both
-    columns take `.question-text` unchanged — the sizes cannot drift apart,
-    because there is only one declaration.
+    THE TWO QUESTIONS ARE TYPOGRAPHICALLY IDENTICAL — same size, same weight,
+    same ink (editors, 2026-08-21). The answered one was set a step smaller, and
+    then still a shade lighter, for part of a day. Both were the wrong
+    instrument: a smaller or fainter headline does not say "this one is
+    finished", it says "this one mattered less", and both are questions this
+    journal actually asked.
 
-    THE DISTINCTION IS CARRIED BY THE LABEL AND THE RULE ABOVE EACH COLUMN,
+    NOTHING HERE SETS SIZE OR WEIGHT, so both columns take `.question-text`
+    unchanged and cannot drift apart — there is one declaration. Ink is the
+    exception that has to be written down: the column itself is --ink-soft, and
+    the question would inherit that, so the primary ink is restated here rather
+    than achieved by deleting a line.
+
+    WHAT STAYS SECONDARY IS THE APPARATUS AROUND IT — the column's label and
+    "Answers below." — because those are the distinction, not decoration on it.
+
+    THE DISTINCTION LIVES ENTIRELY IN THE LABEL AND THE RULE ABOVE EACH COLUMN,
     which is where a reader looks to answer "can I still answer this?" — a
-    question about the state of the question, not about its importance.
+    question about the state of a question, never about its importance.
   */
   .question--answered .question-text {
-    color: var(--ink-soft);
+    color: var(--ink);
   }
 
   .question--open {
