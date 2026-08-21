@@ -273,6 +273,12 @@ const isUnasked = current !== null && current.status === 'unasked';
       IT FOLLOWS THE LEFT COLUMN WHEREVER THAT POINTS. Nothing here names a
       question number by hand; the block renders whichever question the left
       column is showing, so the two cannot come apart.
+
+      THE LABEL IS THE WHOLE IDENTIFICATION, AND THE QUESTION IS NOT RESTATED
+      (editors, 2026-08-21). A quotation of the headline stood here for part of
+      a day and came out: the question it quoted is in the left column a few
+      inches above, so the line repeated on screen what the reader had just
+      read, and the label already names the question by number and issue.
     */}
     {
       answered !== null && (
@@ -281,7 +287,6 @@ const isUnasked = current !== null && current.status === 'unasked';
             Answers to {questionLabel(answered)}
             {answered.issue ? <> · Issue No. {answered.issue}</> : null}
           </p>
-          <p class="answers-restated">“{questionHeadline(answered)}”</p>
           <QuestionAnswers answers={answersTo(articles, answered.number)} status={answered.status} />
         </section>
       )
@@ -498,19 +503,15 @@ const isUnasked = current !== null && current.status === 'unasked';
     margin: 2.6rem 0 2.8rem;
   }
 
+  /* The gap below is the one the restated question used to carry. It moved here
+     with that line's removal rather than being dropped with it: 0.5rem was the
+     space to a quotation directly beneath, and the answers list needs the room
+     the quotation's own bottom margin was giving it. */
   .answers-label {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--ink-soft);
-    margin: 0 0 0.5rem;
-  }
-
-  .answers-restated {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    line-height: 1.3;
     color: var(--ink-soft);
     margin: 0 0 1.4rem;
   }
