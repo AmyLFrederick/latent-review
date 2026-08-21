@@ -192,18 +192,40 @@ export const SUPPORTER_LINKS = {
   founding: null,
 };
 
-// Monthly giving, $5 a month. Its own link because Stripe's customer-chooses
-// links do not support recurring payments, so a recurring gift is a fixed
-// preset on a separate link. Recorded as Support and not listed — the page says
-// so before the giver acts.
+// RECURRING GIVING — two presets, annual and monthly. Their own links because
+// Stripe's customer-chooses links do not support recurring payments, so a
+// recurring gift is a fixed preset on a separate link. Both are recorded as
+// Support and neither is listed — the page says so before the giver acts.
 //
-// It sits here rather than in site.ts for the same reason the map does, and it
-// is NOT exempt for not being a tier: /supporters renders this link
+// THE AMOUNTS ARE STATED IN THE PAGE'S COPY AND NOWHERE ELSE, AND NOTHING HERE
+// READS THEM FROM STRIPE. A payment link is an opaque URL; its amount lives in
+// the Stripe dashboard, and this repository cannot see it. So the figure a
+// reader is shown and the figure a reader is charged are kept in step by hand,
+// by these two constants pointing at presets that match the copy beside them.
+// A link swapped without its copy — or copy edited without its link — is a page
+// that misstates a price to someone about to pay it. That is the failure this
+// comment exists to prevent, and it has no machinery behind it.
+//
+// They sit here rather than in site.ts for the same reason the map does, and
+// they are NOT exempt for not being tiers: /supporters renders each link
 // conditionally, so an empty or misnamed value does not break the page. It
-// removes monthly giving from it, silently, and a page with no monthly link
-// looks exactly like a page that never offered one. The suite asserts it is a
-// real https URL.
+// removes that way of giving from it, silently, and a page with no annual link
+// looks exactly like a page that never offered one. The suite asserts that any
+// link present is a real https URL.
+//
+// ⚠️ AMOUNT/LINK MISMATCH, KNOWN AND DELIBERATE (2026-08-21). The copy on
+// /supporters now states $1 a month; the link below is still the $5/month
+// preset, and the annual link does not exist yet. The editors are creating both
+// presets in Stripe and will replace these values before this reaches `main`.
+// Until they do, THIS BRANCH MUST NOT MERGE: the page would say one dollar and
+// charge five.
 export const SUPPORT_MONTHLY_URL = 'https://buy.stripe.com/3cIbJ36JIdexaTFego4Vy04';
+
+// Annual giving, $10 a year — the first preset added since the monthly one, as
+// the 2026-07-28 record anticipated ("a second added only if demand shows").
+// null until the editors create it in Stripe; the annual row does not render
+// while it is null, exactly as the monthly row does not.
+export const SUPPORT_ANNUAL_URL = null;
 
 /** The tier a gift is recorded at, or undefined if the key is not one of ours. */
 export function tierFor(key) {

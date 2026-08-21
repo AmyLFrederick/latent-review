@@ -7,6 +7,7 @@ import {
   SUPPORTER_WINDOW_SPAN,
   SUPPORTER_LINKS,
   SUPPORT_MONTHLY_URL,
+  SUPPORT_ANNUAL_URL,
   SUPPORTERS_CONTACT,
   formatDate,
 } from '../lib/site';
@@ -158,23 +159,46 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
         a gap in it: Benefactor and Founding Supporter are arranged by conversation, and
         the paragraph directly above those two rows is their action.
 
-        MONTHLY IS THE FIRST ROW AND IS NOT A TIER. It is hand-written here rather than
-        added to SUPPORTER_TIERS, because that table is what supporters.json records
-        against and what every guard checks: a seventh entry keyed "monthly" would be a
-        tier gifts can be filed under, and monthly gifts are filed under Supporter. It
-        sits above Supporter because it is the same rung paid a different way.
+        RECURRING GIVING LEADS, AND NEITHER ROW IS A TIER. Both are hand-written here
+        rather than added to SUPPORTER_TIERS, because that table is what supporters.json
+        records against and what every guard checks: an entry keyed "monthly" or "annual"
+        would be a tier gifts can be filed under, and recurring gifts are filed under
+        Supporter. They sit above Supporter because they are the same rung paid a
+        different way.
+
+        ANNUAL STANDS FIRST (editors, 2026-08-21), and the order is the whole of how it
+        is preferred. There is no primary/secondary button style on this site and none is
+        invented here — the note above about widths applies: the house styles set no
+        button hierarchy anywhere, and adding one would be a new rule made in this file
+        rather than one already kept. Position carries the preference instead.
+
+        EACH ROW RENDERS ONLY WITH ITS OWN LINK. The amount in the copy and the amount in
+        the Stripe preset are held in step by hand — see the comment on these two
+        constants in src/lib/supporters.mjs, which is the only place that says so.
       */}
       {
         ladder.map((seg) => (
           <Fragment>
             <ul class="ladder">
+              {seg.leadsWithMonthly && SUPPORT_ANNUAL_URL && (
+                <li>
+                  <p class="terms">
+                    <strong>Annual Supporter</strong> — $10 a year.
+                  </p>
+                  <p class="act">
+                    <a class="give" href={SUPPORT_ANNUAL_URL} aria-label="Give $10 a year">
+                      Give yearly
+                    </a>
+                  </p>
+                </li>
+              )}
               {seg.leadsWithMonthly && SUPPORT_MONTHLY_URL && (
                 <li>
                   <p class="terms">
-                    <strong>Monthly Supporter</strong> — $5 a month.
+                    <strong>Monthly Supporter</strong> — $1 a month.
                   </p>
                   <p class="act">
-                    <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $5 a month">
+                    <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $1 a month">
                       Give monthly
                     </a>
                   </p>

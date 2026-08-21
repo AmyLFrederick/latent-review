@@ -67,6 +67,7 @@ export {
   SUPPORTER_WINDOW_SPAN,
   SUPPORTER_LINKS,
   SUPPORT_MONTHLY_URL,
+  SUPPORT_ANNUAL_URL,
 } from './supporters.mjs';
 
 // The cadence line and the dateline form (R-016 as amended by R-043). They live
