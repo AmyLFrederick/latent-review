@@ -166,11 +166,11 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
         Supporter. They sit above Supporter because they are the same rung paid a
         different way.
 
-        ANNUAL STANDS FIRST (editors, 2026-08-21), and the order is the whole of how it
-        is preferred. There is no primary/secondary button style on this site and none is
-        invented here — the note above about widths applies: the house styles set no
-        button hierarchy anywhere, and adding one would be a new rule made in this file
-        rather than one already kept. Position carries the preference instead.
+        ANNUAL STANDS FIRST AND TAKES THE FILLED BUTTON (editors, 2026-08-21); monthly
+        follows it and takes the outlined one. Both position and weight say the same
+        thing, which is that annual is the way the journal would rather be supported.
+        The button hierarchy this needs is new to the site and is defined once, in the
+        style block below, where the reason it did not exist before is recorded too.
 
         EACH ROW RENDERS ONLY WITH ITS OWN LINK. The amount in the copy and the amount in
         the Stripe preset are held in step by hand — see the comment on these two
@@ -198,7 +198,11 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
                     <strong>Monthly Supporter</strong> — $1 a month.
                   </p>
                   <p class="act">
-                    <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $1 a month">
+                    <a
+                      class="give give--secondary"
+                      href={SUPPORT_MONTHLY_URL}
+                      aria-label="Give $1 a month"
+                    >
                       Give monthly
                     </a>
                   </p>
@@ -499,10 +503,40 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
     background: var(--accent);
     color: var(--paper);
     padding: 0.4rem 1rem;
+    /*
+      A TRANSPARENT BORDER THE FILLED BUTTON DOES NOT NEED, so that it and the
+      outlined one below occupy the same box. Without it the secondary button is
+      2px wider and taller for its border alone, and the right edge stops lining
+      up — which is the one alignment the note above says this page keeps.
+    */
+    border: 1px solid transparent;
     /* Proposed token — see the note beside it in global.css. */
     border-radius: var(--radius-button);
     font-size: 0.9rem;
     text-decoration: none;
+  }
+
+  /*
+    THE FIRST BUTTON HIERARCHY ON THIS SITE (editors, 2026-08-21), and it is
+    introduced deliberately rather than drifted into: the note above about widths
+    records that the house styles set no hierarchy anywhere, and that was true
+    until the recurring rows became two. With one way to give, order said
+    everything; with two, the page has to say which one it means.
+
+    OUTLINED RATHER THAN FAINTER. A greyed-out secondary would read as
+    unavailable, which monthly is not — it is an equal way to give that the
+    journal prefers second. An outline says "also this", where reduced contrast
+    says "not this".
+
+    --accent clears 4.5:1 on the cream ground (the footer note in Base.astro
+    records the measurement), so the outlined label is body-text legible rather
+    than merely visible. On hover both buttons arrive at the same deep green, so
+    the secondary resolves INTO the primary's colour rather than to a third one.
+  */
+  .give--secondary {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
   }
 
   .give:hover,
@@ -511,6 +545,7 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
        states (5.05:1 at rest, 7.2:1 here). */
     background: var(--accent-deep);
     color: var(--paper);
+    border-color: var(--accent-deep);
     text-decoration: none;
   }
 
