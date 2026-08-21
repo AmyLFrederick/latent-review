@@ -161,6 +161,33 @@ added 2026-08-19") is written either way and stands.
    2026-08-18* and *amended 2026-08-19*, and every reference in prose, code
    comment and contract to when something was ruled is untouched. Each PR
    description says which dates changed and which did not.
+
+   **And it moved once more, for the branches that did not merge that day —
+   2026-08-21.** #176's two entries arrived on `main` on 2026-08-20 and are
+   published at that date, which is correct and does not move again. #177 and
+   #178 did not merge that day, so an entry of theirs reading `2026-08-20` would
+   have named a day on which no consumer could have fetched it. #177 was
+   re-dated **`2026-08-21`** and arrived on `main` that day, so its entry is now
+   correct and final. #178's entry is re-dated to **`2026-08-21`** on the same
+   grounds, `TZ=America/Chicago` verified both times.
+
+   **This is the standing hazard of dating an arrival before it arrives, and it
+   recurs every day a branch waits:** each further slip needs a further bump.
+   If #178 does not merge on 2026-08-21, its entry is wrong again and needs the
+   same treatment — that is the one thing to check before merging it. The
+   entries stay in ascending date order either way, which the build asserts.
+
+   The decision dates are untouched throughout. #177's entry still opens *"THE
+   CORRECTION, ruled 2026-08-18"* and #178's opens *"DISPLAY ONLY, ruled
+   2026-08-18"* — naming the ruling day inside the text is exactly what makes
+   an arrival date safe to move.
+
+   **The published order is `main`'s, not this branch's.** This branch had the
+   four entries as mark → derivation → display → pencil; `main` published them
+   as mark → pencil → derivation. A naive merge kept both orderings and produced
+   a **duplicate** derivation entry. The resolution rebuilt the array from
+   `main`'s published three, verbatim and in `main`'s order, and appended the
+   display entry alone — verified as zero deletions against `main`.
 3. **`/provenance` has its own versioned changelog** with the known R-046/R-051
    gap and an unresolved version-bump question. I did **not** add an entry
    there — not for the notation and not for this amendment; that question is

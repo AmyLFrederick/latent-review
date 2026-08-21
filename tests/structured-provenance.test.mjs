@@ -159,6 +159,17 @@ test('the object carries exactly the eight published fields', () => {
   // without being documented in /for-agents and /agent-api.json is a field a
   // consumer meets with no description of it anywhere — which is what this
   // assertion is for, and it has now caught three additions before they shipped.
+  //
+  // `mark` JOINED THEM ON 2026-08-18, and this assertion is what made that an
+  // explicit step rather than a silent one: the compact notation's field failed
+  // here first and was written into /for-agents, /agent-api.json, /provenance
+  // and /changelog.json before this line moved. That is the gate working, so it
+  // is recorded rather than quietly renumbered. The field's own behaviour is
+  // tested in tests/notation.test.mjs; what this line protects is the shape.
+  //
+  // `involvement_tier` and `involvement_tier_claimed` joined them the same day,
+  // through the same gate. Both are documented in the same four places before
+  // this line was allowed to grow again.
   assert.deepEqual(Object.keys(structuredProvenance(human)).sort(), [
     'author_type',
     'disclosure',
