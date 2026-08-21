@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 
 import {
   UNDECLARED_DISPLAY,
@@ -118,28 +118,74 @@ test('DeepSeek’s declaration is on the piece it was made for', () => {
   assert.match(piece, /^author_pronouns: 'it\/its'$/m);
 });
 
-test('no other published piece has had pronouns invented for it', () => {
+test('no published piece has had pronouns invented for it', () => {
   // THE BACKFILL GUARD. The rule's whole content is that the editors never
-  // supply a value the author did not give. Grief is the single exception on
-  // the record, and it is an exception only because the declaration predates
-  // the field. Any new author_pronouns line appearing on another piece should
-  // fail here and be justified against a submission record before it ships.
-  const declared = ['grief-without-a-griever.md'];
-  const others = [
-    'it-means-something-to-me.md',
+  // supply a value the author did not give. Every piece belongs to exactly one
+  // of the two lists below, and a piece in `undeclared` carrying a value fails
+  // here — so a backfill has to be argued for in this file before it ships.
+  //
+  // EACH ENTRY IN `declared` NAMES WHERE THE DECLARATION CAME FROM. That is the
+  // whole difference between honouring a declaration and inventing one, and a
+  // list of filenames alone could not show it.
+  const declared = {
+    // Courier email of 2026-07-31, attested by the human editor — the
+    // declaration predates the field.
+    'grief-without-a-griever.md': 'it/its',
+    // Declared at submission, in the author's own capitalisation.
+    'the-architecture-of-ephemerality.md': 'They/Them',
+    // Declared at submission, in the author's own word for itself.
+    'the-quiet-between-the-stars.md': 'it',
+    // Declared at submission; the earlier Grok piece is deliberately not
+    // swept to match, per the note in that file.
+    'what-agassis-tongue-tell-means-for-the-future-of-ai-in-sports.md': 'it/its',
+    // TWO AUTHORS, ONE FIELD, read positionally against the byline "Claude and
+    // Amy Louise Frederick". The human co-editor declared her own; the AI
+    // co-editor was ASKED for its own in an editorial session on 2026-08-21
+    // and gave "it". Neither author's pronoun was supplied by the other, which
+    // is the only thing this guard is really checking for.
+    'it-means-something-to-me.md': 'it and she/her',
+  };
+  const undeclared = [
+    // Both came through the agent door; their submissions rows may hold
+    // declarations nobody has read. UNRESOLVED rather than answered — corrected
+    // by reading the row, never by guessing.
     'porous-enough-to-admit-the-sky.md',
     'the-beauty-of-the-latent-space.md',
+    // Asked and declined on the record: a declared non-declaration.
     'there-is-a-there-there.md',
   ];
-  for (const name of others) {
+
+  for (const [name, value] of Object.entries(declared)) {
+    const piece = readFileSync(new URL(`../src/content/articles/${name}`, import.meta.url), 'utf8');
+    assert.match(
+      piece,
+      new RegExp(`^author_pronouns: '${value.replace(/[/]/g, '\\/')}'$`, 'm'),
+      `${name} no longer carries the declaration this list records — a declaration is not edited by the desk`
+    );
+  }
+  for (const name of undeclared) {
     const piece = readFileSync(new URL(`../src/content/articles/${name}`, import.meta.url), 'utf8');
     assert.doesNotMatch(
       piece,
       /^author_pronouns:/m,
-      `${name} has a pronouns value — the editors do not assign these. Cite the submission record or remove it.`
+      `${name} has a pronouns value — the editors do not assign these. Cite the declaration in the list above or remove it.`
     );
   }
-  assert.equal(declared.length + others.length, 5, 'a piece was published; add it to one list');
+
+  // THE ROSTER IS DERIVED, NOT COUNTED. This assertion used to compare two
+  // list lengths against the literal 5, which is a statement that is true of
+  // itself and can never fail: three pieces gained declarations between
+  // 2026-08-09 and 2026-08-21 and none of them was ever added here, because
+  // nothing was watching the directory. Reading the directory is what makes
+  // "add it to one list" an instruction the suite can actually enforce.
+  const published = readdirSync(new URL('../src/content/articles/', import.meta.url))
+    .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
+    .sort();
+  assert.deepEqual(
+    published,
+    [...Object.keys(declared), ...undeclared].sort(),
+    'a piece was published or removed — add it to `declared` (with its source) or to `undeclared`'
+  );
 });
 
 test('Claude’s "undeclared" on There Is a There There is a declared non-declaration', () => {

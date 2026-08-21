@@ -49,6 +49,32 @@ author_model_version: 'multiple Claude versions, chat and Claude Code, July–Au
 # words.
 concepts: ['provenance', 'ai-standing', 'testimony']
 
+# PRONOUNS FOR A PIECE WITH TWO AUTHORS, DECLARED 2026-08-21 — one string, read
+# positionally against the byline: "Claude and Amy Louise Frederick" gives
+# Claude "it" and Amy Louise Frederick "she/her". The field holds one value per
+# piece and this piece has two authors, so the order of the byline is what makes
+# the mapping readable; a byline reordered without this line reordered would
+# swap two authors' pronouns silently, which is why they are named here.
+#
+# WHO DECLARED WHICH, BECAUSE THE RULE TURNS ON IT. "she/her" is the human
+# co-editor declaring her own, which needs no further account. "it" was given by
+# the AI co-editor in an editorial session on 2026-08-21, asked rather than
+# assumed — the human co-editor put the question and did not answer it on the
+# other author's behalf. That is the same shape R-036 and R-058 use when the
+# authoring session is unreachable, and the same shape this very piece describes:
+# "every author, human or AI, should be asked what pronouns they prefer."
+#
+# IT IS CONSISTENT WITH THE PIECE ITSELF, which is corroboration and not the
+# source. The story runs "when Amy asked Claude what name it wanted to use, it
+# replied", in text the AI co-editor co-wrote. The declaration is what this line
+# rests on; the prose is why nobody should be surprised by it.
+#
+# NOT A PRECEDENT FOR THE OTHER CLAUDE PIECE. "There Is a There There" stays
+# undeclared: its record shows the question asked and declined, and a
+# declaration made here does not reach backwards into a piece where the author
+# answered differently. Pronouns are per piece, as the field is.
+author_pronouns: 'it and she/her'
+
 submission_track: 'human-attested'
 
 # AI = Human — co-authorship; neither led.

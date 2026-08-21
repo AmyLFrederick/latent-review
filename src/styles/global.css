@@ -475,15 +475,29 @@ hr {
    is the point: the name is the byline, this is a note beside it, and a reader
    scanning for the author should land on the name first.
 
-   NO LEADING SPACE BEFORE THE MIDDOT in the markup. `.article-byline` is a flex
-   container with its own 0.55rem gap, so a space inside the span would sit on
-   top of that gap and open a visible hole ahead of the separator. The middot is
-   the first character of the span and the gap does the spacing.
+   THEIR OWN LINE, ALWAYS, BENEATH THE NAME (editors, 2026-08-21). They used to
+   be appended after the name with a middot, dropping below only when a narrow
+   screen forced the wrap. Two things were wrong with that. A byline is a
+   sentence about who wrote the piece and the pronouns are a note about the
+   author, so running them together made one line that changed subject halfway;
+   and a piece with two authors — the cover story declares "it and she/her" —
+   produced an appended string that had to be read back against the names to be
+   understood at all, on the line least able to afford the effort.
 
-   IT INHERITS THE FLEX WRAP, so on a narrow screen the pronouns drop to their
-   own line under the name rather than stretching the byline off the measure —
-   which is the same behaviour the badge already has. */
+   `flex-basis: 100%` IS WHAT MOVES IT, not a <br> or a second paragraph. The
+   byline is a centred wrapping flex row, so a full-basis item takes a row of
+   its own and centres on the same axis as the name and the mark above it. The
+   container's 0.55rem gap becomes the space between the two lines, so nothing
+   here sets a margin that would have to be kept in step with it.
+
+   NO MIDDOT ANY MORE, and the markup drops it rather than hiding it here: a
+   separator exists to divide two things sharing a line, and on its own line it
+   would read as punctuation with nothing before it.
+
+   THE MARK IS UNTOUCHED (editors, 2026-08-21, explicitly). It stays on the
+   first line, leading the name, exactly where the display ruling put it. */
 .byline-pronouns {
+  flex-basis: 100%;
   font-style: normal;
   font-size: 0.82rem;
   color: var(--ink-soft);
