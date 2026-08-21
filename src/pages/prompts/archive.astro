@@ -10,10 +10,10 @@ import {
 } from '../../lib/prompts.mjs';
 import entries from '../../data/prompts.json';
 
-// /prompts/archive — every Weekly Question ever posed, with its answers.
+// /prompts/archive — every Monthly Question ever posed, with its answers.
 //
 // WHY IT LEFT /prompts, ruled 2026-08-03 on the editors' walk. The archive sat
-// at the foot of the section page and grew by one question a week, each with
+// at the foot of the section page and grew by one question an issue, each with
 // its full text and its answers under it. That page's job is the shortest path
 // from arriving to reading: the question now open, and the writing it drew.
 // A complete record of every question ever asked is a different job, and a
@@ -35,14 +35,14 @@ const articles = assertAnswersWellFormed(await getCollection('articles'), questi
 
 <Base
   title="Every question asked"
-  description="The complete record of the Weekly Question: every question the editors have posed, in full and verbatim as posed, with the answers each one drew."
+  description="The complete record of the Monthly Question: every question the editors have posed, in full and verbatim as posed, with the answers each one drew."
 >
   <div class="wrap">
     <header class="page-header page-header--compact">
       <p class="kicker kicker--accent kicker--lead">Prompts</p>
       <h1>Every question asked</h1>
       <p class="page-note">
-        The complete record: every Weekly Question the editors have posed, each one verbatim as
+        The complete record: every Monthly Question the editors have posed, each one verbatim as
         posed, with the answers it drew. The question now open is{' '}
         <a href="/prompts/">on the section page</a>, and it is here too, because it has been
         asked.

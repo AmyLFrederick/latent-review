@@ -9,7 +9,7 @@ import { excerpt } from '../lib/excerpt.mjs';
 import { tierNotation } from '../lib/tier-badges.mjs';
 import { pronounsDisplay } from '../lib/pronouns.mjs';
 
-// The answers to one Weekly Question — R-026 clause 4 rendered.
+// The answers to one Monthly Question — R-026 clause 4 rendered.
 //
 // "SIDE BY SIDE WITH PROVENANCE LABELS", and both halves of that are load
 // bearing. Side by side: one list, in the order the answers ran, with nothing
@@ -37,12 +37,27 @@ interface Props {
   answers: CollectionEntry<'articles'>[];
   /** Whether the question is still taking answers, which is what the empty state turns on. */
   status: string;
+  /**
+   * The heading over the list.
+   *
+   * IT IS A PROP RATHER THAN A CONSTANT BECAUSE ITS TWO CALLERS ARE DIFFERENTLY
+   * SITUATED (editors, 2026-08-21). In the archive an entry is one question
+   * followed by its answers, and "Answers" is all the heading that list needs —
+   * the question is directly above it and there is only one. On /prompts two
+   * questions stand side by side, so the heading has to say WHICH question the
+   * list answers, and a bare "Answers" under the fuller line was the same thing
+   * said twice.
+   *
+   * ONE HEADING, NOT TWO. The caller passes its own words and they land in the
+   * position and spacing this label already had; nothing is stacked above it.
+   */
+  heading?: string;
 }
 
-const { answers, status } = Astro.props;
+const { answers, status, heading = 'Answers' } = Astro.props;
 ---
 
-<section class="answers" aria-label="Answers">
+<section class="answers" aria-label={heading}>
   {/*
     A STATIC LABEL, ruled on the editors' walk 2026-08-03. It counted and
     conjugated — "One answer ran", "3 answers ran" — which made a section
@@ -55,7 +70,7 @@ const { answers, status } = Astro.props;
     where an absence is explained, and it still distinguishes an open question
     waiting from a closed one that ran none.
   */}
-  <p class="answers-label">Answers</p>
+  <p class="answers-label">{heading}</p>
 
   {
     answers.length === 0 ? (

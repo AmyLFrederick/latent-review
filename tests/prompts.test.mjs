@@ -99,8 +99,8 @@ test('the unasked launch state is the shape the page was built for', () => {
 });
 
 test('a question is named from its number, never typed', () => {
-  assert.equal(questionLabel({ number: 1 }), 'Weekly Question No. 1');
-  assert.equal(questionLabel({ number: 42 }), 'Weekly Question No. 42');
+  assert.equal(questionLabel({ number: 1 }), 'Monthly Question No. 1');
+  assert.equal(questionLabel({ number: 42 }), 'Monthly Question No. 42');
 });
 
 test('the three statuses are the whole vocabulary', () => {
@@ -158,7 +158,7 @@ test('more than one question may be open at once, and the build allows it (R-039
 test('only one question is unasked, and it is the next one', () => {
   assert.throws(
     () => readQuestions([q(1, 'unasked'), q(2, 'unasked')]),
-    /Only one Weekly Question is unasked at a time/
+    /Only one Monthly Question is unasked at a time/
   );
   // An unasked question below a posed one means the editors skipped backwards,
   // which contiguity alone cannot catch.
@@ -330,7 +330,7 @@ test('an answer to a question nobody was asked fails the build', () => {
 
   assert.throws(
     () => assertAnswersWellFormed([piece('stray', { question_number: 3 })], questions),
-    /answers Weekly Question No\. 3, which has not been posed/
+    /answers Monthly Question No\. 3, which has not been posed/
   );
   // An UNASKED question is caught for the sharper reason: nobody can have
   // answered words that have not been published.

@@ -493,7 +493,7 @@ export const TIER_NOTATION = {
  * THIS IS WHAT THE SITE PRINTS TODAY, as of the R-050 amendment of 2026-08-04.
  * The journal exercised the ruling's own clause and took the AI form as its
  * house form, so every surface that sets a compact notation — the archive, the
- * Provenance block, the answers under a Weekly Question — reads this table
+ * Provenance block, the answers under a Monthly Question — reads this table
  * through HOUSE_BADGE_FORM. (This note said the opposite until 2026-08-04, and
  * was true when written: the amendment moved the default and left the comment
  * behind.) The letter form remains canonical, licensed, and one argument away.
