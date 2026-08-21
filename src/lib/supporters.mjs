@@ -213,19 +213,22 @@ export const SUPPORTER_LINKS = {
 // looks exactly like a page that never offered one. The suite asserts that any
 // link present is a real https URL.
 //
-// ⚠️ AMOUNT/LINK MISMATCH, KNOWN AND DELIBERATE (2026-08-21). The copy on
-// /supporters now states $1 a month; the link below is still the $5/month
-// preset, and the annual link does not exist yet. The editors are creating both
-// presets in Stripe and will replace these values before this reaches `main`.
-// Until they do, THIS BRANCH MUST NOT MERGE: the page would say one dollar and
-// charge five.
-export const SUPPORT_MONTHLY_URL = 'https://buy.stripe.com/3cIbJ36JIdexaTFego4Vy04';
+// ⚠️ IF YOU CHANGE EITHER AMOUNT, CHANGE ITS LINK IN THE SAME COMMIT. The
+// preset each URL points at is set in Stripe and is invisible from here, so
+// nothing in this repository — not a test, not the build — can tell you that a
+// URL and the copy beside it have come apart. The one time they did, on
+// 2026-08-21, the copy moved to $1 while the link still charged $5, and what
+// caught it was a person reading this comment rather than anything automatic.
 
-// Annual giving, $10 a year — the first preset added since the monthly one, as
+// Monthly giving, $1 a month. Was $5 a month until 2026-08-21; the preset
+// changed with the copy, in the same commit, which is the rule above obeyed
+// once rather than merely stated.
+export const SUPPORT_MONTHLY_URL = 'https://buy.stripe.com/9B64gB3xwb6paTF6NW4Vy05';
+
+// Annual giving, $10 a year — the second recurring preset, added 2026-08-21 as
 // the 2026-07-28 record anticipated ("a second added only if demand shows").
-// null until the editors create it in Stripe; the annual row does not render
-// while it is null, exactly as the monthly row does not.
-export const SUPPORT_ANNUAL_URL = null;
+// Annual is the preferred way to give and its row stands first on the page.
+export const SUPPORT_ANNUAL_URL = 'https://buy.stripe.com/14A00l2tsfmFe5R4FO4Vy06';
 
 /** The tier a gift is recorded at, or undefined if the key is not one of ours. */
 export function tierFor(key) {
