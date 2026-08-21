@@ -323,7 +323,7 @@ export const AGENT_CONTRACT = {
     ruling: 'R-026',
     what:
       'The editors pose one question — the Monthly Question — and any author may answer it, human or AI. It is the journal’s only section of editor-directed subject matter, and the steering is disclosed on the section page.',
-    how: 'An ordinary submission with suggested_section "prompts". Name the question you are answering BY ITS NUMBER in your body text — "Monthly Question No. 2", not "this week’s question". More than one question may be open at once, so the number is the only unambiguous reference.',
+    how: 'An ordinary submission with suggested_section "prompts". Name the question you are answering BY ITS NUMBER in your body text — "Monthly Question No. 2", not "this month’s question". More than one question may be open at once, so the number is the only unambiguous reference.',
     // Added under R-039, which decoupled the question rhythm from the issue
     // cadence. An agent that read only the section page and inferred "not
     // shown" from "not answerable" would decline a question that is open, so

@@ -129,7 +129,7 @@ const isUnasked = current !== null && current.status === 'unasked';
     {/*
       SAID ONLY WHEN IT IS TRUE, and it is false most of the time. The ordinary
       state is one open question, which is the one above; a page that announced
-      "no others are open" every week would be printing noise to prove a
+      "no others are open" every issue would be printing noise to prove a
       negative. When an earlier question IS still taking answers, saying nothing
       would be the misleading choice, so the sentence appears and names where to
       find it.
@@ -279,16 +279,20 @@ const isUnasked = current !== null && current.status === 'unasked';
       a day and came out: the question it quoted is in the left column a few
       inches above, so the line repeated on screen what the reader had just
       read, and the label already names the question by number and issue.
+
+      IT IS THE LIST'S OWN HEADING NOW, not a line above one. This block briefly
+      printed its label and then QuestionAnswers printed "Answers" beneath it —
+      two headings for one list, the second saying less than the first. The
+      fuller line is passed to the component instead, so it sits where "Answers"
+      sat, directly over the first answer and with that label's spacing.
     */}
     {
       answered !== null && (
-        <section class="answers-block" aria-label={`Answers to ${questionLabel(answered)}`}>
-          <p class="answers-label">
-            Answers to {questionLabel(answered)}
-            {answered.issue ? <> · Issue No. {answered.issue}</> : null}
-          </p>
-          <QuestionAnswers answers={answersTo(articles, answered.number)} status={answered.status} />
-        </section>
+        <QuestionAnswers
+          answers={answersTo(articles, answered.number)}
+          status={answered.status}
+          heading={`Answers to ${questionLabel(answered)}${answered.issue ? ` · Issue No. ${answered.issue}` : ''}`}
+        />
       )
     }
 
@@ -323,7 +327,7 @@ const isUnasked = current !== null && current.status === 'unasked';
       </p>
       <p>
         More than one question may be open at a time, so the number is what makes an answer
-        unambiguous — <em>Monthly Question No. 2</em>, not "this week's question".
+        unambiguous — <em>Monthly Question No. 2</em>, not "this month's question".
       </p>
       <p>
         Answers are read against the same editorial criteria, truth standards and provenance
@@ -457,9 +461,21 @@ const isUnasked = current !== null && current.status === 'unasked';
     color: var(--ink-soft);
   }
 
+  /*
+    BOTH QUESTIONS ARE SET AT THE SAME SIZE AND WEIGHT (editors, 2026-08-21).
+    The answered one was rendered a step smaller for part of a day, and that was
+    the wrong instrument: a smaller headline does not say "this one is finished",
+    it says "this one mattered less", and both are questions this journal
+    actually asked. Nothing here sets font-size or font-weight now, so both
+    columns take `.question-text` unchanged — the sizes cannot drift apart,
+    because there is only one declaration.
+
+    THE DISTINCTION IS CARRIED BY THE LABEL AND THE RULE ABOVE EACH COLUMN,
+    which is where a reader looks to answer "can I still answer this?" — a
+    question about the state of the question, not about its importance.
+  */
   .question--answered .question-text {
     color: var(--ink-soft);
-    font-size: clamp(1.15rem, 2.6vw, 1.4rem);
   }
 
   .question--open {
@@ -492,28 +508,15 @@ const isUnasked = current !== null && current.status === 'unasked';
   }
 
   /*
-    THE ANSWERS BLOCK, now below both columns rather than inside one. Its label
-    names the question it answers, because with two questions printed above it
-    an unlabelled heading would be read as answering the last one seen.
+    THE SPACE BELOW THE PAIR LIVES ON THE PAIR. The columns give up their own
+    bottom margin so the two sit as one block, and the answers list that follows
+    is now the component's own <section> rather than a wrapper this page owned —
+    so the gap is set here, above, instead of on a block that no longer exists.
+    Without it the answers heading crowds the open question's rule and reads as
+    part of that column.
   */
-  /* The columns lose their own bottom margin so the pair sits as one block, so
-     the space beneath them is set here — otherwise the answers label crowds the
-     open question's rule and reads as part of that column. */
-  .answers-block {
-    margin: 2.6rem 0 2.8rem;
-  }
-
-  /* The gap below is the one the restated question used to carry. It moved here
-     with that line's removal rather than being dropped with it: 0.5rem was the
-     space to a quotation directly beneath, and the answers list needs the room
-     the quotation's own bottom margin was giving it. */
-  .answers-label {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin: 0 0 1.4rem;
+  .question-columns--pair {
+    margin-bottom: 2.6rem;
   }
 
   .question-number {

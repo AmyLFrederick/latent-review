@@ -22,7 +22,7 @@
 //   it, it is shown wherever the question appears, and nothing derives it.
 //
 // A question can be open and not current: that is the ordinary state of the
-// week after a new question posts, and it is the state rotation exists to
+// month after a new question posts, and it is the state rotation exists to
 // make possible. Nothing here may write `status` and nothing may infer one of
 // these two from the other.
 
