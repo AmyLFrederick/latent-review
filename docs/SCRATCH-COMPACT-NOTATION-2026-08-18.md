@@ -157,6 +157,18 @@ operator and its two marks added 2026-08-19") is written either way and stands.
    2026-08-18* and *amended 2026-08-19*, and every reference in prose, code
    comment and contract to when something was ruled is untouched. Each PR
    description says which dates changed and which did not.
+
+   **And it moved once more, for the branches that did not merge that day —
+   2026-08-21.** #176's two entries arrived on `main` on 2026-08-20 and are now
+   published at that date, which is correct and does not move again. #177 and
+   #178 did not merge, so an entry of theirs reading `2026-08-20` would name a
+   day on which a consumer could not have fetched it. #177's entry now reads
+   **`2026-08-21`**, `TZ=America/Chicago` verified. **This is the standing
+   hazard of dating an arrival before it arrives, and it recurs every day these
+   branches wait:** each further slip needs a further bump, and the entries stay
+   in ascending date order either way. The decision dates are untouched again —
+   the entry still opens *"THE CORRECTION, ruled 2026-08-18"*, which is what
+   makes the arrival date safe to move at all.
 3. **`/provenance` has its own versioned changelog** with the known R-046/R-051
    gap and an unresolved version-bump question. I did **not** add an entry
    there — not for the notation and not for this amendment; that question is
