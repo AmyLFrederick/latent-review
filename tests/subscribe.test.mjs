@@ -1,15 +1,24 @@
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 
-// Global-ceiling checks for /api/subscribe, added 2026-07-31 after the
-// cost-exposure audit found the one publicly reachable path that could cause an
-// unbounded number of billable API calls (docs/SCRATCH-COST-EXPOSURE-2026-07-31.md).
+// Checks for /api/subscribe, in two groups.
 //
-// What these assert is not "the limiter works" — ratelimit.mts is exercised
+// S1–S7 are the global-ceiling checks, added 2026-07-31 after the cost-exposure
+// audit found the one publicly reachable path that could cause an unbounded
+// number of billable API calls (docs/SCRATCH-COST-EXPOSURE-2026-07-31.md).
+// What they assert is not "the limiter works" — ratelimit.mts is exercised
 // elsewhere — but the four things that make the ceiling a ceiling: that it
 // exists at the ruled numbers, that tripping it sends NO email, that a request
 // already refused by a narrower limit does not spend global budget, and that a
-// broken limiter fails closed instead of open. Numbering: S1–S6.
+// broken limiter fails closed instead of open.
+//
+// S8–S13 are new on 2026-08-22, when a signup began subscribing immediately.
+// Removing the confirmation step removed a safety property along with a step —
+// nothing now stands between a POST and a live subscription — so the things
+// that replaced it are pinned here: the row is written confirmed with a consent
+// record, a welcome email goes out, that email carries the way out in the body
+// and not only in the footer, and an address already on the list is neither
+// rewritten nor re-mailed.
 
 process.env.SUPABASE_URL = 'http://supabase.test';
 process.env.SUPABASE_SECRET_KEY = 'sb_secret_test_only';
@@ -28,11 +37,16 @@ const GLOBAL_DAILY_MAX = 3000;
 // rateCounts is a queue: one entry consumed per rate-limit COUNT query, in the
 // order the handler asks. That ordering is what lets S4/S5 prove which buckets
 // were consulted and which were not.
+//
+// `writes` records every POST/PATCH body sent to /rest/v1/subscribers, which is
+// how S8–S10 read what was actually written rather than inferring it from a
+// 200.
 const stub = {
   rateCounts: [],
   buckets: [],
   subscriber: null,
   emails: [],
+  writes: [],
   rateFails: false,
 };
 
@@ -69,10 +83,17 @@ globalThis.fetch = async (input, init = {}) => {
       });
     }
     if (method === 'POST' || method === 'PATCH') {
-      return new Response(
-        JSON.stringify([{ confirm_token: 'ctok', unsubscribe_token: 'utok' }]),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
+      stub.writes.push({ method, body: JSON.parse(body || '{}') });
+      // A bare object, not an array: both write paths end in `.single()`, which
+      // asks PostgREST for `application/vnd.pgrst.object+json` and does no
+      // client-side unwrapping — unlike `.maybeSingle()` on the read above,
+      // which takes data[0] itself and is why that branch can answer with an
+      // array. A stub that answered both the same way would hand the handler an
+      // undefined token and still return 200.
+      return new Response(JSON.stringify({ unsubscribe_token: 'utok' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
   }
 
@@ -90,17 +111,23 @@ beforeEach(() => {
   stub.buckets = [];
   stub.subscriber = null;
   stub.emails = [];
+  stub.writes = [];
   stub.rateFails = false;
 });
 
 const ctx = { ip: '203.0.113.7' };
 
-const request = (email = 'reader@example.com') =>
+const request = (email = 'reader@example.com', extra = {}) =>
   new Request('http://site.test/api/subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, ...extra }),
   });
+
+// A signup that clears every limiter. Four zeroes, one per bucket.
+const clear = () => {
+  stub.rateCounts = [0, 0, 0, 0];
+};
 
 // --- S1: the ceiling exists, at the ruled hourly number --------------------
 
@@ -182,44 +209,150 @@ test('S5: a broken limiter refuses rather than sending unmetered', async () => {
   assert.deepEqual(stub.emails, [], 'an unmeasurable request is never sent');
 });
 
-// --- S7: the success reply is one reply, whatever the address's state ------
+// --- S6/S7: one reply for every non-error outcome --------------------------
 
-test('S7: a new address and an already-confirmed one get byte-identical replies', async () => {
-  // The copy changed on 2026-08-13 from a hedge ("if that address isn't
-  // already subscribed…") to a flat statement that a confirmation email has
-  // been sent. The hedge was doing two jobs: telling the truth in the
-  // already-confirmed case, and refusing to be an enumeration oracle. Only the
-  // second is load-bearing, and only the second is asserted here — because it
-  // is the one a future copy edit could quietly break by writing a friendlier
-  // sentence for the reader whose address is new.
-  stub.rateCounts = [0, 0, 0, 0];
+test('S6: an already-subscribed address is not re-mailed and not rewritten', async () => {
+  clear();
+  stub.subscriber = { id: 'sub_1', status: 'confirmed', unsubscribe_token: 'utok' };
+  const res = await subscribe(request(), ctx);
+
+  assert.equal(res.status, 200);
+  assert.deepEqual(stub.emails, [], 'confirmed addresses are not re-mailed');
+  // Load-bearing since 2026-08-22: signing up twice must not refresh the
+  // consent record. What the row says is when this reader actually consented,
+  // and a second POST by anyone who knows the address would otherwise move that
+  // date forward — quietly turning the evidence into a record of the last time
+  // a form was submitted.
+  assert.deepEqual(stub.writes, [], 'a second signup must not touch the row');
+});
+
+test('S7: a new address and an already-subscribed one get byte-identical replies', async () => {
+  // The property, unchanged through two copy rewrites: this endpoint must not
+  // be usable to test whether an address is on the list. A future copy edit
+  // could break it by writing a friendlier sentence for the reader whose
+  // address is new.
+  clear();
   const fresh = await subscribe(request(), ctx);
 
-  stub.rateCounts = [0, 0, 0, 0];
-  stub.subscriber = {
-    id: 'sub_1',
-    status: 'confirmed',
-    confirm_token: 'ctok',
-    unsubscribe_token: 'utok',
-  };
+  clear();
+  stub.subscriber = { id: 'sub_1', status: 'confirmed', unsubscribe_token: 'utok' };
   const confirmed = await subscribe(request(), ctx);
 
   assert.equal(fresh.status, confirmed.status);
   assert.equal(await fresh.text(), await confirmed.text());
 });
 
-// --- S6: the ceilings do not break the ordinary path ----------------------
+// --- S8: a signup subscribes, in one step ---------------------------------
 
-test('S6: an already-confirmed address still sends nothing, and costs no budget beyond the checks', async () => {
-  stub.rateCounts = [0, 0, 0, 0];
-  stub.subscriber = {
-    id: 'sub_1',
-    status: 'confirmed',
-    confirm_token: 'ctok',
-    unsubscribe_token: 'utok',
-  };
-  const res = await subscribe(request(), ctx);
+test('S8: a new signup is written confirmed, with a consent record', async () => {
+  clear();
+  const res = await subscribe(request('new@example.com', { source: 'web-form' }), ctx);
 
   assert.equal(res.status, 200);
-  assert.deepEqual(stub.emails, [], 'confirmed addresses are not re-mailed');
+  assert.equal(stub.writes.length, 1);
+  const [write] = stub.writes;
+  assert.equal(write.method, 'POST');
+  assert.equal(write.body.email, 'new@example.com');
+  assert.equal(write.body.status, 'confirmed', 'nobody is left pending');
+  assert.equal(write.body.consent_source, 'web-form');
+  assert.ok(write.body.consent_at, 'a consent record needs its moment');
+  assert.equal(write.body.confirmed_at, write.body.consent_at);
+});
+
+test('S9: a source we did not issue is recorded as api, never echoed back', async () => {
+  // The consent record is evidence. Free text supplied by the caller is not.
+  clear();
+  await subscribe(request('new@example.com', { source: 'referred-by-a-friend' }), ctx);
+  assert.equal(stub.writes[0].body.consent_source, 'api');
+
+  clear();
+  stub.writes = [];
+  await subscribe(request('new@example.com'), ctx);
+  assert.equal(stub.writes[0].body.consent_source, 'api', 'no source at all is still api');
+
+  clear();
+  stub.writes = [];
+  await subscribe(request('new@example.com', { source: 'web-form-footer' }), ctx);
+  assert.equal(stub.writes[0].body.consent_source, 'web-form-footer', 'our own doors survive');
+});
+
+// --- S10: the welcome email, and the way out ------------------------------
+
+test('S10: a signup gets exactly one welcome email', async () => {
+  clear();
+  await subscribe(request('new@example.com'), ctx);
+
+  assert.equal(stub.emails.length, 1);
+  const [mail] = stub.emails;
+  assert.deepEqual(mail.to, ['new@example.com']);
+  assert.match(mail.subject, /on the list/i);
+});
+
+test('S11: the welcome email carries the unsubscribe link in the body, not only the footer', async () => {
+  // THE REASON THIS IS PINNED. Under confirmed opt-in, someone whose address
+  // was typed in by mistake could ignore the mail and stay off the list; doing
+  // nothing was a complete remedy. It is not any more — they are subscribed
+  // before the email arrives — so the link out has to be somewhere they will
+  // find it, not only in 13px type under a rule.
+  clear();
+  await subscribe(request('new@example.com'), ctx);
+
+  const [mail] = stub.emails;
+  const unsub = 'https://thelatentreview.com/api/unsubscribe?token=utok';
+  assert.equal(mail.headers['List-Unsubscribe'], `<${unsub}>`);
+
+  for (const [name, part] of [
+    ['text', mail.text],
+    ['html', mail.html],
+  ]) {
+    const withoutFooter = part.split('thelatentreview.com · ').join('').split('—\nThe Latent Review')[0];
+    assert.ok(
+      withoutFooter.includes(unsub),
+      `the ${name} body must carry the unsubscribe link above the footer`
+    );
+    // The apostrophe is a character in the text part and an entity in the HTML
+    // one, so match around it rather than pinning the spelling.
+    assert.match(part, /ask for this/, `the ${name} body must say what to do about it`);
+  }
+});
+
+test('S12: nothing in the welcome email asks for a confirmation click', async () => {
+  clear();
+  await subscribe(request('new@example.com'), ctx);
+
+  const [mail] = stub.emails;
+  for (const part of [mail.text, mail.html, mail.subject]) {
+    assert.doesNotMatch(part, /\/api\/confirm/, 'no confirmation link is minted any more');
+    assert.doesNotMatch(part, /confirm/i, 'and nothing asks the reader to confirm');
+  }
+});
+
+// --- S13: the two states that are not on the list --------------------------
+
+test('S13: an unsubscribed address coming back is resubscribed with a fresh consent record', async () => {
+  clear();
+  stub.subscriber = { id: 'sub_1', status: 'unsubscribed', unsubscribe_token: 'utok' };
+  const res = await subscribe(request('back@example.com', { source: 'web-form' }), ctx);
+
+  assert.equal(res.status, 200);
+  assert.equal(stub.writes.length, 1);
+  assert.equal(stub.writes[0].method, 'PATCH');
+  assert.equal(stub.writes[0].body.status, 'confirmed');
+  assert.equal(stub.writes[0].body.consent_source, 'web-form');
+  assert.ok(stub.writes[0].body.consent_at, 'coming back is a new consent, recorded as one');
+  assert.equal(stub.emails.length, 1, 'and they are welcomed like anyone else');
+});
+
+test('S13b: a legacy pending row is subscribed rather than left stranded', async () => {
+  // The 2026-08-22 migration should leave none of these behind. This asserts
+  // what happens if one turns up anyway — from a row created between the deploy
+  // and the migration, or a hand edit — because the failure mode being guarded
+  // is a reader who asked and silently never got on.
+  clear();
+  stub.subscriber = { id: 'sub_1', status: 'pending', unsubscribe_token: 'utok' };
+  const res = await subscribe(request('stranded@example.com'), ctx);
+
+  assert.equal(res.status, 200);
+  assert.equal(stub.writes[0].body.status, 'confirmed');
+  assert.equal(stub.emails.length, 1);
 });

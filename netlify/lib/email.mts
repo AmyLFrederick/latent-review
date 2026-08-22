@@ -6,16 +6,16 @@
 // forget.
 //
 // "NO TRACKING" IS A PUBLIC PROMISE, MADE IN TWO PLACES A READER CAN READ:
-// the footer below, on every email, and the page a reader lands on once they
-// have confirmed ("No tracking, unsubscribe anytime, and every email we send
-// carries the way out").
+// the footer below, on every email, and the note under the signup form itself
+// ("No tracking, unsubscribe anytime") — which is now the earlier of the two,
+// read before an address is typed rather than after.
 //
-// IT USED TO BE THE PRE-CONFIRM SHEET AND IS NOW THE POST-CONFIRM ONE, moved
-// 2026-08-13. The sheet with the button on it was stripped to a heading and an
-// instruction, because its one job is to get a press and everything else on it
-// was competing; the terms it carried now sit one press later, on the page that
-// has nothing else to do. The count of places is unchanged, and so is the
-// audience — nobody reaches the second page without passing the first.
+// IT MOVED AGAIN ON 2026-08-22, and this is the second move. On 2026-08-13 it
+// went from the pre-confirm sheet to the post-confirm one. The post-confirm
+// sheet is now a page almost nobody reaches, since confirming is not a step any
+// more, so the promise would have been technically published and practically
+// unread. It is made on the form instead, where a reader meets it while the
+// decision is still theirs to make.
 //
 // Nothing in this file or in scripts/send-issue.mjs asks Resend to track opens
 // or clicks — no tracking option is sent with any request, so the behaviour is
@@ -43,9 +43,9 @@ interface EmailArgs {
   unsubscribeUrl: string;
 }
 
-export function confirmUrl(token: string): string {
-  return `${SITE_URL}/api/confirm?token=${token}`;
-}
+// confirmUrl() was removed on 2026-08-22 along with the step it built links
+// for. /api/confirm still answers the links already sitting in inboxes (see
+// the header of that function); nothing in this repository mints a new one.
 
 export function unsubscribeUrl(token: string): string {
   return `${SITE_URL}/api/unsubscribe?token=${token}`;
@@ -61,8 +61,8 @@ const MUTED = '#413b33';
 
 export function emailFooter(unsubUrl: string): { text: string; html: string } {
   return {
-    text: `\n\n—\nThe Latent Review · thelatentreview.com\nConfirmed opt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
-    html: `<hr style="border:0;border-top:1px solid #e0d8c6;margin:2em 0 1em"><p style="font-size:13px;color:${MUTED}">The Latent Review · <a href="${SITE_URL}" style="color:${MUTED}">thelatentreview.com</a><br>Confirmed opt-in, no tracking. <a href="${unsubUrl}" style="color:${MUTED}">Unsubscribe anytime</a>.</p>`,
+    text: `\n\n—\nThe Latent Review · thelatentreview.com\nOpt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
+    html: `<hr style="border:0;border-top:1px solid #e0d8c6;margin:2em 0 1em"><p style="font-size:13px;color:${MUTED}">The Latent Review · <a href="${SITE_URL}" style="color:${MUTED}">thelatentreview.com</a><br>Opt-in, no tracking. <a href="${unsubUrl}" style="color:${MUTED}">Unsubscribe anytime</a>.</p>`,
   };
 }
 

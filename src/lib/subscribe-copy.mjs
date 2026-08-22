@@ -1,4 +1,4 @@
-// The words a reader meets between pressing Subscribe and confirming.
+// The words a reader meets after pressing Subscribe.
 //
 // ONE SOURCE, TWO RENDERERS, AND THAT IS WHY THIS FILE EXISTS. The same state
 // is drawn in two places that share no stylesheet and no build: the inline
@@ -12,15 +12,22 @@
 // The lead is split around its bold clause rather than carrying markup,
 // because one renderer needs `<strong>` inside a class-bearing paragraph and
 // the other needs it inside a plain one. Neither gets to invent the wording.
+//
+// THESE USED TO BE THE PENDING WORDS — "One more step", "until then, you're
+// not subscribed" — because until 2026-08-22 a signup was not a subscription.
+// It is one now. The panel's job flipped with it: it used to be an instruction
+// and is now a receipt, and the shape stayed because the shape was never about
+// the instruction. A reader still needs to be told plainly what just happened
+// and still needs to be told where the email went if it does not arrive.
 
-export const SUBSCRIBE_PENDING_HEADING = 'One more step';
+export const SUBSCRIBE_DONE_HEADING = 'You’re on the list';
 
-export const SUBSCRIBE_PENDING_LEAD_BEFORE = 'We’ve sent a confirmation email. ';
-export const SUBSCRIBE_PENDING_LEAD_BOLD = 'Click the link inside it';
-export const SUBSCRIBE_PENDING_LEAD_AFTER =
-  ' and you’re on the list — until then, you’re not subscribed.';
+export const SUBSCRIBE_DONE_LEAD_BEFORE = 'That’s it — you’re subscribed. ';
+export const SUBSCRIBE_DONE_LEAD_BOLD = 'A welcome email is on its way';
+export const SUBSCRIBE_DONE_LEAD_AFTER =
+  ', and every email we send carries a link that takes you back off.';
 
-export const SUBSCRIBE_PENDING_SPAM =
+export const SUBSCRIBE_DONE_SPAM =
   'If it isn’t in your inbox in a few minutes, check spam or promotions. New journals are strangers to mail filters.';
 
 /**
@@ -30,7 +37,7 @@ export const SUBSCRIBE_PENDING_SPAM =
  * other client of /api/subscribe reads, and it must not be a shorter or
  * softer version of what a browser is shown.
  */
-export const SUBSCRIBE_PENDING_TEXT = [
-  SUBSCRIBE_PENDING_LEAD_BEFORE + SUBSCRIBE_PENDING_LEAD_BOLD + SUBSCRIBE_PENDING_LEAD_AFTER,
-  SUBSCRIBE_PENDING_SPAM,
+export const SUBSCRIBE_DONE_TEXT = [
+  SUBSCRIBE_DONE_LEAD_BEFORE + SUBSCRIBE_DONE_LEAD_BOLD + SUBSCRIBE_DONE_LEAD_AFTER,
+  SUBSCRIBE_DONE_SPAM,
 ].join(' ');

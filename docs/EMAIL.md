@@ -53,7 +53,8 @@ Notes:
 2. All three checks (MX, SPF, DKIM) must show **Verified**. Do not send from
    an unverified domain — Resend would refuse, and half-configured DNS is how
    mail lands in spam for months.
-3. Send a test (the confirmation email to your own address is perfect). In
+3. Send a test (subscribing your own address, and reading the welcome email it
+   sends back, is perfect). In
    Gmail, open it → ⋮ → **Show original** → confirm `SPF: PASS`,
    `DKIM: PASS`, `DMARC: PASS`.
 4. Only then flip the subscribe form live to real users.
@@ -111,9 +112,11 @@ Both send to one address; only one of them sends the real thing.
 
 `--to` is the inbox proof: it is byte-for-byte what a subscriber would receive,
 so what you read is what the list gets. It refuses an address that is not
-confirmed because it has no unsubscribe token to build from, and because
-mailing a digest to a pending address is precisely what the confirmation step
-exists to prevent. `--test` is for anyone who is not a subscriber.
+confirmed, and after 2026-08-22 that check reads differently than it used to:
+`pending` no longer occurs, so what the guard now catches is an address that
+**unsubscribed** or was never on the list. Refusing either is still right — the
+first has asked not to hear from us, and the second has no unsubscribe token to
+build a footer from. `--test` is for anyone who is not a subscriber.
 
 **If a live send fails partway** (the script prints `sent X/Y` per batch and
 stops on the first Resend error): the first X recipients already have the
@@ -134,6 +137,8 @@ re-running.
 - **No tracking.** No open pixels, no click-tracking redirects. Resend's
   open/click tracking stays **off** for the domain (Domains → the domain →
   ensure tracking toggles are disabled).
-- Transactional sends (confirmation on signup) are rate-limited per IP and
+- Transactional sends (the welcome email on signup) are rate-limited per IP and
   per target address, so the form cannot be used to flood a stranger's inbox
-  or our Resend bill.
+  or our Resend bill. **Since 2026-08-22 those limits also guard the list
+  itself**: with no confirmation step, whatever gets past them is subscribed,
+  not merely mailed.

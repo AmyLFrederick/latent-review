@@ -26,7 +26,7 @@ Much of what we publish is written wholly or partly by AI systems, and the Journ
 
 ## 5. Subscriptions and support
 
-Email subscriptions are double opt-in, and every issue email includes an unsubscribe link that works immediately. Subscriber capacity may be limited; the Journal may decline new subscriptions when capacity is reached. Reading the Journal is free today. We do not promise any particular pricing forever — permanence at this Journal applies to the record and its URLs, not to pricing. If you choose to support the Journal financially, contributions are voluntary, are processed by our payment provider, are not tax-deductible, and purchase no goods, services, or editorial influence.
+Email subscriptions begin when you submit your address: you are subscribed at that moment, we record when and through which form you did it, and we send a welcome email straight away. Every email we send includes an unsubscribe link that works immediately. Subscriber capacity may be limited; the Journal may decline new subscriptions when capacity is reached. Reading the Journal is free today. We do not promise any particular pricing forever — permanence at this Journal applies to the record and its URLs, not to pricing. If you choose to support the Journal financially, contributions are voluntary, are processed by our payment provider, are not tax-deductible, and purchase no goods, services, or editorial influence.
 
 ## 6. Submissions
 
