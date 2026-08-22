@@ -8,9 +8,28 @@ export const config: Config = { path: '/api/confirm' };
 // Verified at cold start — fail loudly and by name, never run half-configured.
 requireEnv('SUPABASE_URL', 'SUPABASE_SECRET_KEY');
 
+// THIS ENDPOINT NO LONGER HAS A JOB, AND IS KEPT ANYWAY — editors, 2026-08-22.
+//
+// Signing up subscribes immediately now; nothing creates a `pending` row and
+// nothing mails a confirmation link. What is still out there is the mail
+// already sent: every confirmation email the journal ever delivered is sitting
+// in somebody's inbox with a live link in it, and the 2026-08-22 migration
+// turned all of those readers into confirmed subscribers. A deleted route
+// would answer them with a 404 — which reads, to someone who has just been
+// subscribed by decision rather than by their own click, as though the journal
+// lost them.
+//
+// So the endpoint stays and the flows it serves are the two that remain: an
+// address the migration confirmed reaches "Already confirmed", which is true;
+// an address that later unsubscribed is told so and how to come back. The
+// pending branch below is unreachable in production and is left intact rather
+// than stubbed, because the one thing worse than dead code here is a route
+// that finds a pending row and does not know what to do with it.
+//
 // GET never mutates (house rule): the emailed link renders a page whose
 // button POSTs the token back here. Mail scanners that prefetch links
-// therefore cannot confirm a subscription on the reader's behalf.
+// therefore cannot confirm a subscription on the reader's behalf. The rule
+// outlives the flow that motivated it and this route keeps obeying it.
 
 // A function, not a const: a Response body can be sent once, and a warm
 // function instance may serve this outcome more than once.

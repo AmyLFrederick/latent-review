@@ -7,23 +7,34 @@ rules. This document is the operator's map.
 ## Architecture
 
 ```
-browser form ──POST──▶ /api/subscribe ──▶ Supabase (service key)
-                                      └─▶ Resend: confirmation email
-email link ───GET───▶ /api/confirm ────▶ renders page (no mutation)
-page button ──POST──▶ /api/confirm ────▶ status → confirmed
+browser form ──POST──▶ /api/subscribe ──▶ Supabase: row written `confirmed`
+                                      └─▶ Resend: welcome email
 email link ───GET───▶ /api/unsubscribe ▶ renders page (no mutation)
 page button ──POST──▶ /api/unsubscribe ▶ status → unsubscribed
+
+/api/confirm still answers links in already-delivered mail; nothing mints new ones.
 ```
 
-- **GET never mutates.** Confirm and unsubscribe links render a page whose
-  button POSTs the token. Mail scanners that prefetch links can't change
-  anyone's state.
-- **Confirmed opt-in.** Only `status = 'confirmed'` addresses ever receive an
-  issue. Nothing sends to `pending`.
-- **Idempotent signup.** Re-subscribing while pending re-sends the same
-  confirmation; while confirmed, does nothing; after unsubscribing, restarts
-  the confirmation flow on a fresh token. The endpoint's response is the same
-  in every case, so it can't be used to probe who subscribes.
+- **One step, since 2026-08-22.** A signup subscribes. There is no confirmation
+  click; the welcome email is sent on signup and is what proves the address is
+  real. Double opt-in was the previous posture and the editors gave it up
+  knowingly — see the migration header and PR for what was traded.
+- **Consent is recorded, not inferred.** Every row carries `consent_at` (when
+  the address was submitted) and `consent_source` (which door). Both are NOT
+  NULL: this table cannot hold a subscriber whose consent is unaccounted for.
+  No IP or user-agent is retained — that would be stronger evidence bought by
+  breaking the louder promise.
+- **GET never mutates.** Unsubscribe links render a page whose button POSTs the
+  token. Mail scanners that prefetch links can't change anyone's state.
+- **Only `confirmed` addresses receive an issue.** `pending` no longer occurs;
+  the column default is left at `pending` deliberately, so that any future path
+  which forgets to say what it means produces a row that receives nothing
+  rather than one silently added to a mailing list.
+- **Idempotent signup.** Re-subscribing while confirmed does nothing at all —
+  no write, no email, so a second POST cannot move the consent date or mail
+  someone already on the list; after unsubscribing, it resubscribes on a fresh
+  consent record. The endpoint's response is the same in every case, so it
+  can't be used to probe who subscribes.
 - **Rate limits** (per IP and per target email) are enforced in
   `netlify/lib/ratelimit.mts` against the `rate_limit_events` table, which
   stores salted hashes only — never raw IPs or addresses.
@@ -31,15 +42,17 @@ page button ──POST──▶ /api/unsubscribe ▶ status → unsubscribed
 
 ## Database
 
-Schema and RLS live in `supabase/migrations/20260716000000_subscribers.sql`.
-Apply it in the Supabase dashboard (SQL Editor → paste → run) or with the
-Supabase CLI (`supabase db push`).
+Schema and RLS live in `supabase/migrations/20260716000000_subscribers.sql`,
+amended by `20260822120000_subscribe_without_confirmation.sql`. Apply in the
+Supabase dashboard (SQL Editor → paste → run) or with the Supabase CLI
+(`supabase db push`).
 
-RLS posture: `subscribers` is insert-only for the public role, and the anon
-grant is column-restricted to `email` — tokens and status always come from
-server-side defaults, so an anonymous client can never plant a token it
-knows. `rate_limit_events` has no public access at all. Every state change
-goes through the service key in the functions.
+RLS posture: `subscribers` has **no public access at all**. The original anon
+`INSERT(email)` grant was revoked on 2026-08-22 — no code had ever used it, and
+after that migration it could only produce a row born `pending` with no consent
+source: stranded by construction and unreadable, since anon cannot select.
+`rate_limit_events` likewise has no public access. Every read and every state
+change goes through the service key in the functions.
 
 ## Environment variables (Netlify, never the repo)
 

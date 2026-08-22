@@ -555,8 +555,8 @@ const digestText = [
 // template anyone could fork without it.
 function footer(unsubUrl) {
   return {
-    text: `\n\n—\nThe Latent Review · thelatentreview.com\nConfirmed opt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
-    html: `<div style="max-width:600px;margin:0 auto;"><hr style="border:0;border-top:1px solid ${HAIRLINE};margin:2em 0 1em"><p style="font-family:${SERIF};font-size:13px;color:${INK_SOFT}">The Latent Review · <a href="${SITE_URL}" style="color:${INK_SOFT}">thelatentreview.com</a><br>Confirmed opt-in, no tracking. <a href="${unsubUrl}" style="color:${INK_SOFT}">Unsubscribe anytime</a>.</p></div>`,
+    text: `\n\n—\nThe Latent Review · thelatentreview.com\nOpt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
+    html: `<div style="max-width:600px;margin:0 auto;"><hr style="border:0;border-top:1px solid ${HAIRLINE};margin:2em 0 1em"><p style="font-family:${SERIF};font-size:13px;color:${INK_SOFT}">The Latent Review · <a href="${SITE_URL}" style="color:${INK_SOFT}">thelatentreview.com</a><br>Opt-in, no tracking. <a href="${unsubUrl}" style="color:${INK_SOFT}">Unsubscribe anytime</a>.</p></div>`,
   };
 }
 
@@ -645,9 +645,14 @@ if (reviewTo) {
   // THE ADDRESS MUST ALREADY BE ON THE CONFIRMED LIST, and the reason is not
   // ceremony. This mode sends the real email, with a real working unsubscribe
   // token, and the token is the subscriber's own row — there is nothing to build
-  // one from if the row does not exist. An address that is merely pending has
-  // not agreed to receive anything yet, and mailing it a digest would be the
-  // journal doing exactly what the confirmation step exists to prevent.
+  // one from if the row does not exist.
+  //
+  // WHAT THE STATUS CHECK CATCHES CHANGED ON 2026-08-22. It used to catch a
+  // `pending` row — someone who had signed up and not yet agreed to receive
+  // anything. Signing up is agreeing now, so `pending` does not occur, and the
+  // check's live case is an address that UNSUBSCRIBED. Mailing that one would be
+  // worse than mailing a pending one ever was: it is a person who was on the
+  // list and left.
   //
   // Use --test for an address that is not a subscriber; that is what it is for.
   const { data: subscriber, error: lookupError } = await supabase
@@ -660,7 +665,7 @@ if (reviewTo) {
     fail(`${reviewTo} is not on the subscriber list. --to sends the real digest to a confirmed subscriber; for any other address use --test, which sends a clearly marked copy.`);
   }
   if (subscriber.status !== 'confirmed') {
-    fail(`${reviewTo} is on the list with status "${subscriber.status}", not "confirmed". --to will not mail an address that has not confirmed — that is what the confirmation step is for. Use --test for a marked copy.`);
+    fail(`${reviewTo} is on the list with status "${subscriber.status}", not "confirmed". --to mails subscribers only, and an address that has unsubscribed is not one. Use --test for a marked copy.`);
   }
 
   const message = emailFor(subscriber);
