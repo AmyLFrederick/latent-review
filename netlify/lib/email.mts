@@ -35,12 +35,33 @@ export const SITE_URL = process.env.SITE_URL ?? 'https://thelatentreview.com';
 export const FROM =
   process.env.RESEND_FROM ?? 'The Latent Review <notifications@mail.thelatentreview.com>';
 
+interface FooterOptions {
+  /**
+   * One extra line under the unsubscribe link.
+   *
+   * THIS EXISTS FOR THE WELCOME EMAIL AND SHOULD STAY RARE. Its line — that a
+   * mistyped address is what brought this message here, and the link above is
+   * the whole remedy — belongs beside the link rather than in a paragraph of
+   * its own (editors, 2026-08-22). It must not reach the digest: "if you
+   * didn't ask for this" is nonsense in issue seven to somebody who has been
+   * reading since issue one, and a standing footer that said it would be the
+   * journal apologising monthly for the subscription it was asked for.
+   */
+  note?: string;
+  /**
+   * Whether to carry the standing terms clause ("Opt-in, no tracking.").
+   * Default true. See the note at `emailFooter` before setting it false.
+   */
+  standingTerms?: boolean;
+}
+
 interface EmailArgs {
   to: string;
   subject: string;
   text: string;
   html: string;
   unsubscribeUrl: string;
+  footer?: FooterOptions;
 }
 
 // confirmUrl() was removed on 2026-08-22 along with the step it built links
@@ -59,18 +80,62 @@ export function unsubscribeUrl(token: string): string {
 // scripts/send-issue.mjs; the three files are kept in step by hand.
 const MUTED = '#413b33';
 
-export function emailFooter(unsubUrl: string): { text: string; html: string } {
+// THE FOOT SITS INSIDE THE PAGE, which it did not until 2026-08-22. This
+// helper appended its rule and its line after the caller's markup had closed
+// every wrapper, so the foot landed outside the centred 600px column and
+// outside the paper ground — full-bleed, left-aligned, on whatever white the
+// client paints. Nobody caught it because nobody had rendered the email and
+// looked; scripts/send-issue.mjs never used this helper and had quietly solved
+// the same problem in its own copy of the footer.
+//
+// The wrapper below is that fix. It assumes the caller's ground is the
+// journal's paper, which is true of the one email that uses sendEmail today and
+// of any email the journal is likely to send. A future template on a different
+// ground would need this to become an option rather than a constant — better to
+// find that out from a rendered message than to make it configurable now.
+const PAPER = '#faf3ef';
+
+/**
+ * The standing foot of every email the journal sends.
+ *
+ * ONE OF THE TWO PLACES "NO TRACKING" IS PUBLISHED, which is why
+ * `standingTerms` has a default and a warning rather than being a plain
+ * parameter. Dropping the clause from an email removes a public promise from
+ * it; the promise is also made under the signup form, so a reader who has just
+ * subscribed has read it minutes earlier, and that is the only case where
+ * leaving it out is defensible. Nothing that goes to the standing list —
+ * digests, dispatches — may omit it.
+ */
+export function emailFooter(
+  unsubUrl: string,
+  { note, standingTerms = true }: FooterOptions = {}
+): { text: string; html: string } {
+  const terms = standingTerms ? 'Opt-in, no tracking. ' : '';
+  const termsHtml = standingTerms ? 'Opt-in, no tracking. ' : '';
   return {
-    text: `\n\n—\nThe Latent Review · thelatentreview.com\nOpt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
-    html: `<hr style="border:0;border-top:1px solid #e0d8c6;margin:2em 0 1em"><p style="font-size:13px;color:${MUTED}">The Latent Review · <a href="${SITE_URL}" style="color:${MUTED}">thelatentreview.com</a><br>Opt-in, no tracking. <a href="${unsubUrl}" style="color:${MUTED}">Unsubscribe anytime</a>.</p>`,
+    text:
+      `\n\n—\nThe Latent Review · thelatentreview.com\n${terms}Unsubscribe anytime: ${unsubUrl}\n` +
+      (note ? `${note}\n` : ''),
+    html:
+      `<div style="background-color:${PAPER};padding:0 12px 28px;"><div style="max-width:600px;margin:0 auto;text-align:center;">` +
+      `<hr style="border:0;border-top:1px solid #e0d8c6;margin:0 0 1em"><p style="margin:0;font-family:Georgia, 'Times New Roman', serif;font-size:13px;line-height:1.6;color:${MUTED}">The Latent Review · <a href="${SITE_URL}" style="color:${MUTED}">thelatentreview.com</a><br>${termsHtml}<a href="${unsubUrl}" style="color:${MUTED}">Unsubscribe anytime</a>.` +
+      (note ? `<br>${note}` : '') +
+      `</p></div></div>`,
   };
 }
 
-export async function sendEmail({ to, subject, text, html, unsubscribeUrl: unsubUrl }: EmailArgs) {
+export async function sendEmail({
+  to,
+  subject,
+  text,
+  html,
+  unsubscribeUrl: unsubUrl,
+  footer: footerOptions,
+}: EmailArgs) {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error('RESEND_API_KEY must be set');
 
-  const footer = emailFooter(unsubUrl);
+  const footer = emailFooter(unsubUrl, footerOptions);
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {

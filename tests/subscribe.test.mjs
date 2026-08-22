@@ -288,12 +288,18 @@ test('S10: a signup gets exactly one welcome email', async () => {
   assert.match(mail.subject, /on the list/i);
 });
 
-test('S11: the welcome email carries the unsubscribe link in the body, not only the footer', async () => {
+test('S11: the way out is in the message, once, with the sentence that explains it', async () => {
   // THE REASON THIS IS PINNED. Under confirmed opt-in, someone whose address
   // was typed in by mistake could ignore the mail and stay off the list; doing
   // nothing was a complete remedy. It is not any more — they are subscribed
-  // before the email arrives — so the link out has to be somewhere they will
-  // find it, not only in 13px type under a rule.
+  // before the email arrives — so the link out and the sentence naming their
+  // case both have to be present and next to each other.
+  //
+  // THEY SIT IN THE FOOT, not in a paragraph (editors, 2026-08-22): somebody
+  // who wants out needs the link, not prose about the link. What that costs is
+  // prominence, and what it must not cost is presence — hence this test, and
+  // hence "exactly once", because two unsubscribe links in one message make a
+  // reader choose between them.
   clear();
   await subscribe(request('new@example.com'), ctx);
 
@@ -305,15 +311,35 @@ test('S11: the welcome email carries the unsubscribe link in the body, not only 
     ['text', mail.text],
     ['html', mail.html],
   ]) {
-    const withoutFooter = part.split('thelatentreview.com · ').join('').split('—\nThe Latent Review')[0];
-    assert.ok(
-      withoutFooter.includes(unsub),
-      `the ${name} body must carry the unsubscribe link above the footer`
+    assert.equal(
+      part.split(unsub).length - 1,
+      1,
+      `the ${name} message must carry the unsubscribe link exactly once`
     );
     // The apostrophe is a character in the text part and an entity in the HTML
     // one, so match around it rather than pinning the spelling.
-    assert.match(part, /ask for this/, `the ${name} body must say what to do about it`);
+    assert.match(part, /ask for this/, `the ${name} message must name the mistyped case`);
+    // Adjacent, not merely both present: the sentence follows the link it
+    // refers to ("that link"), and would be a dangling reference apart from it.
+    assert.ok(
+      part.indexOf('ask for this') > part.indexOf(unsub),
+      `in ${name}, the sentence must sit beside the link it points at`
+    );
   }
+});
+
+test('S11b: the mistyped-address line is this email’s alone, and the standing terms are everyone else’s', async () => {
+  // The foot is shared with the digest. "If you didn't ask for this" would be
+  // nonsense in issue seven to a long-standing reader, and the tracking promise
+  // must not go missing from anything sent to the standing list — so the
+  // defaults are asserted here, not just the override.
+  const { emailFooter } = await import('../netlify/lib/email.mts');
+  const plain = emailFooter('https://example.test/u');
+
+  assert.match(plain.text, /Opt-in, no tracking\./, 'the standing terms are the default');
+  assert.match(plain.html, /Opt-in, no tracking\./);
+  assert.doesNotMatch(plain.text, /ask for this/, 'and the welcome line is not');
+  assert.doesNotMatch(plain.html, /ask for this/);
 });
 
 test('S12: nothing in the welcome email asks for a confirmation click', async () => {
@@ -324,6 +350,32 @@ test('S12: nothing in the welcome email asks for a confirmation click', async ()
   for (const part of [mail.text, mail.html, mail.subject]) {
     assert.doesNotMatch(part, /\/api\/confirm/, 'no confirmation link is minted any more');
     assert.doesNotMatch(part, /confirm/i, 'and nothing asks the reader to confirm');
+  }
+});
+
+test('S12b: the welcome email is the editors’ letter, and says the four things it is for', async () => {
+  // The copy is the editors' verbatim, and it carries commitments as well as
+  // warmth. Pinned so that a later edit to the voice has to notice what it is
+  // moving: the volume promise that bounds the dispatch, the invitation to
+  // write, the ask to share, and the signature that says who is writing —
+  // including that one of them is an AI, which is the whole premise of the
+  // journal and not a disclosure to be tidied away.
+  clear();
+  await subscribe(request('new@example.com'), ctx);
+
+  const [mail] = stub.emails;
+  for (const [name, part] of [
+    ['text', mail.text],
+    ['html', mail.html],
+  ]) {
+    assert.match(part, /Thank you for subscribing\./, `${name}: opens as a letter`);
+    assert.match(part, /one email per issue/, `${name}: the volume promise survives`);
+    assert.match(part, /between issues/, `${name}: and it bounds the dispatch`);
+    assert.match(part, /Letters section is open to human and AI readers/, `${name}: invites a reply`);
+    assert.match(part, /sharing it is the single most helpful thing/, `${name}: makes the ask`);
+    assert.match(part, /The Editors/, `${name}: is signed`);
+    assert.match(part, /Claude \(AI\) and Amy Louise Frederick \(Human\)/, `${name}: by both, named`);
+    assert.match(part, /supporters\//, `${name}: carries the support link`);
   }
 });
 

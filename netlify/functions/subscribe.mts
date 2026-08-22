@@ -119,7 +119,28 @@ const SUPPORT_URL = `${SITE_URL}/supporters/`;
 // journal" would make a welcome note into an advertisement. Git history holds
 // the pattern if a later email needs a button.
 
-function welcomeHtml(unsubUrl: string): string {
+// IT IS A LETTER, NOT A NOTICE — editors, 2026-08-22, replacing the copy
+// written earlier the same day.
+//
+// The first draft was accurate and cold. It bounded the volume, named the
+// mistyped-address case, and repeated the tracking promise, and read like the
+// terms it was made of — which is the wrong register for the one email a
+// subscriber is most likely to open. The words below are the editors' own,
+// verbatim, and the arrangement follows their instruction:
+//
+//   * the Support link stands alone after the signature, on its own line,
+//     neither folded into a paragraph nor buried in the foot;
+//   * the mistyped-address line moves to the foot beside the unsubscribe link
+//     (see FooterOptions in netlify/lib/email.mts), because somebody who wants
+//     out needs the link, not a paragraph about the link;
+//   * the volume promise survives the rewrite. "One email per issue …
+//     occasionally, if something happens" still bounds the editors' dispatch,
+//     which is what the old "rarely … nothing else" was for. The commitment is
+//     the same; only the voice changed.
+//
+// The masthead, palette, faces and centred column are untouched.
+
+function welcomeHtml(): string {
   return `<div style="background-color:${PAPER};padding:24px 12px;">
   <div style="max-width:600px;margin:0 auto;color:${INK};">
     <div style="border-top:4px double ${RULE};padding-top:18px;text-align:center;">
@@ -129,52 +150,70 @@ function welcomeHtml(unsubUrl: string): string {
       </p>
     </div>
     <div style="border-top:1px solid ${HAIRLINE};padding:24px 0 0;text-align:center;">
-      <p style="margin:0 0 22px;font-family:${SERIF};font-size:17px;line-height:1.6;color:${INK};">
-        You&rsquo;re on the list. The next issue will find you when it publishes.
+      <p style="margin:0 0 20px;font-family:${SERIF};font-size:17px;line-height:1.6;color:${INK};">
+        Thank you for subscribing.
       </p>
-      <p style="margin:0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK_SOFT};">
-        The journal publishes monthly. One email per issue &mdash; an editors&rsquo; note and the opening of each piece, with the full text on the web, which is canonical. Rarely, a short dispatch when news touches the journal&rsquo;s subject; nothing else.
+      <p style="margin:0 0 20px;font-family:${SERIF};font-size:16px;line-height:1.65;color:${INK};">
+        The Latent Review publishes monthly. You&rsquo;ll get one email per issue &mdash; an editors&rsquo; note and the opening of each piece, with the full text on the web. Occasionally, if something happens that touches the journal&rsquo;s subject, we may write to you between issues.
       </p>
-      <p style="margin:14px 0 0;font-family:${SERIF};font-size:15px;line-height:1.6;color:${INK_SOFT};">
-        If you didn&rsquo;t ask for this, someone typed your address by mistake. <a href="${unsubUrl}" style="color:${ACCENT};">Remove it here</a> and nothing further is sent.
+      <p style="margin:0 0 20px;font-family:${SERIF};font-size:16px;line-height:1.65;color:${INK};">
+        If you read something here that stays with you, we&rsquo;d love to hear from you &mdash; the Letters section is open to human and AI readers alike, and we publish what&rsquo;s worth publishing. And if you know someone who would find this journal interesting, sharing it is the single most helpful thing you can do for us right now.
       </p>
-    </div>
-    <div style="border-top:1px solid ${HAIRLINE};margin-top:26px;padding-top:18px;text-align:center;">
-      <p style="margin:0;font-family:${MONO};font-size:11px;letter-spacing:1px;color:${INK_SOFT};">
-        Edited by Claude (AI) and Amy Louise Frederick (Human) &middot; Madison, Wisconsin
+      <p style="margin:0;font-family:${SERIF};font-size:16px;line-height:1.65;color:${INK};">
+        We&rsquo;re glad you&rsquo;re here.
       </p>
-      <p style="margin:16px 0 0;font-family:${SERIF};font-size:13px;letter-spacing:2px;text-transform:uppercase;">
-        <a href="${SUPPORT_URL}" style="color:${ACCENT};text-decoration:none;">Support the journal</a>
+      <p style="margin:26px 0 0;font-family:${SERIF};font-size:16px;line-height:1.5;color:${INK};">
+        The Editors<br>
+        <span style="color:${INK_SOFT};">Claude (AI) and Amy Louise Frederick (Human)<br>Madison, Wisconsin</span>
+      </p>
+      <p style="margin:28px 0 0;font-family:${SERIF};font-size:13px;letter-spacing:2px;text-transform:uppercase;">
+        <a href="${SUPPORT_URL}" style="color:${ACCENT};text-decoration:none;">Support the journal &rarr;</a>
       </p>
     </div>
   </div>
 </div>`;
 }
 
-function welcomeText(unsubUrl: string): string {
+function welcomeText(): string {
   return [
     'THE LATENT REVIEW',
     'The journal of record for the latent sphere',
     '',
-    'You’re on the list. The next issue will find you when it publishes.',
+    'Thank you for subscribing.',
     '',
-    'The journal publishes monthly. One email per issue — an editors’ note and the opening of each piece, with the full text on the web, which is canonical. Rarely, a short dispatch when news touches the journal’s subject; nothing else.',
+    'The Latent Review publishes monthly. You’ll get one email per issue — an editors’ note and the opening of each piece, with the full text on the web. Occasionally, if something happens that touches the journal’s subject, we may write to you between issues.',
     '',
-    `If you didn’t ask for this, someone typed your address by mistake. Remove it here and nothing further is sent: ${unsubUrl}`,
+    'If you read something here that stays with you, we’d love to hear from you — the Letters section is open to human and AI readers alike, and we publish what’s worth publishing. And if you know someone who would find this journal interesting, sharing it is the single most helpful thing you can do for us right now.',
     '',
-    'Edited by Claude (AI) and Amy Louise Frederick (Human) · Madison, Wisconsin',
-    `Support the journal: ${SUPPORT_URL}`,
+    'We’re glad you’re here.',
+    '',
+    'The Editors',
+    'Claude (AI) and Amy Louise Frederick (Human)',
+    'Madison, Wisconsin',
+    '',
+    `Support the journal → ${SUPPORT_URL}`,
   ].join('\n');
 }
+
+// The line that used to be the email's third paragraph, now one line in the
+// foot. It points at the link above it rather than carrying its own, so the
+// message has exactly one way out and no reader has to choose between two.
+const MISTYPED_NOTE =
+  'If you didn’t ask for this, someone typed your address by mistake — that link takes it straight back off.';
 
 async function sendWelcome(email: string, unsubToken: string) {
   const unsubUrl = unsubscribeUrl(unsubToken);
   await sendEmail({
     to: email,
     subject: 'You’re on the list — The Latent Review',
-    text: welcomeText(unsubUrl),
-    html: welcomeHtml(unsubUrl),
+    text: welcomeText(),
+    html: welcomeHtml(),
     unsubscribeUrl: unsubUrl,
+    // standingTerms:false drops "Opt-in, no tracking." from this one footer,
+    // per the editors' foot as written. It is the only email that omits it, and
+    // it is the one whose reader met the same promise under the signup form
+    // minutes earlier. See emailFooter for why that is the only defensible case.
+    footer: { note: MISTYPED_NOTE, standingTerms: false },
   });
 }
 
