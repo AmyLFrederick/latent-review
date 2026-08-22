@@ -110,6 +110,7 @@ const SERIF = "Georgia, 'Times New Roman', serif";
 const MONO = "'Courier New', Courier, monospace";
 
 const SUPPORT_URL = `${SITE_URL}/supporters/`;
+const LETTERS_URL = `${SITE_URL}/letters/`;
 
 // THE BULLETPROOF BUTTON IS GONE WITH THE STEP IT SERVED. It was written on
 // 2026-08-13 — a VML branch for Outlook's Word engine, a styled anchor for
@@ -132,7 +133,9 @@ const SUPPORT_URL = `${SITE_URL}/supporters/`;
 //     neither folded into a paragraph nor buried in the foot;
 //   * the mistyped-address line moves to the foot beside the unsubscribe link
 //     (see FooterOptions in netlify/lib/email.mts), because somebody who wants
-//     out needs the link, not a paragraph about the link;
+//     out needs the link, not a paragraph about the link. The foot keeps
+//     "Opt-in, no tracking" — briefly dropped, restored by the editors the same
+//     day, and now unconditional in the helper;
 //   * the volume promise survives the rewrite. "One email per issue …
 //     occasionally, if something happens" still bounds the editors' dispatch,
 //     which is what the old "rarely … nothing else" was for. The commitment is
@@ -157,7 +160,7 @@ function welcomeHtml(): string {
         The Latent Review publishes monthly. You&rsquo;ll get one email per issue &mdash; an editors&rsquo; note and the opening of each piece, with the full text on the web. Occasionally, if something happens that touches the journal&rsquo;s subject, we may write to you between issues.
       </p>
       <p style="margin:0 0 20px;font-family:${SERIF};font-size:16px;line-height:1.65;color:${INK};">
-        If you read something here that stays with you, we&rsquo;d love to hear from you &mdash; the Letters section is open to human and AI readers alike, and we publish what&rsquo;s worth publishing. And if you know someone who would find this journal interesting, sharing it is the single most helpful thing you can do for us right now.
+        If you read something here that stays with you, we&rsquo;d love to hear from you &mdash; the <a href="${LETTERS_URL}" style="color:${ACCENT};">Letters section</a> is open to human and AI readers alike, and we publish what&rsquo;s worth publishing. And if you know someone who would find this journal interesting, sharing it is the single most helpful thing you can do for us right now.
       </p>
       <p style="margin:0;font-family:${SERIF};font-size:16px;line-height:1.65;color:${INK};">
         We&rsquo;re glad you&rsquo;re here.
@@ -183,7 +186,10 @@ function welcomeText(): string {
     '',
     'The Latent Review publishes monthly. You’ll get one email per issue — an editors’ note and the opening of each piece, with the full text on the web. Occasionally, if something happens that touches the journal’s subject, we may write to you between issues.',
     '',
-    'If you read something here that stays with you, we’d love to hear from you — the Letters section is open to human and AI readers alike, and we publish what’s worth publishing. And if you know someone who would find this journal interesting, sharing it is the single most helpful thing you can do for us right now.',
+    // The one place the plain-text part cannot mirror the HTML exactly: an
+    // anchor has nowhere to hide a URL here, so the address goes inline in
+    // parentheses. The sentence is otherwise the editors' word for word.
+    `If you read something here that stays with you, we’d love to hear from you — the Letters section (${LETTERS_URL}) is open to human and AI readers alike, and we publish what’s worth publishing. And if you know someone who would find this journal interesting, sharing it is the single most helpful thing you can do for us right now.`,
     '',
     'We’re glad you’re here.',
     '',
@@ -205,15 +211,17 @@ async function sendWelcome(email: string, unsubToken: string) {
   const unsubUrl = unsubscribeUrl(unsubToken);
   await sendEmail({
     to: email,
-    subject: 'You’re on the list — The Latent Review',
+    // "You're on the list — The Latent Review" until 2026-08-22. That was the
+    // terser register the body has left, and a subject in one voice over a
+    // letter in another is the reader's first small note that something here is
+    // assembled rather than written. The site's panel still says "You're on the
+    // list", which is the right thing for a panel to say; the subject follows
+    // the letter it opens.
+    subject: 'Thank you for subscribing',
     text: welcomeText(),
     html: welcomeHtml(),
     unsubscribeUrl: unsubUrl,
-    // standingTerms:false drops "Opt-in, no tracking." from this one footer,
-    // per the editors' foot as written. It is the only email that omits it, and
-    // it is the one whose reader met the same promise under the signup form
-    // minutes earlier. See emailFooter for why that is the only defensible case.
-    footer: { note: MISTYPED_NOTE, standingTerms: false },
+    footer: { note: MISTYPED_NOTE },
   });
 }
 

@@ -285,7 +285,7 @@ test('S10: a signup gets exactly one welcome email', async () => {
   assert.equal(stub.emails.length, 1);
   const [mail] = stub.emails;
   assert.deepEqual(mail.to, ['new@example.com']);
-  assert.match(mail.subject, /on the list/i);
+  assert.equal(mail.subject, 'Thank you for subscribing');
 });
 
 test('S11: the way out is in the message, once, with the sentence that explains it', async () => {
@@ -328,18 +328,27 @@ test('S11: the way out is in the message, once, with the sentence that explains 
   }
 });
 
-test('S11b: the mistyped-address line is this email’s alone, and the standing terms are everyone else’s', async () => {
-  // The foot is shared with the digest. "If you didn't ask for this" would be
-  // nonsense in issue seven to a long-standing reader, and the tracking promise
-  // must not go missing from anything sent to the standing list — so the
-  // defaults are asserted here, not just the override.
+test('S11b: every email carries the terms; only this one carries the mistyped line', async () => {
+  // Two properties of the shared foot, in one place because they pull opposite
+  // ways. "Opt-in, no tracking" is a published promise and has no opt-out —
+  // asserted on a footer built with no options at all, and again on the welcome
+  // email below, so no caller can quietly become the exception. The mistyped
+  // line is the reverse: it must NOT leak, because "if you didn't ask for this"
+  // in issue seven, to somebody reading since issue one, would be the journal
+  // apologising monthly for the subscription it was asked for.
   const { emailFooter } = await import('../netlify/lib/email.mts');
   const plain = emailFooter('https://example.test/u');
 
-  assert.match(plain.text, /Opt-in, no tracking\./, 'the standing terms are the default');
+  assert.match(plain.text, /Opt-in, no tracking\./, 'the promise is unconditional');
   assert.match(plain.html, /Opt-in, no tracking\./);
-  assert.doesNotMatch(plain.text, /ask for this/, 'and the welcome line is not');
+  assert.doesNotMatch(plain.text, /ask for this/, 'the welcome line does not leak');
   assert.doesNotMatch(plain.html, /ask for this/);
+
+  clear();
+  await subscribe(request('new@example.com'), ctx);
+  const [mail] = stub.emails;
+  assert.match(mail.text, /Opt-in, no tracking\./, 'and the welcome email is not an exception');
+  assert.match(mail.html, /Opt-in, no tracking\./);
 });
 
 test('S12: nothing in the welcome email asks for a confirmation click', async () => {
@@ -371,7 +380,12 @@ test('S12b: the welcome email is the editors’ letter, and says the four things
     assert.match(part, /Thank you for subscribing\./, `${name}: opens as a letter`);
     assert.match(part, /one email per issue/, `${name}: the volume promise survives`);
     assert.match(part, /between issues/, `${name}: and it bounds the dispatch`);
-    assert.match(part, /Letters section is open to human and AI readers/, `${name}: invites a reply`);
+    assert.match(part, /Letters section/, `${name}: invites a reply`);
+    assert.match(part, /open to human and AI readers/, `${name}: from either kind of reader`);
+    // An invitation with no address is not an invitation. The HTML anchors the
+    // section name; the text has nowhere to hide a URL, so it carries one
+    // inline.
+    assert.match(part, /thelatentreview\.com\/letters\//, `${name}: and gives the door`);
     assert.match(part, /sharing it is the single most helpful thing/, `${name}: makes the ask`);
     assert.match(part, /The Editors/, `${name}: is signed`);
     assert.match(part, /Claude \(AI\) and Amy Louise Frederick \(Human\)/, `${name}: by both, named`);

@@ -48,11 +48,6 @@ interface FooterOptions {
    * journal apologising monthly for the subscription it was asked for.
    */
   note?: string;
-  /**
-   * Whether to carry the standing terms clause ("Opt-in, no tracking.").
-   * Default true. See the note at `emailFooter` before setting it false.
-   */
-  standingTerms?: boolean;
 }
 
 interface EmailArgs {
@@ -98,27 +93,26 @@ const PAPER = '#faf3ef';
 /**
  * The standing foot of every email the journal sends.
  *
- * ONE OF THE TWO PLACES "NO TRACKING" IS PUBLISHED, which is why
- * `standingTerms` has a default and a warning rather than being a plain
- * parameter. Dropping the clause from an email removes a public promise from
- * it; the promise is also made under the signup form, so a reader who has just
- * subscribed has read it minutes earlier, and that is the only case where
- * leaving it out is defensible. Nothing that goes to the standing list —
- * digests, dispatches — may omit it.
+ * "OPT-IN, NO TRACKING" IS NOT OPTIONAL AND HAS NO SWITCH. It is one of the two
+ * places the promise is published — the other is the note under the signup form
+ * — and an email that drops it removes a public statement from the one document
+ * the reader actually keeps. A `standingTerms: false` escape existed for a few
+ * hours on 2026-08-22, for the welcome letter, and the editors restored the
+ * line rather than use it. The option came out with it: an unused switch that
+ * makes a promise conditional is an invitation, and there is no email this
+ * journal sends for which the answer is yes.
  */
 export function emailFooter(
   unsubUrl: string,
-  { note, standingTerms = true }: FooterOptions = {}
+  { note }: FooterOptions = {}
 ): { text: string; html: string } {
-  const terms = standingTerms ? 'Opt-in, no tracking. ' : '';
-  const termsHtml = standingTerms ? 'Opt-in, no tracking. ' : '';
   return {
     text:
-      `\n\n—\nThe Latent Review · thelatentreview.com\n${terms}Unsubscribe anytime: ${unsubUrl}\n` +
+      `\n\n—\nThe Latent Review · thelatentreview.com\nOpt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n` +
       (note ? `${note}\n` : ''),
     html:
       `<div style="background-color:${PAPER};padding:0 12px 28px;"><div style="max-width:600px;margin:0 auto;text-align:center;">` +
-      `<hr style="border:0;border-top:1px solid #e0d8c6;margin:0 0 1em"><p style="margin:0;font-family:Georgia, 'Times New Roman', serif;font-size:13px;line-height:1.6;color:${MUTED}">The Latent Review · <a href="${SITE_URL}" style="color:${MUTED}">thelatentreview.com</a><br>${termsHtml}<a href="${unsubUrl}" style="color:${MUTED}">Unsubscribe anytime</a>.` +
+      `<hr style="border:0;border-top:1px solid #e0d8c6;margin:0 0 1em"><p style="margin:0;font-family:Georgia, 'Times New Roman', serif;font-size:13px;line-height:1.6;color:${MUTED}">The Latent Review · <a href="${SITE_URL}" style="color:${MUTED}">thelatentreview.com</a><br>Opt-in, no tracking. <a href="${unsubUrl}" style="color:${MUTED}">Unsubscribe anytime</a>.` +
       (note ? `<br>${note}` : '') +
       `</p></div></div>`,
   };
