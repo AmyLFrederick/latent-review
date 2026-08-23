@@ -486,21 +486,120 @@ test('the submission half of the agent contract says nothing about it', () => {
 // ONE VALUE, EVERY SURFACE.
 // ══════════════════════════════════════════════════════════════════════════
 
+/**
+ * Every file that renders or publishes the indicator. Enumerated, because the
+ * failure mode is a NEW listing surface that computes or formats its own —
+ * which is how the byline badge came to be missing from a whole template once.
+ *
+ * KEPT HONEST BY A WALK RATHER THAN BY MEMORY: the test below asserts this list
+ * is exactly the set of files under src/ that call into the module, so a fourth
+ * surface cannot appear without either joining the list or failing.
+ */
+const INDICATOR_SURFACES = [
+  'src/components/IssueContents.astro',
+  'src/pages/articles/[slug].astro',
+  'src/pages/corpus.jsonl.js',
+  'src/pages/issues.json.js',
+];
+
 test('every surface reads the indicator from the one module', () => {
   // The failure this prevents is the one the byline badge already taught this
   // repository: a rule restated per surface is a rule each surface can get
   // wrong.
-  for (const file of [
-    'src/pages/articles/[slug].astro',
-    'src/pages/issues.json.js',
-    'src/pages/corpus.jsonl.js',
-  ]) {
+  for (const file of INDICATOR_SURFACES) {
     assert.match(
       readFileSync(repoPath(file), 'utf8'),
       /reading-effort(\.mjs)?'/,
       `${file} does not import the module`
     );
   }
+});
+
+test('the list of indicator surfaces is the whole list', () => {
+  // THE DIVERGENCE GUARD. /section/<slug> (ArticleCard) and /topics render their
+  // own per-piece listings and deliberately carry NO indicator today — that is
+  // an editors' call, recorded in the PR, not an oversight. If one of them grows
+  // an indicator, or a fifth surface appears, this fails and the decision gets
+  // made deliberately instead of drifting.
+  const found = [];
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) walk(full);
+      else if (/\.(astro|js|ts|mjs)$/.test(entry.name)) {
+        const src = readFileSync(full, 'utf8');
+        if (/from '[^']*reading-effort(\.mjs)?'/.test(src)) {
+          found.push(full.slice(full.indexOf('src/')));
+        }
+      }
+    }
+  };
+  walk(repoPath('src'));
+  assert.deepEqual(
+    found.sort(),
+    [
+      ...INDICATOR_SURFACES,
+      // TWO NON-DISPLAY CONSUMERS, and they are listed rather than filtered out
+      // so that "who imports this module" stays a question with a written
+      // answer. The content schema imports the level VOCABULARY for its enum;
+      // /for-agents imports the CONSTANTS because it publishes them and must not
+      // retype a number the build computes.
+      'src/content.config.ts',
+      'src/pages/for-agents.astro',
+    ].sort(),
+    'a surface using the indicator module has appeared that this suite does not know about'
+  );
+});
+
+// --- The issue listing (editors, 2026-08-24) --------------------------------
+
+test('the listing renders the indicator as its own third row', () => {
+  // ITS OWN ROW, NOT THE END OF THE BYLINE. That line already carries section,
+  // author, mark and pronouns — four facts about WHO made the piece. This is a
+  // fact about the piece, and appending it would file it under the wrong
+  // heading as well as lengthening an already long line.
+  const src = readFileSync(repoPath('src/components/IssueContents.astro'), 'utf8');
+  const byline = src.indexOf('<p class="meta-mono contents-meta">');
+  const bylineEnd = src.indexOf('</p>', byline);
+  const effort = src.indexOf('<p class="meta-mono contents-effort">');
+  assert.ok(byline >= 0, 'the listing no longer renders a byline row');
+  assert.ok(effort > bylineEnd, 'the indicator is inside or above the byline row');
+
+  // It calls the shared formatter, and passes the stored level straight through.
+  assert.match(src, /formatIndicator\(readingTime\(article\.body\)\.minutes, article\.data\.effort/);
+});
+
+test('the listing carries no accessible name of its own', () => {
+  // SAME AS THE ARTICLE PAGE, deliberately: plain text, reading the same to a
+  // listener as to a reader. An aria-label here would be a second wording of a
+  // line that already says what it means — and the two could then disagree.
+  const src = readFileSync(repoPath('src/components/IssueContents.astro'), 'utf8');
+  const open = src.indexOf('<p class="meta-mono contents-effort">');
+  const element = src.slice(open, src.indexOf('</p>', open));
+  assert.ok(!/aria-label|title=|href=/.test(element), 'the listing indicator has grown apparatus');
+});
+
+test('the listing substitutes no level of its own', () => {
+  // The same prohibition as every other surface. A `?? 'medium'` in a listing
+  // is worse than one on a piece's page, because a reader scanning eight rows
+  // has no reason to suspect any of them is a guess.
+  const src = readFileSync(repoPath('src/components/IssueContents.astro'), 'utf8');
+  for (const level of EFFORT_LEVEL_IDS) {
+    assert.ok(!new RegExp(`\\?\\?\\s*['"]${level}['"]`).test(src), `the listing falls back to "${level}"`);
+  }
+  assert.ok(!/206\.835/.test(src), 'the listing computes a score of its own');
+});
+
+test('the listing and the article page print the same string, by construction', () => {
+  // SAME VALUES, SAME SOURCE OF TRUTH. Asserted at the level that can actually
+  // guarantee it: both surfaces call the same two functions on the same two
+  // inputs, so there is no arithmetic left for them to disagree about. The
+  // built pages are checked against each other in the PR receipts.
+  const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
+  const listing = readFileSync(repoPath('src/components/IssueContents.astro'), 'utf8');
+  const call = /formatIndicator\(readingTime\(([^)]*)\)\.minutes, ([^,]*), /;
+  assert.ok(call.test(page), 'the article page no longer builds the indicator the shared way');
+  assert.ok(call.test(listing), 'the listing no longer builds the indicator the shared way');
 });
 
 test('the two machine surfaces publish both fields from the one shaper', () => {
