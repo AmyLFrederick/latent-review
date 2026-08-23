@@ -15,6 +15,17 @@ import {
   PENCIL_COVERS,
   PENCIL_VERSUS_CONTRIBUTION,
 } from '../lib/notation.ts';
+// The thresholds and the reading speeds are READ, never retyped. This page is
+// where they are published, and a number documented here that disagreed with
+// the number the build computes would be worse than publishing none: it would
+// invite a reader to check a piece and reach the wrong answer.
+import {
+  MEASURE_NAME,
+  SPEED_ANCHOR_FAST_SCORE,
+  SPEED_ANCHOR_MEDIUM_SCORE,
+  WPM_FAST,
+  WPM_SLOW,
+} from '../lib/reading-effort.mjs';
 ---
 
 <Base
@@ -340,6 +351,237 @@ import {
         term in it names an idea some published piece actually argues about. It grows when a
         piece earns a term, which means a piece may carry none rather than be forced into the
         nearest available word.
+      </p>
+
+      {/*
+        THE EFFORT-AND-TIME INDICATOR, AND THE LINE BETWEEN ITS TWO HALVES
+        (editors, dual yes, 2026-08-23, revised the same day).
+
+        THE REQUIREMENT THIS SECTION EXISTS TO MEET, in the revision's own
+        words: a machine reader must be able to tell which field is a
+        MEASUREMENT and which is a JUDGEMENT. It is stated here in prose, it is
+        stated in /agent-api.json as data, and — because a consumer may read
+        neither — it is stated in the emitted objects themselves, as `basis`.
+        Three places, because the failure it guards is a consumer treating an
+        editorial judgement as a computed fact and reasoning from it.
+
+        THE WITHDRAWN VERSION IS DESCRIBED RATHER THAN QUIETLY DROPPED. This
+        journal published a corrected derivation once before by saying what the
+        old one was; the same practice applies to a shape that changed before it
+        shipped. The reasoning is a fact about how we now label pieces.
+      */}
+      <h3>Effort and reading time</h3>
+      <p>
+        Every published piece carries a short line beside its byline —{' '}
+        <em>“5 min · Medium effort”</em> — and both halves reach you as fields:{' '}
+        <code>reading_time</code> and <code>effort</code>, on every article in{' '}
+        <a href="/issues.json"><code>issues.json</code></a> and every piece line in{' '}
+        <a href="/corpus.jsonl"><code>corpus.jsonl</code></a>.
+      </p>
+      <p class="door-term">
+        <strong>They are two different kinds of claim, and you should not treat them alike.</strong>{' '}
+        <code>reading_time</code> is <strong>computed</strong> from the piece's own prose by the
+        formula below; you can re-derive it from the text and check us.{' '}
+        <code>effort</code> is <strong>editorial</strong> — the editors' judgement of what the
+        piece asks of a reader, assigned at acceptance from its <em>subject</em> and from what it
+        asks a reader to hold in mind. There is no formula behind it, nothing to re-derive, and
+        no score to compare against. Each object states which it is in its own{' '}
+        <code>basis</code> field, so you never have to infer it from this page.
+      </p>
+      <p>
+        <strong>Neither is a claim about quality.</strong> <em>High effort</em> says a piece asks
+        something of a reader; it says nothing about whether it is worth it.
+      </p>
+
+      <h4>Why the effort level is not computed</h4>
+      <p>
+        It was, for one afternoon, and the reasoning is published because it is a fact about how
+        we label pieces. The first build derived <em>both</em> halves from the readability score
+        below. Tested against our own corpus before it shipped, the measure{' '}
+        <strong>inverted real reader experience</strong>: the piece a reader had actually stopped
+        halfway through scored among the easiest of eight, and the piece that reader found most
+        accessible scored the hardest.
+      </p>
+      <p>
+        No adjustment of thresholds fixes that. A readability formula measures syllables per word
+        and words per sentence — <em>how the prose is built</em> — and what makes a piece
+        demanding here is what it is <em>about</em>. A piece can write short sentences about
+        something very hard, and several of ours do. So the effort level is a judgement, and we
+        label it as one rather than letting it pass as a measurement.
+      </p>
+      <p>
+        There is <strong>no default and no fallback</strong>. Where the editors have not assigned
+        a level, <code>effort.level</code> and <code>effort.display</code> are <code>null</code>,
+        the piece's page prints its reading time alone, and nothing fills the gap.{' '}
+        <strong>A null is an unassigned piece, never a guess</strong> — and{' '}
+        <code>basis</code> is still <code>editorial</code>, so the field tells you what kind of
+        claim it will hold when it holds one.
+      </p>
+
+      <h4><code>reading_time</code> — computed</h4>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Values</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>display</code></td>
+            <td>string</td>
+            <td>The rendered time, as we print it — <code>7 min</code>.</td>
+          </tr>
+          <tr>
+            <td><code>minutes</code></td>
+            <td>integer ≥ 1</td>
+            <td>
+              Complexity-adjusted reading time: <code>ceil(words ÷ words_per_minute)</code>,
+              never below one.
+            </td>
+          </tr>
+          <tr>
+            <td><code>basis</code></td>
+            <td><code>computed</code></td>
+            <td>Always. This object is a measurement.</td>
+          </tr>
+          <tr>
+            <td><code>measure</code></td>
+            <td><code>flesch-reading-ease</code></td>
+            <td>
+              The readability measure, named so you never have to infer it. It sets the reading
+              SPEED and nothing else — it is not a difficulty rating, and the effort level is
+              not derived from it.
+            </td>
+          </tr>
+          <tr>
+            <td><code>score</code></td>
+            <td>number, or <code>null</code></td>
+            <td>
+              The {MEASURE_NAME} score, to one decimal. <strong>Higher is a faster read.</strong>{' '}
+              Not clamped — dense prose can score below zero, and we let the formula say so.{' '}
+              <code>null</code> only where a piece has no countable prose at all.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code>words</code> · <code>sentences</code> · <code>syllables</code>
+            </td>
+            <td>integers</td>
+            <td>
+              <strong>The three inputs to the score</strong>, published so you can re-derive it
+              rather than take it on our word. <code>words</code> counts only what we counted —
+              see the exclusions below — so it is at or below the word count of the piece's full
+              text.
+            </td>
+          </tr>
+          <tr>
+            <td><code>words_per_minute</code></td>
+            <td>{WPM_SLOW}–{WPM_FAST}</td>
+            <td>The reading speed used for this piece, derived from its score. Formula below.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4><code>effort</code> — editorial</h4>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Values</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>level</code></td>
+            <td>
+              <code>light</code> · <code>medium</code> · <code>high</code> · <code>null</code>
+            </td>
+            <td>
+              <strong>Exactly three levels</strong>, assigned by the editors at acceptance.{' '}
+              <code>null</code> where they have not assigned one — an unassigned piece, never a
+              guess.
+            </td>
+          </tr>
+          <tr>
+            <td><code>display</code></td>
+            <td>string, or <code>null</code></td>
+            <td>
+              The words we print: <em>Light effort</em>, <em>Medium effort</em>,{' '}
+              <em>High effort</em>. <code>null</code> with an unassigned level.
+            </td>
+          </tr>
+          <tr>
+            <td><code>basis</code></td>
+            <td><code>editorial</code></td>
+            <td>
+              Always, including on an unassigned piece. <strong>This object is a judgement.</strong>{' '}
+              It carries no score, no threshold and no input list, because there is no formula —
+              and a shape that implied one would be the conflation this split exists to end.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        The page joins the two with a middle dot — <code>display</code>, a space, <code>·</code>,
+        a space, <code>display</code> — and prints the time alone where no level is assigned.{' '}
+        <strong>The effort level is never a submitter's field</strong>: no door accepts one, in
+        the same way that no door accepts a subject label or a section. A piece's own claim about
+        what it demands of a reader is a claim the record cannot check.
+      </p>
+
+      <h4>How the reading time is computed</h4>
+      <p>{MEASURE_NAME} (Flesch, 1948):</p>
+      <pre><code>{'score = 206.835 − 1.015 × (words ÷ sentences) − 84.6 × (syllables ÷ words)'}</code></pre>
+      <p>
+        Syllables are counted by a documented heuristic rather than a pronouncing dictionary — it
+        is the reason this measure was chosen over one needing a word list, and it is not exact.
+        Two adjacent vowels in different syllables read as one, so words like <em>idea</em> and{' '}
+        <em>create</em> come out a syllable short. The error is systematic, small, and in one
+        direction (very slightly toward <em>faster</em>); on a thousand-word piece it does not
+        move the minutes. The implementation is in the public repository at{' '}
+        <code>src/lib/reading-effort.mjs</code>.
+      </p>
+      <p>
+        <strong>What is counted: the piece's own prose, and nothing else.</strong> Excluded from
+        both the score and the word count:
+      </p>
+      <ul>
+        <li>
+          <strong>Block quotes and quoted transcripts.</strong> A piece carrying a long quoted
+          exchange would otherwise be credited with minutes of somebody else's words. Our cover
+          piece is the live case: several hundred words of its <code>text</code> are a quoted
+          exchange and are not counted.
+        </li>
+        <li>
+          <strong>Headings, lists, images, thematic breaks and code blocks.</strong> Not prose,
+          and not read at prose speed.
+        </li>
+        <li>
+          <strong>The whole of the editorial apparatus</strong> — provenance blocks, correction
+          notices, deks, editors' notes, signed personal notes, attestations, finding aids. None
+          of them is body text, so counting the body excludes them without a rule that has to
+          list them.
+        </li>
+      </ul>
+      <p>
+        One limit, stated rather than hidden: a transcript typed as ordinary paragraphs is
+        indistinguishable from the author's own prose and <em>is</em> counted. The block type is
+        the signal.
+      </p>
+      <p>
+        <strong>Reading speed is complexity-adjusted, not a flat rate.</strong> The research puts
+        dense prose nearer {WPM_SLOW}–220 words per minute against roughly {WPM_FAST} for
+        moderately complex prose. A flat rate applied to both is not neutral — it is wrong in a
+        known direction, and wrong hardest on exactly the pieces a reader most wants warned
+        about. So the speed is a straight line in the score, anchored at two points and clamped:
+      </p>
+      <pre><code>{`words_per_minute = clamp(${WPM_SLOW}, ${WPM_FAST}, 200 + (score − ${SPEED_ANCHOR_MEDIUM_SCORE}) × 5/3)
+
+  score ${SPEED_ANCHOR_FAST_SCORE}  →  ${WPM_FAST} wpm
+  score ${SPEED_ANCHOR_MEDIUM_SCORE}  →  200 wpm
+  minutes = ceil(words ÷ words_per_minute), never below 1`}</code></pre>
+      <p>
+        The two anchor scores are Flesch's own band boundaries — the feet of “plain English” and
+        of “very difficult”. In the withdrawn version they did double duty as the effort
+        thresholds; they no longer do, and <strong>nothing in this journal derives an effort
+        level from a score</strong>. The same description, as data, is in{' '}
+        <a href="/agent-api.json"><code>/agent-api.json</code></a> under{' '}
+        <code>reading.indicator_fields</code>.
       </p>
 
       <h2>How to follow this journal</h2>

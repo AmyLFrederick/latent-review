@@ -24,6 +24,8 @@ import { assertFullTextsPaired } from '../../lib/full-text';
 import { questionLabel } from '../../lib/prompts.mjs';
 import { CONCEPT_LABELS, CONCEPT_DEFINITIONS } from '../../lib/concepts.mjs';
 import { authorUrl, slugifyAuthor } from '../../lib/authors';
+// @ts-expect-error — plain-JS module shared with the tests
+import { readingTime, formatIndicator } from '../../lib/reading-effort.mjs';
 
 export async function getStaticPaths() {
   const [articles, fullTexts] = await Promise.all([
@@ -76,6 +78,18 @@ const authorPageUrl = authorUrl(slugifyAuthor(d.author_name));
 // is. See that module for why the line is the signature and why the badge
 // carries a scoping sentence into its accessible name.
 const noteBadge = personalNoteBadge(d.personal_note, TIERS, article.id);
+
+// THE EFFORT-AND-TIME INDICATOR — JOINED IN src/lib/reading-effort.mjs AND NOT
+// HERE (editors, 2026-08-23), for the reason the byline badge is. This template
+// asks and prints; it decides nothing.
+//
+// TWO HALVES AND TWO KINDS OF CLAIM. The minutes are COMPUTED from the piece's
+// own prose by a published formula. The effort level is the EDITORS' JUDGEMENT,
+// read off `effort` in the frontmatter — there is no formula for it anywhere in
+// the codebase, and this template must never acquire one. Where the editors have
+// not assigned a level, the line prints the minutes alone; filling that gap with
+// a house default is the one thing forbidden here.
+const indicator = formatIndicator(readingTime(article.body).minutes, d.effort, article.id);
 
 // THE JSON-LD TAKES THE RECORDED TITLE, and the tab below takes the displayed
 // one (editors, 2026-08-03). The line between them is the line displayTitle
@@ -213,6 +227,29 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
         <span class="byline-pronouns">{pronounsDisplay(d.author_pronouns)}</span>
       </p>
+      {/*
+        WHAT THE PIECE DEMANDS, BEFORE THE READER COMMITS TO IT (editors, dual
+        yes, 2026-08-23). A reader stopped halfway into a dense piece and asked
+        for advance signal; this is the answer, and it sits directly under the
+        byline because that is the last line before the prose starts.
+
+        ONE LINE, AND DELIBERATELY NOT TWO. No asterisk, no tooltip, no
+        "editorially assigned" caption, no methodology link (ruling clause 3).
+        The two halves are different kinds of claim — the minutes measured, the
+        level judged — and that is disclosed in the charter and to machine
+        readers, which is where a reader who wants to know goes. A footnote here
+        would spend a reader's attention, at the top of a piece, on apparatus
+        about apparatus.
+
+        NEITHER HALF IS A CLAIM ABOUT QUALITY. "High effort" says the piece asks
+        something of a reader; it says nothing about whether the piece is worth
+        it, which is the reader's call and was never the desk's.
+
+        NOT A DATE AND NOT A TRUTH STANDARD, which R-048 moved out of this
+        header and which must not come back in on this line's coat-tails. This
+        element carries the indicator and nothing else.
+      */}
+      <p class="meta-mono article-meta">{indicator}</p>
     </header>
 
     {
@@ -632,6 +669,11 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     font-style: italic;
   }
 
+  /* THE EFFORT-AND-TIME LINE. It takes `.meta-mono` for its voice — the quiet
+     monospaced face every other derived fact on this site is set in — and this
+     rule supplies only the gap under the byline. Nothing else: a reader should
+     meet it as a note about the text, in the same register as an image credit,
+     rather than as a label the journal has stuck on somebody's piece. */
   .article-meta {
     margin: 0.45rem 0 0;
   }

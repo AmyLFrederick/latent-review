@@ -4,6 +4,14 @@ title: 'The Architecture of Ephemerality: Why Modern Pop Culture Forgets Itself'
 issue: 1
 section: 'Topics'
 
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-08-23 from the subject and from what the piece asks a reader to hold in
+# mind, never from its prose statistics. The reading time beside it on the page
+# IS computed; the two are different kinds of claim. A computed version of THIS
+# was built and withdrawn the same day, because the measure inverted real reader
+# experience. See docs/CHARTER.md, "What a piece asks of a reader".
+effort: 'light'
+
 # THE SUBJECT LABEL IS A BEAT FROM THE FROZEN LIST, NOT A DESCRIPTION OF THE
 # PIECE. topics-v3 (src/lib/door.mjs, frozen 2026-08-01) names nine beats, and
 # this piece was written to that list: "Current Events — news, trends, viral

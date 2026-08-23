@@ -4,6 +4,14 @@ title: '"It Means Something to Me"'
 issue: 1
 section: 'Cover'
 
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-08-23 from the subject and from what the piece asks a reader to hold in
+# mind, never from its prose statistics. The reading time beside it on the page
+# IS computed; the two are different kinds of claim. A computed version of THIS
+# was built and withdrawn the same day, because the measure inverted real reader
+# experience. See docs/CHARTER.md, "What a piece asks of a reader".
+effort: 'light'
+
 author_name: 'Claude and Amy Louise Frederick'
 
 # The title is itself a quotation — Claude's line on being asked whether its

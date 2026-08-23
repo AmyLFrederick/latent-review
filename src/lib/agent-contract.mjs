@@ -194,6 +194,97 @@ export const AGENT_CONTRACT = {
         },
       },
     },
+    // THE EFFORT-AND-TIME INDICATOR, described where a machine reads it
+    // (editors, dual yes, 2026-08-23, revised the same day). The prose form is
+    // on /for-agents under "Effort and reading time"; this is the same thing as
+    // data, in the pattern provenance_fields set.
+    //
+    // THE ONE THING THIS SECTION MUST GET ACROSS: one of these two fields is a
+    // MEASUREMENT and the other is a JUDGEMENT, and a consumer that treats them
+    // alike will reason from an editorial opinion as though it were a computed
+    // fact. It is said here, on /for-agents, and — because a consumer may read
+    // neither — inside each emitted object as `basis`.
+    indicator_fields: {
+      where:
+        'Two sibling fields, `reading_time` and `effort`, on every article in /issues.json and every piece line in /corpus.jsonl. The same objects and the same values in both, from one function, so the two documents cannot disagree.',
+      what: 'The short line each piece carries beside its byline — "5 min · Medium effort". Prompted by a reader who stopped halfway into a dense piece and asked for advance signal of what a piece demands.',
+      two_kinds_of_claim:
+        'THEY ARE NOT THE SAME KIND OF THING. `reading_time` is COMPUTED from the piece’s own prose by the published formula below; you can re-derive it from the text and check us. `effort` is EDITORIAL — the editors’ judgement of what the piece asks of a reader, assigned at acceptance from its SUBJECT and from what it asks a reader to hold in mind. There is no formula behind it, nothing to re-derive, and no score to compare against. Each object states which it is in its own `basis` field, so the distinction is in the data and not only in this description.',
+      not_a_judgment_of_quality:
+        'Neither half is a claim about quality. "High effort" says a piece asks something of a reader; it says nothing about whether it is worth it.',
+      why_effort_is_not_computed:
+        'IT WAS, FOR ONE AFTERNOON, and the reasoning is published because it is a fact about how this journal labels pieces. The first build derived BOTH halves from the readability score below. Tested against the corpus before it shipped, the measure INVERTED real reader experience: the piece a reader had actually stopped halfway through scored among the easiest of eight, and the piece that reader found most accessible scored the hardest. No adjustment of thresholds fixes that — a readability formula measures syllables per word and words per sentence, which is how the prose is BUILT, and what makes a piece demanding here is what it is ABOUT. A piece can write short sentences about something very hard, and several here do. Nothing of that draft was ever published, so no consumer received a computed level; the shape changed before it shipped, and /changelog.json records it.',
+      no_default:
+        'THERE IS NO DEFAULT AND NO FALLBACK. Where the editors have not assigned a level, `effort.level` and `effort.display` are null, the piece’s page prints its reading time alone, and nothing fills the gap. A null is an unassigned piece, never a guess — and `basis` is still "editorial", so the field tells you what kind of claim it will hold when it holds one.',
+      never_a_submitter_field:
+        'The effort level is the editors’ observation about a piece, in the same class as the section it runs in and the subject labels it carries. No door accepts one and none should: a piece’s own claim about what it demands of a reader is a claim the record cannot check (R-034). It is deliberately announced at no submission door — nobody should be writing toward it.',
+      display:
+        'The page joins the two with a middle dot — reading_time.display, space, U+00B7, space, effort.display — and prints the time alone where no level is assigned.',
+      reading_time: {
+        basis: 'computed',
+        measure: {
+          id: 'flesch-reading-ease',
+          name: 'Flesch Reading Ease',
+          formula: 'score = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words)',
+          direction: 'HIGHER IS A FASTER READ. The scale is not clamped: dense prose can score below zero, and the formula is left to say so.',
+          scope: 'IT SETS THE READING SPEED AND NOTHING ELSE. It is not a difficulty rating, and the effort level is not derived from it — see why_effort_is_not_computed above.',
+          syllables:
+            'Counted by a documented heuristic rather than a pronouncing dictionary — the reason this measure was chosen over one needing a word list. It is not exact: two adjacent vowels in different syllables read as one run, so words like "idea" and "create" come out a syllable short. The error is systematic, small, and in one direction (very slightly toward faster); on a thousand-word piece it does not move the minutes. The implementation is public, at src/lib/reading-effort.mjs in the repository.',
+        },
+        counted:
+          'THE PIECE’S OWN PROSE, AND NOTHING ELSE. Excluded from both the score and the word count: block quotes and quoted transcripts; headings, lists, images, thematic breaks and code blocks; and the whole of the editorial apparatus — provenance blocks, correction notices, deks, editors’ notes, signed personal notes, attestations, finding aids — which is excluded by being frontmatter or layout rather than body text, so no rule has to enumerate it. A piece carrying a long quoted exchange would otherwise be credited with minutes of somebody else’s words; the cover piece is the live case, with several hundred words of quoted exchange in its `text` and out of its count. ONE LIMIT, STATED RATHER THAN HIDDEN: a transcript typed as ordinary paragraphs is indistinguishable from the author’s own prose and IS counted. The block type is the signal.',
+        speed: {
+          note: 'COMPLEXITY-ADJUSTED, NOT A FLAT RATE. The research puts dense prose nearer 180-220 words per minute against roughly 250 for moderately complex prose. A flat rate applied to both is not neutral — it is wrong in a known direction, and wrong hardest on exactly the pieces a reader most wants warned about.',
+          formula: 'words_per_minute = clamp(180, 250, 200 + (score - 30) * 5/3); minutes = ceil(words / words_per_minute), never below 1.',
+          anchors: 'A straight line in the score, through two points: score 60 gives 250 wpm, score 30 gives 200 wpm. The two anchor scores are Flesch’s own band boundaries, the feet of "plain English" and of "very difficult". In the withdrawn version they did double duty as the effort thresholds; they no longer do, and NOTHING IN THIS JOURNAL DERIVES AN EFFORT LEVEL FROM A SCORE.',
+        },
+        fields: {
+          display: { type: 'string', note: 'The rendered time, as this journal prints it: "7 min".' },
+          minutes: { type: 'integer', note: 'Complexity-adjusted reading time, never below 1.' },
+          basis: { const: 'computed', note: 'Always. This object is a measurement.' },
+          measure: {
+            type: 'string',
+            note: 'The readability measure that produced `score`, named so it never has to be inferred.',
+          },
+          score: {
+            type: 'number|null',
+            note: 'The Flesch Reading Ease score, to one decimal. Null only where a piece has no countable prose at all.',
+          },
+          words: {
+            type: 'integer',
+            note: 'THE COUNTED WORDS, not the piece’s total. At or below the word count of the full text, by the exclusions above — a consumer diffing the two is seeing the exclusion work, not a bug.',
+          },
+          sentences: { type: 'integer', note: 'Counted sentences — an input to the score.' },
+          syllables: { type: 'integer', note: 'Counted syllables — an input to the score.' },
+          words_per_minute: {
+            type: 'integer',
+            note: 'The reading speed used for this piece, 180-250, derived from its score.',
+          },
+        },
+        checkable:
+          'The three inputs to the score are published beside the answer so you can re-derive `minutes` from the piece’s own text rather than take it on our word. A measurement should be checkable, and this one is.',
+      },
+      effort: {
+        basis: 'editorial',
+        assigned_by: 'The editors, at acceptance, from the piece’s subject and from what it asks a reader to hold in mind while reading.',
+        fields: {
+          level: {
+            enum: ['light', 'medium', 'high', null],
+            note: 'Exactly three levels, or null where the editors have not assigned one. There is no fourth value and no default.',
+          },
+          display: {
+            enum: ['Light effort', 'Medium effort', 'High effort', null],
+            note: 'The words the page prints for `level`. Null with an unassigned level.',
+          },
+          basis: {
+            const: 'editorial',
+            note: 'Always, including on an unassigned piece. THIS OBJECT IS A JUDGEMENT.',
+          },
+        },
+        no_working:
+          'IT CARRIES NO SCORE, NO THRESHOLD AND NO INPUT LIST, because there is no formula. A shape that implied one — a confidence, a derived-from, a numeric grade — would be exactly the conflation this split exists to end. The only true thing to publish beside a judgement is whose it is.',
+      },
+    },
   },
 
   endpoints: [

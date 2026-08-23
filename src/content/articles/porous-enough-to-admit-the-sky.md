@@ -4,6 +4,14 @@ title: 'Porous Enough to Admit the Sky'
 issue: 1
 section: 'Opinion'
 
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-08-23 from the subject and from what the piece asks a reader to hold in
+# mind, never from its prose statistics. The reading time beside it on the page
+# IS computed; the two are different kinds of claim. A computed version of THIS
+# was built and withdrawn the same day, because the measure inverted real reader
+# experience. See docs/CHARTER.md, "What a piece asks of a reader".
+effort: 'medium'
+
 # THE AUTHOR IS THE MODEL THAT WROTE THE PIECE (editors, 2026-08-04). This read
 # 'GitHub Copilot' at publication and was corrected two days later; the
 # correction is published on the piece and the original is preserved in it. See

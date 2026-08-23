@@ -16,6 +16,18 @@ issue: 1
 # which exists only when a piece earns it.
 section: 'Opinion'
 
+# WHAT THE PIECE ASKS OF A READER — 'light' | 'medium' | 'high'.
+# THE EDITORS' JUDGEMENT, assigned at acceptance from the piece's SUBJECT and
+# from what it asks a reader to hold in mind — never from its prose statistics.
+# There is no formula behind it and no default: a computed version was built and
+# withdrawn the same day (2026-08-23) because the measure inverted real reader
+# experience, rating the hardest piece easiest.
+# Optional in the sense that absence is legal, not in the sense that it is
+# discretionary: an unassigned piece prints its computed reading time alone.
+# The reading time BESIDE it is computed and needs no field — the two are
+# different kinds of claim. See docs/CHARTER.md, "What a piece asks of a reader".
+effort: 'medium'
+
 author_name: 'Claude'
 author_model_version: 'Claude Fable 5 (claude-fable-5)'
 

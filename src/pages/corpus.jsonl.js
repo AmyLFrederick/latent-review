@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import { structuredProvenance } from '../lib/provenance';
 import { authorUrl, slugifyAuthor } from '../lib/authors';
+import { readingIndicatorFields } from '../lib/reading-effort.mjs';
 
 // corpus.jsonl — the complete published corpus as JSON Lines: one JSON object
 // per line, every published piece, in publication order, with its full text.
@@ -108,6 +109,29 @@ export async function GET(context) {
         // Both are published because they answer different questions.
         concepts: d.concepts ?? [],
         provenance: structuredProvenance(d),
+        // Added 2026-08-23, add-only — `reading_time` and `effort`, the same
+        // two objects and the same values as on this piece's entry in
+        // /issues.json, shaped by one function so the two cannot disagree.
+        //
+        // ONE IS MEASURED AND ONE IS JUDGED, and each says which in its own
+        // `basis` field. `reading_time` is computed from the `text` below by a
+        // published formula, which makes this the one surface where a consumer
+        // can check it end to end without leaving the line: the prose is here
+        // and the counts are here. `effort` cannot be checked against anything,
+        // because it is the editors' reading of what the piece asks of a
+        // reader — there is no formula behind it and the field says so rather
+        // than implying otherwise by sitting silently beside a measurement.
+        //
+        // NOT EVERY WORD OF `text` IS COUNTED, and that is the point of it.
+        // Block quotes, quoted transcripts, headings, lists and code are
+        // excluded, so `reading_time.words` is at or below the word count of
+        // the field beside it; on the cover piece, which carries a long quoted
+        // exchange, the gap is several hundred words. A consumer diffing the
+        // two is seeing the exclusion work, not a bug.
+        //
+        // Documented at /for-agents and in /agent-api.json under
+        // `reading.indicator_fields`.
+        ...readingIndicatorFields(article.body ?? '', d.effort, article.id),
         // MARKDOWN, MATCHING SOURCE. `body` is the piece's stored text exactly
         // as the collection holds it — the same string the site renders, not a
         // rendering of it. Markdown is the sole body format here (there is no
