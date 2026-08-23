@@ -4,6 +4,8 @@ import { pronounsDisplay } from '../lib/pronouns.mjs';
 import ProvenanceMark from './ProvenanceMark.astro';
 import { MARK_SIZE_LISTING } from '../lib/notation.ts';
 import { bylineBadgeTier } from '../lib/byline-badge.mjs';
+// @ts-expect-error — plain-JS module shared with the tests
+import { readingTime, formatIndicator } from '../lib/reading-effort.mjs';
 import type { Issue } from '../lib/issues';
 
 // The body of an issue: the contents, and nothing else. Rendered identically on
@@ -108,6 +110,37 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
                     pronouns below the rest of the line for no reason. */}
                 {' · '}{pronounsDisplay(article.data.author_pronouns)}
               </p>
+              {/*
+                WHAT THE PIECE ASKS, ON THE LINE A READER IS DECIDING FROM
+                (editors, 2026-08-24). The indicator reached the piece's own page
+                first, which is the one place a reader has already committed by
+                the time they see it. This listing is where the question is
+                actually being asked.
+
+                ITS OWN ROW, NOT THE END OF THE BYLINE. That line already carries
+                section, author, mark and pronouns — four facts about WHO made
+                the piece and under what claim. This is a fact about the piece
+                itself, and appending it would make a long line longer while
+                filing it under the wrong heading.
+
+                SAME VALUES, SAME SOURCE, SAME STRING. `readingTime` and
+                `formatIndicator` are the article page's own, so a reader who
+                sees "7 min · Light effort" here meets the identical characters
+                there. The joining rule — including the minutes alone where the
+                editors have assigned no level, with no dangling separator —
+                lives in that module and is not restated here. This component
+                asks and prints; it decides nothing and must never grow a
+                default.
+
+                NO ACCESSIBLE NAME OF ITS OWN, deliberately, exactly as on the
+                article page: it is plain text, and it reads the same to a
+                listener as to a reader. An aria-label here would be a second
+                wording of a line that already says what it means — and the two
+                could then disagree.
+              */}
+              <p class="meta-mono contents-effort">
+                {formatIndicator(readingTime(article.body).minutes, article.data.effort, article.id)}
+              </p>
             </li>
           ))}
         </ol>
@@ -148,6 +181,25 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
 
   .contents-meta {
     margin: 0.3rem 0 0;
+  }
+
+  /* QUIETER THAN THE BYLINE, because it is orientation and not attribution. The
+     byline row says who made the piece and under what provenance claim; this row
+     helps a reader decide whether to start it, and it should be available to a
+     reader looking for it without competing with the line above.
+
+     THE STEP IS OPACITY RATHER THAN A NEW COLOUR OR A FOURTH TYPE SIZE. The
+     palette has exactly two ink tokens and this line is already set in the
+     softer of them, so a third would have to be invented for one row; and
+     .meta-mono is small enough that a step down in size costs legibility rather
+     than emphasis. Receding a shared class by opacity is the device the
+     editorial note, the editors' note and the personal note all already use.
+
+     TIGHTER TO THE BYLINE THAN THE BYLINE IS TO THE TITLE, so the three rows
+     read as one entry with a heading rather than as three separate things. */
+  .contents-effort {
+    margin: 0.15rem 0 0;
+    opacity: 0.75;
   }
 
   /* The lead rules that stood here are deleted, not commented out — the
