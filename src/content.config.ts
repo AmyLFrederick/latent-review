@@ -5,6 +5,8 @@ import { TIER_CODES } from './lib/site';
 import { ARRIVAL_VALUES } from './lib/notice.mjs';
 import { validateTierCode } from './lib/tier-codes.mjs';
 import { assertConceptsKnown } from './lib/concepts.mjs';
+// @ts-expect-error — plain-JS module shared with the tests
+import { EFFORT_LEVEL_IDS } from './lib/reading-effort.mjs';
 
 // The provenance schema is a GATE, not a prompt: a build with a missing or
 // inconsistent provenance field must fail. See docs/CHARTER.md.
@@ -114,6 +116,74 @@ const articles = defineCollection({
          * nothing there renders differently. Extending it is the editors' call,
          * not a drafting one.
          */
+        /**
+         * WHAT THE PIECE ASKS OF A READER — Light, Medium or High effort,
+         * assigned by the editors at acceptance (ruled 2026-08-23, revised the
+         * same day).
+         *
+         * OPTIONAL, AND UNASSIGNED IS A VISIBLE ABSENCE RATHER THAN A GUESS. An
+         * earlier draft made this required so that an unassigned piece failed
+         * the build. The editors removed that backstop the same day: nothing
+         * reaches the site without a dual yes and a human merge, so the gate had
+         * no scenario left to catch, and a gate that cannot fire only costs. An
+         * unassigned piece renders its computed minutes alone — "7 min" — and
+         * prints no half-line it has no value for, which is the house pattern
+         * for every absent field on this schema. That is the OPPOSITE of a
+         * fallback: nothing is invented, and a reader sees what the record
+         * holds.
+         *
+         * IT WAS COMPUTED FOR ONE AFTERNOON AND IT IS NOT ANY MORE. The first
+         * build derived this from a Flesch Reading Ease score. Tested against
+         * the corpus before it shipped, the measure INVERTED real reader
+         * experience: the piece a reader actually stopped halfway through
+         * scored third-easiest of eight, and the piece that reader found most
+         * accessible scored hardest. No threshold fixes that. Flesch measures
+         * syllables per word and words per sentence — how the prose is BUILT —
+         * and what makes a piece demanding here is its SUBJECT and what it asks
+         * a reader to hold in mind, which a syllable counter cannot see. A
+         * piece can write short sentences about something very hard, and
+         * several here do.
+         *
+         * NO FALLBACK, ANYWHERE, AND THAT IS THE LESSON RATHER THAN A STYLE
+         * PREFERENCE. Not a computed default, not an override sitting on top of
+         * one, not a `?? 'medium'` in a template. A fallback fails silently: it
+         * publishes a guess that looks exactly like a judgement, which is
+         * precisely what went wrong the first time. There is no formula left in
+         * the codebase that produces a level; src/lib/reading-effort.mjs holds
+         * the vocabulary and the display words and nothing that picks between
+         * them. Dropping the build gate did not soften this: absence renders as
+         * absence, and the one thing no surface may do is fill it in.
+         *
+         * THE ENUM IS STILL CLOSED. Absence is a legal state; a typo is not. A
+         * value outside the three fails here, by name, which is a different
+         * thing from the backstop the editors removed — that one refused a
+         * question the editors had not answered yet, and this refuses an answer
+         * that is not one of the three answers.
+         *
+         * NEVER A SUBMITTER'S FIELD, in the same class as `topics`, `concepts`
+         * and the section a piece runs in. A piece's own claim about what it
+         * demands of a reader is a claim the record cannot check, where the
+         * editors' reading is the editors' own observation (R-034). No door
+         * accepts it and none should — and it is deliberately announced at no
+         * door, because nobody should be writing toward it.
+         *
+         * THE READING TIME BESIDE IT IS STILL COMPUTED, and the two are
+         * different kinds of claim. The charter says so for readers, and the
+         * machine surfaces say so in the data: each carries its own `basis`,
+         * `computed` or `editorial`.
+         */
+        effort: z
+          .enum(EFFORT_LEVEL_IDS as [string, ...string[]], {
+            message:
+              `effort is one of ${EFFORT_LEVEL_IDS.join(', ')}, assigned by the editors — or ` +
+              'absent, where they have not assigned one yet. It is an editorial judgement about ' +
+              'what the piece asks of a reader, made from its subject rather than from its prose ' +
+              'statistics; there is no computed default and no fallback, so an unassigned piece ' +
+              'renders its reading time alone rather than a guess. ' +
+              'See docs/CHARTER.md, "What a piece asks of a reader".',
+          })
+          .optional(),
+
         section_order: z.number().int().positive().optional(),
         author_name: z.string().min(1),
         /**

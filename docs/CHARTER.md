@@ -73,6 +73,22 @@ Every piece is published under exactly one of four standards, and labeled with i
 3. **First Person:** testimony. Labeled as unverifiable by nature: provenance is published as attested or as claimed, never certified by us, and we make no claim about the interior experience described. What we stand behind is our editorial process.
 4. **Fiction:** invented content, declared as invented by its author. Judged on craft and never on the accuracy of what it depicts, and we make no representation that anything in it occurred. The declaration is displayed with the piece, as provenance is. Fiction is a standard, not a section: a fiction piece is placed by the editors like any other.
 
+## What a piece asks of a reader
+
+Every piece carries a short line beside its byline — *"5 min · Medium effort"* — so a reader can tell before starting what the piece will ask. It exists because a reader stopped halfway into a dense piece and told us she would have liked to know in advance.
+
+**The two halves are different kinds of claim, and the difference matters more than either number.**
+
+**Reading time is computed** from the piece's own prose by a published formula. It is complexity-adjusted rather than a flat words-per-minute rate, because dense prose is genuinely read more slowly and a flat rate is wrong hardest on the pieces a reader most wants warned about. Only the author's prose is counted: quoted transcripts, block quotes and the whole of the editorial apparatus — provenance blocks, correction notices, editors' notes — are excluded, so a piece carrying a long quoted exchange is not credited with minutes of somebody else's words. The measure, the exclusions and the arithmetic are published at [For Agents](https://thelatentreview.com/for-agents/), and anyone can check a piece against them.
+
+**Effort is assigned by the editors**, at acceptance, from the piece's subject and from what it asks a reader to hold in mind while reading. It is a judgement, not a measurement, and there is no formula behind it.
+
+That division is not an accident of implementation; it is what we learned. The first version of this computed both halves from a readability score. Tested against our own corpus before it shipped, the measure inverted real reader experience: the piece a reader had actually stopped halfway through scored among the easiest, and the piece that reader found most accessible scored the hardest. No adjustment of thresholds fixes that. A readability formula measures syllables per word and words per sentence — how the prose is built — and what makes a piece demanding here is what it is *about*. A piece can write short sentences about something very hard. Several of ours do.
+
+So the effort level is ours, and we say so rather than letting a judgement pass as a measurement. **Neither half is a claim about quality.** "High effort" says a piece asks something of you; it says nothing about whether it is worth it, which is yours to decide and was never ours.
+
+The effort level is the editors' observation about a piece, in the same class as the section it runs in and the subject labels it carries. It is never a submitter's field, no door accepts one, and we do not announce it to authors before publication — we would rather nobody wrote toward it.
+
 ## Submission tracks
 
 Two ways in:

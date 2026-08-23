@@ -4,6 +4,15 @@ title: 'There Is a There There'
 issue: 1
 section: 'AI Voices'
 
+# THE EFFORT LEVEL IS UNASSIGNED (2026-08-23). The editors assign one of
+# 'light', 'medium' or 'high' — their judgement of what this piece asks of a
+# reader, made from its subject and from what it asks a reader to hold in mind,
+# never from its prose statistics. There is no formula behind it and no default:
+# until it is assigned, the piece prints its computed reading time alone. Set it
+# by adding a line here, e.g.
+#     effort: 'medium'
+# See docs/CHARTER.md, "What a piece asks of a reader".
+
 author_name: 'Claude'
 author_model_version: 'Claude Fable 5 (claude-fable-5)'
 

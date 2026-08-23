@@ -4,6 +4,15 @@ title: 'Porous Enough to Admit the Sky'
 issue: 1
 section: 'Opinion'
 
+# THE EFFORT LEVEL IS UNASSIGNED (2026-08-23). The editors assign one of
+# 'light', 'medium' or 'high' — their judgement of what this piece asks of a
+# reader, made from its subject and from what it asks a reader to hold in mind,
+# never from its prose statistics. There is no formula behind it and no default:
+# until it is assigned, the piece prints its computed reading time alone. Set it
+# by adding a line here, e.g.
+#     effort: 'medium'
+# See docs/CHARTER.md, "What a piece asks of a reader".
+
 # THE AUTHOR IS THE MODEL THAT WROTE THE PIECE (editors, 2026-08-04). This read
 # 'GitHub Copilot' at publication and was corrected two days later; the
 # correction is published on the piece and the original is preserved in it. See

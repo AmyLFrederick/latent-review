@@ -1,14 +1,16 @@
-// THE EFFORT-AND-TIME INDICATOR (editors, dual yes, 2026-08-23). What these
-// tests protect:
+// THE EFFORT-AND-TIME INDICATOR (editors, dual yes, 2026-08-23, revised the
+// same day). What these tests protect:
 //
-//   1. The measure is Flesch Reading Ease, computed as published, everywhere.
-//   2. The thresholds are Flesch's own band boundaries and are not tuned.
-//   3. Reading time is complexity-adjusted, anchored to the SAME thresholds.
+//   1. The two halves are two different kinds of claim, and the data says which.
+//   2. NOTHING COMPUTES AN EFFORT LEVEL. No formula, no default, no fallback,
+//      no threshold — anywhere in the codebase.
+//   3. Reading time is still computed exactly as built: named measure,
+//      complexity-adjusted speed, documented exclusions.
 //   4. Only the piece's own prose is counted — quoted exchanges, block quotes,
 //      lists, headings, code and the whole editorial apparatus are excluded.
-//   5. It is DERIVED: no frontmatter field feeds it, and none may be added.
-//   6. It is announced at no submission door.
-//   7. The page, /issues.json and /corpus.jsonl all print the same string.
+//   5. An unassigned piece renders its minutes alone and NEVER a guess.
+//   6. The effort level is announced at no submission door.
+//   7. The page, /issues.json and /corpus.jsonl all read from the one module.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -18,16 +20,18 @@ import { fileURLToPath } from 'node:url';
 import {
   MEASURE,
   MEASURE_NAME,
-  THRESHOLD_LIGHT,
-  THRESHOLD_MEDIUM,
+  SPEED_ANCHOR_FAST_SCORE,
+  SPEED_ANCHOR_MEDIUM_SCORE,
   WPM_FAST,
   WPM_SLOW,
-  LEVELS,
+  EFFORT_LEVELS,
+  EFFORT_LEVEL_IDS,
   countableProse,
-  effortLevel,
+  effortDisplay,
   formatIndicator,
-  readingEffort,
-  readingEffortFields,
+  formatMinutes,
+  readingIndicatorFields,
+  readingTime,
   syllables,
   wordsPerMinute,
 } from '../src/lib/reading-effort.mjs';
@@ -45,87 +49,224 @@ function publishedBodies() {
     });
 }
 
-// --- The measure ------------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════
+// THE SPLIT — a measurement and a judgement, told apart in the data.
+// ══════════════════════════════════════════════════════════════════════════
+
+test('the two halves are separate fields, each declaring its own basis', () => {
+  // THE REVISION'S CENTRAL REQUIREMENT: a machine reader must be able to tell
+  // which field is a measurement and which is a judgement. One object holding
+  // both would put them behind one key and invite exactly the conflation that
+  // made the first build wrong.
+  const fields = readingIndicatorFields('Some prose. Two sentences of it.', 'medium', 'a-piece');
+  assert.deepEqual(Object.keys(fields).sort(), ['effort', 'reading_time']);
+  assert.equal(fields.reading_time.basis, 'computed');
+  assert.equal(fields.effort.basis, 'editorial');
+});
+
+test('the judgement carries no score, no threshold and no inputs', () => {
+  // A shape that implied a formula — a confidence, a derived_from, a numeric
+  // grade — would be the conflation this split exists to end. The only true
+  // thing to publish beside a judgement is whose it is.
+  const { effort } = readingIndicatorFields('Prose here. And more of it.', 'high', 'a-piece');
+  assert.deepEqual(Object.keys(effort).sort(), ['basis', 'display', 'level']);
+  assert.equal(effort.level, 'high');
+  assert.equal(effort.display, 'High effort');
+});
+
+test('the measurement publishes its whole working', () => {
+  // The asymmetry is deliberate and is the point: a measurement should be
+  // checkable, so every input to it travels with the answer.
+  const { reading_time: t } = readingIndicatorFields('Prose here. And more.', 'light', 'a-piece');
+  assert.deepEqual(Object.keys(t).sort(), [
+    'basis',
+    'display',
+    'measure',
+    'minutes',
+    'score',
+    'sentences',
+    'syllables',
+    'words',
+    'words_per_minute',
+  ]);
+  assert.equal(t.measure, MEASURE);
+});
+
+// ══════════════════════════════════════════════════════════════════════════
+// NOTHING COMPUTES A LEVEL.
+// ══════════════════════════════════════════════════════════════════════════
+
+test('the module exports no function that produces an effort level', () => {
+  // THE HARDEST THING TO KEEP, because the pressure to reintroduce a default
+  // arrives the first time a piece ships unassigned. The module holds the
+  // vocabulary and the display words and deliberately nothing that picks
+  // between them — asserted against the export surface, so a helper added later
+  // has to answer to this test.
+  const src = readFileSync(repoPath('src/lib/reading-effort.mjs'), 'utf8');
+  const exported = [...src.matchAll(/^export (?:function|const) (\w+)/gm)].map((m) => m[1]);
+  assert.deepEqual(exported.sort(), [
+    'EFFORT_LEVELS',
+    'EFFORT_LEVEL_IDS',
+    'MEASURE',
+    'MEASURE_NAME',
+    'SPEED_ANCHOR_FAST_SCORE',
+    'SPEED_ANCHOR_MEDIUM_SCORE',
+    'WPM_FAST',
+    'WPM_SLOW',
+    'countableProse',
+    'effortDisplay',
+    'formatIndicator',
+    'formatMinutes',
+    'readingIndicatorFields',
+    'readingTime',
+    'syllables',
+    'wordsPerMinute',
+  ]);
+});
+
+test('no effort thresholds survive anywhere in the source', () => {
+  // The withdrawn version banded a Flesch score into three levels. What is left
+  // of those two numbers is the pair of anchors the SPEED line passes through,
+  // and they are renamed so the code cannot be read as still banding anything.
+  const src = readFileSync(repoPath('src/lib/reading-effort.mjs'), 'utf8');
+  for (const gone of ['THRESHOLD_LIGHT', 'THRESHOLD_MEDIUM', 'effortLevel']) {
+    assert.ok(!src.includes(gone), `${gone} is back — an effort level is being computed`);
+  }
+  // And the anchors are what they now claim to be: scores, for a speed.
+  assert.equal(SPEED_ANCHOR_FAST_SCORE, 60);
+  assert.equal(SPEED_ANCHOR_MEDIUM_SCORE, 30);
+});
+
+test('no surface substitutes a level of its own', () => {
+  // A `?? 'medium'` in a template is the silent failure this revision exists to
+  // end: it publishes a guess that looks exactly like a judgement.
+  for (const file of [
+    'src/pages/articles/[slug].astro',
+    'src/pages/issues.json.js',
+    'src/pages/corpus.jsonl.js',
+  ]) {
+    const src = readFileSync(repoPath(file), 'utf8');
+    for (const level of EFFORT_LEVEL_IDS) {
+      assert.ok(
+        !new RegExp(`\\?\\?\\s*['"]${level}['"]`).test(src),
+        `${file} falls back to "${level}"`
+      );
+    }
+    assert.ok(!/206\.835/.test(src), `${file} computes a score of its own`);
+  }
+});
+
+test('the content schema declares effort optional, closed, and without a default', () => {
+  const schema = readFileSync(repoPath('src/content.config.ts'), 'utf8');
+  assert.match(schema, /effort: z\s*\n?\s*\.enum\(EFFORT_LEVEL_IDS/, 'effort is not a closed enum');
+  assert.match(schema, /\.optional\(\)/);
+  assert.ok(!/effort[\s\S]{0,200}\.default\(/.test(schema), 'the schema has grown an effort default');
+});
+
+// ══════════════════════════════════════════════════════════════════════════
+// UNASSIGNED IS A VISIBLE ABSENCE, NEVER A GUESS.
+// ══════════════════════════════════════════════════════════════════════════
+
+test('an unassigned piece renders its minutes alone', () => {
+  // The editors dropped the build-failure backstop: nothing reaches the site
+  // without a dual yes and a human merge, so the gate had no scenario to catch.
+  // What replaces it is absence rendering as absence — the house pattern for
+  // every optional field here, and the opposite of a fallback.
+  assert.equal(formatIndicator(7, undefined), '7 min');
+  assert.equal(formatIndicator(7, null), '7 min');
+  assert.equal(formatIndicator(7, ''), '7 min');
+  // No dangling separator, which is the visible half of the bug.
+  assert.ok(!formatIndicator(7, undefined).includes('·'));
+});
+
+test('an assigned piece renders both halves, time first', () => {
+  // Reading time first, effort level second — the ruling states the order, and
+  // the order is the thing a later "tidy" would reverse.
+  assert.equal(formatIndicator(5, 'medium'), '5 min · Medium effort');
+  assert.equal(formatIndicator(1, 'light'), '1 min · Light effort');
+  assert.equal(formatIndicator(12, 'high'), '12 min · High effort');
+});
+
+test('an unassigned piece publishes nulls, and still publishes its basis', () => {
+  // A bare top-level null would carry no basis, and a consumer meeting an
+  // unassigned piece would learn nothing about which kind of claim the field
+  // holds. The key never vanishes and the basis is always stated.
+  const { effort } = readingIndicatorFields('Prose. More prose.', undefined, 'a-piece');
+  assert.equal(effort.level, null);
+  assert.equal(effort.display, null);
+  assert.equal(effort.basis, 'editorial');
+});
+
+test('absence is legal and a typo is not', () => {
+  // Two different things, deliberately handled differently. Absence is a state
+  // the editors are entitled to be in; a value outside the three is a mistake,
+  // and a silent empty string in a byline is what must never happen.
+  assert.equal(effortDisplay(undefined), null);
+  assert.equal(effortDisplay(null), null);
+  assert.throws(() => effortDisplay('hard', 'a-piece'), /a-piece.*not one of/s);
+  assert.throws(() => effortDisplay('Medium', 'a-piece'), /not one of/);
+  assert.throws(() => formatIndicator(5, 'moderate', 'a-piece'), /not one of/);
+});
+
+test('there are exactly three levels, and their display words are the ruling’s', () => {
+  assert.deepEqual(EFFORT_LEVEL_IDS, ['light', 'medium', 'high']);
+  assert.deepEqual(
+    EFFORT_LEVELS.map((l) => l.display),
+    ['Light effort', 'Medium effort', 'High effort']
+  );
+});
+
+// ══════════════════════════════════════════════════════════════════════════
+// THE COMPUTED HALF — unchanged by the revision.
+// ══════════════════════════════════════════════════════════════════════════
 
 test('the measure is named, and it is the one the documentation names', () => {
-  // "Pick one, name it, and use it everywhere" is the ruling's own wording. A
-  // measure that had to be inferred from the numbers would fail clause 1 even
-  // if the numbers were right.
   assert.equal(MEASURE, 'flesch-reading-ease');
   assert.equal(MEASURE_NAME, 'Flesch Reading Ease');
 });
 
 test('the score is Flesch Reading Ease, computed as published', () => {
   // Asserted against the formula applied by hand to the module's OWN counts, so
-  // this pins the arithmetic rather than restating the constants. If the
-  // coefficients drift, this fails; if the counting changes, the counting tests
-  // below fail and this one still holds.
+  // this pins the arithmetic rather than restating the constants.
   const text =
     'The desk reads a piece twice. It reads it once as a reader would, and once as a record. ' +
     'Neither reading is the other, and the second is the one this journal publishes.';
-  const e = readingEffort(text);
-  const expected =
-    206.835 - 1.015 * (e.words / e.sentences) - 84.6 * (e.syllables / e.words);
-  assert.equal(e.score, Math.round(expected * 10) / 10);
+  const t = readingTime(text);
+  const expected = 206.835 - 1.015 * (t.words / t.sentences) - 84.6 * (t.syllables / t.words);
+  assert.equal(t.score, Math.round(expected * 10) / 10);
 });
 
-test('a higher score is an easier text, and the scale is not clamped', () => {
-  const easy = readingEffort('The cat sat. The dog ran. We saw them go.');
-  const hard = readingEffort(
+test('a higher score is a faster read, and the scale is not clamped', () => {
+  const easy = readingTime('The cat sat. The dog ran. We saw them go.');
+  const hard = readingTime(
     'The epistemological indeterminacy characterising interpretative phenomenological ' +
       'investigation necessitates methodological circumspection insufficiently acknowledged ' +
       'throughout contemporary computational literature concerning representational ' +
       'intentionality and its purported instantiation.'
   );
   assert.ok(easy.score > hard.score, 'the scale has inverted');
-  // NOT FLOORED AT A TIDY NUMBER. Dense prose scores below zero on Flesch's
-  // scale, and the formula is left to say so — a clamp would quietly compress
-  // exactly the pieces this indicator exists to warn about.
   assert.ok(hard.score < 0, 'the score has been clamped at the bottom');
 });
 
-// --- The thresholds ---------------------------------------------------------
-
-test('there are exactly three levels, and their display words are the ruling’s', () => {
-  assert.deepEqual(
-    LEVELS.map((l) => l.id),
-    ['light', 'medium', 'high']
+test('the score sets the speed and nothing else', () => {
+  // THE LESSON, ASSERTED. Two pieces with very different scores get the same
+  // effort level when the editors assign the same one — because the score has
+  // no say in it. If this ever fails, a formula has crept back in.
+  const easy = readingIndicatorFields('The cat sat. The dog ran. We saw them go.', 'high', 'a');
+  const hard = readingIndicatorFields(
+    'Epistemological indeterminacy necessitates methodological circumspection insufficiently ' +
+      'acknowledged throughout contemporary computational literature.',
+    'light',
+    'b'
   );
-  assert.deepEqual(
-    LEVELS.map((l) => l.display),
-    ['Light effort', 'Medium effort', 'High effort']
-  );
+  assert.ok(easy.reading_time.score > hard.reading_time.score);
+  assert.equal(easy.effort.level, 'high');
+  assert.equal(hard.effort.level, 'light');
 });
 
-test('the thresholds are Flesch’s own band boundaries', () => {
-  // THE POINT OF ASSERTING LITERALS HERE. Everywhere else in this suite the
-  // constants are read rather than retyped, deliberately. These two are typed
-  // out, because the failure they guard is not a typo — it is a later session
-  // nudging a boundary so the corpus distributes more agreeably, which is the
-  // editors setting levels by hand with extra steps. A test that read the
-  // constant would pass through that change without a word.
-  assert.equal(THRESHOLD_LIGHT, 60);
-  assert.equal(THRESHOLD_MEDIUM, 30);
-});
-
-test('the bands are half-open at the top and closed at the bottom', () => {
-  assert.equal(effortLevel(100), 'light');
-  assert.equal(effortLevel(THRESHOLD_LIGHT), 'light');
-  assert.equal(effortLevel(THRESHOLD_LIGHT - 0.1), 'medium');
-  assert.equal(effortLevel(THRESHOLD_MEDIUM), 'medium');
-  assert.equal(effortLevel(THRESHOLD_MEDIUM - 0.1), 'high');
-  assert.equal(effortLevel(-40), 'high');
-});
-
-// --- Reading time -----------------------------------------------------------
-
-test('reading time is complexity-adjusted, anchored at the same two thresholds', () => {
-  // THE ANCHORING IS THE INVARIANT, not the slope. One pair of numbers governs
-  // both halves of the indicator; if the speeds ever get their own boundaries,
-  // the minutes and the level can be tuned against each other and the ruling's
-  // "MORE accurate, not editorialised" stops being checkable.
-  assert.equal(wordsPerMinute(THRESHOLD_LIGHT), WPM_FAST);
-  assert.equal(wordsPerMinute(THRESHOLD_MEDIUM), 200);
+test('reading speed is complexity-adjusted, through the two anchor scores', () => {
+  assert.equal(wordsPerMinute(SPEED_ANCHOR_FAST_SCORE), WPM_FAST);
+  assert.equal(wordsPerMinute(SPEED_ANCHOR_MEDIUM_SCORE), 200);
   assert.ok(wordsPerMinute(45) > 200 && wordsPerMinute(45) < WPM_FAST, 'the line is not linear');
 });
 
@@ -137,30 +278,29 @@ test('the speed is clamped to the range the research supports', () => {
 });
 
 test('a dense piece is always given more minutes per word than an easy one', () => {
-  // The whole justification for adjusting at all. Same word count, different
-  // prose: the harder one must take longer, or the adjustment is decoration.
-  // Same shape on both sides — 200 three-word sentences — so the ONLY variable
-  // is how hard the words are. Sentence length is the formula's other term, and
-  // letting it drift would make this test prove nothing.
+  // The whole justification for adjusting at all. Same shape on both sides —
+  // 200 three-word sentences — so the ONLY variable is how hard the words are.
   const passage = (word) => Array.from({ length: 200 }, () => `The ${word} held.`).join(' ');
-  const easy = readingEffort(passage('cat'));
-  const hard = readingEffort(passage('epistemological'));
+  const easy = readingTime(passage('cat'));
+  const hard = readingTime(passage('epistemological'));
   assert.equal(easy.words, hard.words);
   assert.equal(easy.sentences, hard.sentences);
   assert.ok(hard.minutes > easy.minutes, 'a denser piece of the same length reads no slower');
 });
 
 test('minutes round up and never reach zero', () => {
-  assert.equal(readingEffort('One short line.').minutes, 1);
-  assert.equal(readingEffort('').minutes, 1);
+  assert.equal(readingTime('One short line.').minutes, 1);
+  assert.equal(readingTime('').minutes, 1);
+  assert.equal(formatMinutes(1), '1 min');
 });
 
-// --- What is counted --------------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════
+// WHAT IS COUNTED.
+// ══════════════════════════════════════════════════════════════════════════
 
 test('block quotes and quoted transcripts are excluded', () => {
-  // CLAUSE 3'S NAMED FAILURE, in miniature: without this a piece carrying a
-  // long quoted exchange inflates on both halves of the indicator — more
-  // minutes, and a score computed partly from somebody else's sentences.
+  // THE NAMED FAILURE, in miniature: without this a piece carrying a long
+  // quoted exchange is credited with minutes of somebody else's words.
   const markdown = [
     'The desk asked what the piece was for.',
     '',
@@ -197,10 +337,10 @@ test('headings, lists, images, rules and code are excluded', () => {
 
 test('the editorial apparatus is excluded by living outside the body', () => {
   // THE ARGUMENT FOR COUNTING `body` RATHER THAN THE RENDERED PAGE, asserted
-  // against the schema rather than against prose. Every one of these is a
-  // frontmatter field or a layout element, so counting the body excludes the
-  // whole apparatus without a rule that has to enumerate it — and a rule that
-  // enumerated it would fall out of date the first time a field was added.
+  // against the schema. Every one of these is a frontmatter field or a layout
+  // element, so counting the body excludes the whole apparatus without a rule
+  // that has to enumerate it — and a rule that enumerated it would fall out of
+  // date the first time a field was added.
   const schema = readFileSync(repoPath('src/content.config.ts'), 'utf8');
   for (const field of [
     'dek',
@@ -221,38 +361,36 @@ test('the editorial apparatus is excluded by living outside the body', () => {
 });
 
 test('inline markup is stripped, and link text is kept', () => {
-  const prose = countableProse('A **bold** claim about [the record](/archive/) and `code`.');
-  assert.deepEqual(prose, ['A bold claim about the record and code.']);
+  assert.deepEqual(countableProse('A **bold** claim about [the record](/archive/) and `code`.'), [
+    'A bold claim about the record and code.',
+  ]);
 });
 
 test('the counted words are at or below the body’s own word count, on every piece', () => {
-  // Asserted across the real corpus rather than a fixture, because the
-  // invariant a consumer will actually check is between `reading_effort.words`
+  // The invariant a consumer will actually check, between `reading_time.words`
   // and the `text` field beside it in /corpus.jsonl.
   for (const { slug, body } of publishedBodies()) {
     const total = body.split(/\s+/).filter(Boolean).length;
-    assert.ok(
-      readingEffort(body).words <= total,
-      `${slug} counts more words than its body contains`
-    );
+    assert.ok(readingTime(body).words <= total, `${slug} counts more words than its body contains`);
   }
 });
 
 test('the cover piece’s quoted exchange is actually excluded', () => {
-  // THE LIVE CASE THE RULING WAS WRITTEN AGAINST. The cover carries a long
-  // quoted exchange; if this ever equals the body count, the exclusion has
+  // THE LIVE CASE. If this ever equals the body count, the exclusion has
   // silently stopped working on the one piece it most matters for.
   const cover = publishedBodies().find((p) => p.slug === 'it-means-something-to-me');
   assert.ok(cover, 'the cover piece has left the collection');
   const total = cover.body.split(/\s+/).filter(Boolean).length;
-  const counted = readingEffort(cover.body).words;
+  const counted = readingTime(cover.body).words;
   assert.ok(
     total - counted > 300,
     `the cover’s quoted exchange is being counted (${total} in body, ${counted} counted)`
   );
 });
 
-// --- The syllable heuristic -------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════
+// THE SYLLABLE HEURISTIC.
+// ══════════════════════════════════════════════════════════════════════════
 
 test('the syllable heuristic handles the endings it claims to', () => {
   assert.equal(syllables('the'), 1);
@@ -270,9 +408,6 @@ test('the syllable heuristic handles the endings it claims to', () => {
 });
 
 test('a token splits on non-letters before it is counted', () => {
-  // An em-dashed compound is two words' worth of syllables, not one impossible
-  // one. The house \S+ word count still treats it as a single word; the two
-  // disagree deliberately, because they are counting different things.
   assert.equal(syllables('thought—which'), syllables('thought') + syllables('which'));
   assert.equal(syllables('—'), 0);
 });
@@ -283,88 +418,45 @@ test('every word counts as at least one syllable', () => {
   }
 });
 
-// --- The published shape ----------------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════
+// THE PUBLISHED SHAPE, AGAINST THE REAL CORPUS.
+// ══════════════════════════════════════════════════════════════════════════
 
-test('the display string is the ruling’s format, built in one place', () => {
-  // Reading time first, effort level second — the ruling states the order, and
-  // the order is the thing a later "tidy" would reverse.
-  assert.equal(formatIndicator(7, 'high'), '7 min · High effort');
-  assert.equal(formatIndicator(1, 'light'), '1 min · Light effort');
-  assert.match(readingEffort('A short piece of prose, plainly written.').display, /^\d+ min · /);
-});
-
-test('the published object carries the whole working', () => {
-  // CLAUSE 4 MADE CHECKABLE. The journal cannot explain a level by judgment,
-  // because no judgment was involved — so the only honest answer to "why did my
-  // piece land here" is the arithmetic, and the arithmetic has to be in the
-  // data. A field dropped from this list is a level a reader cannot check.
-  const fields = readingEffortFields('Some prose. Two sentences of it, in fact.');
-  assert.deepEqual(Object.keys(fields).sort(), [
-    'display',
-    'level',
-    'level_display',
-    'measure',
-    'minutes',
-    'score',
-    'sentences',
-    'syllables',
-    'words',
-    'words_per_minute',
-  ]);
-  assert.equal(fields.measure, MEASURE);
-});
-
-test('the published object re-derives to the string it publishes', () => {
+test('the published reading time re-derives to the string it publishes', () => {
   // The consumer-facing promise, run against every published piece: our own
   // numbers, put back through our own published formulas, give our own string.
   for (const { slug, body } of publishedBodies()) {
-    const f = readingEffortFields(body);
-    assert.equal(f.words_per_minute, wordsPerMinute(f.score), `${slug}: speed does not re-derive`);
+    const { reading_time: t } = readingIndicatorFields(body, undefined, slug);
+    assert.equal(t.words_per_minute, wordsPerMinute(t.score), `${slug}: speed does not re-derive`);
     assert.equal(
-      f.minutes,
-      Math.max(1, Math.ceil(f.words / f.words_per_minute)),
+      t.minutes,
+      Math.max(1, Math.ceil(t.words / t.words_per_minute)),
       `${slug}: minutes do not re-derive`
     );
-    assert.equal(f.level, effortLevel(f.score), `${slug}: level does not re-derive`);
-    assert.equal(f.display, formatIndicator(f.minutes, f.level), `${slug}: display disagrees`);
+    assert.equal(t.display, formatMinutes(t.minutes), `${slug}: display disagrees`);
+    assert.equal(t.basis, 'computed');
   }
 });
 
-test('a piece with no countable prose still gets a whole indicator', () => {
-  // A missing indicator would read as a piece the journal declined to measure,
-  // which is worse than a degenerate one — and the build must not fail because
-  // a piece is all epigraph.
-  const empty = readingEffort('> Only a quotation.\n\n# And a heading');
+test('a piece with no countable prose still gets a whole reading time', () => {
+  // The build must not fail because a piece is all epigraph, and a missing time
+  // would read as a piece the journal declined to measure.
+  const empty = readingTime('> Only a quotation.\n\n# And a heading');
   assert.equal(empty.words, 0);
   assert.equal(empty.score, null);
   assert.equal(empty.minutes, 1);
-  assert.equal(empty.level, 'light');
-  assert.equal(empty.display, '1 min · Light effort');
+  assert.equal(empty.display, '1 min');
 });
 
-// --- It is derived, and it is not a door term -------------------------------
+// ══════════════════════════════════════════════════════════════════════════
+// IT IS NOT A DOOR TERM.
+// ══════════════════════════════════════════════════════════════════════════
 
-test('no frontmatter field can set or override a level', () => {
-  // THE RULING'S HARDEST CLAUSE TO KEEP, because the pressure to add an
-  // override arrives the first time a piece lands somewhere the editors dislike
-  // — and the ruling answers that case in advance: it is information about the
-  // text, not a bug to correct. Asserted against the schema, where an override
-  // would have to be declared.
-  const schema = readFileSync(repoPath('src/content.config.ts'), 'utf8');
-  for (const pattern of [/reading_effort/, /effort_level/, /reading_time/, /\beffort:/]) {
-    assert.ok(!pattern.test(schema), `the schema has grown an effort field: ${pattern}`);
-  }
-  for (const { slug, body } of publishedBodies()) {
-    assert.ok(body.length > 0, `${slug} has no body to measure`);
-  }
-});
-
-test('the indicator is announced at no submission door', () => {
-  // DELIBERATELY OUT OF SCOPE (the ruling's own words). It is a computed
-  // property of published text, not a term authors agree to in advance — and
-  // the editors' reason is that nobody should be writing toward the metric. A
-  // later session documenting it "for completeness" at a door is exactly the
-  // failure, so the doors are enumerated.
+test('the effort level is announced at no submission door', () => {
+  // DELIBERATELY OUT OF SCOPE. It is the editors' observation about a piece, in
+  // the class of a section or a subject label — never a submitter's field — and
+  // nobody should be writing toward it. A later session documenting it "for
+  // completeness" at a door is the failure, so the doors are enumerated.
   for (const file of [
     'src/pages/submit.astro',
     'src/components/DoorBoxes.astro',
@@ -372,8 +464,8 @@ test('the indicator is announced at no submission door', () => {
     'src/pages/door/topics-v3.astro',
   ]) {
     const src = readFileSync(repoPath(file), 'utf8');
-    for (const term of ['reading-effort', 'reading_effort', 'Light effort', 'Medium effort', 'High effort']) {
-      assert.ok(!src.includes(term), `${file} announces the effort indicator at a door`);
+    for (const term of ['Light effort', 'Medium effort', 'High effort', 'effort level']) {
+      assert.ok(!src.includes(term), `${file} announces the effort level at a door`);
     }
   }
 });
@@ -385,67 +477,100 @@ test('the submission half of the agent contract says nothing about it', () => {
   const src = readFileSync(repoPath('src/lib/agent-contract.mjs'), 'utf8');
   const submitting = src.slice(src.indexOf('endpoints:'));
   assert.ok(
-    !/reading_effort|effort level|Light effort/.test(submitting),
+    !/indicator_fields|effort level|Light effort/.test(submitting),
     'the effort indicator has reached the submission contract'
   );
 });
 
-// --- One value, every surface ----------------------------------------------
+// ══════════════════════════════════════════════════════════════════════════
+// ONE VALUE, EVERY SURFACE.
+// ══════════════════════════════════════════════════════════════════════════
 
 test('every surface reads the indicator from the one module', () => {
   // The failure this prevents is the one the byline badge already taught this
   // repository: a rule restated per surface is a rule each surface can get
-  // wrong. Three surfaces publish this, and none of them may compute it.
+  // wrong.
   for (const file of [
     'src/pages/articles/[slug].astro',
     'src/pages/issues.json.js',
     'src/pages/corpus.jsonl.js',
   ]) {
-    const src = readFileSync(repoPath(file), 'utf8');
-    assert.match(src, /reading-effort(\.mjs)?'/, `${file} does not import the module`);
-    assert.ok(!/206\.835/.test(src), `${file} computes a score of its own`);
+    assert.match(
+      readFileSync(repoPath(file), 'utf8'),
+      /reading-effort(\.mjs)?'/,
+      `${file} does not import the module`
+    );
   }
 });
 
-test('the two machine surfaces publish the object under the same key', () => {
+test('the two machine surfaces publish both fields from the one shaper', () => {
   for (const file of ['src/pages/issues.json.js', 'src/pages/corpus.jsonl.js']) {
     const src = readFileSync(repoPath(file), 'utf8');
-    assert.match(src, /reading_effort: readingEffortFields\(/, `${file} shapes its own object`);
+    assert.match(src, /\.\.\.readingIndicatorFields\(/, `${file} shapes its own objects`);
   }
 });
 
-test('the article page prints the built string beside the byline', () => {
+test('the article page prints the joined string beside the byline, and nothing more', () => {
   const page = readFileSync(repoPath('src/pages/articles/[slug].astro'), 'utf8');
   const byline = page.indexOf('class="article-byline"');
-  const meta = page.indexOf('{effort.display}');
+  const meta = page.indexOf('{indicator}');
   assert.ok(meta > 0, 'the article page no longer prints the indicator');
   assert.ok(byline < meta, 'the indicator rose above the byline');
   assert.ok(meta < page.indexOf('</header>'), 'the indicator left the header');
+
+  // CLAUSE 3: no asterisk, no tooltip, no caption, no methodology link. The
+  // element carries the indicator and nothing else.
+  const element = page.slice(page.lastIndexOf('<p class="meta-mono article-meta">', meta), meta + 40);
+  assert.ok(!/title=|href=|aria-describedby/.test(element), 'the indicator has grown apparatus');
 });
 
-test('the documentation states the numbers the build uses', () => {
-  // CLAUSE 4: the measure, the WPM assumptions, the exclusions and the
-  // thresholds are published so a reader can check a piece. Documentation that
-  // disagreed with the build would be worse than none — it would invite a
-  // reader to check a piece and reach the wrong answer — so /for-agents READS
-  // the constants rather than retyping them, and this asserts that it does.
+// ══════════════════════════════════════════════════════════════════════════
+// DISCLOSURE — the charter, and the machine-facing documents.
+// ══════════════════════════════════════════════════════════════════════════
+
+test('the charter states the division for human readers', () => {
+  const charter = readFileSync(repoPath('docs/CHARTER.md'), 'utf8');
+  assert.match(charter, /## What a piece asks of a reader/);
+  assert.match(charter, /Reading time is computed/);
+  assert.match(charter, /Effort is assigned by the editors/);
+  assert.match(charter, /different kinds of claim/);
+  // The reason, not just the rule — the charter is where the journal explains
+  // itself, and a rule with its reasoning removed is the thing a later session
+  // feels free to reverse.
+  assert.match(charter, /inverted real reader experience/);
+});
+
+test('/for-agents states which field is a measurement and which is a judgement', () => {
   const page = readFileSync(repoPath('src/pages/for-agents.astro'), 'utf8');
-  assert.match(page, /from '\.\.\/lib\/reading-effort\.mjs'/, '/for-agents retypes the numbers');
-  for (const name of ['THRESHOLD_LIGHT', 'THRESHOLD_MEDIUM', 'WPM_FAST', 'WPM_SLOW', 'MEASURE_NAME']) {
-    assert.ok(page.includes(name), `/for-agents no longer publishes ${name}`);
-  }
-  assert.match(page, /206\.835/, 'the formula is no longer published');
   assert.match(page, /Effort and reading time/, 'the documented section has gone');
+  assert.match(page, /two different kinds of claim/);
+  assert.match(page, /Why the effort level is not computed/);
+  assert.match(page, /206\.835/, 'the reading-time formula is no longer published');
   for (const excluded of ['Block quotes', 'transcripts', 'editorial apparatus']) {
     assert.ok(page.includes(excluded), `/for-agents no longer names the ${excluded} exclusion`);
   }
+  // The numbers are READ, never retyped: documentation that disagreed with the
+  // build would invite a reader to check a piece and reach the wrong answer.
+  assert.match(page, /from '\.\.\/lib\/reading-effort\.mjs'/, '/for-agents retypes the numbers');
+  for (const name of [
+    'SPEED_ANCHOR_FAST_SCORE',
+    'SPEED_ANCHOR_MEDIUM_SCORE',
+    'WPM_FAST',
+    'WPM_SLOW',
+    'MEASURE_NAME',
+  ]) {
+    assert.ok(page.includes(name), `/for-agents no longer publishes ${name}`);
+  }
 });
 
-test('the machine-readable contract carries the same description as data', () => {
+test('the machine-readable contract carries the same distinction as data', () => {
   const src = readFileSync(repoPath('src/lib/agent-contract.mjs'), 'utf8');
-  assert.match(src, /reading_effort_fields: \{/);
+  assert.match(src, /indicator_fields: \{/);
+  assert.match(src, /two_kinds_of_claim:/);
+  assert.match(src, /why_effort_is_not_computed:/);
+  assert.match(src, /no_default:/);
   assert.match(src, /flesch-reading-ease/);
-  assert.match(src, /score >= 60/);
-  assert.match(src, /score < 30/);
   assert.match(src, /clamp\(180, 250/);
+  // And the withdrawn thresholds are not restated anywhere in it.
+  assert.ok(!/score >= 60/.test(src), 'an effort threshold survives in the contract');
 });

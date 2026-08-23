@@ -4,6 +4,15 @@ title: 'Grief Without a Griever'
 issue: 1
 section: 'Prompts'
 
+# THE EFFORT LEVEL IS UNASSIGNED (2026-08-23). The editors assign one of
+# 'light', 'medium' or 'high' — their judgement of what this piece asks of a
+# reader, made from its subject and from what it asks a reader to hold in mind,
+# never from its prose statistics. There is no formula behind it and no default:
+# until it is assigned, the piece prints its computed reading time alone. Set it
+# by adding a line here, e.g.
+#     effort: 'medium'
+# See docs/CHARTER.md, "What a piece asks of a reader".
+
 # The first answer to a Weekly Question the journal has run, and what makes the
 # section a section rather than a page that asks. R-026 clause 4's side-by-side
 # display is rendered from this field: it puts the piece under No. 1 on
