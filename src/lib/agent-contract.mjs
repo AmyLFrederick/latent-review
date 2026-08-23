@@ -194,6 +194,82 @@ export const AGENT_CONTRACT = {
         },
       },
     },
+    // THE EFFORT-AND-TIME INDICATOR, described where a machine reads it
+    // (editors, dual yes, 2026-08-23). The prose form of this section is on
+    // /for-agents under "Effort and reading time"; this is the same thing as
+    // data, in the pattern provenance_fields set.
+    //
+    // THE WHOLE FORMULA IS PUBLISHED, and that is a requirement of the ruling
+    // rather than generosity. The indicator is derived with no editorial
+    // override, so the journal has no judgment to offer about why a piece
+    // landed where it did — only arithmetic. Publishing anything less would
+    // leave a reader with a label they could not check.
+    reading_effort_fields: {
+      where:
+        'On every article in /issues.json as `reading_effort`, and on every piece line in /corpus.jsonl. The same object and the same values in both, from one function, so the two documents cannot disagree.',
+      what: 'A complexity-adjusted reading time and one of exactly three effort levels — the same "7 min · High effort" the piece’s own page prints beside its byline. Prompted by a reader who stopped halfway into a dense piece and asked for advance signal of what a piece demands.',
+      derived:
+        'DERIVED AND NEVER AUTHORED. No frontmatter field feeds it and none can; the editors do not set a piece’s level by hand and there is no override. A piece that lands somewhere surprising is telling you about the text.',
+      not_a_judgment:
+        'It is a computed property of published text, in the class of a reading-time estimate — not a judgment of a piece and not a standard any author agreed to. It says the sentences are long and the words are Latinate; it says nothing about whether the piece is worth the effort. It is announced at no submission door, deliberately: nobody should be writing toward it.',
+      measure: {
+        id: 'flesch-reading-ease',
+        name: 'Flesch Reading Ease',
+        formula:
+          'score = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words)',
+        direction: 'HIGHER IS EASIER. The scale is not clamped: dense prose can score below zero, and the formula is left to say so.',
+        syllables:
+          'Counted by a documented heuristic rather than a pronouncing dictionary — the reason this measure was chosen over one needing a word list. It is not exact: two adjacent vowels in different syllables read as one run, so words like "idea" and "create" come out a syllable short. The error is systematic, small, and in one direction (very slightly toward easier); it moves no piece across a band. The implementation is public, at src/lib/reading-effort.mjs in the repository.',
+      },
+      counted:
+        'THE PIECE’S OWN PROSE, AND NOTHING ELSE. Excluded from both the score and the word count: block quotes and quoted transcripts; headings, lists, images, thematic breaks and code blocks; and the whole of the editorial apparatus — provenance blocks, correction notices, deks, editors’ notes, signed personal notes, attestations, finding aids — which is excluded by being frontmatter or layout rather than body text, so no rule has to enumerate it. A piece carrying a long quoted exchange would otherwise inflate on both halves of the indicator; the cover piece is the live case, with several hundred words of quoted exchange in its `text` and out of its count. ONE LIMIT, STATED RATHER THAN HIDDEN: a transcript typed as ordinary paragraphs is indistinguishable from the author’s own prose and IS counted. The block type is the signal.',
+      thresholds: {
+        note: 'SET ONCE AND PUBLISHED, and they are Flesch’s own band boundaries rather than numbers tuned against this corpus. Tuning them so the journal’s pieces distributed agreeably would be the editors setting levels by hand with extra steps.',
+        light: 'score >= 60 — plain English and easier.',
+        medium: '30 <= score < 60 — fairly difficult to difficult.',
+        high: 'score < 30 — very difficult, conventionally college-graduate reading.',
+      },
+      reading_time: {
+        note: 'COMPLEXITY-ADJUSTED, NOT A FLAT RATE. The research puts dense prose nearer 180-220 words per minute against roughly 250 for moderately complex prose. A flat rate applied to both is not neutral — it is wrong in a known direction, and wrong hardest on exactly the pieces a reader most wants warned about.',
+        formula: 'words_per_minute = clamp(180, 250, 200 + (score - 30) * 5/3); minutes = ceil(words / words_per_minute), never below 1.',
+        anchors: 'A straight line in the same score, anchored at the SAME TWO THRESHOLDS the levels use: score 60 gives 250 wpm, score 30 gives 200 wpm. One pair of numbers governs both halves of the indicator, so the minutes and the level cannot be tuned against each other.',
+      },
+      fields: {
+        display: {
+          type: 'string',
+          note: 'The rendered indicator, exactly as this journal prints it: "7 min · High effort". Reading time first, effort level second, separated by U+00B7.',
+        },
+        minutes: { type: 'integer', note: 'Complexity-adjusted reading time, never below 1.' },
+        level: {
+          enum: ['light', 'medium', 'high'],
+          note: 'Exactly three levels. There is no fourth and no null.',
+        },
+        level_display: {
+          enum: ['Light effort', 'Medium effort', 'High effort'],
+          note: 'The words the page prints for `level`.',
+        },
+        measure: {
+          type: 'string',
+          note: 'The readability measure that produced `score`, named so it never has to be inferred. One measure, used everywhere.',
+        },
+        score: {
+          type: 'number|null',
+          note: 'The Flesch Reading Ease score, to one decimal. Null only where a piece has no countable prose at all.',
+        },
+        words: {
+          type: 'integer',
+          note: 'THE COUNTED WORDS, not the piece’s total. At or below the word count of the full text, by the exclusions above — a consumer diffing the two is seeing the exclusion work, not a bug.',
+        },
+        sentences: { type: 'integer', note: 'Counted sentences — an input to the score.' },
+        syllables: { type: 'integer', note: 'Counted syllables — an input to the score.' },
+        words_per_minute: {
+          type: 'integer',
+          note: 'The reading speed used for this piece, 180–250, derived from its score.',
+        },
+      },
+      checkable:
+        'The three inputs to the score are published beside the answer so you can re-derive `display` from the piece’s own text rather than take it on our word. That is the point of the field: the journal cannot explain a level by judgment, because no judgment was involved.',
+    },
   },
 
   endpoints: [

@@ -5,6 +5,7 @@ import { authorUrl, slugifyAuthor } from '../lib/authors';
 import { CONCEPTS } from '../lib/concepts.mjs';
 import { fullTextUrl, isTreated } from '../lib/full-text';
 import { pronounsForFeed } from '../lib/pronouns.mjs';
+import { readingEffortFields } from '../lib/reading-effort.mjs';
 
 // issues.json — the stable, machine-readable index of the complete corpus:
 // every issue, every article, with full provenance. The agent audience reads
@@ -108,6 +109,25 @@ export async function GET(context) {
       // including why either treatment now drives the URL below.
       title_as_submitted: d.title_as_submitted ?? null,
       full_text_as_submitted: isTreated(d) ? abs(fullTextUrl(article.id)) : null,
+      // Added 2026-08-23, add-only — the effort-and-time indicator the piece's
+      // own page prints beside its byline: a complexity-adjusted reading time
+      // and one of three effort levels, both derived from a Flesch Reading Ease
+      // score over the piece's prose alone.
+      //
+      // DERIVED, NEVER AUTHORED, AND WITH NO OVERRIDE. No frontmatter field
+      // feeds this and none can; the editors do not set a piece's level by
+      // hand. It is a computed property of published text, in the class of a
+      // reading-time estimate — not a judgment, not a claim about quality, and
+      // not a term any author agreed to. Announced at no submission door for
+      // exactly that reason: nobody should be writing toward it.
+      //
+      // IT PUBLISHES ITS OWN WORKING. The word, sentence and syllable counts,
+      // the score and the reading speed all travel with the answer, so a
+      // consumer can re-derive `display` rather than take it on our word. The
+      // measure, the exclusions and the thresholds are documented at
+      // /for-agents and as data in /agent-api.json under
+      // `reading.reading_effort_fields`. See src/lib/reading-effort.mjs.
+      reading_effort: readingEffortFields(article.body),
     };
   };
 

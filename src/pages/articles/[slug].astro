@@ -24,6 +24,8 @@ import { assertFullTextsPaired } from '../../lib/full-text';
 import { questionLabel } from '../../lib/prompts.mjs';
 import { CONCEPT_LABELS, CONCEPT_DEFINITIONS } from '../../lib/concepts.mjs';
 import { authorUrl, slugifyAuthor } from '../../lib/authors';
+// @ts-expect-error — plain-JS module shared with the tests
+import { readingEffort } from '../../lib/reading-effort.mjs';
 
 export async function getStaticPaths() {
   const [articles, fullTexts] = await Promise.all([
@@ -76,6 +78,13 @@ const authorPageUrl = authorUrl(slugifyAuthor(d.author_name));
 // is. See that module for why the line is the signature and why the badge
 // carries a scoping sentence into its accessible name.
 const noteBadge = personalNoteBadge(d.personal_note, TIERS, article.id);
+
+// THE EFFORT-AND-TIME INDICATOR — DECIDED IN src/lib/reading-effort.mjs AND NOT
+// HERE (editors, 2026-08-23), for the reason the byline badge is. It is computed
+// from the piece's own prose by a published formula; this template asks and
+// prints. There is no editorial override and no frontmatter field to add one, so
+// there is nothing for a template to decide.
+const effort = readingEffort(article.body);
 
 // THE JSON-LD TAKES THE RECORDED TITLE, and the tab below takes the displayed
 // one (editors, 2026-08-03). The line between them is the line displayTitle
@@ -213,6 +222,28 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
         <span>By&#160;{bylineWithProtectedNames(d.byline ?? d.author_name)}</span>
         <span class="byline-pronouns">{pronounsDisplay(d.author_pronouns)}</span>
       </p>
+      {/*
+        WHAT THE PIECE DEMANDS, BEFORE THE READER COMMITS TO IT (editors, dual
+        yes, 2026-08-23). A reader stopped halfway into a dense piece and asked
+        for advance signal; this is the answer, and it sits directly under the
+        byline because that is the last line before the prose starts.
+
+        IT IS DERIVED AND IT IS NOT A CLAIM ABOUT QUALITY. The minutes and the
+        level both come out of the same Flesch Reading Ease score computed over
+        the piece's own prose — quoted transcripts, block quotes and every piece
+        of editorial apparatus excluded — and the whole formula, its exclusions
+        and its thresholds are published at /for-agents so a reader or an author
+        can check how a piece landed where it did. "High effort" says the
+        sentences are long and the words are Latinate. It says nothing about
+        whether the piece is worth the effort, which is the reader's call and
+        was never the machine's.
+
+        NOT A DATE AND NOT A TRUTH STANDARD, which R-048 moved out of this
+        header and which must not come back in on this line's coat-tails. This
+        is one derived fact about the text, in the meta voice, and it is the
+        only thing this element carries.
+      */}
+      <p class="meta-mono article-meta">{effort.display}</p>
     </header>
 
     {
@@ -632,6 +663,11 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
     font-style: italic;
   }
 
+  /* THE EFFORT-AND-TIME LINE. It takes `.meta-mono` for its voice — the quiet
+     monospaced face every other derived fact on this site is set in — and this
+     rule supplies only the gap under the byline. Nothing else: a reader should
+     meet it as a note about the text, in the same register as an image credit,
+     rather than as a label the journal has stuck on somebody's piece. */
   .article-meta {
     margin: 0.45rem 0 0;
   }
