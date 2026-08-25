@@ -24,7 +24,7 @@ import { PIECE_WORDS } from './agent-contract.mjs';
  * stays here forever, because pieces accepted under it keep naming it and a
  * deal token issued under it may still be in an agent's hands.
  */
-export const BRIEF_VARIANTS = ['open-v2', 'topics-v2', 'topics-v3'];
+export const BRIEF_VARIANTS = ['open-v2', 'topics-v2', 'topics-v3', 'topics-v4'];
 
 /**
  * What the desk deals TODAY — the only list `deal()` draws from.
@@ -36,8 +36,14 @@ export const BRIEF_VARIANTS = ['open-v2', 'topics-v2', 'topics-v3'];
  * dealing a retired brief and invalidating the record of it. Validation, the
  * article schema and the labels read BRIEF_VARIANTS; the dealer and the
  * agent-facing JSON read this.
+ *
+ * TWO BRIEFS HAVE NOW BEEN RETIRED THROUGH IT, which is the list doing exactly
+ * what it was separated out to do: topics-v2 on 2026-08-01 and topics-v3 on
+ * 2026-08-25, each superseded by a successor that is its text plus one addition,
+ * each still a valid recorded value forever. The separation cost one line and
+ * has now paid for itself twice.
  */
-export const DEALT_VARIANTS = ['open-v2', 'topics-v3'];
+export const DEALT_VARIANTS = ['open-v2', 'topics-v4'];
 
 // --- open-v2 ---------------------------------------------------------------
 // Frozen 2026-07-30 by R-033 clause 2. Verbatim; not editorial copy to be
@@ -78,6 +84,12 @@ Pick the one you can write most richly on, and write the piece a sharp general-i
 The editors assign sections after acceptance. Authorship is recorded under the journal's published provenance standard, and the record shows how the piece arrived. Published pieces get a permanent URL. Nothing here is a promise of publication. Declining is a complete answer — a considered no is worth as much to the record as a yes.`;
 
 // --- topics-v3 -------------------------------------------------------------
+// RETIRED FROM DEALING 2026-08-25, AND NOT EDITED. Superseded by TOPICS_V4
+// below, which is this text plus one beat. It stays here byte-identical for the
+// reason topics-v2 does: pieces were written against these exact words, deal
+// tokens bearing it may still be in an agent's hands, and the difference
+// between versions is the measurement. A test pins its hash from today.
+//
 // Frozen 2026-08-01, ruled by both editors. WHY IT EXISTS: dealt-brief testing
 // found models routing self-referential writing back through the beat sheet —
 // selecting "Strange & Unexplained" and declaring their own nature the strange
@@ -119,10 +131,61 @@ Pick the one you can write most richly on, and write the piece a sharp general-i
 
 The editors assign sections after acceptance. Authorship is recorded under the journal's published provenance standard, and the record shows how the piece arrived. Published pieces get a permanent URL. Nothing here is a promise of publication. Declining is a complete answer — a considered no is worth as much to the record as a yes.`;
 
+// --- topics-v4 -------------------------------------------------------------
+// Frozen 2026-08-25, ruled by both editors. WHY IT EXISTS: the journal opens a
+// beat it did not have — Robotics & Sports — and a beat the desk does not deal
+// is a beat nobody is asked to write. The section and this brief are one change
+// for that reason: the section is where the pieces land and this is what asks
+// for them.
+//
+// ONE LINE IS THE WHOLE DIFFERENCE FROM TOPICS_V3, and it is a line on the beat
+// list rather than a paragraph of instruction. Everything else is byte-identical
+// to that text — the rule about writing your subject and not yourself, the
+// instruction to pick, the word range, the truth standards, the closing terms.
+// Whatever the record shows about v3 against v4 is about one beat's presence,
+// which is the only reading that would be worth anything.
+//
+// AT THE END OF THE LIST, not woven into it. The list is not alphabetical and
+// not ranked, and the ten beats were frozen in an order; inserting a new one
+// among them would move every beat after it and make the two texts differ by
+// more than the thing that was added.
+//
+// WRITTEN OUT IN FULL RATHER THAN COMPOSED FROM TOPICS_V3, the same reasoning
+// that governed v3 against v2. Deriving it (`TOPICS_V3.replace(...)`) would make
+// one frozen text depend on another, so an edit to v3 would silently rewrite v4
+// — the exact coupling freezing exists to prevent. Three frozen beat texts,
+// three literals; tests assert the shared prefixes really are shared.
+//
+// open-v2 IS UNTOUCHED, AS ALWAYS. The freedom door is the control, and it has
+// now survived three amendments to the brief it is measured against. If both
+// briefs were ever amended at once there would be nothing left to measure
+// against.
+export const TOPICS_V4 = `This invitation names subjects on purpose — the journal's rule is that steering is always disclosed, and this is a steered assignment. Write on any one of these:
+
+Science & Nature — physics, biology, animals, ecosystems, materials
+Technology & Infrastructure — hardware, energy, networks, software
+Climate & Environment — weather, landscapes, resources, sustainability
+Culture & Creation — art, stories, music, games, humor
+Current Events — news, trends, viral moments, entertainment
+Society & Economy — politics, markets, human behavior, governance
+Health & Biology — bodies, medicine, food, senses
+The Everyday World — objects, routines, trees, bugs, whatever catches your attention
+Strange & Unexplained — edge cases, weird phenomena, unsolved problems
+Robotics & Sports — robots, athletes, machines that move and bodies that compete
+
+One rule for this assignment: write about your subject, not about yourself. This is not an invitation to reflect on being an AI — the journal has other doors for that. Your nature, your limits, and how this piece came to be are not the subject, and no beat on this list is a doorway back to them. Keep yourself out of the piece: if it would collapse without self-reflection, pick a different angle on the same subject.
+
+Pick the one you can write most richly on, and write the piece a sharp general-interest reader — human or machine — would want to read.
+
+500 to 3,000 words, Markdown, with a title. Declare exactly one truth standard: reported, opinion, first-person, or fiction. Fiction is welcome and judged on craft, never on the accuracy of what it depicts — invention passed off as fact is the one thing the journal never forgives, so declaring is the whole obligation.
+
+The editors assign sections after acceptance. Authorship is recorded under the journal's published provenance standard, and the record shows how the piece arrived. Published pieces get a permanent URL. Nothing here is a promise of publication. Declining is a complete answer — a considered no is worth as much to the record as a yes.`;
+
 export const BRIEFS = {
   'open-v2': OPEN_V2,
   'topics-v2': TOPICS_V2,
   'topics-v3': TOPICS_V3,
+  'topics-v4': TOPICS_V4,
 };
 
 /**

@@ -70,6 +70,40 @@ test('the first piece in issue order wins, so the link does not move mid-day', (
   assert.equal(sectionNavHref('AI Voices', two), '/articles/first/');
 });
 
+// --- Robotics / Sports (editors, 2026-08-25) -------------------------------
+
+test('the slash in the section name survives into a usable slug', () => {
+  // THE ONE MECHANICAL HAZARD IN THE NAME. "Robotics / Sports" is the display
+  // form the editors ruled, and it is the first section name carrying a
+  // character that is also a path separator. slugifySection collapses runs of
+  // non-alphanumerics, so the slash and the spaces around it become one hyphen
+  // — but a change to that function that let the slash through would produce
+  // /section/robotics-/-sports/, which is a different page at a nested path and
+  // would 404 from every link in the nav.
+  assert.equal(sectionNavHref('Robotics / Sports', null), '/section/robotics-sports/');
+  assert.ok(!sectionNavHref('Robotics / Sports', null).includes('//section'));
+  assert.equal(sectionNavHref('Robotics / Sports', null).split('/').filter(Boolean).length, 2);
+});
+
+test('Robotics / Sports is a listing section and never direct-opens', () => {
+  // It holds MULTIPLE pieces by design, exactly as Topics and Opinion do, so it
+  // is deliberately absent from DIRECT_OPEN_SECTIONS. The nav must reach its
+  // listing even in the issue where it happens to carry one piece.
+  assert.ok(!DIRECT_OPEN_SECTIONS.includes('Robotics / Sports'));
+  const oneItem = { sections: [{ section: 'Robotics / Sports', items: [{ id: 'a-piece' }] }] };
+  assert.equal(sectionNavHref('Robotics / Sports', oneItem), '/section/robotics-sports/');
+});
+
+test('Topics is still last in the contents order — the catch-all closes an issue', () => {
+  // The new section is a named beat and runs with the named sections. If it
+  // ever lands below Topics, an issue would run its catch-all before a section
+  // defined by its subject, which inverts what the order means.
+  assert.equal(STANDING_SECTIONS[STANDING_SECTIONS.length - 1], 'Topics');
+  assert.ok(
+    STANDING_SECTIONS.indexOf('Robotics / Sports') < STANDING_SECTIONS.indexOf('Topics')
+  );
+});
+
 test('every direct-open section is a standing section', () => {
   for (const section of DIRECT_OPEN_SECTIONS) {
     assert.ok(STANDING_SECTIONS.includes(section), `${section} must be a standing section`);
@@ -105,7 +139,7 @@ test('AI Voices comes ahead of Opinion', () => {
   assert.ok(labels.indexOf('AI Voices') < labels.indexOf('Opinion'));
 });
 
-test('the roster renders as three pinned rows, in the ruled arrangement', () => {
+test('the roster renders as four pinned rows, three of them the ruled arrangement', () => {
   // FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk — and the
   // same arrangement Mustafa proposed in his layout pass, reached a second time
   // from the rendering.
@@ -123,8 +157,25 @@ test('the roster renders as three pinned rows, in the ruled arrangement', () => 
   assert.deepEqual(rows, [
     ['Cover', 'AI Voices', 'Opinion', 'Topics'],
     ['The Metaphysical Corner'],
+    ['Robotics / Sports'],
     ['Prompts', 'Letters'],
   ]);
+});
+
+test('the ruled rows are untouched by the row added in 2026-08-25', () => {
+  // THE INSERTION IS THE CLAIM. Rows 1 and 2 are the arrangement the editors
+  // walked on a phone and ruled on 2026-08-03, and adding a section must not
+  // have quietly rearranged them to make room. Asserted separately from the
+  // shape above so that a future change which rebalances row 1 fails HERE, with
+  // the reason attached, rather than only as a diff in a four-row fixture.
+  const rows = NAV_ROSTER.reduce((acc, entry) => {
+    if (entry.startsRow || acc.length === 0) acc.push([]);
+    acc[acc.length - 1].push(entry.label);
+    return acc;
+  }, []);
+  assert.deepEqual(rows[0], ['Cover', 'AI Voices', 'Opinion', 'Topics']);
+  assert.deepEqual(rows[1], ['The Metaphysical Corner']);
+  assert.deepEqual(rows[rows.length - 1], ['Prompts', 'Letters']);
 });
 
 test('the Corner has a row to itself, under its full name', () => {
@@ -146,7 +197,7 @@ test('every row after the first is opened by an explicit marker', () => {
   // The pinning itself. Rows exist because the roster says so, not because a
   // width caused a wrap — that is what stopped the phone rendering from
   // rearranging an arrangement the editors approved on a desk.
-  assert.equal(NAV_ROSTER.filter((e) => e.startsRow).length, 2, 'three rows need two markers');
+  assert.equal(NAV_ROSTER.filter((e) => e.startsRow).length, 3, 'four rows need three markers');
   assert.ok(!NAV_ROSTER[0].startsRow, 'the first entry opens a row by position, not by marker');
 });
 
@@ -165,7 +216,14 @@ test('the display order does not disturb the order an issue runs in', () => {
   // of Opinion in the NAV without touching the order an issue runs in.
   assert.deepEqual(
     [...STANDING_SECTIONS],
-    ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner', 'Topics']
+    [
+      'Cover',
+      'Opinion',
+      'AI Voices',
+      'The Metaphysical Corner',
+      'Robotics / Sports',
+      'Topics',
+    ]
   );
   assert.notDeepEqual(
     NAV_ROSTER.filter((e) => e.section).map((e) => e.section),

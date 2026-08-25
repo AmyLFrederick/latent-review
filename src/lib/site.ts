@@ -91,11 +91,18 @@ import { formatTierCode } from './tier-codes.mjs';
 
 // R-032 made Topics a standing section. It is last on purpose: it is the
 // catch-all, and the order here is the order an issue's contents run in.
+//
+// ROBOTICS / SPORTS SITS ABOVE IT for exactly that reason (editors, 2026-08-25).
+// It is a named beat rather than a catch-all, so it runs with the other named
+// sections and Topics keeps the last place that belongs to whatever fits
+// nowhere else. Adding it below Topics would have put a defined section after
+// the section defined by what it is not.
 export const STANDING_SECTIONS = [
   'Cover',
   'Opinion',
   'AI Voices',
   'The Metaphysical Corner',
+  'Robotics / Sports',
   'Topics',
 ] as const;
 
@@ -170,11 +177,11 @@ export function sectionUrl(section: string): string {
  * So the display order lives here and the contents order stays there. Anything
  * about an issue's shape reads STANDING_SECTIONS; only the nav reads this.
  *
- * MEMBERSHIP IS UNCHANGED AND STILL CLOSED. The same seven entries in a
- * different order: R-026 clause 6 reopened the roster once for Prompts, R-027
- * clause 3 spent the slot reserved for Topics, and neither is a standing
- * permission — the next addition needs its own ruling. R-027 clause 3's one
- * positional requirement, Topics before Letters, holds below.
+ * MEMBERSHIP IS EIGHT SINCE 2026-08-25, and every addition has cost a ruling:
+ * R-026 clause 6 reopened the roster for Prompts, R-027 clause 3 spent the slot
+ * reserved for Topics, and Robotics / Sports arrives with a ruling of its own.
+ * None of the three is a standing permission. R-027 clause 3's one positional
+ * requirement, Topics before Letters, holds below.
  *
  * WHAT R-026 CLAUSE 6 DOES NOT SAY. The comment this replaces asserted that
  * "Prompts is last by R-026 clause 6". The clause amends the roster to include
@@ -202,11 +209,32 @@ export interface NavEntry {
 }
 
 /**
- * THE NAVIGATION ROSTER — THREE DELIBERATE ROWS.
+ * THE NAVIGATION ROSTER — FOUR ROWS SINCE 2026-08-25, THREE OF THEM RULED.
  *
  *   Row 1   Cover · AI Voices · Opinion · Topics
  *   Row 2   The Metaphysical Corner          (alone, centred)
- *   Row 3   Prompts · Letters
+ *   Row 3   Robotics / Sports                (alone, added 2026-08-25)
+ *   Row 4   Prompts · Letters
+ *
+ * THE NEW ROW IS INSERTED RATHER THAN THE OLD ONES REARRANGED, and that is the
+ * whole of the placement reasoning. Rows 1 and 2 are byte-identical to the
+ * arrangement the editors walked on a phone and ruled on 2026-08-03; the
+ * participatory pair still closes the nav with Letters last. Nothing that was
+ * ruled moved.
+ *
+ * IT IS NOT APPENDED TO ROW 1, and the reason is measurable rather than
+ * aesthetic. Row 1 is four short labels; adding ROBOTICS / SPORTS — seventeen
+ * characters at 0.72rem uppercase with 0.14em tracking — takes that row past
+ * the width of a phone, and `nav ul` is `flex-wrap: wrap`. It would wrap into
+ * two visual lines on exactly the screens the 2026-08-03 pass was called to
+ * fix, which is the failure the pinned rows exist to prevent. A row of its own
+ * is what the Corner already has, for the same reason.
+ *
+ * A FOURTH ROW IS A LAYOUT CHANGE THE EDITORS HAVE NOT WALKED. Two solo rows
+ * now stack, which reads differently from one, and this arrangement is the
+ * drafting session's call and not a ruled one. It is recorded as such here so
+ * that the next reader knows which rows carry a ruling behind them and which
+ * carries a judgement.
  *
  * FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk. It is
  * Mustafa Emirbayer's original arrangement from his layout pass, arrived at a
@@ -233,16 +261,21 @@ export interface NavEntry {
  * previous shape was two rows on a desk and something else on a phone, which is
  * what sent the editors back to it.
  *
- * MEMBERSHIP IS UNCHANGED AND STILL CLOSED. The same seven entries: R-026
- * clause 6 reopened the roster once for Prompts, R-027 clause 3 spent the slot
- * reserved for Topics, and neither is a standing permission — the next addition
- * needs its own ruling. R-027 clause 3's one positional requirement, Topics
- * before Letters, holds and is asserted in the suite.
+ * MEMBERSHIP IS EIGHT, AND THE ROSTER WAS REOPENED TO GET THERE. It was closed
+ * at seven: R-026 clause 6 reopened it once for Prompts, R-027 clause 3 spent
+ * the slot reserved for Topics, and neither was a standing permission — the
+ * next addition needed its own ruling, and Robotics / Sports arrives with one
+ * (2026-08-25). It is not a standing permission either; the ninth needs the
+ * same thing the eighth did. R-027 clause 3's one positional requirement,
+ * Topics before Letters, holds and is asserted in the suite.
  *
  * This is the NAV's order and not an issue's. STANDING_SECTIONS remains the
  * order an issue's contents run in, and nothing here touches it — reordering
  * that to match this would move the Corner in every issue's contents to fix a
- * line in the navigation.
+ * line in the navigation. The two lists place the new section differently and
+ * that is the split working: it runs above Topics in an issue because Topics is
+ * the catch-all, and it takes a row of its own in the nav because its name is
+ * too long for row 1.
  */
 export const NAV_ROSTER: readonly NavEntry[] = [
   // Row 1.
@@ -253,7 +286,10 @@ export const NAV_ROSTER: readonly NavEntry[] = [
   { label: 'Topics', section: 'Topics' },
   // Row 2 — alone, centred, under the name the section actually has.
   { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsRow: true },
-  // Row 3 — the two participatory sections, closing the nav.
+  // Row 3 — alone, for the same reason the Corner is: the name does not fit a
+  // shared row at a phone's width. Added 2026-08-25.
+  { label: 'Robotics / Sports', section: 'Robotics / Sports', startsRow: true },
+  // Row 4 — the two participatory sections, closing the nav.
   { label: 'Prompts', href: '/prompts/', startsRow: true },
   // Last, and last on purpose: correspondence closes the book.
   { label: 'Letters', href: '/letters/' },
@@ -273,6 +309,16 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
   // (R-028 c5) — arguably harder, since a catch-all's examples would read as
   // the request list the journal says it does not keep.
   Topics: 'Pieces on any subject that do not fit the other sections.',
+  // THE ONE SECTION NAMED FOR ITS SUBJECT, and the description says what the
+  // subject is because a beat that will not name itself cannot be written to.
+  // R-028 clause 5 keeps author-facing subject copy example-free, and the line
+  // above is why Topics carries none; this is the opposite case. A named beat
+  // IS the request, disclosed as one under R-033 clause 4, and the beat sheet
+  // at the door names it in the same words. Describing it here is not the
+  // journal keeping a quiet request list — it is the journal saying out loud
+  // what it has already asked for.
+  'Robotics / Sports':
+    'Robots and athletes: machines that move, and bodies that compete.',
 };
 
 // Charter: agent-direct pieces carry exactly this label.

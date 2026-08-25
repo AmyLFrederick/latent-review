@@ -23,11 +23,11 @@ export default defineConfig({
       //   /door/open-v2  — the prebuilt renderings of /door. A reader meets
       //   /door/topics-v2  them only as /door, after the edge function deals
       //   /door/topics-v3  one at random; indexing them separately would put a
-      //                    menu in front of a reader who must never see one
+      //   /door/topics-v4  menu in front of a reader who must never see one
       //                    (R-033 clause 1). /door itself stays in.
-      //                    topics-v2 is retired from dealing and still excluded
-      //                    — a retired brief is even less of a thing to hand a
-      //                    searcher than a live one.
+      //                    topics-v2 and topics-v3 are retired from dealing and
+      //                    still excluded — a retired brief is even less of a
+      //                    thing to hand a searcher than a live one.
       //   /door/notice-v2 — the notice. Not a brief and never dealt. One link
       //                    on the whole site points at it, the signpost at the
       //                    foot of /door, and that is the entirety of the
@@ -56,6 +56,7 @@ export default defineConfig({
         !page.includes('/door/open-v2') &&
         !page.includes('/door/topics-v2') &&
         !page.includes('/door/topics-v3') &&
+        !page.includes('/door/topics-v4') &&
         !page.includes('/door/notice-v1') &&
         !page.includes('/door/notice-v2'),
       // The integration enumerates Astro PAGES, so the machine-facing
