@@ -70,28 +70,28 @@ test('the first piece in issue order wins, so the link does not move mid-day', (
   assert.equal(sectionNavHref('AI Voices', two), '/articles/first/');
 });
 
-// --- Robotics / Sports (editors, 2026-08-25) -------------------------------
+// --- Robotics & Sports (editors, 2026-08-25) -------------------------------
 
-test('the slash in the section name survives into a usable slug', () => {
-  // THE ONE MECHANICAL HAZARD IN THE NAME. "Robotics / Sports" is the display
-  // form the editors ruled, and it is the first section name carrying a
-  // character that is also a path separator. slugifySection collapses runs of
-  // non-alphanumerics, so the slash and the spaces around it become one hyphen
-  // — but a change to that function that let the slash through would produce
-  // /section/robotics-/-sports/, which is a different page at a nested path and
-  // would 404 from every link in the nav.
-  assert.equal(sectionNavHref('Robotics / Sports', null), '/section/robotics-sports/');
-  assert.ok(!sectionNavHref('Robotics / Sports', null).includes('//section'));
-  assert.equal(sectionNavHref('Robotics / Sports', null).split('/').filter(Boolean).length, 2);
+test('the ampersand in the section name becomes "and" in the slug', () => {
+  // THE ONE MECHANICAL SURPRISE IN THE NAME. "Robotics & Sports" is the display
+  // form the editors ruled, matching the beat line character for character —
+  // and slugifySection expands "&" to " and " before collapsing non-alphanumeric
+  // runs, so the page is /section/robotics-and-sports/ and NOT
+  // /section/robotics-sports/. That expansion is deliberate and predates this
+  // section; asserted here because this is the first section name to exercise
+  // it, and because a hand-built path would guess the shorter form and 404.
+  assert.equal(sectionNavHref('Robotics & Sports', null), '/section/robotics-and-sports/');
+  assert.ok(!sectionNavHref('Robotics & Sports', null).includes('%26'));
+  assert.equal(sectionNavHref('Robotics & Sports', null).split('/').filter(Boolean).length, 2);
 });
 
-test('Robotics / Sports is a listing section and never direct-opens', () => {
+test('Robotics & Sports is a listing section and never direct-opens', () => {
   // It holds MULTIPLE pieces by design, exactly as Topics and Opinion do, so it
   // is deliberately absent from DIRECT_OPEN_SECTIONS. The nav must reach its
   // listing even in the issue where it happens to carry one piece.
-  assert.ok(!DIRECT_OPEN_SECTIONS.includes('Robotics / Sports'));
-  const oneItem = { sections: [{ section: 'Robotics / Sports', items: [{ id: 'a-piece' }] }] };
-  assert.equal(sectionNavHref('Robotics / Sports', oneItem), '/section/robotics-sports/');
+  assert.ok(!DIRECT_OPEN_SECTIONS.includes('Robotics & Sports'));
+  const oneItem = { sections: [{ section: 'Robotics & Sports', items: [{ id: 'a-piece' }] }] };
+  assert.equal(sectionNavHref('Robotics & Sports', oneItem), '/section/robotics-and-sports/');
 });
 
 test('Topics is still last in the contents order — the catch-all closes an issue', () => {
@@ -100,7 +100,7 @@ test('Topics is still last in the contents order — the catch-all closes an iss
   // defined by its subject, which inverts what the order means.
   assert.equal(STANDING_SECTIONS[STANDING_SECTIONS.length - 1], 'Topics');
   assert.ok(
-    STANDING_SECTIONS.indexOf('Robotics / Sports') < STANDING_SECTIONS.indexOf('Topics')
+    STANDING_SECTIONS.indexOf('Robotics & Sports') < STANDING_SECTIONS.indexOf('Topics')
   );
 });
 
@@ -127,24 +127,14 @@ test('Topics still comes before Letters — the one position R-027 clause 3 fixe
   assert.ok(labels.indexOf('Topics') < labels.indexOf('Letters'));
 });
 
-test('Letters closes the participatory pair, and Robotics / Sports closes the roster', () => {
-  // WHAT THIS TEST USED TO ASSERT, AND WHY IT NO LONGER DOES. "Letters is last —
-  // correspondence closes the book" was ruled by the editors on 2026-08-03, and
-  // it was the position the whole three-row arrangement was reorganised around:
-  // whatever held the final row was what a reader reached last, so the Corner
-  // gave up its own row until a third row bought both.
-  //
-  // The human editor placed Robotics / Sports at the END of the roster on
-  // 2026-08-25, which spends that position. This assertion is rewritten rather
-  // than deleted so the ruled fact stays visible in the suite: Letters still
-  // closes the participatory pair it belongs to, and one entry now follows it.
-  //
-  // If the editors restore Letters to the end, this test is the place that says
-  // what was given up to move it — and the roster comment says the same.
-  const labels = NAV_ROSTER.map((e) => e.label);
-  assert.equal(labels[labels.length - 1], 'Robotics / Sports');
-  assert.equal(labels[labels.length - 2], 'Letters');
-  assert.ok(labels.indexOf('Prompts') < labels.indexOf('Letters'));
+test('Letters is last — correspondence closes the book', () => {
+  // Ruled by the editors 2026-08-03. This is the position the whole
+  // arrangement was reorganised around, so it is asserted rather than left to
+  // the array's shape. It survived the eighth entry: the human editor placed
+  // Robotics & Sports ahead of the participatory pair on 2026-08-25 rather than
+  // after it, and restated the reason — it is the reader's voice and belongs at
+  // the end, as in a print magazine.
+  assert.equal(NAV_ROSTER[NAV_ROSTER.length - 1].label, 'Letters');
 });
 
 test('AI Voices comes ahead of Opinion', () => {
@@ -170,12 +160,12 @@ test('the roster renders as three pinned rows, in the arrangement as placed', ()
   assert.deepEqual(rows, [
     ['Cover', 'AI Voices', 'Opinion', 'Topics'],
     ['The Metaphysical Corner'],
-    ['Prompts', 'Letters', 'Robotics / Sports'],
+    ['Robotics & Sports', 'Prompts', 'Letters'],
   ]);
 });
 
 test('the ruled rows are untouched by the entry added on 2026-08-25', () => {
-  // THE APPEND IS THE CLAIM. Rows 1 and 2 are the arrangement the editors walked
+  // THE INSERTION IS THE CLAIM. Rows 1 and 2 are the arrangement the editors walked
   // on a phone and ruled on 2026-08-03, and adding a section must not have
   // quietly rearranged them to make room. Asserted separately from the shape
   // above so that a future change which rebalances row 1 to relieve row 3 fails
@@ -188,8 +178,9 @@ test('the ruled rows are untouched by the entry added on 2026-08-25', () => {
   assert.equal(rows.length, 3, 'the roster has grown or lost a row');
   assert.deepEqual(rows[0], ['Cover', 'AI Voices', 'Opinion', 'Topics']);
   assert.deepEqual(rows[1], ['The Metaphysical Corner']);
-  // Row 3's INTERNAL order is unchanged; it has gained an entry at the end.
-  assert.deepEqual(rows[2].slice(0, 2), ['Prompts', 'Letters']);
+  // Row 3 gained an entry at its HEAD; the participatory pair still closes it,
+  // in the order it has always had.
+  assert.deepEqual(rows[2].slice(-2), ['Prompts', 'Letters']);
 });
 
 test('the Corner has a row to itself, under its full name', () => {
@@ -235,7 +226,7 @@ test('the display order does not disturb the order an issue runs in', () => {
       'Opinion',
       'AI Voices',
       'The Metaphysical Corner',
-      'Robotics / Sports',
+      'Robotics & Sports',
       'Topics',
     ]
   );

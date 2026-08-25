@@ -1,4 +1,4 @@
-# SCRATCH — R-TBD drafted for the editors' read: the Robotics / Sports beat and section
+# SCRATCH — R-TBD drafted for the editors' read: the Robotics & Sports beat and section
 
 Drafted 2026-08-25. **Not ratified.** Nothing has been appended to `RULINGS.md`
 and nothing in this file is in force.
@@ -42,7 +42,7 @@ ratification day.
 
 ---
 
-## R-TBD — 2026-08-XX — The Robotics / Sports beat, and the section it lands in
+## R-TBD — 2026-08-XX — The Robotics & Sports beat, and the section it lands in
 
 Ruled 2026-08-XX by both editors. It does two things at once on purpose: the
 journal opens a beat it did not have, and creates the place the pieces answering
@@ -81,10 +81,10 @@ would be nothing left to measure an amendment against.
 `topics-v4` — as R-033 clause 1 requires. Nothing about the odds, the
 server-side deal, or the writer never seeing the other brief changes.
 
-**6. Robotics / Sports is a standing section**, named exactly that in the
+**6. Robotics & Sports is a standing section**, named exactly that in the
 navigation and everywhere sections are named. It is a listing section: it holds
 as many pieces as the editors assign to it, and it is not a single-piece page.
-Its address is `/section/robotics-sports/`.
+Its address is `/section/robotics-and-sports/`.
 
 **7. It launches with no pieces, and that is a state rather than a fault.** Its
 page renders the same empty state every section page has always had. The brief
@@ -103,39 +103,42 @@ standing permission. This ruling is the eighth entry's own permission. It is not
 a standing permission either. R-027 clause 3's positional requirement, **Topics
 before Letters, holds.**
 
-**10. Robotics / Sports goes last in the roster, and this spends the position
-Letters held.** The human editor placed it at the end of the navigation, after
-Letters, on 2026-08-25. That supersedes the 2026-08-03 decision that *"Letters is
-last — correspondence closes the book"*, which stands unedited in the record and
-is read subject to this clause. It was the position the whole three-row
-arrangement was reorganised around, and it is spent deliberately rather than
-lost: the roster's comment and the suite both now say what was given up, so
-nobody later restores Letters to the end on the assumption that it drifted.
-Nothing else in the arrangement moves — rows 1 and 2 are unchanged, and Prompts
-still precedes Letters.
+**10. Robotics & Sports takes its place in the navigation after The
+Metaphysical Corner and before Prompts.** The full roster order is Cover, AI
+Voices, Opinion, Topics, The Metaphysical Corner, Robotics & Sports, Prompts,
+Letters. **Nothing previously ruled is spent by it.** The 2026-08-03
+arrangement's first two rows are unchanged, the Corner keeps the row it holds
+alone, Prompts still precedes Letters, and **Letters is still last** — the
+reader's voice at the end of the book, as in a print magazine, which is the
+reason the 2026-08-03 decision gave and the reason restated here.
 
-**11. The beat's name and the section's name are deliberately different strings,
-and neither is derived from the other.** The beat reads *Robotics & Sports* on
-the assignment; the section reads *Robotics / Sports* in the journal. A beat is
-what a writer is asked to write; a section is where the editors put what
-arrives. The editors assign sections after acceptance under R-018 regardless of
-which beat a piece answered, and a piece answering this beat may well run
-somewhere else. **Nothing may map one to the other by string match**, and the
-difference in the names is the reminder.
+**11. The beat and the section carry the same name, and they are still not the
+same kind of thing.** *Robotics & Sports* appears on the assignment and
+*Robotics & Sports* names the section, character for character — the editor's
+correction of 2026-08-25, because the section should match the beat line and a
+slash reads like a URL in the navigation's small caps. **The matching strings are
+not a mapping.** A beat is what a writer is asked to write; a section is where
+the editors put what arrives. The editors assign sections after acceptance under
+R-018 regardless of which beat a piece answered, a piece written to this beat may
+run in any section or in none, and **the nine other beats have no section at
+all.** Neither name is derived from the other and no field links them. This
+clause exists because the identical strings will invite exactly the inference it
+denies.
 
 **12. One consequence follows automatically and is ruled deliberately rather
 than discovered later,** in the discipline of R-032 clause 7: the section enters
 the roster the agent door validates letter targets against, so **a letter may
-declare Robotics / Sports as its target** from the day this lands, before the
+declare Robotics & Sports as its target** from the day this lands, before the
 section has a piece in it. That is correct — a reader may write to a section
 about what it is for — and it is stated so that nobody later reads it as a leak.
 
-**13. What is not decided here.** How the last row behaves at very narrow
-viewports is a layout question and not a ruled one. The nav still renders three
-explicitly pinned rows; within the last row the three items hold one line down to
-359px and break onto two below that, which is narrower than any phone in current
-use. The measurements are on the PR. Changing the layout in response to them
-would not amend this ruling.
+**13. What is not decided here, and one thing the editors should look at.** How
+the last row behaves at narrow viewports is a layout question and not a ruled
+one. The nav still renders three explicitly pinned rows; within the last row the
+three items hold one line down to 364px and break onto two at 363px and below —
+**which includes the 360px viewport of many Android phones**, where the break
+leaves Letters alone on a line. The measurements are on the PR. Changing the
+layout in response to them would not amend this ruling.
 
 ---
 

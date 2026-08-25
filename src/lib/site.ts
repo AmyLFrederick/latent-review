@@ -92,7 +92,7 @@ import { formatTierCode } from './tier-codes.mjs';
 // R-032 made Topics a standing section. It is last on purpose: it is the
 // catch-all, and the order here is the order an issue's contents run in.
 //
-// ROBOTICS / SPORTS SITS ABOVE IT for exactly that reason (editors, 2026-08-25).
+// ROBOTICS & SPORTS SITS ABOVE IT for exactly that reason (editors, 2026-08-25).
 // It is a named beat rather than a catch-all, so it runs with the other named
 // sections and Topics keeps the last place that belongs to whatever fits
 // nowhere else. Adding it below Topics would have put a defined section after
@@ -102,7 +102,7 @@ export const STANDING_SECTIONS = [
   'Opinion',
   'AI Voices',
   'The Metaphysical Corner',
-  'Robotics / Sports',
+  'Robotics & Sports',
   'Topics',
 ] as const;
 
@@ -179,7 +179,7 @@ export function sectionUrl(section: string): string {
  *
  * MEMBERSHIP IS EIGHT SINCE 2026-08-25, and every addition has cost a ruling:
  * R-026 clause 6 reopened the roster for Prompts, R-027 clause 3 spent the slot
- * reserved for Topics, and Robotics / Sports arrives with a ruling of its own.
+ * reserved for Topics, and Robotics & Sports arrives with a ruling of its own.
  * None of the three is a standing permission. R-027 clause 3's one positional
  * requirement, Topics before Letters, holds below.
  *
@@ -213,19 +213,13 @@ export interface NavEntry {
  *
  *   Row 1   Cover · AI Voices · Opinion · Topics
  *   Row 2   The Metaphysical Corner          (alone, centred)
- *   Row 3   Prompts · Letters · Robotics / Sports
+ *   Row 3   Robotics & Sports · Prompts · Letters
  *
- * THE NEW SECTION IS APPENDED TO THE LAST ROW, placed at the end of the roster
- * by the human editor on 2026-08-25. Nothing else moved: rows 1 and 2 are
- * byte-identical to the arrangement ruled on 2026-08-03, and the order of
- * Prompts and Letters within row 3 is unchanged.
- *
- * WHAT IT COSTS, STATED RATHER THAN LEFT TO BE NOTICED. "Letters is last —
- * correspondence closes the book" was ruled on 2026-08-03 and was the position
- * the whole three-row arrangement was reorganised around. An eighth entry after
- * it spends that position. The editor placed it there deliberately; this comment
- * exists so that the cost is legible to whoever reads the roster next, and so
- * that nobody restores Letters to the end on the assumption that it drifted.
+ * THE NEW SECTION OPENS THE LAST ROW, placed after the Corner and before Prompts
+ * by the human editor on 2026-08-25. NOTHING RULED IS SPENT: rows 1 and 2 are
+ * byte-identical to the arrangement ruled on 2026-08-03, the Corner keeps the
+ * row it holds alone, Prompts still precedes Letters, and Letters is still last
+ * — the reader's voice at the end, as in a print magazine.
  *
  * THE ROWS ARE STILL EXPLICIT, WHICH IS EASY TO MISREAD FROM THE RENDERING.
  * They are not produced by length: each row is its own <ul>, opened by an entry
@@ -262,7 +256,7 @@ export interface NavEntry {
  * MEMBERSHIP IS EIGHT, AND THE ROSTER WAS REOPENED TO GET THERE. It was closed
  * at seven: R-026 clause 6 reopened it once for Prompts, R-027 clause 3 spent
  * the slot reserved for Topics, and neither was a standing permission — the
- * next addition needed its own ruling, and Robotics / Sports arrives with one
+ * next addition needed its own ruling, and Robotics & Sports arrives with one
  * (2026-08-25). It is not a standing permission either; the ninth needs the
  * same thing the eighth did. R-027 clause 3's one positional requirement,
  * Topics before Letters, holds and is asserted in the suite.
@@ -284,18 +278,21 @@ export const NAV_ROSTER: readonly NavEntry[] = [
   { label: 'Topics', section: 'Topics' },
   // Row 2 — alone, centred, under the name the section actually has.
   { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsRow: true },
-  // Row 3 — the two participatory sections, and then the new section last.
-  { label: 'Prompts', href: '/prompts/', startsRow: true },
-  // NO LONGER LAST, and the displacement is deliberate rather than accidental
-  // (human editor, 2026-08-25). "Letters is last — correspondence closes the
-  // book" was ruled on 2026-08-03 and was the position the whole three-row
-  // arrangement was reorganised around. The editor placed Robotics / Sports at
-  // the end of the roster, which spends that position. It is recorded here
-  // because a later reader finding Letters in the middle of a row should meet a
-  // decision and not a drift.
+  // Row 3 — the new section opens it, then the two participatory sections close
+  // the nav. Placed here by the human editor on 2026-08-25: after the Corner,
+  // before Prompts.
+  //
+  // OPENING ROW 3 RATHER THAN JOINING ROW 2, which is the one thing the editor's
+  // flat ordering does not settle. "After the Corner and before Prompts" is
+  // satisfied either way, and putting it beside the Corner would take away the
+  // row the Corner holds alone — ruled 2026-08-03, and given up once already
+  // before a third row bought it back. So the order is honoured at the head of
+  // this row instead, and nothing ruled is spent.
+  { label: 'Robotics & Sports', section: 'Robotics & Sports', startsRow: true },
+  { label: 'Prompts', href: '/prompts/' },
+  // Last, and last on purpose: correspondence closes the book. It is the
+  // reader's voice and it belongs at the end, as in a print magazine.
   { label: 'Letters', href: '/letters/' },
-  // Last in the roster, by the human editor's placement of 2026-08-25.
-  { label: 'Robotics / Sports', section: 'Robotics / Sports' },
 ];
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
@@ -312,7 +309,13 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
   // (R-028 c5) — arguably harder, since a catch-all's examples would read as
   // the request list the journal says it does not keep.
   Topics: 'Pieces on any subject that do not fit the other sections.',
-  // THE ONE SECTION NAMED FOR ITS SUBJECT, and the description says what the
+  // THE ONE SECTION NAMED FOR ITS SUBJECT, and it carries the beat's own name
+  // character for character (human editor, 2026-08-25): the ampersand matches
+  // the beat line, and a slash reads like a URL in the nav's small caps. The
+  // consequence to know is that slugifySection turns "&" into " and ", so the
+  // page is /section/robotics-and-sports/ rather than /section/robotics-sports/.
+  //
+  // The description says what the
   // subject is because a beat that will not name itself cannot be written to.
   // R-028 clause 5 keeps author-facing subject copy example-free, and the line
   // above is why Topics carries none; this is the opposite case. A named beat
@@ -320,7 +323,7 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
   // at the door names it in the same words. Describing it here is not the
   // journal keeping a quiet request list — it is the journal saying out loud
   // what it has already asked for.
-  'Robotics / Sports':
+  'Robotics & Sports':
     'Robots and athletes: machines that move, and bodies that compete.',
 };
 
