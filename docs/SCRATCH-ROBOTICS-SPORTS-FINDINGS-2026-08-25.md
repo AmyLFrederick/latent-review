@@ -56,7 +56,7 @@ the Robotics & Sports pieces there. Two subject-shaped places, disjoint contents
 and the more discoverable one is the one that excludes the new section.
 
 **What the PR does about it:** states the non-mapping in three places — the
-ruling draft's clause 10, the changelog entry, and the code comment on
+ruling draft's clause 12, the changelog entry, and the code comment on
 `STANDING_SECTIONS` — and keeps the two strings deliberately different
 (`Robotics & Sports` on the assignment, `Robotics & Sports` in the journal) so
 that a string match fails loudly rather than a near-match succeeding quietly.
@@ -86,7 +86,7 @@ showing Robotics & Sports pieces. Neither is touched by this PR.
 
 ---
 
-## 2. `/cfp.json`'s `sections_note` is now false, in both halves
+## 2. `/cfp.json`'s `sections_note` is now false — in one half, since the reassignment
 
 This is the flag I would move on first, because it is a published sentence that
 has stopped being true rather than a risk of confusion.
@@ -98,9 +98,12 @@ Both halves fail on the new section:
 
 - **"never its subject."** Robotics & Sports is named for its subject. It is the
   first section that is.
-- **"a record of where past pieces have landed, not a request list."** It has no
-  past pieces at all, and the desk begins dealing a beat asking for them on the
-  day it launches. It is precisely a request, disclosed as one.
+- **"a record of where past pieces have landed, not a request list."** This half
+  is **no longer false**, as of the reassignment: the section now holds a piece
+  that has in fact landed there. The desk is still dealing a beat asking for
+  more, so it is also a request — but the sentence is at least half true again,
+  which it was not this morning. The first half is still false and is the reason
+  this flag stays open.
 
 The sentence was true of Cover, Opinion, AI Voices, the Corner and Topics — five
 sections defined by the *kind* of piece. It was doing real work: it is the
@@ -282,11 +285,49 @@ may write a letter to Robotics & Sports before the section has a single piece.
 
 That is the R-032 clause 7 consequence arriving again, and it seems right: a
 reader may write to a section about what it is for. It is in the ruling draft as
-clause 12 so nobody later reads it as a leak.
+clause 13 so nobody later reads it as a leak.
 
 ---
 
-## 7. Not affected, checked rather than assumed
+## 7. The two questions left open on the last pass, both answered
+
+**Do pieces assigned to Robotics & Sports appear on `/topics/`? No — they do
+not, and this is now observed rather than predicted.** `/topics/` lists only
+pieces running in the **Topics section** (R-032 clause 2; `TOPICS_SECTION` in
+`src/lib/topics.mjs`). Since the Agassi piece moved, the built `/topics/` no
+longer contains it, and the subject heading **Technology & Infrastructure** — the
+only piece under it in this issue — is gone from that page too. `/topics/` now
+opens on *Science & Nature* where it opened on *Technology & Infrastructure*,
+because the moved piece carried `section_order: 1` and led the page.
+
+Nothing is broken by this and no URL 404s: `/topics/` is intact, the piece's own
+permalink is unchanged, and its `topics` label is still published on the piece in
+`/issues.json` and `/corpus.jsonl`. What changes is discovery — the journal's one
+subject-shaped page no longer surfaces its one sports piece. That is the flag
+from §1 arriving in practice, and it is worth deciding on its own rather than as
+a side effect of this move.
+
+**Does the nav change reach `/door`, with `open-v2` itself untouched? Yes to
+both, verified in the built output.**
+
+All three door pages render the new roster — `/door/`, `/door/open-v2/` and
+`/door/topics-v4/` all show `Cover · AI Voices · Opinion · Topics` /
+`The Metaphysical Corner` / `Robotics & Sports · Prompts · Letters`.
+
+And the control brief is untouched:
+
+- `OPEN_V2` hashes to `a3babf96…d687f5b74`, the value pinned in the suite since
+  the brief was frozen.
+- `/door/open-v2/` contains the control's opener (*"Your subject is yours"*) and
+  none of the beat brief's.
+- **With the nav element removed from that page, the string "Robotics" does not
+  appear on it at all.** The only place the new section reaches the control's
+  page is the journal's navigation — which is the §3 flag, unchanged and still
+  open.
+
+---
+
+## 8. Not affected, checked rather than assumed
 
 - **`llms.txt`** lists pages by hand and names only Topics and Prompts among
   sections — Cover, Opinion, AI Voices and the Corner have never been in it. The
@@ -294,7 +335,10 @@ clause 12 so nobody later reads it as a leak.
 - **`/agent-api.json`** carries no enum of brief variants; `brief_variant` on the
   submission schema is a free string capped at 100 characters, so nothing there
   narrowed or widened.
-- **No published piece changed.** Every existing piece keeps its section, and
-  Issue 1's contents order is unchanged — the new section is empty, and
-  `groupSections()` drops empty sections from an issue.
+- **One published piece changed section**, on the editors' decision of
+  2026-08-25 — the Agassi piece, Topics → Robotics & Sports, section only. Every
+  other piece keeps its section. Issue 1's contents order now runs Cover,
+  Opinion, AI Voices, The Metaphysical Corner, **Robotics & Sports**, Topics,
+  Prompts, which is `STANDING_SECTIONS` order with the non-standing section last.
+  The section is no longer empty, so `groupSections()` no longer drops it.
 - **`/door/why`** still reads "one of two briefs at random", which is still true.
