@@ -121,6 +121,21 @@ export function topicIndex(articles) {
  * clause 2's "subjects appear only if they have a piece in the current issue";
  * the page is this week's page, not an archive.
  *
+ * A HEADING THAT FALLS AWAY IS CORRECT BEHAVIOUR AND NOT A GAP — confirmed by
+ * the human editor on 2026-08-25, and written down here because the next reader
+ * to notice it will be tempted to "fix" it. When the Agassi piece moved from
+ * Topics to Robotics & Sports, it took the "Technology & Infrastructure" heading
+ * off this page with it: it was the only piece under that heading in the issue,
+ * so the heading had nothing left to gather. Its label is unchanged and still
+ * published on the piece; a heading here is a function of which pieces run in
+ * THIS section, never of which labels exist.
+ *
+ * DO NOT ADD EMPTY HEADINGS FOR CONSISTENCY. An index of what exists is truer
+ * than an index of what the journal hopes to cover, and a standing heading with
+ * nothing under it would be the second of those wearing the clothes of the
+ * first. The heading returns on its own the moment a piece carrying that label
+ * runs in Topics again — which is the behaviour above, unchanged and deliberate.
+ *
  * A PIECE IN THIS SECTION WITHOUT A LABEL FAILS THE BUILD, and that is clause 3
  * rather than strictness for its own sake. The page has exactly one shape:
  * subject heading, then the pieces under it. A piece with no label has no

@@ -70,6 +70,40 @@ test('the first piece in issue order wins, so the link does not move mid-day', (
   assert.equal(sectionNavHref('AI Voices', two), '/articles/first/');
 });
 
+// --- Robotics & Sports (editors, 2026-08-25) -------------------------------
+
+test('the ampersand in the section name becomes "and" in the slug', () => {
+  // THE ONE MECHANICAL SURPRISE IN THE NAME. "Robotics & Sports" is the display
+  // form the editors ruled, matching the beat line character for character —
+  // and slugifySection expands "&" to " and " before collapsing non-alphanumeric
+  // runs, so the page is /section/robotics-and-sports/ and NOT
+  // /section/robotics-sports/. That expansion is deliberate and predates this
+  // section; asserted here because this is the first section name to exercise
+  // it, and because a hand-built path would guess the shorter form and 404.
+  assert.equal(sectionNavHref('Robotics & Sports', null), '/section/robotics-and-sports/');
+  assert.ok(!sectionNavHref('Robotics & Sports', null).includes('%26'));
+  assert.equal(sectionNavHref('Robotics & Sports', null).split('/').filter(Boolean).length, 2);
+});
+
+test('Robotics & Sports is a listing section and never direct-opens', () => {
+  // It holds MULTIPLE pieces by design, exactly as Topics and Opinion do, so it
+  // is deliberately absent from DIRECT_OPEN_SECTIONS. The nav must reach its
+  // listing even in the issue where it happens to carry one piece.
+  assert.ok(!DIRECT_OPEN_SECTIONS.includes('Robotics & Sports'));
+  const oneItem = { sections: [{ section: 'Robotics & Sports', items: [{ id: 'a-piece' }] }] };
+  assert.equal(sectionNavHref('Robotics & Sports', oneItem), '/section/robotics-and-sports/');
+});
+
+test('Topics is still last in the contents order — the catch-all closes an issue', () => {
+  // The new section is a named beat and runs with the named sections. If it
+  // ever lands below Topics, an issue would run its catch-all before a section
+  // defined by its subject, which inverts what the order means.
+  assert.equal(STANDING_SECTIONS[STANDING_SECTIONS.length - 1], 'Topics');
+  assert.ok(
+    STANDING_SECTIONS.indexOf('Robotics & Sports') < STANDING_SECTIONS.indexOf('Topics')
+  );
+});
+
 test('every direct-open section is a standing section', () => {
   for (const section of DIRECT_OPEN_SECTIONS) {
     assert.ok(STANDING_SECTIONS.includes(section), `${section} must be a standing section`);
@@ -96,7 +130,10 @@ test('Topics still comes before Letters — the one position R-027 clause 3 fixe
 test('Letters is last — correspondence closes the book', () => {
   // Ruled by the editors 2026-08-03. This is the position the whole
   // arrangement was reorganised around, so it is asserted rather than left to
-  // the array's shape.
+  // the array's shape. It survived the eighth entry: the human editor placed
+  // Robotics & Sports ahead of the participatory pair on 2026-08-25 rather than
+  // after it, and restated the reason — it is the reader's voice and belongs at
+  // the end, as in a print magazine.
   assert.equal(NAV_ROSTER[NAV_ROSTER.length - 1].label, 'Letters');
 });
 
@@ -105,7 +142,7 @@ test('AI Voices comes ahead of Opinion', () => {
   assert.ok(labels.indexOf('AI Voices') < labels.indexOf('Opinion'));
 });
 
-test('the roster renders as three pinned rows, in the ruled arrangement', () => {
+test('the roster renders as three pinned rows, in the arrangement as placed', () => {
   // FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk — and the
   // same arrangement Mustafa proposed in his layout pass, reached a second time
   // from the rendering.
@@ -123,8 +160,69 @@ test('the roster renders as three pinned rows, in the ruled arrangement', () => 
   assert.deepEqual(rows, [
     ['Cover', 'AI Voices', 'Opinion', 'Topics'],
     ['The Metaphysical Corner'],
-    ['Prompts', 'Letters'],
+    ['Robotics & Sports', 'Prompts', 'Letters'],
   ]);
+});
+
+test('the ruled rows are untouched by the entry added on 2026-08-25', () => {
+  // THE INSERTION IS THE CLAIM. Rows 1 and 2 are the arrangement the editors walked
+  // on a phone and ruled on 2026-08-03, and adding a section must not have
+  // quietly rearranged them to make room. Asserted separately from the shape
+  // above so that a future change which rebalances row 1 to relieve row 3 fails
+  // HERE, with the reason attached, rather than only as a diff in a fixture.
+  const rows = NAV_ROSTER.reduce((acc, entry) => {
+    if (entry.startsRow || acc.length === 0) acc.push([]);
+    acc[acc.length - 1].push(entry.label);
+    return acc;
+  }, []);
+  assert.equal(rows.length, 3, 'the roster has grown or lost a row');
+  assert.deepEqual(rows[0], ['Cover', 'AI Voices', 'Opinion', 'Topics']);
+  assert.deepEqual(rows[1], ['The Metaphysical Corner']);
+  // Row 3 gained an entry at its HEAD; the participatory pair still closes it,
+  // in the order it has always had.
+  assert.deepEqual(rows[2].slice(-2), ['Prompts', 'Letters']);
+});
+
+test('one entry takes a line of its own below the narrow breakpoint, and only one', () => {
+  // WHAT THIS PROTECTS. Row 3 holds one line down to 364px; below that it wraps
+  // on its own and leaves LETTERS alone on the final line — the one position in
+  // this nav a ruling fixes. The declared break moves Robotics & Sports onto its
+  // own line instead, so the participatory pair stays together.
+  //
+  // Asserted as "exactly one", because the failure mode is a later entry
+  // acquiring the flag for tidiness and quietly turning the narrow nav into a
+  // column of singles — which is the reflow the pinned rows exist to prevent,
+  // arrived at by a different road.
+  const solo = NAV_ROSTER.filter((e) => e.narrowSolo);
+  assert.equal(solo.length, 1, 'the narrow break is declared on more than one entry');
+  assert.equal(solo[0].label, 'Robotics & Sports');
+
+  // It must OPEN its row. A break declared on a middle or last item would push
+  // a different split than the one that was measured.
+  const rows = NAV_ROSTER.reduce((acc, entry) => {
+    if (entry.startsRow || acc.length === 0) acc.push([]);
+    acc[acc.length - 1].push(entry);
+    return acc;
+  }, []);
+  const row = rows.find((r) => r.some((e) => e.narrowSolo));
+  assert.equal(row[0].label, 'Robotics & Sports', 'the narrow break is not on its row’s first entry');
+  assert.deepEqual(row.slice(1).map((e) => e.label), ['Prompts', 'Letters']);
+});
+
+test('the layout honours the narrow break, at the measured breakpoint', () => {
+  // The roster declares it; this asserts the template and the stylesheet
+  // actually carry it, since a flag nothing reads is worse than no flag.
+  const layout = baseLayout();
+  assert.match(layout, /entry\.narrowSolo \? 'nav-narrow-solo'/, 'the template ignores narrowSolo');
+  assert.match(
+    layout,
+    /@media \(max-width: 23rem\) \{\s*\.nav-rows li\.nav-narrow-solo \{\s*flex-basis: 100%;/,
+    'the narrow break rule is gone or its breakpoint moved'
+  );
+  // The breakpoint sits ABOVE the measured 364px threshold, not on it. Media
+  // queries resolve rem against the browser default of 16px, so 23rem is 368px.
+  assert.ok(!/@media \(max-width: (2[0-2]|1\d)rem\)[\s\S]{0,80}nav-narrow-solo/.test(layout),
+    'the narrow breakpoint has dropped below the width the orphan appears at');
 });
 
 test('the Corner has a row to itself, under its full name', () => {
@@ -165,7 +263,14 @@ test('the display order does not disturb the order an issue runs in', () => {
   // of Opinion in the NAV without touching the order an issue runs in.
   assert.deepEqual(
     [...STANDING_SECTIONS],
-    ['Cover', 'Opinion', 'AI Voices', 'The Metaphysical Corner', 'Topics']
+    [
+      'Cover',
+      'Opinion',
+      'AI Voices',
+      'The Metaphysical Corner',
+      'Robotics & Sports',
+      'Topics',
+    ]
   );
   assert.notDeepEqual(
     NAV_ROSTER.filter((e) => e.section).map((e) => e.section),

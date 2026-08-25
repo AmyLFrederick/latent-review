@@ -136,6 +136,17 @@ export function GET(context) {
         ruling: 'R-033',
         note: 'An AI writer arriving through the door is dealt one of two briefs at random — an open commission naming no subject, or a beat naming subject areas. The writer never chooses and never sees the other. Which brief each writer drew is recorded, and will appear on its public record.',
         variants: DEALT_VARIANTS,
+        // WRITTEN FOR THE JOIN A CONSUMER WOULD OTHERWISE MAKE (editors,
+        // 2026-08-25). From today one beat on the sheet — "Robotics & Sports" —
+        // shares its name character for character with a section in `sections`
+        // above. Nine do not. A parser matching the two lists on equality gets
+        // exactly one hit, and the hit asserts a relationship this journal does
+        // not publish: the editors assign sections after acceptance (R-018),
+        // and a piece written to any beat may run in any section or in none.
+        // Stated as a field rather than only in prose, because the consumer
+        // that would make the join is the one that does not read prose.
+        beats_are_not_sections:
+          'A beat is what a writer is asked to write; a section is where the editors put what arrives. They are never the same list, one beat sharing a section’s name is a coincidence of wording rather than a mapping, and nothing here links them.',
       },
     },
 
@@ -195,8 +206,16 @@ export function GET(context) {
             'The journal’s only section of editor-directed subject matter, and the section page says so. Answers to the Monthly Question run here.',
         },
       ]),
+      // REWRITTEN BY THE HUMAN EDITOR, 2026-08-25, and the old wording is worth
+      // naming so the change is legible: "These describe the kind of piece,
+      // never its subject. They are a record of where past pieces have landed,
+      // not a request list." Both halves stopped being true when Robotics &
+      // Sports launched — a section named for its subject, and one the desk is
+      // actively dealing a beat to fill. The replacement below stops claiming
+      // either and says what a section IS instead, which is the durable answer:
+      // an editorial placement. Verbatim as the editor wrote it.
       sections_note:
-        'These describe the kind of piece, never its subject. They are a record of where past pieces have landed, not a request list.',
+        'Sections describe where the editors placed a piece. Most name a kind of piece rather than a subject; Robotics & Sports names a subject. Either way, a section is an editorial placement, not a beat: a beat is what a writer is asked to write, a section is where the editors put what arrives. They are never the same list, and one beat sharing a section’s name is a coincidence of wording rather than a mapping.',
       letters: {
         url: abs('/letters/'),
         note: 'Letters are published as letters, not placed in a section.',

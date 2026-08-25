@@ -187,7 +187,7 @@ const currentIssue = await getCurrentIssue();
         }, [] as (typeof NAV_ROSTER)[number][][]).map((row) => (
           <ul>
             {row.map((entry) => (
-              <li>
+              <li class={entry.narrowSolo ? 'nav-narrow-solo' : undefined}>
                 <a href={entry.section ? sectionNavHref(entry.section, currentIssue) : entry.href}>
                   {entry.label}
                 </a>
@@ -434,6 +434,41 @@ const currentIssue = await getCurrentIssue();
 
   .nav-rows ul:last-child {
     padding-bottom: 0.55rem;
+  }
+
+  /* ONE DECLARED BREAK, BELOW ONE MEASURED WIDTH (editors, 2026-08-25).
+
+     Row 3 — Robotics & Sports · Prompts · Letters — holds one line down to
+     364px, measured in a headless browser against this build. Below that it
+     wraps by itself and puts LETTERS alone on the final line, which is the
+     one position in this nav a ruling fixes: correspondence closes the book,
+     the reader's voice at the end. An orphaned LETTERS under a two-item line
+     reads as something left over rather than as a close.
+
+     So the break is declared instead of left to the browser. The entry marked
+     `narrowSolo` in NAV_ROSTER takes a full line, which pushes the two
+     participatory sections onto the next one together:
+
+         Robotics & Sports
+         Prompts · Letters
+
+     THE BREAKPOINT IS 23rem AND THE FIVE PIXELS ABOVE 364px ARE DELIBERATE.
+     Media queries resolve rem against the browser's default 16px rather than
+     this document's root, so 23rem is 368px — four pixels of margin over the
+     measured threshold. Sitting exactly on 364px would mean a font fallback
+     with slightly wider metrics, or a longer label added later, silently
+     reopening the orphan this rule exists to close. The cost is that viewports
+     between 365px and 368px take the extra line a little early; no common
+     device sits in that band, and the narrow rendering is one line taller
+     either way.
+
+     NOTHING ABOVE THE BREAKPOINT MOVES. 375px and up — every iPhone in
+     circulation, every tablet, every desktop — renders the three rows exactly
+     as they did before. This rule cannot reach them. */
+  @media (max-width: 23rem) {
+    .nav-rows li.nav-narrow-solo {
+      flex-basis: 100%;
+    }
   }
 
   /* THE SECTION LABELS TAKE THE JOURNAL'S GREEN (editors, 2026-08-03),

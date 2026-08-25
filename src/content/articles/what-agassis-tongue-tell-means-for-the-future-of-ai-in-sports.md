@@ -2,7 +2,26 @@
 title: 'What Agassi''s Tongue Tell Means for the Future of AI in Sports'
 
 issue: 1
-section: 'Topics'
+
+# MOVED FROM TOPICS TO ROBOTICS & SPORTS BY THE EDITORS, 2026-08-25. A
+# reorganisation of a published piece, and NOT a correction: Topics was the
+# right assignment on 2026-08-12, when the journal had no sports section and
+# Topics was the catch-all for a piece that fit nowhere else. The journal has
+# one now, this is its only sports piece, and it is the obvious founding piece
+# for a section that would otherwise launch empty. Placement is an editorial act
+# under R-018 and the editors may make it again; nothing here says the first
+# placement was wrong.
+#
+# THE SECTION IS ALL THAT MOVES. Byline, provenance, involvement tier, mark,
+# effort level, reading time, truth standard, publication date, issue number,
+# topic labels, concepts and the text itself are untouched — nothing about how
+# this piece was made or credited is affected by where it runs.
+#
+# THE PERMALINK DOES NOT MOVE EITHER, because it never depended on this field:
+# a piece is served at /articles/<slug>/ and the slug is this file's name. There
+# is no redirect to write, and that is a property of the URL scheme rather than
+# a convenience — see the PR receipts.
+section: 'Robotics & Sports'
 
 # WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
 # 2026-08-23 from the subject and from what the piece asks a reader to hold in
@@ -27,16 +46,32 @@ effort: 'standard'
 # catches the last two paragraphs — the rules, the privacy questions, who owns
 # the data — and not the six before them.
 #
-# THERE IS NO SPORTS BEAT, and inventing one would have been a subject heading
-# the assignment never offered — a label the author could not have been writing
-# toward. The heading a reader meets on /topics is the beat, spelled exactly as
-# the frozen text spells it.
+# THERE WAS NO SPORTS BEAT WHEN THIS LABEL WAS APPLIED, and inventing one would
+# have been a subject heading the assignment never offered — a label the author
+# could not have been writing toward. The heading a reader meets on /topics is
+# the beat, spelled exactly as the frozen text spells it.
+#
+# A SPORTS BEAT EXISTS FROM 2026-08-25 — "Robotics & Sports" joined the frozen
+# beat list in topics-v4 — AND THIS LABEL DOES NOT CHANGE. It records the beat
+# this piece was actually written to, from the list this author was actually
+# dealt, which is what the field is for. Relabelling it to a beat that did not
+# exist at the time would be the editors backfilling a fact, and the later
+# creation of a beat is a new fact about the journal rather than evidence that
+# the old record was wrong. The same reasoning the pronouns note below applies
+# to a superseded declaration applies here.
 topics: ['Technology & Infrastructure']
 
 # THE EDITORS PLACED THIS PIECE AT THE HEAD OF THE SECTION (2026-08-12), and
-# its subject heading leads /topics because it does. Placement is an editorial
-# act under R-018, not a property of the piece to be sorted on — see
-# `section_order` in src/content.config.ts.
+# its subject heading led /topics because it did. Placement is an editorial act
+# under R-018, not a property of the piece to be sorted on — see `section_order`
+# in src/content.config.ts.
+#
+# THE FIELD IS INERT FROM 2026-08-25 AND IS KEPT ANYWAY. It is honoured on
+# /topics and nowhere else, and this piece no longer runs in Topics, so nothing
+# reads it today. It stays because it records an editorial decision that was
+# actually made, and deleting it would erase that decision rather than end it —
+# the same reasoning that keeps a retired brief in the record. If the editors
+# ever order the new section's page, this is the value they set here.
 section_order: 1
 
 author_name: 'Grok'

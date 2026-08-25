@@ -16,6 +16,7 @@ import {
   DEALT_VARIANTS,
   TOPICS_V2,
   TOPICS_V3,
+  TOPICS_V4,
   OPEN_V2,
   brief,
   deal,
@@ -51,7 +52,7 @@ test('the endpoint’s word bounds match the contract', () => {
 });
 
 test('every variant exists and is non-trivial', () => {
-  assert.deepEqual(BRIEF_VARIANTS, ['open-v2', 'topics-v2', 'topics-v3']);
+  assert.deepEqual(BRIEF_VARIANTS, ['open-v2', 'topics-v2', 'topics-v3', 'topics-v4']);
   for (const v of BRIEF_VARIANTS) {
     assert.ok(BRIEFS[v].length > 500, `${v} is suspiciously short`);
     assert.equal(brief(v), BRIEFS[v]);
@@ -65,9 +66,13 @@ test('the dealt list is a subset of the known list, and drops the retired brief'
   for (const v of DEALT_VARIANTS) {
     assert.ok(BRIEF_VARIANTS.includes(v), `${v} is dealt but not a known variant`);
   }
-  assert.deepEqual(DEALT_VARIANTS, ['open-v2', 'topics-v3']);
-  assert.ok(!DEALT_VARIANTS.includes('topics-v2'), 'the retired brief is still being dealt');
-  assert.ok(BRIEF_VARIANTS.includes('topics-v2'), 'the retired brief left the record');
+  assert.deepEqual(DEALT_VARIANTS, ['open-v2', 'topics-v4']);
+  // TWO RETIRED BRIEFS NOW, and both halves of the add-only rule are asserted
+  // for each: out of the dealing list, and still in the record forever.
+  for (const retired of ['topics-v2', 'topics-v3']) {
+    assert.ok(!DEALT_VARIANTS.includes(retired), `${retired} is still being dealt`);
+    assert.ok(BRIEF_VARIANTS.includes(retired), `${retired} left the record`);
+  }
 });
 
 test('an unknown variant throws rather than falling back', () => {
@@ -80,17 +85,19 @@ test('an unknown variant throws rather than falling back', () => {
 test('the deal is a coin flip, and the boundary lands where it should', () => {
   assert.equal(deal(() => 0), 'open-v2');
   assert.equal(deal(() => 0.499999), 'open-v2');
-  assert.equal(deal(() => 0.5), 'topics-v3');
-  assert.equal(deal(() => 0.999999), 'topics-v3');
+  assert.equal(deal(() => 0.5), 'topics-v4');
+  assert.equal(deal(() => 0.999999), 'topics-v4');
 });
 
-test('the retired brief is never dealt, at any point in the interval', () => {
+test('no retired brief is ever dealt, at any point in the interval', () => {
   // The failing mode this catches is the quiet one: a rewritten deal() that
-  // still returns topics-v2 for some slice of the interval would leave the
-  // door handing out the loophole it was closed to remove, and every
-  // individual deal would look correct.
+  // still returned a retired variant for some slice of the interval would leave
+  // the door handing out a superseded brief, and every individual deal would
+  // look correct.
   for (let n = 0; n <= 1000; n++) {
-    assert.notEqual(deal(() => n / 1000), 'topics-v2');
+    const dealt = deal(() => n / 1000);
+    assert.notEqual(dealt, 'topics-v2');
+    assert.notEqual(dealt, 'topics-v3');
   }
 });
 
@@ -98,10 +105,10 @@ test('a long run of deals stays near even', () => {
   // Deterministic sequence, not randomness: this asserts the picker divides the
   // interval evenly, which is the property that makes the measurement honest.
   let i = 0;
-  const counts = { 'open-v2': 0, 'topics-v3': 0 };
+  const counts = { 'open-v2': 0, 'topics-v4': 0 };
   for (let n = 0; n < 10_000; n++) counts[deal(() => (i++ % 10_000) / 10_000)]++;
   assert.equal(counts['open-v2'], 5000);
-  assert.equal(counts['topics-v3'], 5000);
+  assert.equal(counts['topics-v4'], 5000);
 });
 
 test('the paste block carries the dealt brief and asks for what the desk needs', () => {
@@ -117,8 +124,11 @@ test('the paste block carries the dealt brief and asks for what the desk needs',
 
 test('the paste block never leaks the variant the writer was not dealt', () => {
   assert.ok(!pasteBlock('open-v2').includes('This invitation names subjects on purpose'));
-  assert.ok(!pasteBlock('topics-v3').includes('Your subject is yours.'));
-  assert.ok(!pasteBlock('topics-v2').includes('Your subject is yours.'));
+  for (const beat of ['topics-v2', 'topics-v3', 'topics-v4']) {
+    assert.ok(!pasteBlock(beat).includes('Your subject is yours.'), `${beat} leaks the control`);
+  }
+  // And the control never acquires the beat that arrived on 2026-08-25.
+  assert.ok(!pasteBlock('open-v2').includes('Robotics & Sports'));
 });
 
 // --- The frozen texts ------------------------------------------------------
@@ -176,6 +186,71 @@ test('topics-v3 is topics-v2 plus exactly one paragraph', () => {
     TOPICS_V3.indexOf(RULE) < TOPICS_V3.indexOf('Pick the one you can write most richly on'),
     'the rule must come before the instruction to pick'
   );
+});
+
+test('topics-v3 is frozen too, from the day it was retired', () => {
+  // RETIRED 2026-08-25 AND FROZEN BY THE SAME ACT, exactly as topics-v2 was on
+  // 2026-08-01. Three dealt beat texts now sit in the record and the record is
+  // worth nothing if any of them can drift — the comparison between versions IS
+  // the measurement. If this fails, the question is not "update the hash"; it
+  // is "who edited a frozen brief".
+  const digest = createHash('sha256').update(TOPICS_V3, 'utf8').digest('hex');
+  assert.equal(
+    digest,
+    'cd9d0bf802d6ce0c30c4148adc25de92ad509c65e2c2c59ad2f0d7c3d590a28f',
+    'topics-v3 has been edited. A frozen brief is changed by a ruling, never by a commit.'
+  );
+});
+
+test('topics-v4 is topics-v3 plus exactly one beat', () => {
+  // The claim the record makes about these two briefs. ONE LINE is the only
+  // variable, and it is a beat rather than a paragraph of instruction — if v4
+  // were also a rewrite, nothing the two versions produce could be attributed
+  // to the beat's presence.
+  const BEAT = 'Robotics & Sports — robots, athletes, machines that move and bodies that compete';
+
+  assert.ok(TOPICS_V4.includes(BEAT), 'the new beat is not in topics-v4 verbatim');
+  assert.ok(!TOPICS_V3.includes(BEAT), 'the beat leaked backwards into the frozen topics-v3');
+  assert.ok(!TOPICS_V2.includes(BEAT), 'the beat leaked backwards into the frozen topics-v2');
+
+  // Remove the added line and what remains must be the older brief exactly.
+  assert.equal(TOPICS_V4.replace(`\n${BEAT}`, ''), TOPICS_V3);
+
+  // It closes the beat list rather than sitting inside it. Inserting it among
+  // the others would move every beat after it, and the two texts would differ
+  // by more than the thing that was added.
+  assert.ok(
+    TOPICS_V4.indexOf(BEAT) > TOPICS_V4.indexOf('Strange & Unexplained'),
+    'the new beat must come last in the list'
+  );
+  assert.ok(
+    TOPICS_V4.indexOf(BEAT) < TOPICS_V4.indexOf('One rule for this assignment'),
+    'the new beat must sit inside the list, above the rule that follows it'
+  );
+
+  // The rule topics-v3 exists for is carried forward untouched. A beat added
+  // beneath it would be the obvious way to lose it.
+  assert.ok(TOPICS_V4.includes('write about your subject, not about yourself'));
+});
+
+test('the beat list is what changed, and nothing below it moved', () => {
+  // Everything from the closing rule onward — the instruction to pick, the word
+  // range, the truth standards, the terms — is byte-identical across v3 and v4.
+  // Asserted as its own fact because the tail is the half a reader of the diff
+  // scrolls past.
+  const tail = (t) => t.slice(t.indexOf('One rule for this assignment'));
+  assert.equal(tail(TOPICS_V4), tail(TOPICS_V3));
+});
+
+test('the beat count is ten, and the ninth is where it was', () => {
+  // The list grew by exactly one. A brief that quietly gained or dropped a beat
+  // alongside the ruled one would still pass the prefix test above if the
+  // change happened to cancel out in length.
+  const beats = TOPICS_V4.split('\n\n')[1].split('\n');
+  assert.equal(beats.length, 10);
+  assert.equal(TOPICS_V3.split('\n\n')[1].split('\n').length, 9);
+  assert.match(beats[8], /^Strange & Unexplained/);
+  assert.match(beats[9], /^Robotics & Sports/);
 });
 
 test('the disclosure page’s text is present and says what R-033 clause 5 requires', () => {
