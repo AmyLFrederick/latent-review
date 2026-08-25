@@ -209,32 +209,30 @@ export interface NavEntry {
 }
 
 /**
- * THE NAVIGATION ROSTER — FOUR ROWS SINCE 2026-08-25, THREE OF THEM RULED.
+ * THE NAVIGATION ROSTER — STILL THREE ROWS.
  *
  *   Row 1   Cover · AI Voices · Opinion · Topics
  *   Row 2   The Metaphysical Corner          (alone, centred)
- *   Row 3   Robotics / Sports                (alone, added 2026-08-25)
- *   Row 4   Prompts · Letters
+ *   Row 3   Prompts · Letters · Robotics / Sports
  *
- * THE NEW ROW IS INSERTED RATHER THAN THE OLD ONES REARRANGED, and that is the
- * whole of the placement reasoning. Rows 1 and 2 are byte-identical to the
- * arrangement the editors walked on a phone and ruled on 2026-08-03; the
- * participatory pair still closes the nav with Letters last. Nothing that was
- * ruled moved.
+ * THE NEW SECTION IS APPENDED TO THE LAST ROW, placed at the end of the roster
+ * by the human editor on 2026-08-25. Nothing else moved: rows 1 and 2 are
+ * byte-identical to the arrangement ruled on 2026-08-03, and the order of
+ * Prompts and Letters within row 3 is unchanged.
  *
- * IT IS NOT APPENDED TO ROW 1, and the reason is measurable rather than
- * aesthetic. Row 1 is four short labels; adding ROBOTICS / SPORTS — seventeen
- * characters at 0.72rem uppercase with 0.14em tracking — takes that row past
- * the width of a phone, and `nav ul` is `flex-wrap: wrap`. It would wrap into
- * two visual lines on exactly the screens the 2026-08-03 pass was called to
- * fix, which is the failure the pinned rows exist to prevent. A row of its own
- * is what the Corner already has, for the same reason.
+ * WHAT IT COSTS, STATED RATHER THAN LEFT TO BE NOTICED. "Letters is last —
+ * correspondence closes the book" was ruled on 2026-08-03 and was the position
+ * the whole three-row arrangement was reorganised around. An eighth entry after
+ * it spends that position. The editor placed it there deliberately; this comment
+ * exists so that the cost is legible to whoever reads the roster next, and so
+ * that nobody restores Letters to the end on the assumption that it drifted.
  *
- * A FOURTH ROW IS A LAYOUT CHANGE THE EDITORS HAVE NOT WALKED. Two solo rows
- * now stack, which reads differently from one, and this arrangement is the
- * drafting session's call and not a ruled one. It is recorded as such here so
- * that the next reader knows which rows carry a ruling behind them and which
- * carries a judgement.
+ * THE ROWS ARE STILL EXPLICIT, WHICH IS EASY TO MISREAD FROM THE RENDERING.
+ * They are not produced by length: each row is its own <ul>, opened by an entry
+ * marked `startsRow`, and `nav ul` cannot reflow an item into another list. The
+ * three lines a reader sees are three decisions. Within a row the items DO wrap
+ * if they outgrow the viewport, and row 3 is now the row where that can happen
+ * first — see the measurements recorded on the PR.
  *
  * FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk. It is
  * Mustafa Emirbayer's original arrangement from his layout pass, arrived at a
@@ -286,13 +284,18 @@ export const NAV_ROSTER: readonly NavEntry[] = [
   { label: 'Topics', section: 'Topics' },
   // Row 2 — alone, centred, under the name the section actually has.
   { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsRow: true },
-  // Row 3 — alone, for the same reason the Corner is: the name does not fit a
-  // shared row at a phone's width. Added 2026-08-25.
-  { label: 'Robotics / Sports', section: 'Robotics / Sports', startsRow: true },
-  // Row 4 — the two participatory sections, closing the nav.
+  // Row 3 — the two participatory sections, and then the new section last.
   { label: 'Prompts', href: '/prompts/', startsRow: true },
-  // Last, and last on purpose: correspondence closes the book.
+  // NO LONGER LAST, and the displacement is deliberate rather than accidental
+  // (human editor, 2026-08-25). "Letters is last — correspondence closes the
+  // book" was ruled on 2026-08-03 and was the position the whole three-row
+  // arrangement was reorganised around. The editor placed Robotics / Sports at
+  // the end of the roster, which spends that position. It is recorded here
+  // because a later reader finding Letters in the middle of a row should meet a
+  // decision and not a drift.
   { label: 'Letters', href: '/letters/' },
+  // Last in the roster, by the human editor's placement of 2026-08-25.
+  { label: 'Robotics / Sports', section: 'Robotics / Sports' },
 ];
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {

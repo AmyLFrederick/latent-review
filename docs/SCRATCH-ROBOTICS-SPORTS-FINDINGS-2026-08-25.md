@@ -1,4 +1,4 @@
-# Robotics / Sports: what "Topics" now means in three places, and four other flags
+# Robotics / Sports: what "Topics" now means in three places, the nav measured, and four other flags
 
 Scratch, 2026-08-25. For the editors' read on PR #189, branch
 `robotics-sports-section`. Nothing here is fixed in that PR — you asked to know,
@@ -149,34 +149,102 @@ comes out and the section page carries the name alone.
 
 ---
 
-## 5. The nav has a fourth row, and no editor has walked it on a phone
+## 5. The nav: how it actually wraps, measured
 
-The three-row arrangement was ruled 2026-08-03 from your phone walk, and the
-rows are pinned as separate `<ul>`s precisely so a width cannot rearrange them.
+**First, a correction to the premise, because it changes what the question
+means.** The nav does *not* wrap to three lines by length. **The three rows are
+explicit.** Each is its own `<ul>`, opened by an entry marked `startsRow` in
+`NAV_ROSTER`, and a flex container cannot reflow an item into a different list.
 
-**Rows 1 and 2 are untouched, and there is a test asserting they stay untouched.**
-Robotics / Sports takes a row of its own between the Corner and the participatory
-pair:
+That is not incidental — it is the whole point of the 2026-08-03 pass. The nav
+*was* one list broken by CSS, it held at the widths the layout anticipated and
+became something else on a phone, and that is what sent the editors back to it.
+The fix was to stop letting width decide. From `Base.astro`: *"A list cannot
+reflow its items into another list, so what is approved on one screen is what
+renders on every screen."*
+
+So the three lines you see are three decisions, not a wrap. What *can* still
+happen is that the items **inside** one row outgrow the viewport and wrap within
+that row — and that is now possible in row 3 where it was not before.
+
+### The placement
+
+Robotics / Sports is appended to the end of row 3, after Letters, as instructed.
+Nothing else moved.
 
 ```
 Row 1   Cover · AI Voices · Opinion · Topics
 Row 2   The Metaphysical Corner
-Row 3   Robotics / Sports          ← new
-Row 4   Prompts · Letters
+Row 3   Prompts · Letters · Robotics / Sports
 ```
 
-**Why not simply add it to row 1.** `nav ul` is `flex-wrap: wrap`. Row 1 is four
-short labels; ROBOTICS / SPORTS is seventeen characters at 0.72rem uppercase with
-0.14em tracking, and adding it takes that row past a phone's width. It would wrap
-into two visual lines on exactly the screens the 2026-08-03 pass was called to
-fix — the failure the pinning exists to prevent.
+### Measured in headless Chromium against the built site
 
-**What I cannot tell you** is how two stacked solo rows look, because I have not
-seen it rendered at a phone width. It is a layout judgement, it is recorded in
-the code as the drafting session's and not a ruled one, and it can change without
-amending the ruling.
+Not estimated. Every figure below is from `getBoundingClientRect()` on the real
+built page at real viewport widths, comparing the roster with and without the new
+entry.
 
----
+| Viewport | Before | After |
+|---|---|---|
+| 1440 / 1280 / 1024 px (desktop) | 3 lines | **3 lines** |
+| 834 / 768 px (tablet) | 3 lines | **3 lines** |
+| 430 / 414 / 393 / 375 / 360 px (phones) | 3 lines | **3 lines** |
+| 320 px | 4 lines | **5 lines** |
+
+**The exact thresholds**, found by binary search:
+
+- **Row 3 holds one line down to 359px** and breaks onto two at **358px** and
+  below. Before this change it never broke at any width tested.
+- **Row 1 breaks at 331px** and below — **unchanged**, before and after. That is
+  pre-existing behaviour and nothing here caused or worsened it.
+
+### Is the wrap somewhere awkward? My read: no, and here is the honest margin
+
+**Every phone in current use is fine.** The narrowest common viewport is 360px
+(small Android) and the narrowest iPhone in circulation is 375px. Row 3 holds one
+line at both, with 360px clearing the 359px threshold by a single pixel.
+
+**That one-pixel margin at 360px is the whole of the risk, and I am not going to
+dress it up.** It is not a comfortable clearance. Anything that widens those
+three labels — a longer section name later, a font fallback with wider metrics on
+a device without the display face, a user's larger default text size — pushes
+360px over and the row breaks. The gap is `clamp(0.75rem, 2.4vw, 1.6rem)`, so it
+is already at its 0.75rem floor down there and has no more give to offer.
+
+**At 320px it wraps, and the wrap lands cleanly:**
+
+```
+Cover · AI Voices · Opinion
+Topics
+The Metaphysical Corner
+Prompts · Letters
+Robotics / Sports
+```
+
+Robotics / Sports drops whole onto its own line rather than splitting mid-name,
+and row 1 was already wrapping at that width before today. 320px is iPhone SE
+first generation and old Android — not nothing, but not a screen the journal has
+been designed around, and the page was already showing four lines there.
+
+**I did not adjust the layout**, as instructed. If you want the margin widened,
+the options are: give Robotics / Sports its own row (which is what I had before
+this instruction, and it costs the Letters-last position nothing extra since that
+is already spent), or move it to row 1 and let *that* row carry the length. Both
+are yours.
+
+### One thing this placement costs, which is not a layout question
+
+**"Letters is last — correspondence closes the book" was ruled on 2026-08-03**,
+and it was the position the entire three-row arrangement was reorganised around:
+the Corner gave up its own row until a third row could buy both. Putting Robotics
+/ Sports after Letters spends that.
+
+That is a ruling being superseded, not a layout preference, so it is recorded
+rather than done quietly: clause 10 of the ruling draft states the supersession,
+the roster comment says what was given up, and the suite's `Letters is last` test
+is **rewritten rather than deleted** so the ruled fact stays visible to whoever
+reads it next. If you did not intend to spend it, this is the reversible part —
+say so and Letters goes back to the end.
 
 ## 6. One consequence that is automatic, correct, and worth knowing
 
@@ -187,7 +255,7 @@ may write a letter to Robotics / Sports before the section has a single piece.
 
 That is the R-032 clause 7 consequence arriving again, and it seems right: a
 reader may write to a section about what it is for. It is in the ruling draft as
-clause 11 so nobody later reads it as a leak.
+clause 12 so nobody later reads it as a leak.
 
 ---
 

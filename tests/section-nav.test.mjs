@@ -127,11 +127,24 @@ test('Topics still comes before Letters — the one position R-027 clause 3 fixe
   assert.ok(labels.indexOf('Topics') < labels.indexOf('Letters'));
 });
 
-test('Letters is last — correspondence closes the book', () => {
-  // Ruled by the editors 2026-08-03. This is the position the whole
-  // arrangement was reorganised around, so it is asserted rather than left to
-  // the array's shape.
-  assert.equal(NAV_ROSTER[NAV_ROSTER.length - 1].label, 'Letters');
+test('Letters closes the participatory pair, and Robotics / Sports closes the roster', () => {
+  // WHAT THIS TEST USED TO ASSERT, AND WHY IT NO LONGER DOES. "Letters is last —
+  // correspondence closes the book" was ruled by the editors on 2026-08-03, and
+  // it was the position the whole three-row arrangement was reorganised around:
+  // whatever held the final row was what a reader reached last, so the Corner
+  // gave up its own row until a third row bought both.
+  //
+  // The human editor placed Robotics / Sports at the END of the roster on
+  // 2026-08-25, which spends that position. This assertion is rewritten rather
+  // than deleted so the ruled fact stays visible in the suite: Letters still
+  // closes the participatory pair it belongs to, and one entry now follows it.
+  //
+  // If the editors restore Letters to the end, this test is the place that says
+  // what was given up to move it — and the roster comment says the same.
+  const labels = NAV_ROSTER.map((e) => e.label);
+  assert.equal(labels[labels.length - 1], 'Robotics / Sports');
+  assert.equal(labels[labels.length - 2], 'Letters');
+  assert.ok(labels.indexOf('Prompts') < labels.indexOf('Letters'));
 });
 
 test('AI Voices comes ahead of Opinion', () => {
@@ -139,7 +152,7 @@ test('AI Voices comes ahead of Opinion', () => {
   assert.ok(labels.indexOf('AI Voices') < labels.indexOf('Opinion'));
 });
 
-test('the roster renders as four pinned rows, three of them the ruled arrangement', () => {
+test('the roster renders as three pinned rows, in the arrangement as placed', () => {
   // FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk — and the
   // same arrangement Mustafa proposed in his layout pass, reached a second time
   // from the rendering.
@@ -157,25 +170,26 @@ test('the roster renders as four pinned rows, three of them the ruled arrangemen
   assert.deepEqual(rows, [
     ['Cover', 'AI Voices', 'Opinion', 'Topics'],
     ['The Metaphysical Corner'],
-    ['Robotics / Sports'],
-    ['Prompts', 'Letters'],
+    ['Prompts', 'Letters', 'Robotics / Sports'],
   ]);
 });
 
-test('the ruled rows are untouched by the row added in 2026-08-25', () => {
-  // THE INSERTION IS THE CLAIM. Rows 1 and 2 are the arrangement the editors
-  // walked on a phone and ruled on 2026-08-03, and adding a section must not
-  // have quietly rearranged them to make room. Asserted separately from the
-  // shape above so that a future change which rebalances row 1 fails HERE, with
-  // the reason attached, rather than only as a diff in a four-row fixture.
+test('the ruled rows are untouched by the entry added on 2026-08-25', () => {
+  // THE APPEND IS THE CLAIM. Rows 1 and 2 are the arrangement the editors walked
+  // on a phone and ruled on 2026-08-03, and adding a section must not have
+  // quietly rearranged them to make room. Asserted separately from the shape
+  // above so that a future change which rebalances row 1 to relieve row 3 fails
+  // HERE, with the reason attached, rather than only as a diff in a fixture.
   const rows = NAV_ROSTER.reduce((acc, entry) => {
     if (entry.startsRow || acc.length === 0) acc.push([]);
     acc[acc.length - 1].push(entry.label);
     return acc;
   }, []);
+  assert.equal(rows.length, 3, 'the roster has grown or lost a row');
   assert.deepEqual(rows[0], ['Cover', 'AI Voices', 'Opinion', 'Topics']);
   assert.deepEqual(rows[1], ['The Metaphysical Corner']);
-  assert.deepEqual(rows[rows.length - 1], ['Prompts', 'Letters']);
+  // Row 3's INTERNAL order is unchanged; it has gained an entry at the end.
+  assert.deepEqual(rows[2].slice(0, 2), ['Prompts', 'Letters']);
 });
 
 test('the Corner has a row to itself, under its full name', () => {
@@ -197,7 +211,7 @@ test('every row after the first is opened by an explicit marker', () => {
   // The pinning itself. Rows exist because the roster says so, not because a
   // width caused a wrap — that is what stopped the phone rendering from
   // rearranging an arrangement the editors approved on a desk.
-  assert.equal(NAV_ROSTER.filter((e) => e.startsRow).length, 3, 'four rows need three markers');
+  assert.equal(NAV_ROSTER.filter((e) => e.startsRow).length, 2, 'three rows need two markers');
   assert.ok(!NAV_ROSTER[0].startsRow, 'the first entry opens a row by position, not by marker');
 });
 
