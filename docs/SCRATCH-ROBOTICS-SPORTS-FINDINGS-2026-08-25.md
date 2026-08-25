@@ -303,9 +303,20 @@ because the moved piece carried `section_order: 1` and led the page.
 Nothing is broken by this and no URL 404s: `/topics/` is intact, the piece's own
 permalink is unchanged, and its `topics` label is still published on the piece in
 `/issues.json` and `/corpus.jsonl`. What changes is discovery — the journal's one
-subject-shaped page no longer surfaces its one sports piece. That is the flag
-from §1 arriving in practice, and it is worth deciding on its own rather than as
-a side effect of this move.
+subject-shaped page no longer surfaces its one sports piece.
+
+**DECIDED, 2026-08-25 — the current behaviour is the decision.** The human editor
+confirmed it and gave the reasoning: the page lists only subject headings that
+have pieces under them, and a heading falling away when its only piece moves is
+correct behaviour rather than a gap. **No empty headings are to be added for
+consistency** — an index of what exists is truer than an index of what the
+journal hopes to cover — and the heading returns on its own when a piece under
+that subject arrives.
+
+**No code changed for this**, because the behaviour was already right. What was
+added is a note at `issueSubjects()` in `src/lib/topics.mjs` recording the
+decision, so that the next reader who notices a heading disappear meets a
+decision rather than an apparent bug to fix.
 
 **Does the nav change reach `/door`, with `open-v2` itself untouched? Yes to
 both, verified in the built output.**
