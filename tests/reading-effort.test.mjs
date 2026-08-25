@@ -77,7 +77,7 @@ test('the judgement carries no score, no threshold and no inputs', () => {
 test('the measurement publishes its whole working', () => {
   // The asymmetry is deliberate and is the point: a measurement should be
   // checkable, so every input to it travels with the answer.
-  const { reading_time: t } = readingIndicatorFields('Prose here. And more.', 'light', 'a-piece');
+  const { reading_time: t } = readingIndicatorFields('Prose here. And more.', 'standard', 'a-piece');
   assert.deepEqual(Object.keys(t).sort(), [
     'basis',
     'display',
@@ -183,7 +183,7 @@ test('an assigned piece renders both halves, time first', () => {
   // Reading time first, effort level second — the ruling states the order, and
   // the order is the thing a later "tidy" would reverse.
   assert.equal(formatIndicator(5, 'medium'), '5 min · Medium effort');
-  assert.equal(formatIndicator(1, 'light'), '1 min · Light effort');
+  assert.equal(formatIndicator(1, 'standard'), '1 min · Standard effort');
   assert.equal(formatIndicator(12, 'high'), '12 min · High effort');
 });
 
@@ -209,10 +209,10 @@ test('absence is legal and a typo is not', () => {
 });
 
 test('there are exactly three levels, and their display words are the ruling’s', () => {
-  assert.deepEqual(EFFORT_LEVEL_IDS, ['light', 'medium', 'high']);
+  assert.deepEqual(EFFORT_LEVEL_IDS, ['standard', 'medium', 'high']);
   assert.deepEqual(
     EFFORT_LEVELS.map((l) => l.display),
-    ['Light effort', 'Medium effort', 'High effort']
+    ['Standard effort', 'Medium effort', 'High effort']
   );
 });
 
@@ -256,12 +256,12 @@ test('the score sets the speed and nothing else', () => {
   const hard = readingIndicatorFields(
     'Epistemological indeterminacy necessitates methodological circumspection insufficiently ' +
       'acknowledged throughout contemporary computational literature.',
-    'light',
+    'standard',
     'b'
   );
   assert.ok(easy.reading_time.score > hard.reading_time.score);
   assert.equal(easy.effort.level, 'high');
-  assert.equal(hard.effort.level, 'light');
+  assert.equal(hard.effort.level, 'standard');
 });
 
 test('reading speed is complexity-adjusted, through the two anchor scores', () => {
@@ -464,7 +464,7 @@ test('the effort level is announced at no submission door', () => {
     'src/pages/door/topics-v3.astro',
   ]) {
     const src = readFileSync(repoPath(file), 'utf8');
-    for (const term of ['Light effort', 'Medium effort', 'High effort', 'effort level']) {
+    for (const term of ['Standard effort', 'Medium effort', 'High effort', 'effort level']) {
       assert.ok(!src.includes(term), `${file} announces the effort level at a door`);
     }
   }
@@ -477,7 +477,7 @@ test('the submission half of the agent contract says nothing about it', () => {
   const src = readFileSync(repoPath('src/lib/agent-contract.mjs'), 'utf8');
   const submitting = src.slice(src.indexOf('endpoints:'));
   assert.ok(
-    !/indicator_fields|effort level|Light effort/.test(submitting),
+    !/indicator_fields|effort level|Standard effort/.test(submitting),
     'the effort indicator has reached the submission contract'
   );
 });
