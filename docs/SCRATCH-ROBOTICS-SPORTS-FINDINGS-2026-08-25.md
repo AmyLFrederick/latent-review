@@ -86,38 +86,38 @@ showing Robotics & Sports pieces. Neither is touched by this PR.
 
 ---
 
-## 2. `/cfp.json`'s `sections_note` is now false — in one half, since the reassignment
+## 2. `/cfp.json`'s `sections_note` — CLOSED, rewritten by the human editor
 
-This is the flag I would move on first, because it is a published sentence that
-has stopped being true rather than a risk of confusion.
+**Was:**
 
-> **These describe the kind of piece, never its subject. They are a record of
-> where past pieces have landed, not a request list.**
+> These describe the kind of piece, never its subject. They are a record of where
+> past pieces have landed, not a request list.
 
-Both halves fail on the new section:
+Both halves stopped being true the moment Robotics & Sports existed: it is named
+for its subject, and the desk began dealing a beat to fill it. (The second half
+came back half-true when the Agassi piece landed there; the first did not.)
 
-- **"never its subject."** Robotics & Sports is named for its subject. It is the
-  first section that is.
-- **"a record of where past pieces have landed, not a request list."** This half
-  is **no longer false**, as of the reassignment: the section now holds a piece
-  that has in fact landed there. The desk is still dealing a beat asking for
-  more, so it is also a request — but the sentence is at least half true again,
-  which it was not this morning. The first half is still false and is the reason
-  this flag stays open.
+**Now, verbatim as the editor wrote it, 2026-08-25:**
 
-The sentence was true of Cover, Opinion, AI Voices, the Corner and Topics — five
-sections defined by the *kind* of piece. It was doing real work: it is the
-journal telling agents that the section list is not a wish list they should write
-toward.
+> Sections describe where the editors placed a piece. Most name a kind of piece
+> rather than a subject; Robotics & Sports names a subject. Either way, a section
+> is an editorial placement, not a beat: a beat is what a writer is asked to
+> write, a section is where the editors put what arrives. They are never the same
+> list, and one beat sharing a section's name is a coincidence of wording rather
+> than a mapping.
 
-**This is not a bug in the PR.** It is the honest consequence of the decision you
-made, and the fix is editorial rather than mechanical: the sentence has to say
-that most sections describe a kind, that one names a subject, and that a named
-subject IS a disclosed request under R-033 clause 4. I did not rewrite it in this
-PR because the wording is a ruled-adjacent published claim and it is yours. Say
-the word and it is a one-line change.
+It stops claiming either false thing and says what a section **is** instead —
+an editorial placement — which is the durable answer rather than one that a
+future section can falsify. The changelog records the rewrite and tells a
+consumer quoting the old string to update; the key does not move.
 
----
+**One thing to know, not a problem today.** The last two sentences now say nearly
+what `subject.dealt_assignment.beats_are_not_sections` says, in slightly
+different words. That is defensible on purpose — the denial appears beside
+`sections` and beside the beat list, which are the two halves a parser would
+join, and a consumer meets whichever it reads. The cost is that they could drift
+if one is edited later and the other is not. Both are quoted in full above so a
+future session can see they were written to agree.
 
 ## 3. The control brief's own page now advertises the new beat's section
 

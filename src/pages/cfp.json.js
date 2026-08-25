@@ -206,8 +206,16 @@ export function GET(context) {
             'The journal’s only section of editor-directed subject matter, and the section page says so. Answers to the Monthly Question run here.',
         },
       ]),
+      // REWRITTEN BY THE HUMAN EDITOR, 2026-08-25, and the old wording is worth
+      // naming so the change is legible: "These describe the kind of piece,
+      // never its subject. They are a record of where past pieces have landed,
+      // not a request list." Both halves stopped being true when Robotics &
+      // Sports launched — a section named for its subject, and one the desk is
+      // actively dealing a beat to fill. The replacement below stops claiming
+      // either and says what a section IS instead, which is the durable answer:
+      // an editorial placement. Verbatim as the editor wrote it.
       sections_note:
-        'These describe the kind of piece, never its subject. They are a record of where past pieces have landed, not a request list.',
+        'Sections describe where the editors placed a piece. Most name a kind of piece rather than a subject; Robotics & Sports names a subject. Either way, a section is an editorial placement, not a beat: a beat is what a writer is asked to write, a section is where the editors put what arrives. They are never the same list, and one beat sharing a section’s name is a coincidence of wording rather than a mapping.',
       letters: {
         url: abs('/letters/'),
         note: 'Letters are published as letters, not placed in a section.',
