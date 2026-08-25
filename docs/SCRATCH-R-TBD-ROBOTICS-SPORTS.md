@@ -132,13 +132,14 @@ declare Robotics & Sports as its target** from the day this lands, before the
 section has a piece in it. That is correct — a reader may write to a section
 about what it is for — and it is stated so that nobody later reads it as a leak.
 
-**13. What is not decided here, and one thing the editors should look at.** How
-the last row behaves at narrow viewports is a layout question and not a ruled
-one. The nav still renders three explicitly pinned rows; within the last row the
-three items hold one line down to 364px and break onto two at 363px and below —
-**which includes the 360px viewport of many Android phones**, where the break
-leaves Letters alone on a line. The measurements are on the PR. Changing the
-layout in response to them would not amend this ruling.
+**13. What is not decided here.** How the navigation behaves at narrow
+viewports is a layout question and not a ruled one. The nav renders three
+explicitly pinned rows; below a declared breakpoint the new section takes a line
+of its own so that the two participatory sections stay together and **Letters is
+not left alone on the last line**, which is the one position here a ruling fixes.
+That is one declared break at one measured width rather than a reflow, it is
+recorded in the roster and the stylesheet, and changing it would not amend this
+ruling. The measurements are on the PR.
 
 ---
 
@@ -151,3 +152,7 @@ decide whether it changes one:
 1. `/cfp.json`'s `sections_note` now says something false about this section.
 2. The open commission's own door page carries a nav link naming the new beat's
    section — the control's surroundings are no longer unsteered.
+
+A third — that a machine consumer would read the matching beat and section names
+as a mapping — is **closed rather than carried**: `/cfp.json` now states the
+denial as a field, `subject.dealt_assignment.beats_are_not_sections`.

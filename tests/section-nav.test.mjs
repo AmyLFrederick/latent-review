@@ -183,6 +183,48 @@ test('the ruled rows are untouched by the entry added on 2026-08-25', () => {
   assert.deepEqual(rows[2].slice(-2), ['Prompts', 'Letters']);
 });
 
+test('one entry takes a line of its own below the narrow breakpoint, and only one', () => {
+  // WHAT THIS PROTECTS. Row 3 holds one line down to 364px; below that it wraps
+  // on its own and leaves LETTERS alone on the final line — the one position in
+  // this nav a ruling fixes. The declared break moves Robotics & Sports onto its
+  // own line instead, so the participatory pair stays together.
+  //
+  // Asserted as "exactly one", because the failure mode is a later entry
+  // acquiring the flag for tidiness and quietly turning the narrow nav into a
+  // column of singles — which is the reflow the pinned rows exist to prevent,
+  // arrived at by a different road.
+  const solo = NAV_ROSTER.filter((e) => e.narrowSolo);
+  assert.equal(solo.length, 1, 'the narrow break is declared on more than one entry');
+  assert.equal(solo[0].label, 'Robotics & Sports');
+
+  // It must OPEN its row. A break declared on a middle or last item would push
+  // a different split than the one that was measured.
+  const rows = NAV_ROSTER.reduce((acc, entry) => {
+    if (entry.startsRow || acc.length === 0) acc.push([]);
+    acc[acc.length - 1].push(entry);
+    return acc;
+  }, []);
+  const row = rows.find((r) => r.some((e) => e.narrowSolo));
+  assert.equal(row[0].label, 'Robotics & Sports', 'the narrow break is not on its row’s first entry');
+  assert.deepEqual(row.slice(1).map((e) => e.label), ['Prompts', 'Letters']);
+});
+
+test('the layout honours the narrow break, at the measured breakpoint', () => {
+  // The roster declares it; this asserts the template and the stylesheet
+  // actually carry it, since a flag nothing reads is worse than no flag.
+  const layout = baseLayout();
+  assert.match(layout, /entry\.narrowSolo \? 'nav-narrow-solo'/, 'the template ignores narrowSolo');
+  assert.match(
+    layout,
+    /@media \(max-width: 23rem\) \{\s*\.nav-rows li\.nav-narrow-solo \{\s*flex-basis: 100%;/,
+    'the narrow break rule is gone or its breakpoint moved'
+  );
+  // The breakpoint sits ABOVE the measured 364px threshold, not on it. Media
+  // queries resolve rem against the browser default of 16px, so 23rem is 368px.
+  assert.ok(!/@media \(max-width: (2[0-2]|1\d)rem\)[\s\S]{0,80}nav-narrow-solo/.test(layout),
+    'the narrow breakpoint has dropped below the width the orphan appears at');
+});
+
 test('the Corner has a row to itself, under its full name', () => {
   // Restored by the three-row arrangement. It was given up when Letters had to
   // close a TWO-row nav — whatever held the second row was what a reader

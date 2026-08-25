@@ -70,16 +70,19 @@ that a string match fails loudly rather than a near-match succeeding quietly.
   would end the *first* collision (the `topics-*` name) at the source. It does
   nothing about the identical beat and section names. Add-only rules mean the
   four existing values stay forever.
-- **Say it in the data rather than in prose.** A `beats_are_not_sections: true`
-  style field, or naming the beat sheet in `/cfp.json` with an explicit note. I
-  can draft either.
+- **Say it in the data rather than in prose. DONE** — see the resolution below.
 
-My read: keep the ampersand — your two reasons for it are good and a reader sees
-the nav far more often than a machine joins two lists — and add the explicit
-statement to `/cfp.json`, where the machine that would make the bad join is the
-one that will read it. A one-line `beats_are_not_sections` note beside the beat
-list costs nothing and is the only form of the denial a parser can act on. But
-this is squarely an editors' call.
+**Resolved, in part.** The ampersand stays — your two reasons are good, and a
+reader meets the nav far more often than a machine joins two lists. And
+`/cfp.json` now carries `subject.dealt_assignment.beats_are_not_sections`, which
+is the only form of the denial a parser can act on:
+
+> A beat is what a writer is asked to write; a section is where the editors put
+> what arrives. They are never the same list, one beat sharing a section's name
+> is a coincidence of wording rather than a mapping, and nothing here links them.
+
+**Still open:** the `topics-*` brief-family name, and the `/topics/` page not
+showing Robotics & Sports pieces. Neither is touched by this PR.
 
 ---
 
@@ -162,7 +165,7 @@ comes out and the section page carries the name alone.
 
 ---
 
-## 5. The nav: how it actually wraps, measured — and one screen where it is now awkward
+## 5. The nav: how it wraps, measured — and the narrow-only extra row
 
 **First, a correction to the premise, because it changes what the question
 means.** The nav does *not* wrap to three lines by length. **The three rows are
@@ -215,44 +218,60 @@ entry.
 - **Row 1 breaks at 331px** and below — **unchanged**, before and after.
   Pre-existing; nothing here touched it.
 
-### Yes, it is awkward — on one class of screen, and the ampersand is why
+### The orphan is closed, at the narrow breakpoint only
 
-**Desktop and tablet: no issue at all**, nowhere near the threshold. **iPhone: no
-issue** — the narrowest in circulation is 375px, clear of 364px.
+Before this change, 360px broke row 3 on its own and left LETTERS alone on the
+last line. On your instruction it is closed with **one declared break on one
+entry below one measured width** — nothing above it is rearranged.
 
-**360px Android is the problem, and it is new as of the ampersand correction.**
-With the slash form the threshold was 358px and 360px held by two pixels. `&`
-sets wider than `/` in the display face, and that moved the threshold to 363px —
-past 360px. So on a Galaxy-class phone in portrait the nav now renders:
+`NAV_ROSTER`'s Robotics & Sports entry carries `narrowSolo: true`; the template
+puts a class on that `<li>`; one rule gives it a full line below the breakpoint.
+The two participatory sections then wrap onto the next line **together**, which
+is the whole point.
 
-```
-Cover · AI Voices · Opinion · Topics
-The Metaphysical Corner
-Robotics & Sports · Prompts
-Letters
-```
+**This is not the reflow the pinned rows exist to prevent, and the difference is
+worth stating.** Nothing here lets the browser decide *which* items move or
+*where* they land. It declares one break, on one named entry, at one width — a
+second decision rather than an absence of one, and the roster is still the only
+place either is made. A test asserts that exactly one entry may carry the flag,
+so a later entry cannot acquire it for tidiness and turn the narrow nav into a
+column of singles.
 
-**Letters is orphaned onto a line of its own.** That is the awkward part, and it
-is worse than a stray line in the abstract: Letters being last is a deliberate,
-ruled position — the reader's voice closing the book — and a lone LETTERS beneath
-a two-item line reads as something left over rather than as a close.
+**The breakpoint is 23rem, and the four pixels above the threshold are
+deliberate.** Media queries resolve `rem` against the browser's default 16px
+rather than this document's root, so 23rem is 368px against a measured threshold
+of 364px. Sitting exactly on 364px would let a font fallback with wider metrics,
+or a longer label added later, silently reopen the orphan. The cost is that
+365–368px takes the extra line a little early; no common device sits in that band,
+and the narrow rendering is one line taller either way.
 
-At 320px the same break happens with row 1 also wrapping, five lines total. Row 1
-was already wrapping there before today.
+### Measured after the change — headless Chromium, real built page
 
-**Two things worth knowing before you decide.** The gap is
-`clamp(0.75rem, 2.4vw, 1.6rem)` and is already sitting on its 0.75rem floor at
-these widths, so there is no slack left to reclaim there. And 360px is not a rare
-screen — it is the most common Android portrait width.
+**The three widths you asked for:**
 
-**I did not adjust the layout, as instructed.** The options, all yours:
+| Viewport | Lines | Rendering |
+|---|---|---|
+| **Desktop (1440px)** | **3 — unchanged** | `Cover · AI Voices · Opinion · Topics` / `The Metaphysical Corner` / `Robotics & Sports · Prompts · Letters` |
+| **390px** | **3 — unchanged** | identical to desktop |
+| **360px** | **4** | `Cover · AI Voices · Opinion · Topics` / `The Metaphysical Corner` / `Robotics & Sports` / `Prompts · Letters` |
 
-1. **Give Robotics & Sports its own row** (a fourth, between the Corner and
-   Prompts). Keeps your ordering exactly, keeps Letters last, and no row is near
-   its threshold. Costs a fourth row and a second stacked solo row.
-2. **Accept the 360px orphan.** It is one line on one class of phone.
-3. **Go back to the slash**, which buys five pixels and clears 360px — but you
-   corrected it away for two good reasons and this is the weakest of the three.
+**Letters is no longer orphaned at 360px.** It closes the line with Prompts, as
+it does at every other width.
+
+**The full sweep, confirming nothing above the breakpoint moved:**
+
+| Viewport | Lines | Changed by this? |
+|---|---|---|
+| 1440 / 1280 / 1024 px | 3 | no |
+| 834 / 768 / 480 px | 3 | no |
+| 430 / 414 / 393 / 390 / 375 px | 3 | no |
+| 369 px | 3 | no |
+| **368 px** | **4** | yes — the rule takes effect here |
+| 365 / 364 / 363 / 360 px | 4 | yes |
+| 320 px | 5 | yes — row 1's own wrap there is unchanged and pre-existing |
+
+Desktop is untouched, as instructed. The rule cannot reach anything 369px or
+wider.
 
 ## 6. One consequence that is automatic, correct, and worth knowing
 

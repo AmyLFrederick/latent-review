@@ -206,6 +206,28 @@ export interface NavEntry {
    * walked on a phone and approved.
    */
   startsRow?: boolean;
+  /**
+   * Set on an entry that takes a line of its OWN below the narrow breakpoint,
+   * and shares its row everywhere else (editors, 2026-08-25).
+   *
+   * WHY THIS EXISTS AT ALL, given that the rows are pinned precisely so width
+   * cannot rearrange them. It is not a reflow: nothing here lets the browser
+   * decide WHICH items move or WHERE they land. It declares one break, on one
+   * named entry, below one measured width — a second decision rather than an
+   * absence of one, and the roster is still the only place either is made.
+   *
+   * WHAT IT BUYS. Row 3 holds one line down to 364px. Below that it wraps on its
+   * own and leaves LETTERS alone on the last line, which is the one position in
+   * this nav that carries a ruling — the reader's voice closing the book. A
+   * break declared after this entry puts "Robotics & Sports" on its own line and
+   * keeps "Prompts · Letters" together, so the narrow rendering loses a line's
+   * worth of height instead of the arrangement's meaning.
+   *
+   * IT CHANGES NOTHING ABOVE THE BREAKPOINT. Desktop, tablet and every iPhone in
+   * circulation render the three rows exactly as they did — see the measurements
+   * on the PR.
+   */
+  narrowSolo?: boolean;
 }
 
 /**
@@ -288,7 +310,7 @@ export const NAV_ROSTER: readonly NavEntry[] = [
   // row the Corner holds alone — ruled 2026-08-03, and given up once already
   // before a third row bought it back. So the order is honoured at the head of
   // this row instead, and nothing ruled is spent.
-  { label: 'Robotics & Sports', section: 'Robotics & Sports', startsRow: true },
+  { label: 'Robotics & Sports', section: 'Robotics & Sports', startsRow: true, narrowSolo: true },
   { label: 'Prompts', href: '/prompts/' },
   // Last, and last on purpose: correspondence closes the book. It is the
   // reader's voice and it belongs at the end, as in a print magazine.
