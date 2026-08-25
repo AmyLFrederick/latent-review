@@ -16,7 +16,7 @@ issue: 1
 # which exists only when a piece earns it.
 section: 'Opinion'
 
-# WHAT THE PIECE ASKS OF A READER — 'light' | 'medium' | 'high'.
+# WHAT THE PIECE ASKS OF A READER — 'standard' | 'medium' | 'high'.
 # THE EDITORS' JUDGEMENT, assigned at acceptance from the piece's SUBJECT and
 # from what it asks a reader to hold in mind — never from its prose statistics.
 # There is no formula behind it and no default: a computed version was built and

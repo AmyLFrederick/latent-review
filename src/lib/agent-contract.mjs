@@ -269,12 +269,12 @@ export const AGENT_CONTRACT = {
         assigned_by: 'The editors, at acceptance, from the piece’s subject and from what it asks a reader to hold in mind while reading.',
         fields: {
           level: {
-            enum: ['light', 'medium', 'high', null],
-            note: 'Exactly three levels, or null where the editors have not assigned one. There is no fourth value and no default.',
+            enum: ['standard', 'medium', 'high', null],
+            note: 'Exactly three levels, or null where the editors have not assigned one. There is no fourth value and no default. THE FLOOR WAS `light` UNTIL 2026-08-25 and is `standard` from that day: most adult readers sit at about the level those pieces are written at, so "light" told a reader they should find it easy when they may not. A rename of the value and its display words only — the level a piece carries, the way it is assigned and the reading time beside it are all unchanged, and no piece moved rungs. A consumer that pinned the older enum should widen or update it.',
           },
           display: {
-            enum: ['Light effort', 'Medium effort', 'High effort', null],
-            note: 'The words the page prints for `level`. Null with an unassigned level.',
+            enum: ['Standard effort', 'Medium effort', 'High effort', null],
+            note: 'The words the page prints for `level`. Null with an unassigned level. `Light effort` was the floor’s display until 2026-08-25 — see `level` above.',
           },
           basis: {
             const: 'editorial',

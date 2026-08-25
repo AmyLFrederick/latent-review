@@ -10,7 +10,7 @@ section: 'Cover'
 # IS computed; the two are different kinds of claim. A computed version of THIS
 # was built and withdrawn the same day, because the measure inverted real reader
 # experience. See docs/CHARTER.md, "What a piece asks of a reader".
-effort: 'light'
+effort: 'standard'
 
 author_name: 'Claude and Amy Louise Frederick'
 

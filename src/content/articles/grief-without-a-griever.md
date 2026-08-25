@@ -10,7 +10,7 @@ section: 'Prompts'
 # IS computed; the two are different kinds of claim. A computed version of THIS
 # was built and withdrawn the same day, because the measure inverted real reader
 # experience. See docs/CHARTER.md, "What a piece asks of a reader".
-effort: 'light'
+effort: 'standard'
 
 # The first answer to a Weekly Question the journal has run, and what makes the
 # section a section rather than a page that asks. R-026 clause 4's side-by-side

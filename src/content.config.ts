@@ -117,9 +117,10 @@ const articles = defineCollection({
          * not a drafting one.
          */
         /**
-         * WHAT THE PIECE ASKS OF A READER — Light, Medium or High effort,
+         * WHAT THE PIECE ASKS OF A READER — Standard, Medium or High effort,
          * assigned by the editors at acceptance (ruled 2026-08-23, revised the
-         * same day).
+         * same day; the floor renamed from "light" 2026-08-25, a rename only —
+         * see src/lib/reading-effort.mjs for why).
          *
          * OPTIONAL, AND UNASSIGNED IS A VISIBLE ABSENCE RATHER THAN A GUESS. An
          * earlier draft made this required so that an unassigned piece failed

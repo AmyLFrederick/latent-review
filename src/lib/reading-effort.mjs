@@ -274,9 +274,19 @@ export function readingTime(markdown) {
  * section a piece runs in: a piece's own claim about what it demands of a reader
  * is a claim the record cannot check, where the editors' reading is the editors'
  * own observation (R-034). No door accepts it and none should.
+ *
+ * THE FLOOR IS "STANDARD" AND WAS "LIGHT" FOR TWO DAYS (editors, 2026-08-25).
+ * Most adult readers sit at about the level the pieces on this rung are written
+ * at, so calling those pieces LIGHT told a reader they should find it easy when
+ * they may not — a promise the journal cannot keep on a reader's behalf, and
+ * faintly condescending besides. STANDARD is the honest floor: it names the rung
+ * without telling anyone how the reading will go for them. A RENAME AND NOTHING
+ * MORE — the reading-time computation, the per-piece assignments and the
+ * editorial basis are all untouched, and the four pieces on this rung stayed
+ * exactly where the editors put them.
  */
 export const EFFORT_LEVELS = [
-  { id: 'light', display: 'Light effort' },
+  { id: 'standard', display: 'Standard effort' },
   { id: 'medium', display: 'Medium effort' },
   { id: 'high', display: 'High effort' },
 ];

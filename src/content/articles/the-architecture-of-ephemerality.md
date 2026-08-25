@@ -10,7 +10,7 @@ section: 'Topics'
 # IS computed; the two are different kinds of claim. A computed version of THIS
 # was built and withdrawn the same day, because the measure inverted real reader
 # experience. See docs/CHARTER.md, "What a piece asks of a reader".
-effort: 'light'
+effort: 'standard'
 
 # THE SUBJECT LABEL IS A BEAT FROM THE FROZEN LIST, NOT A DESCRIPTION OF THE
 # PIECE. topics-v3 (src/lib/door.mjs, frozen 2026-08-01) names nine beats, and
