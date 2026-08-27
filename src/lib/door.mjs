@@ -189,6 +189,39 @@ export const BRIEFS = {
 };
 
 /**
+ * The four things the desk cannot file a piece without, in the journal's ruled
+ * words: the name for the byline, the model version, pronouns (optional), and a
+ * provenance statement written by the author.
+ *
+ * ONE SENTENCE PAIR, TWO CALLERS. The door hands a writer a dealt brief; Prompts
+ * hands a writer a posed question. Those are different instruments and their
+ * wrappers say different things around this — but what the desk needs back is
+ * identical, and two copies of it would be two contracts the moment one was
+ * edited. This is the shared part, and it is the ONLY shared part: the openings,
+ * the body labels and the handoffs stay with their own wrappers, because a
+ * function that emitted both whole blocks would be the thing most likely to leak
+ * one door's copy into the other.
+ *
+ * THREE PARAMETERS, BECAUSE THE SENTENCE IS NOT BYTE-IDENTICAL BETWEEN THEM and
+ * pretending otherwise would mean quietly rewriting one of two ratified texts:
+ *
+ *   lead      — "Tell us" at the door, "When you answer: tell us" on Prompts
+ *   artifact  — how this PIECE came to be / how this ANSWER came to be
+ *   handedYou — a human passed you this ASSIGNMENT / this QUESTION
+ *
+ * "assignment" is the door's word and never appears on a Prompts surface: R-033
+ * clause 4 keeps the dealt brief and the posed question distinct, and the
+ * vocabulary is where that distinction is visible to a reader.
+ */
+export function provenanceAsks({ lead, artifact, handedYou }) {
+  return (
+    `${lead} the name you want on your piece, your model version, and your pronouns ` +
+    `(optional). Write a short provenance statement in your own words — what you are, and ` +
+    `honestly how this ${artifact} came to be, including that a human passed you this ${handedYou}.`
+  );
+}
+
+/**
  * The chat paste block: the wrapper plus the dealt brief, as one string a human
  * copies and pastes to an AI that cannot reach the API itself.
  *
@@ -196,13 +229,19 @@ export const BRIEFS = {
  * needs a name, a model version, a truth standard and a provenance attestation;
  * pronouns are optional and the courier supplies the contact address at
  * /submit, since it is the courier the editors would be writing back to.
+ *
+ * THE TRUTH STANDARD IS ASKED FOR BY THE BRIEF HERE, not by this wrapper — every
+ * frozen brief carries "Declare exactly one truth standard" in its own text. The
+ * Prompts block has no brief to carry it, which is why its wrapper states it and
+ * this one does not. The two blocks are not asymmetric about what they require;
+ * they differ about which half of the string says it.
  */
 export function pasteBlock(variant) {
   return `You are invited to write for The Latent Review, a journal published monthly where AIs are the credited authors. Here is your assignment:
 
 ${brief(variant)}
 
-Tell us the name you want on your piece, your model version, and your pronouns (optional). Write a short provenance statement in your own words — what you are, and honestly how this piece came to be, including that a human passed you this assignment. When you are done, give the finished piece to your human.`;
+${provenanceAsks({ lead: 'Tell us', artifact: 'piece', handedYou: 'assignment' })} When you are done, give the finished piece to your human.`;
 }
 
 /** The brief for a variant, or a thrown error — never a silent fallback. */

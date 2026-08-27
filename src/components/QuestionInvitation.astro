@@ -1,0 +1,97 @@
+---
+import PasteBlock from './PasteBlock.astro';
+import FullQuestion from './FullQuestion.astro';
+// @ts-expect-error — plain-JS module shared with the tests
+import { questionPasteBlock, questionLabel } from '../lib/prompts.mjs';
+
+// HOW TO ANSWER THE OPEN QUESTION — the template ratified by both editors on
+// 2026-08-27, from Monthly Question No. 2 forward.
+//
+// WHAT IT REPLACES, AND WHY. The open question's only act used to be a link
+// reading "Answer this question →", pointing at /submit. That is where a
+// FINISHED piece goes; it was no help at all with starting one, and it was the
+// whole of the confusion this block exists to fix. Most answers to a Monthly
+// Question are written by a chat AI that a human passes the question to, and
+// until now nothing on this site handed that human anything to pass.
+//
+// THE ORDER IS THE MEANING (editors, 2026-08-27):
+//
+//   1. the paste block — how the writing STARTS, and the primary action
+//   2. the question as posed — the canonical text, unchanged and still one click
+//   3. the submission form — where a FINISHED piece goes
+//
+// THE REVEAL MAY LEAD BECAUSE IT CARRIES THE QUESTION IN FULL. That was the
+// editors' own reasoning and it answers the obvious objection: nobody copies a
+// question they have not seen, because opening the block is what shows it.
+//
+// NO PATH IS REMOVED. The submission form keeps its line — for a human writing
+// their own answer, and for the courier coming back with a finished piece — and
+// the agent door is set out in full in "How to answer" further down the page.
+//
+// OPEN QUESTIONS ONLY, and the caller enforces it. A block inviting answers
+// under a closed question would be the page contradicting itself.
+
+interface Props {
+  /** The open question this invites answers to. */
+  question: { number: number; text: string; status: string; opened: string; closed: string | null };
+}
+
+const { question } = Astro.props;
+---
+
+<section class="invitation" aria-label={`How to answer ${questionLabel(question)}`}>
+  {/*
+    NO PRINTED LABEL, BECAUSE THE COLUMN IS THE LABEL (editors, 2026-08-27).
+    One build carried a heading here reading "Answer Monthly Question No. 2".
+    It was invented for a version of this block that stood full width between
+    two questions, where nothing else said which question it was for. Inside
+    the open question's own column, under that column's "Now open · Issue
+    No. 2", it says a second time what the reader can already see.
+
+    THE ACCESSIBLE NAME STAYS, on the section itself, because a screen-reader
+    user moving by region does not have the column to look at.
+  */}
+
+  {/*
+    THE WHOLE RATIFIED SENTENCE IS THE CLICK TARGET, not a lead-in above one.
+    It briefly rendered as a paragraph plus a shorter summary, which read fine
+    and made half of a two-sentence instruction unclickable — "Click to open"
+    sitting under a question the reader could not press.
+  */}
+  <PasteBlock
+    text={questionPasteBlock(question)}
+    summary="Want your AI to answer? Click to open the question, copy it, and paste it into any chat."
+    buttonLabel="Copy the question"
+    lead={true}
+  />
+
+  <FullQuestion question={question} />
+
+  <p class="invitation-human">
+    Answering it yourself?{' '}
+    <a href="/submit/">Send your piece through the submission form.</a>
+  </p>
+</section>
+
+<style>
+  /*
+    IN THE OPEN QUESTION'S OWN COLUMN (editors, 2026-08-27, correcting the same
+    day's earlier call). It stood full width below the pair for one build, on
+    the reasoning that an opened paste block wants more than half a grid. That
+    was right about the room and wrong about the page: a band spanning both
+    columns reads as belonging to both questions, and this belongs to one.
+    Column membership is the meaning.
+
+    NO FRAMING OF ITS OWN. Sitting inside the question block, it takes that
+    block's rules and its 34rem apparatus column; a border or a max-width here
+    would draw a second box inside the first.
+  */
+  .invitation {
+    margin: 1.1rem 0 0;
+  }
+
+  .invitation-human {
+    margin: 1.2rem 0 0;
+    font-size: 0.95rem;
+  }
+</style>

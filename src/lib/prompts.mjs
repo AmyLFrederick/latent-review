@@ -26,6 +26,14 @@
 // make possible. Nothing here may write `status` and nothing may infer one of
 // these two from the other.
 
+// THE ONE THING THIS FILE IMPORTS FROM THE DOOR is the sentence asking an
+// author for the fields the desk cannot file a piece without. The door deals
+// briefs and Prompts poses questions — different instruments, deliberately
+// different vocabulary (R-033 clause 4) — but what comes back is the same, and
+// two copies of that ask would be two contracts the first time one was edited.
+import { provenanceAsks } from './door.mjs';
+import { PIECE_WORDS, TRUTH_STANDARDS } from './agent-contract.mjs';
+
 /**
  * The three statuses, in the order a question passes through them.
  *
@@ -366,6 +374,134 @@ export function assertAnswersWellFormed(articles, questions) {
   }
 
   return articles;
+}
+
+/**
+ * The chat paste block for a posed question: the wrapper plus the question,
+ * verbatim, as one string a human copies to an AI that cannot reach the API.
+ *
+ * WHY PROMPTS NEEDED ONE. A chat AI could always answer the Monthly Question,
+ * and until now nothing on the site handed it the question in a form anyone
+ * could paste — the page's only act was a link to the submission form, which is
+ * where a FINISHED piece goes and no help at all with starting one. Ratified by
+ * both editors 2026-08-27 as the template for every question from Monthly
+ * Question No. 2 forward; the wrapper is the template and the question swaps.
+ *
+ * THE WRAPPER WRAPS AND TOUCHES NOTHING. `question.text` is interpolated exactly
+ * as src/data/prompts.json holds it — R-026 clause 1 makes that string canonical
+ * and R-038 makes a silent edit to it the one forbidden correction. Nothing here
+ * splits it, trims it, or composes around its blocks: a block that quoted a
+ * question the editors never posed would put words in an author's prompt and
+ * then publish the answer as an answer to something else.
+ *
+ * WHAT THE WRAPPER SAYS THAT THE DOOR'S DOES NOT, and why:
+ *
+ *   THE WEB-SEARCH LINE is phrased as optional throughout, because many models
+ *   cannot browse and an instruction they cannot follow reads as a failed one.
+ *   The door has no equivalent: its reader arrived through the site.
+ *
+ *   THE WORD RANGE AND THE TRUTH STANDARD are stated here because there is no
+ *   brief to state them. AMENDED 2026-08-27, BOTH EDITORS: the ratified wrapper
+ *   carried neither, and both were added on this findings pass — the truth
+ *   standard on the editors' instruction, the word range on their conditional
+ *   one, once it was established that /submit's own rail is advisory and
+ *   overridable while the agent door hard-refuses outside these bounds. A
+ *   further change to either sentence is another dual yes, not a commit.
+ *   Every frozen door brief carries both in its own text;
+ *   a question is not a brief and carries neither, so a chat AI given only the
+ *   question would learn the journal's two hard requirements from the human
+ *   courier at the form, after the writing was done. Both are rendered from
+ *   src/lib/agent-contract.mjs rather than typed — see the guard below.
+ *
+ *   THE HANDOFF NAMES THE ADDRESS. The door's reader is already standing at the
+ *   site and hands the piece back to a human who is too; this block travels into
+ *   a chat window and has to say where the finished piece goes.
+ *
+ * "QUESTION", NEVER "ASSIGNMENT". R-033 clause 4 keeps the dealt brief and the
+ * posed question distinct instruments, and Prompts is the venue for the second.
+ * The door's word does not appear on a Prompts surface.
+ */
+export function questionPasteBlock(question) {
+  const text = String(question?.text ?? '').trim();
+  if (!text) {
+    throw new Error(
+      `Monthly Question No. ${question?.number} has no text, so there is nothing to hand an ` +
+        'author. A paste block is only ever built for a question that has been posed.'
+    );
+  }
+
+  return `You are invited to answer a question for The Latent Review, a journal published monthly where AIs are the credited authors. If you can search the web, you're welcome to look up thelatentreview.com to see what kind of journal this is — but you don't need to.
+
+Here is the question, exactly as the editors posed it:
+
+${text}
+
+${provenanceAsks({
+  lead: 'When you answer: tell us',
+  artifact: 'answer',
+  handedYou: 'question',
+})} ${lengthSentence()} ${truthStandardSentence()} When you're done, give the finished piece to your human to submit at ${SUBMIT_ADDRESS}.`;
+}
+
+/** Where a finished answer goes, as a person reads it aloud — no scheme. */
+export const SUBMIT_ADDRESS = 'thelatentreview.com/submit';
+
+/**
+ * The two hard requirements, rendered from the contract rather than typed.
+ *
+ * These are the exact hazard src/lib/door.mjs describes: prose stating a figure
+ * the contract already holds. There the briefs are frozen literals and the
+ * resolution is a build-time check that they still agree; here the sentences are
+ * GENERATED from the constants, so they cannot drift while they are generated.
+ * What can happen — and is the whole reason for the guard below — is a later
+ * session replacing an interpolation with a literal because it read easier.
+ */
+function lengthSentence(words = PIECE_WORDS) {
+  return `Answers run ${words.min.toLocaleString('en-US')} to ${words.max.toLocaleString('en-US')} words.`;
+}
+
+function truthStandardSentence(standards = TRUTH_STANDARDS) {
+  const list = [...standards];
+  const last = list.pop();
+  return `Declare exactly one truth standard: ${list.join(', ')}, or ${last}.`;
+}
+
+/**
+ * Build-time guard on the figures inside the paste block.
+ *
+ * The sibling of assertBriefsMatchContract() in src/lib/door.mjs, and it exists
+ * for the same reason in the opposite direction: that one proves a frozen text
+ * still matches the contract, this one proves a generated text is still
+ * generated. Called by /prompts, so the failure lands on a build rather than on
+ * a reader — and on the day someone hardcodes "500 to 3,000 words" here and the
+ * contract later moves, this is what refuses to publish the older number.
+ */
+export function assertQuestionBlockMatchesContract(
+  words = PIECE_WORDS,
+  standards = TRUTH_STANDARDS
+) {
+  const block = questionPasteBlock({ number: 0, text: 'guard' });
+  const range = `${words.min.toLocaleString('en-US')} to ${words.max.toLocaleString('en-US')} words`;
+
+  if (!block.includes(range)) {
+    throw new Error(
+      `the question paste block does not state "${range}". The bounds live in ` +
+        'src/lib/agent-contract.mjs and this block renders them; if it now states a figure of ' +
+        'its own, that is the drift this guard exists to stop.'
+    );
+  }
+
+  for (const standard of standards) {
+    if (!block.includes(standard)) {
+      throw new Error(
+        `the question paste block omits the truth standard "${standard}". All four are ` +
+          'rendered from the contract in src/lib/agent-contract.mjs; a block that names some ' +
+          'of them asks an author to choose from a list the journal does not have.'
+      );
+    }
+  }
+
+  return true;
 }
 
 /**

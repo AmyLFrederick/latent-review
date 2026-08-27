@@ -1,0 +1,123 @@
+---
+// A block of text a human copies and pastes into a chat AI, with a copy button.
+//
+// TWO SURFACES, ONE COMPONENT (ratified 2026-08-27). The door hands a writer a
+// dealt brief; /prompts hands a writer a posed question. The wrappers around
+// those two strings are different texts on purpose, but the thing the reader
+// does with them is identical — select a wall of text without losing half of
+// it, or press a button — and that behaviour was written once at the door and
+// was about to be written a second time for Prompts.
+//
+// THE TEXT IS ALWAYS VISIBLE AND ALWAYS SELECTABLE, in both modes. The copy
+// button is a convenience; with JavaScript off the page still works by hand,
+// which is why this is a <pre> a reader can drag across and never a control that
+// only yields its contents to a script.
+//
+// COLLAPSED IS A DISCLOSURE, NOT A GATE — and only when a summary is given. The
+// door's block stands open, because a reader who has just been dealt an
+// assignment is looking straight at the thing they came for. On /prompts the
+// same block at full length would push the rest of the page below the fold, so
+// it is one line until a reader asks for it. <details> does that with no
+// JavaScript at all.
+
+interface Props {
+  /** The exact string to show and to copy. Never trimmed or reflowed here. */
+  text: string;
+  /** The copy button's label — it names what is being copied. */
+  buttonLabel: string;
+  /**
+   * The disclosure summary. Given, the block is collapsed behind it; omitted,
+   * the block stands open. NOT a default either way: which one is right is a
+   * decision about the page it sits on, and a component that guessed would make
+   * that decision silently the next time it was reused.
+   */
+  summary?: string | null;
+  /**
+   * Whether the summary carries the page's primary-action weight.
+   *
+   * On /prompts this reveal IS the open question's call to action — it inherited
+   * the accent treatment from the "Answer this question →" link it replaced —
+   * and a primary action set like a footnote is a primary action nobody takes.
+   */
+  lead?: boolean;
+}
+
+const { text, buttonLabel, summary = null, lead = false } = Astro.props;
+---
+
+<div class="paste-block">
+  {
+    summary ? (
+      <details class="paste-details">
+        <summary class:list={['paste-summary', lead && 'paste-summary--lead']}>{summary}</summary>
+        <div class="paste-body">
+          <pre>{text}</pre>
+          <button type="button" data-copy={text}>
+            {buttonLabel}
+          </button>
+        </div>
+      </details>
+    ) : (
+      <div class="paste-body">
+        <pre>{text}</pre>
+        <button type="button" data-copy={text}>
+          {buttonLabel}
+        </button>
+      </div>
+    )
+  }
+</div>
+
+<script>
+  import { wireCopyButtons } from '../lib/copy-button.mjs';
+
+  // Scoped to this component's own root: DoorBoxes wires its address button on
+  // the same page, and a document-wide selector in each would bind both twice.
+  wireCopyButtons('.paste-block');
+</script>
+
+<style>
+  /* A link, and it has to look like one — a disclosure triangle alone reads as
+     decoration. Same treatment as the "Read the full question as posed"
+     summary, so the two disclosures in a column are recognisably one kind of
+     thing. */
+  .paste-summary {
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    color: var(--ink-soft);
+  }
+
+  /* THE PRIMARY ACTION, carrying the weight of the link it replaced: the
+     accent-coloured mono of the old "Answer this question →". Deliberately
+     louder than the disclosure it sits above, because a reader deciding whether
+     to write should meet the act before the apparatus. */
+  .paste-summary--lead {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+
+  .paste-details[open] .paste-summary {
+    margin-bottom: 0.9rem;
+  }
+
+  .paste-body pre {
+    white-space: pre-wrap;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    max-height: 18rem;
+    overflow-y: auto;
+    padding: 0.75rem;
+    border: 1px solid var(--rule, #ddd);
+  }
+
+  .paste-body button[data-copy] {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
+  }
+</style>
