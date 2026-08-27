@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import FullQuestion from '../components/FullQuestion.astro';
 import QuestionAnswers from '../components/QuestionAnswers.astro';
+import QuestionInvitation from '../components/QuestionInvitation.astro';
 import {
   readQuestions,
   currentQuestion,
@@ -12,6 +13,7 @@ import {
   questionHeadline,
   answersTo,
   assertAnswersWellFormed,
+  assertQuestionBlockMatchesContract,
 } from '../lib/prompts.mjs';
 import entries from '../data/prompts.json';
 
@@ -28,6 +30,12 @@ import entries from '../data/prompts.json';
 // complete record while quietly dropping a question.
 const questions = readQuestions(entries);
 const current = currentQuestion(questions);
+
+// Fails the build if the paste block's two hard requirements — the word range
+// and the four truth standards — have stopped being rendered from the contract
+// in src/lib/agent-contract.mjs. The sibling of assertBriefsMatchContract() at
+// the door; see the note on the function.
+assertQuestionBlockMatchesContract();
 
 // THE PAGE CARRIES ONE QUESTION: the one most recently posed (R-039). When a
 // new question posts it becomes current here and the one before it is read in
@@ -233,34 +241,52 @@ const isUnasked = current !== null && current.status === 'unasked';
               {current.status === 'closed' ? (
                 <p class="question-note question-note--closed">Closed.</p>
               ) : null}
-              {/* The apparatus reads left-aligned in a column of its own, inside a
-                  block that is otherwise centred: the question is a headline and
-                  is set like one, the things under it are read rather than
-                  scanned. */}
-              <div class="question-apparatus">
-                <FullQuestion question={current} />
-                {/*
-                  THE ANSWERS LEFT THIS BLOCK (editors, 2026-08-21) and now
-                  stand below both columns, under a label naming the question
-                  they answer. They were never the current question's answers in
-                  the general case — they are the answers to whichever question
-                  has them — and printing them inside the open question's block
-                  said otherwise on the one page where that matters.
+              {/*
+                THE APPARATUS LEFT THIS COLUMN (editors, 2026-08-27) and now
+                stands full width below the pair, as QuestionInvitation.
 
-                  WHAT REPLACES THEM HERE IS THE ACT, not a link to more
-                  reading. A reader who has just read the open question is at
-                  the point of deciding to write.
-                */}
-                {current.status === 'open' ? (
-                  <p class="question-act">
-                    <a href="/submit/">Answer this question →</a>
-                  </p>
-                ) : null}
-              </div>
+                WHAT MOVED AND WHY. Two things used to sit here: the "Read the
+                full question as posed" disclosure, and a link reading "Answer
+                this question →". The link is gone — it pointed at /submit,
+                which is where a FINISHED piece goes, and it was the whole of
+                the confusion this change fixes. The disclosure is not gone; it
+                moved, because it now follows the paste block in a ratified
+                order the two cannot be in while one is in a grid column and the
+                other is below it.
+
+                THE OPEN COLUMN IS NOW THE QUESTION AND NOTHING ELSE, which is
+                the state the answered column has been in since 2026-08-21 apart
+                from its own disclosure. A reader compares two questions here
+                and acts underneath.
+
+                IT MOVED FOR ROOM, NOT FOR TIDINESS. This column is half a
+                two-column grid on desktop; an opened paste block inside it
+                would be a scrolling window barely wider than its own text.
+              */}
             </>
           )}
         </section>
         </div>
+      )
+    }
+
+    {/*
+      HOW TO ANSWER THE OPEN QUESTION, full width, directly below the pair and
+      above the answers (editors, 2026-08-27).
+
+      ONLY WHEN THE QUESTION IS OPEN. `current` is the most recently POSED
+      question and may have been closed by the editors while it still leads this
+      page (R-039); inviting answers under it then would contradict the "Closed."
+      note two inches above. An unasked question has no text to hand anybody, and
+      questionPasteBlock throws rather than emitting an empty invitation.
+
+      IT INVITES ANSWERS TO THE OPEN QUESTION, NOT TO THE ANSWERED ONE. The block
+      below this shows answers to whichever question the LEFT column holds, which
+      is a different question — hence the label on each.
+    */}
+    {
+      current !== null && current.status === 'open' && (
+        <QuestionInvitation question={current} />
       )
     }
 
@@ -503,17 +529,12 @@ const isUnasked = current !== null && current.status === 'unasked';
     margin: 1rem 0 0;
   }
 
-  /* The act, not a link to more reading — a reader here is deciding to write. */
-  .question-act {
-    margin: 1.1rem 0 0;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-  }
-
-  .question-act a {
-    color: var(--accent);
-    text-decoration-color: var(--accent);
-  }
+  /* `.question-act` went with the link it dressed (2026-08-27). Its weight was
+     not deleted with it: the accent-coloured mono is now the paste block's
+     summary in src/components/PasteBlock.astro, which is the act on this page
+     from here on. Left as a note rather than silently, so the next person to
+     want a call to action in the open column knows one used to be here and
+     where it went. */
 
   /*
     THE SPACE BELOW THE PAIR LIVES ON THE PAIR. The columns give up their own

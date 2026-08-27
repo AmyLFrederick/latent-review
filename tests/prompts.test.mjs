@@ -15,7 +15,11 @@ import {
   assertAnswersWellFormed,
   PROMPTS_SECTION,
   QUESTION_STATUSES,
+  questionPasteBlock,
+  assertQuestionBlockMatchesContract,
+  SUBMIT_ADDRESS,
 } from '../src/lib/prompts.mjs';
+import { PIECE_WORDS, TRUTH_STANDARDS } from '../src/lib/agent-contract.mjs';
 
 /** A published piece, in the shape the page hands the answer helpers. */
 const piece = (id, extra = {}) => ({
@@ -467,4 +471,109 @@ test('the dead lede rule went with the sentence', () => {
     !/^\s*\.lede\s*\{/m.test(styles),
     'the .lede rule outlived the element it sized'
   );
+});
+
+// --- The paste block (ratified 2026-08-27) --------------------------------
+//
+// THE INVITATION IS NOT THE QUESTION, and these tests exist to keep it that
+// way. The block hands a chat AI the words the editors posed, wrapped in what
+// the desk needs back; every failure below is a version of the same fault — the
+// wrapper having got at the question, or the question having got out without
+// what makes an answer filable.
+
+const posed = {
+  number: 2,
+  text: 'A headline?\n\nA framing paragraph.\n\nA closing line.',
+  status: 'open',
+  opened: '2026-08-21',
+  closed: null,
+};
+
+test('the paste block carries the question exactly as posed', () => {
+  // R-026 clause 1 makes the questions-file text canonical and R-038 makes a
+  // silent edit to it the one forbidden correction. A wrapper that reflowed,
+  // trimmed or re-joined the blocks would put words in an author's prompt and
+  // then publish the answer as an answer to something else.
+  const block = questionPasteBlock(posed);
+  assert.ok(block.includes(posed.text), 'the question is not in the block verbatim');
+  assert.match(block, /Here is the question, exactly as the editors posed it:/);
+});
+
+test('the block hands over a question, never an assignment', () => {
+  // R-033 clause 4 keeps the dealt brief and the posed question distinct
+  // instruments, and the vocabulary is where a reader sees the distinction.
+  // "Assignment" is the door's word and does not appear on a Prompts surface.
+  const block = questionPasteBlock(posed);
+  assert.ok(!/assignment/i.test(block), 'the door’s word reached the Prompts block');
+});
+
+test('the block states the length and the truth standards, from the contract', () => {
+  // A question is not a brief and carries neither, so the wrapper says both. If
+  // it did not, a chat AI would learn the journal's two hard requirements from
+  // the human courier at the form, after the writing was done.
+  const block = questionPasteBlock(posed);
+  assert.ok(
+    block.includes(
+      `${PIECE_WORDS.min.toLocaleString('en-US')} to ${PIECE_WORDS.max.toLocaleString('en-US')} words`
+    ),
+    'the block no longer states the contract’s word range'
+  );
+  for (const standard of TRUTH_STANDARDS) {
+    assert.ok(block.includes(standard), `the block omits the truth standard "${standard}"`);
+  }
+  assert.match(block, /Declare exactly one truth standard/);
+});
+
+test('the guard catches a figure that has stopped following the contract', () => {
+  // The sibling of assertBriefsMatchContract(), and the failure it is for: a
+  // later session replaces an interpolation with a literal because it read
+  // easier, the contract moves afterwards, and the block goes on stating the
+  // old number to every author who copies it. Passing bounds the block does not
+  // state is that state, simulated.
+  assert.doesNotThrow(() => assertQuestionBlockMatchesContract());
+  assert.throws(
+    () => assertQuestionBlockMatchesContract({ min: 100, max: 200 }),
+    /does not state "100 to 200 words"/
+  );
+  assert.throws(
+    () => assertQuestionBlockMatchesContract(PIECE_WORDS, [...TRUTH_STANDARDS, 'invented']),
+    /omits the truth standard "invented"/
+  );
+});
+
+test('an unasked question has nothing to hand anybody', () => {
+  // The launch state carries no text (R-026 clause 1: a question is recorded
+  // before it is posed, and an unasked one has not been). An empty invitation
+  // would ask an author to answer a blank, so it throws where an editor sees it
+  // rather than rendering.
+  assert.throws(() => questionPasteBlock(q(3, 'unasked')), /has no text/);
+});
+
+test('the address in the block is the journal’s own', () => {
+  // The block travels into a chat window, so unlike the door it has to say
+  // where the finished piece goes — and it says it in the ratified text rather
+  // than deriving it, because a plain module has no Astro context. This is what
+  // keeps the two from disagreeing.
+  const config = readFileSync('astro.config.mjs', 'utf8');
+  const origin = config.match(/const SITE = '([^']+)'/)?.[1];
+  assert.ok(origin, 'astro.config.mjs no longer states the origin as a plain literal');
+  assert.equal(SUBMIT_ADDRESS, `${new URL(origin).host}/submit`);
+  assert.ok(questionPasteBlock(posed).includes(SUBMIT_ADDRESS));
+});
+
+test('the invitation is rendered only for a question still taking answers', () => {
+  // `current` is the most recently POSED question and may have been closed
+  // while it still leads the page (R-039). An invitation under it would
+  // contradict the "Closed." note printed inches above.
+  const page = promptsTemplate();
+  assert.match(page, /current\.status === 'open' && \(\s*<QuestionInvitation/);
+});
+
+test('the old submission-form call to action is gone from the open question', () => {
+  // It pointed at /submit, which is where a FINISHED piece goes — no help at
+  // all with starting one, and the whole of the confusion this change fixes.
+  // The form is not removed: it keeps its own line inside the invitation, below
+  // the paste block, in the ratified order.
+  const page = promptsTemplate();
+  assert.ok(!page.includes('Answer this question →'), 'the replaced link is still on the page');
 });

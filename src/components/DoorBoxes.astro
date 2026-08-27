@@ -1,5 +1,6 @@
 ---
 import { pasteBlock, assertBriefsMatchContract } from '../lib/door.mjs';
+import PasteBlock from './PasteBlock.astro';
 
 // The three boxes at /door, shared by every variant of the page so the copy
 // exists once and only the dealt brief differs (R-033 clause 1).
@@ -60,10 +61,12 @@ const paste = variant ? pasteBlock(variant) : null;
         <strong>Step 1.</strong> Copy this and paste it to your AI. It’s the assignment the
         desk dealt you:
       </p>
-      <div class="paste">
-        <pre>{paste}</pre>
-        <button type="button" data-copy={paste}>Copy the assignment</button>
-      </div>
+      {/* THE DOOR'S BLOCK STANDS OPEN, and that is a deliberate difference from
+          /prompts rather than an oversight. A reader here has just been dealt an
+          assignment and is looking straight at it; collapsing it would hide the
+          one thing this box exists to hand over. The shared component takes no
+          summary, so it renders exactly as it did before it was a component. */}
+      <PasteBlock text={paste} buttonLabel="Copy the assignment" />
     </>
   ) : (
     <p class="step undealt">
@@ -157,26 +160,14 @@ const paste = variant ? pasteBlock(variant) : null;
 </p>
 
 <script>
-  // Copy buttons. Every copyable string is also rendered as visible, selectable
-  // text, so this is a convenience and never the only way through: with
-  // JavaScript off the page still works by hand.
-  for (const button of document.querySelectorAll('button[data-copy]')) {
-    button.addEventListener('click', async () => {
-      const text = button.getAttribute('data-copy') ?? '';
-      const original = button.textContent;
-      try {
-        await navigator.clipboard.writeText(text);
-        button.textContent = 'Copied';
-      } catch {
-        // Clipboard access can be refused, and saying so is better than a
-        // button that looks like it worked.
-        button.textContent = 'Copy failed — select it by hand';
-      }
-      setTimeout(() => {
-        button.textContent = original;
-      }, 2500);
-    });
-  }
+  import { wireCopyButtons } from '../lib/copy-button.mjs';
+
+  // THE ADDRESS BUTTON IN BOX 1, and only that one. The paste block below wires
+  // its own button from inside the shared component, so this selector is scoped
+  // to `.copy-row` rather than the whole document: an unscoped pass here would
+  // bind that button a second time, and one click would write the clipboard
+  // twice and race two "Copied" resets against each other.
+  wireCopyButtons('.copy-row');
 </script>
 
 <style>
@@ -242,15 +233,11 @@ const paste = variant ? pasteBlock(variant) : null;
     font-size: 0.95rem;
     word-break: break-all;
   }
-  .paste pre {
-    white-space: pre-wrap;
-    font-size: 0.85rem;
-    line-height: 1.45;
-    max-height: 18rem;
-    overflow-y: auto;
-    padding: 0.75rem;
-    border: 1px solid var(--rule, #ddd);
-  }
+  /* `.paste pre` went with the markup it sized — the block is
+     src/components/PasteBlock.astro now, and carries its own rules so the door
+     and /prompts cannot render the same block two ways. The button rule below
+     stays: it dresses the address button in box 1, which is this component's
+     own and is not inside a paste block. */
   button[data-copy] {
     font: inherit;
     font-size: 0.85rem;

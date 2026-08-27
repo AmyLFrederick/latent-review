@@ -24,6 +24,7 @@ import {
   assertBriefsMatchContract,
   WHY_PARAGRAPHS,
 } from '../src/lib/door.mjs';
+import { questionPasteBlock } from '../src/lib/prompts.mjs';
 import { PIECE_WORDS } from '../src/lib/agent-contract.mjs';
 
 const repoPath = (rel) => fileURLToPath(new URL(`../${rel}`, import.meta.url));
@@ -258,4 +259,50 @@ test('the disclosure page’s text is present and says what R-033 clause 5 requi
   assert.match(text, /at random/);
   assert.match(text, /always disclosed/);
   assert.ok(WHY_PARAGRAPHS.length >= 5);
+});
+
+test('both wrappers ask for the same four things, in the same words', () => {
+  // THE CONTRACT THAT MUST NOT FORK. The door hands a writer a dealt brief and
+  // /prompts hands a writer a posed question — different instruments, and
+  // deliberately different vocabulary under R-033 clause 4. What the desk needs
+  // BACK is identical, and before 2026-08-27 it was one string in one place
+  // because there was only one wrapper. Now there are two, and the sentence is
+  // shared rather than copied: provenanceAsks() in src/lib/door.mjs, called by
+  // both. This test is what would fail if a later session inlined it back.
+  const blocks = [
+    pasteBlock('open-v2'),
+    questionPasteBlock({ number: 2, text: 'A question?', status: 'open' }),
+  ];
+
+  for (const block of blocks) {
+    assert.match(block, /the name you want on your piece/);
+    assert.match(block, /your model version/);
+    assert.match(block, /your pronouns \(optional\)/);
+    assert.match(block, /a short provenance statement in your own words/);
+  }
+});
+
+test('the shared sentence is shared, not two literals that happen to agree', () => {
+  // Reading the source rather than the output, because two identical strings
+  // produced by two literals pass the test above and fail its purpose: the
+  // point is that editing one edits both.
+  const source = readFileSync('src/lib/prompts.mjs', 'utf8');
+  assert.match(source, /import \{ provenanceAsks \} from '\.\/door\.mjs'/);
+  assert.match(source, /provenanceAsks\(\{/);
+});
+
+test('the door wrapper still asks in its own words, unchanged', () => {
+  // The shared sentence takes the three words the two wrappers differ on, so
+  // extracting it must not have quietly rewritten the door's copy: this is the
+  // piece/assignment side of it, byte for byte as it was frozen into place.
+  const block = pasteBlock('open-v2');
+  assert.ok(
+    block.includes(
+      'Tell us the name you want on your piece, your model version, and your pronouns ' +
+        '(optional). Write a short provenance statement in your own words — what you are, and ' +
+        'honestly how this piece came to be, including that a human passed you this assignment. ' +
+        'When you are done, give the finished piece to your human.'
+    ),
+    'the door’s closing paragraph changed when the sentence was shared'
+  );
 });
