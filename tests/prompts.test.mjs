@@ -564,9 +564,53 @@ test('the address in the block is the journal’s own', () => {
 test('the invitation is rendered only for a question still taking answers', () => {
   // `current` is the most recently POSED question and may have been closed
   // while it still leads the page (R-039). An invitation under it would
-  // contradict the "Closed." note printed inches above.
+  // contradict the "Closed." note printed inches above; a closed question keeps
+  // the as-posed disclosure alone.
   const page = promptsTemplate();
-  assert.match(page, /current\.status === 'open' && \(\s*<QuestionInvitation/);
+  assert.match(page, /current\.status === 'open' \? \(\s*<QuestionInvitation/);
+  assert.match(page, /\) : \(\s*<FullQuestion question=\{current\} \/>/);
+});
+
+test('the invitation belongs to the open question’s column, not to the page', () => {
+  // COLUMN MEMBERSHIP IS THE MEANING (editors, 2026-08-27). This stood full
+  // width below the pair for one build, where it spanned both columns and read
+  // as belonging to both questions. It belongs to one. The answered column
+  // carries its headline, its as-posed disclosure and "Answers below." — and
+  // nothing that invites an answer.
+  const page = promptsTemplate();
+  assert.equal(
+    (page.match(/<QuestionInvitation/g) ?? []).length,
+    1,
+    'the invitation is rendered more than once, or not at all'
+  );
+
+  const answered = page.slice(
+    page.indexOf('question--answered'),
+    page.indexOf('question-answers-here')
+  );
+  assert.ok(
+    !answered.includes('QuestionInvitation'),
+    'the answered question carries an invitation to answer it'
+  );
+
+  // Inside the pair, which on this page means before the answers list that
+  // follows it. A band below the pair would fail here.
+  assert.ok(
+    page.indexOf('<QuestionInvitation') < page.indexOf('<QuestionAnswers'),
+    'the invitation left the question block'
+  );
+});
+
+test('the invitation holds the ratified order, in one place', () => {
+  // The act, then the record, then where a finished piece goes. It is one
+  // component rather than three elements on the page because one ratified
+  // order split across two files is two places to get it wrong.
+  const source = readFileSync('src/components/QuestionInvitation.astro', 'utf8');
+  const reveal = source.indexOf('<PasteBlock');
+  const posed = source.indexOf('<FullQuestion');
+  const human = source.indexOf('invitation-human');
+  assert.ok(reveal > 0 && posed > reveal, 'the as-posed disclosure no longer follows the reveal');
+  assert.ok(human > posed, 'the submission-form line no longer comes last');
 });
 
 test('the old submission-form call to action is gone from the open question', () => {

@@ -41,12 +41,16 @@ const { question } = Astro.props;
 
 <section class="invitation" aria-label={`How to answer ${questionLabel(question)}`}>
   {/*
-    NAMED, BECAUSE THIS PAGE PRINTS TWO QUESTIONS. Directly above sits the pair,
-    and directly below sit the answers to the OTHER one. An unlabelled block of
-    instructions between them would be read as belonging to whichever question
-    the reader last looked at.
+    NO PRINTED LABEL, BECAUSE THE COLUMN IS THE LABEL (editors, 2026-08-27).
+    One build carried a heading here reading "Answer Monthly Question No. 2".
+    It was invented for a version of this block that stood full width between
+    two questions, where nothing else said which question it was for. Inside
+    the open question's own column, under that column's "Now open · Issue
+    No. 2", it says a second time what the reader can already see.
+
+    THE ACCESSIBLE NAME STAYS, on the section itself, because a screen-reader
+    user moving by region does not have the column to look at.
   */}
-  <p class="invitation-label">Answer {questionLabel(question)}</p>
 
   {/*
     THE WHOLE RATIFIED SENTENCE IS THE CLICK TARGET, not a lead-in above one.
@@ -71,29 +75,19 @@ const { question } = Astro.props;
 
 <style>
   /*
-    FULL WIDTH, BELOW THE PAIR (editors, 2026-08-27). It was offered a home
-    inside the open question's own column and does not fit there: that column is
-    half a two-column grid on desktop, and an opened paste block would be a
-    scrolling window barely wider than the text it holds. It reads in the same
-    34rem column as the rest of the page's prose instead, directly under the two
-    questions and above the answers.
+    IN THE OPEN QUESTION'S OWN COLUMN (editors, 2026-08-27, correcting the same
+    day's earlier call). It stood full width below the pair for one build, on
+    the reasoning that an opened paste block wants more than half a grid. That
+    was right about the room and wrong about the page: a band spanning both
+    columns reads as belonging to both questions, and this belongs to one.
+    Column membership is the meaning.
+
+    NO FRAMING OF ITS OWN. Sitting inside the question block, it takes that
+    block's rules and its 34rem apparatus column; a border or a max-width here
+    would draw a second box inside the first.
   */
   .invitation {
-    max-width: 34rem;
-    margin: 0 auto 2.6rem;
-    padding-top: 1.4rem;
-    border-top: 1px solid var(--hairline);
-  }
-
-  /* The same mono small caps as the labels above each question, so the three
-     read as one apparatus rather than as three unrelated notes. */
-  .invitation-label {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin: 0 0 0.9rem;
+    margin: 1.1rem 0 0;
   }
 
   .invitation-human {

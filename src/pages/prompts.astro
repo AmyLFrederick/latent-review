@@ -242,51 +242,46 @@ const isUnasked = current !== null && current.status === 'unasked';
                 <p class="question-note question-note--closed">Closed.</p>
               ) : null}
               {/*
-                THE APPARATUS LEFT THIS COLUMN (editors, 2026-08-27) and now
-                stands full width below the pair, as QuestionInvitation.
+                THE APPARATUS IS IN THIS COLUMN, AND COLUMN MEMBERSHIP IS THE
+                MEANING (editors, 2026-08-27, correcting the same day's earlier
+                call).
 
-                WHAT MOVED AND WHY. Two things used to sit here: the "Read the
-                full question as posed" disclosure, and a link reading "Answer
-                this question →". The link is gone — it pointed at /submit,
-                which is where a FINISHED piece goes, and it was the whole of
-                the confusion this change fixes. The disclosure is not gone; it
-                moved, because it now follows the paste block in a ratified
-                order the two cannot be in while one is in a grid column and the
-                other is below it.
+                It stood for one build as a full-width band below the pair, on
+                the reasoning that an opened paste block wants more than half a
+                grid. On the rendered page that band spanned both columns and
+                read as belonging to both questions — and it belongs to exactly
+                one, the open one. A reader deciding whether to answer should
+                never have to work out which question the invitation is for; the
+                column answers that before the words do.
 
-                THE OPEN COLUMN IS NOW THE QUESTION AND NOTHING ELSE, which is
-                the state the answered column has been in since 2026-08-21 apart
-                from its own disclosure. A reader compares two questions here
-                and acts underneath.
+                THE ANSWERED COLUMN CARRIES ITS HEADLINE, ITS AS-POSED
+                DISCLOSURE AND "Answers below.", AND NOTHING ELSE. Anything that
+                invites an answer is No. 2's.
 
-                IT MOVED FOR ROOM, NOT FOR TIDINESS. This column is half a
-                two-column grid on desktop; an opened paste block inside it
-                would be a scrolling window barely wider than its own text.
+                WHAT IS GONE RATHER THAN MOVED: a link reading "Answer this
+                question →" that pointed at /submit. That is where a FINISHED
+                piece goes; it was no help at all with starting one, and it was
+                the whole of the confusion this change fixes. Its accent-mono
+                weight was not deleted with it — it is the paste reveal's now.
               */}
+              {/*
+                THE WHOLE APPARATUS IS ONE COMPONENT WHEN THE QUESTION IS OPEN,
+                because it is one ratified order and splitting it across a page
+                and a component would be two places to get that order wrong. A
+                question the editors have CLOSED keeps the disclosure alone:
+                nothing may invite an answer to a question that has shut.
+              */}
+              <div class="question-apparatus">
+                {current.status === 'open' ? (
+                  <QuestionInvitation question={current} />
+                ) : (
+                  <FullQuestion question={current} />
+                )}
+              </div>
             </>
           )}
         </section>
         </div>
-      )
-    }
-
-    {/*
-      HOW TO ANSWER THE OPEN QUESTION, full width, directly below the pair and
-      above the answers (editors, 2026-08-27).
-
-      ONLY WHEN THE QUESTION IS OPEN. `current` is the most recently POSED
-      question and may have been closed by the editors while it still leads this
-      page (R-039); inviting answers under it then would contradict the "Closed."
-      note two inches above. An unasked question has no text to hand anybody, and
-      questionPasteBlock throws rather than emitting an empty invitation.
-
-      IT INVITES ANSWERS TO THE OPEN QUESTION, NOT TO THE ANSWERED ONE. The block
-      below this shows answers to whichever question the LEFT column holds, which
-      is a different question — hence the label on each.
-    */}
-    {
-      current !== null && current.status === 'open' && (
-        <QuestionInvitation question={current} />
       )
     }
 
