@@ -14,6 +14,7 @@ import {
   assertAnswersWellFormed,
 } from '../lib/prompts.mjs';
 import entries from '../data/prompts.json';
+import { formatDate } from '../lib/site';
 
 // /prompts — the Monthly Question (R-026).
 //
@@ -74,11 +75,14 @@ const isUnasked = current !== null && current.status === 'unasked';
 // question as posed, premise and framing and sources, is one click behind the
 // marked link below it.
 //
-// NO DATE HELPER HERE ANY MORE. This page stopped printing the asked date on
-// the editors' walk of 2026-08-03; the date is rendered by FullQuestion and by
-// the archive's entries, each of which formats its own. A helper left behind
-// for a line that no longer exists is the next session's invitation to print
-// the date again.
+// ONE DATE PRINTS HERE, AND ONLY ONE (editors, 2026-08-31). The asked date left
+// this page on the editors' walk of 2026-08-03 and has not come back: it is
+// rendered by FullQuestion and by the archive's entries, each of which formats
+// its own. What prints here is the closing date on the CLOSED line below — the
+// exception the walk already carved out, now saying which day it means. If a
+// third use for a date appears on this page, that is the moment to ask whether
+// the walk's decision still holds rather than to add another one quietly.
+const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
 ---
 
 <Base
@@ -230,8 +234,18 @@ const isUnasked = current !== null && current.status === 'unasked';
                 a question that has shut. Open is the silent state because it
                 is the expected one; closed is the exception and says so.
               */}
+              {/*
+                THE DATE COMES WITH IT (editors, 2026-08-31). "Closed." alone
+                left a reader who had just read the question with no idea
+                whether it shut yesterday or in the spring, and the closing date
+                is in the record already. The note itself stays one click below,
+                in the question as posed, where the rest of the apparatus is —
+                this line is the stop sign, not the explanation.
+              */}
               {current.status === 'closed' ? (
-                <p class="question-note question-note--closed">Closed.</p>
+                <p class="question-note question-note--closed">
+                  {current.closed ? `Closed ${closedOn(current.closed)}.` : 'Closed.'}
+                </p>
               ) : null}
               {/* The apparatus reads left-aligned in a column of its own, inside a
                   block that is otherwise centred: the question is a headline and

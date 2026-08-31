@@ -34,7 +34,12 @@ const q = (number, status, extra = {}) => ({
   text: status === 'unasked' ? '' : `Question ${number}?`,
   status,
   opened: status === 'unasked' ? null : '2026-08-03',
-  closed: status === 'closed' ? '2026-08-10' : null,
+  closed: status === 'closed' ? '2026-09-01' : null,
+  // A posed question carries the day it is due to close: calendar-fixed to the
+  // first of the month after its issue's publication month (both editors,
+  // 2026-08-31), and settled at the moment of posing. An unasked question has
+  // no issue and nothing honest to put here.
+  closes: status === 'unasked' ? null : '2026-09-01',
   ruling: 'R-026',
   sources: [],
   ...extra,
