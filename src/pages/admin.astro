@@ -128,10 +128,19 @@ import Base from '../layouts/Base.astro';
     // 'forward' is the loud one on purpose: it means the parse found a forwarded
     // message and could NOT read its original date, so the row is standing in
     // with the forward's own date and needs a human. It should look unfinished.
+    //
+    // 'direct' JOINED ON 2026-08-31 AND IS THE QUIET ONE. It means the journal
+    // watched the message arrive — our own webhook's clock, the only date here
+    // nobody has to vouch for. It reads in the observed register rather than the
+    // parsed or attested one, and carries no alarm, because there is nothing for
+    // an editor to resolve. Its arrival is what lets 'forward' go back to
+    // meaning only what it says: until this value existed the door had no word
+    // for a clean arrival and labelled every one of them a lost forward.
     const DATE_SOURCE = {
       parsed: { mark: 'ᵖ', note: 'parsed from forwarded header' },
       attested: { mark: 'ᵃ', note: 'attested by the editor' },
       forward: { mark: 'ᵖ', note: 'forward date — original not found' },
+      direct: { mark: 'ᵒ', note: 'observed by the journal — the message reached us this day' },
     } as const;
 
     function renderReceivedDate(s: any): string {
@@ -143,6 +152,34 @@ import Base from '../layouts/Base.astro';
         <span class="desk-date${needsEditor ? ' desk-date--unresolved' : ''}">
           ${esc(s.received_date)}<sup>${source.mark}</sup>
           <span class="desk-date-note">${esc(source.note)}</span>
+        </span>`;
+    }
+
+    // WHICH DOOR THE PIECE CAME THROUGH, INCLUDING WHEN THE ANSWER IS "WE DID
+    // NOT SEE." Added 2026-08-31 with the door fix in email-inbound.mts.
+    //
+    // The email door used to stamp its own name on everything it wrote,
+    // including pieces the editors had carried in from somewhere else — so a
+    // form submission read "arrived by email" and nothing on this surface
+    // suggested otherwise. It now leaves `arrival` blank and flags the row when
+    // the message was a forward, because a carry means the journal never
+    // witnessed the author's door.
+    //
+    // A BLANK FIELD MUST NOT LOOK LIKE A SETTLED ONE. That is the whole reason
+    // this renders at all: an absent value that printed nothing would be an
+    // improvement the editor could not see, and the row would sit there missing
+    // a fact nobody was told to supply. It borrows the dashed underline the
+    // unresolved date wears, in the same register and for the same reason.
+    function renderArrival(s: any): string {
+      if (s.arrival) return `· arrived by ${esc(s.arrival)}`;
+      const flagged = String(s.parse_warning ?? '')
+        .split(';')
+        .includes('arrival-unestablished');
+      if (!flagged) return '';
+      return `
+        · <span class="desk-date desk-date--unresolved">
+          door not established
+          <span class="desk-date-note">the message was carried; attest the door the piece came through</span>
         </span>`;
     }
 
@@ -419,7 +456,7 @@ import Base from '../layouts/Base.astro';
           · ${esc(s.submission_track)}
           · tier ${s.involvement_tier ? (tierHtml(s.involvement_tier) ?? esc(s.involvement_tier)) : '—'}${s.involvement_tier && tierDescription(s.involvement_tier) ? ` (${esc(tierDescription(s.involvement_tier))})` : ''}
           · ${s.truth_standard ? esc(s.truth_standard) : 'truth standard: —'} · contact ${esc(s.contact_email)}
-          ${s.arrival ? `· arrived by ${esc(s.arrival)}` : ''}
+          ${renderArrival(s)}
           ${s.received_date ? `· received ${renderReceivedDate(s)}` : ''}
           ${s.attachment_note ? `· ${esc(s.attachment_note)}` : ''}
         </p>

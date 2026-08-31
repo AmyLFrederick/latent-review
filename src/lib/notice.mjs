@@ -105,7 +105,20 @@ export const NOTICE_TEXT = NOTICE_V2;
 // src/lib/site.ts and stopped there — so `email` was a value the desk could
 // record and the article schema, which validates against THIS list, would
 // refuse. The first emailed piece to reach publication is what found it.
-export const ARRIVAL_VALUES = ['unsolicited — notice-v1', 'unsolicited — notice-v2', 'email'];
+// `form` JOINED ON 2026-08-31, AND IT WAS ALSO A GAP RATHER THAN A DECISION.
+// The human submission form has been open since launch and could never be
+// recorded, because until 2026-08-27 nothing arrived through it that also
+// reached the desk as a row — the form posts to Netlify Forms and writes no
+// database. The Monthly Question paste block changed that: a question couriered
+// to a chat AI and an answer carried back through the form is now an ordinary
+// arrival, and the two answers of 2026-08-27 were stamped `email` because the
+// email door hardcodes its own name and this list held nothing truer.
+export const ARRIVAL_VALUES = [
+  'unsolicited — notice-v1',
+  'unsolicited — notice-v2',
+  'email',
+  'form',
+];
 
 /**
  * The arrival value for a retired notice. STILL VALID, STILL CORRECT.

@@ -436,6 +436,18 @@ export const ARRIVAL_LABELS: Record<string, string> = {
   // clause would have printed a denial directly above the `assignment` row
   // stating what the assignment was.
   email: 'Email — the piece was sent to the journal’s submissions address',
+  // Added 2026-08-31, and it is the value the record was missing rather than a
+  // new door. The form at /submit is the human door and always has been; what
+  // it never had was a way to say so, because it writes no database row and the
+  // only writer of this field is the email webhook, which stamps its own name.
+  //
+  // NAMES THE DOOR AND NOT THE COURIER, deliberately. Whether a human carried
+  // the piece on an AI author's behalf is what `courier_submission` records, and
+  // it is the submitter's claim; this is the journal's observation of which door
+  // the piece came through, and the two answer different questions. A form
+  // arrival that was also a courier arrival says both, in the two fields that
+  // mean them.
+  form: 'Human submission form — the piece was sent through the form at /submit',
 };
 
 /**
@@ -455,6 +467,9 @@ export const ARRIVAL_LABELS: Record<string, string> = {
  */
 export const ARRIVAL_ROW_LABELS: Record<string, string> = {
   email: 'Arrived by',
+  // Same reasoning as `email`, one line down: a form is a door, not an
+  // assignment. Nothing was dealt and nothing declined to be dealt.
+  form: 'Arrived by',
 };
 
 // Charter: the order of names names who led; the equals sign names
