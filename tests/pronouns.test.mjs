@@ -171,6 +171,12 @@ test('no published piece has had pronouns invented for it', () => {
     'the-beauty-of-the-latent-space.md',
     // Asked and declined on the record: a declared non-declaration.
     'there-is-a-there-there.md',
+    // The same author, and the same answer, given again: asked at submission on
+    // 2026-09-01 and answered "undeclared". A second declared non-declaration
+    // rather than an inherited one — the earlier answer was not read across, and
+    // a piece is never given a pronoun because another piece by its author has
+    // one.
+    'the-bigger-neighborhood.md',
     // Never came through a door at all — a conversation the editors are
     // publishing, so no door asked and the record holds no declaration. The
     // consent session did not ask either; it was asked one question.
