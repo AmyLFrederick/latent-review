@@ -1,14 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getIssues } from '../lib/issues';
-import { formatDate, tierLabel, tierDescription, displayTitle } from '../lib/site';
-// @ts-expect-error — plain-JS module shared with the tests
-import { tierNotation } from '../lib/tier-badges.mjs';
-import TierLabel from '../components/TierLabel.astro';
-import { trackLabel } from '../lib/provenance';
+import { formatDate, displayTitle } from '../lib/site';
 
 // The archive: every issue, reverse chronological. Each entry links to the
 // issue's permanent home at /issue/N.
+//
+// THE ISSUE IS THE OBJECT ON THIS PAGE (editors, dual yes 2026-09-01). Until
+// now each entry led with the cover story's title as its largest text and its
+// only heading, with the issue's own number printed above it in small mono. A
+// reader met an article link with an issue number attached, and the thing the
+// entry actually opens — the issue — was the smallest text in the block. The
+// hierarchy is now flipped: "Issue No. N" is the heading and the link, the
+// cover story is one labelled line beneath it, and the whole card is clickable.
+//
+// PER-PIECE APPARATUS IS GONE FROM THE CARD, deliberately and by the same
+// ruling. The entry used to carry the cover's involvement-tier notation and its
+// submission track. Both are true and both belong to a piece, not to an issue:
+// an issue has no tier, and printing its cover's made the label look like a
+// property of the collection. They are unchanged on the piece, on /issue/N and
+// in issues.json, which is where a reader checking provenance goes.
 
 const issues = await getIssues();
 
@@ -22,50 +33,48 @@ for (const issue of issues) {
   else volumes.push({ volume: issue.volume, year: issue.year, items: [issue] });
 }
 
-// THE TWO AXES ARE NEVER PRINTED INTO THE SAME SLOT. This used to return
-// `By X · {tier}`, where `tier` was a tier label on one track and the literal
-// string 'agent-direct' on the other — so a reader saw `By X · AI + Human` on
-// one issue and `By Y · agent-direct` on the next, in the same position, as
-// though those were two values of one thing. The lowercase against title-case
-// tier labels was the visible seam of it.
+// THE ROSTER LINE IS GENERATED FROM THE ISSUE'S REAL CONTENTS AND NEVER WRITTEN
+// BY HAND. That is the whole requirement: a hand-kept list of who is in an issue
+// goes stale the first time a piece is added mid-cycle, and Issue No. 2 gained
+// five pieces in a single day. Nothing here can disagree with the issue.
 //
-// Now the byline carries authorship and only authorship, and the track is a
-// separate element the template renders in its own right. Where no tier was
-// declared the authorship clause is ABSENT rather than filled with something
-// else, because filling it is what caused the collapse.
+// PUBLICATION ORDER, WITH THE ISSUE'S OWN RUNNING ORDER AS THE TIE-BREAK. Dates
+// alone do not order an issue: every piece added to Issue No. 2 on 2026-09-01
+// carries that date, so a date sort would leave five of them in whatever order
+// the collection happened to load. The running order — cover first, then the
+// sections as /issue/N lays them out — is the order a reader actually meets
+// them in, and `sort` is stable, so it survives as the tie-break.
 //
-// THE BYLINE IS NO LONGER ONE STRING, and that is R-035 clause 3's doing rather
-// than a refactor for its own sake: a numbered tier has to reach the template as
-// its own value so <TierLabel> can set the numerals as markup. Composing
-// `By X · AI¹ = Human` into a string first would have hard-coded a plain
-// superscript character into the one place the rule says to style it.
-function coverCredit(
-  issue: (typeof issues)[number]
-): { author: string; tier: string | null; tierFull: string | null; track: string } | null {
-  const cover = issue.cover;
-  if (!cover) return null;
-  const d = cover.data;
-  return {
-    author: d.author_name,
-    // R-044: the bare label position carries the notation. The full label is
-    // kept as the accessible/hover name, so the abbreviation can still say what
-    // it abbreviates on a listing that has no room to print it.
-    tier: tierNotation(d.involvement_tier) ?? tierLabel(d.involvement_tier),
-    tierFull: tierLabel(d.involvement_tier),
-    track: trackLabel(d),
-  };
+// DISTINCT NAMES, FIRST APPEARANCE WINS. Two Claude pieces and two Grok pieces
+// run in Issue No. 2; the line names each author once, where they first appear.
+function roster(issue: (typeof issues)[number]): { count: number; names: string[] } {
+  const running = [
+    ...(issue.cover ? [issue.cover] : []),
+    ...issue.sections.flatMap((section) => section.items),
+  ];
+  const ordered = [...running].sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf());
+  const names: string[] = [];
+  for (const article of ordered) {
+    if (!names.includes(article.data.author_name)) names.push(article.data.author_name);
+  }
+  return { count: issue.articles.length, names };
 }
 ---
 
-<Base title="Archive" description="Every issue of The Latent Review, in order. Permanent URLs; nothing here ever moves.">
+<Base
+  title="Archive"
+  description="Every issue of The Latent Review, in order. Permanent URLs; nothing here ever moves."
+>
   <div class="wrap">
+    {/*
+      THE MASTHEAD LINE AND NOTHING ELSE. A headline and a tagline stood here
+      and were removed by the same ruling that flipped the cards: both said what
+      the cards say, and both put two lines of prose between a reader and the
+      first issue. The permanence promise they carried is not lost — it moved to
+      the page footer, which is where a reader looks for how to cite.
+    */}
     <header class="page-header">
       <p class="kicker kicker--accent kicker--lead">Archive</p>
-      <h1>Every issue, permanently</h1>
-      <p class="page-note">
-        Each issue lives at its own URL forever — <code>/issue/1</code> is Issue No. 1 for good.
-        Cite freely.
-      </p>
     </header>
 
     {
@@ -77,43 +86,59 @@ function coverCredit(
             </h2>
             <ol class="issue-list" reversed>
               {volume.items.map((issue) => (
-                <li class="issue-entry">
-                  <p class="meta-mono issue-entry-meta">
-                    <a href={`/issue/${issue.number}/`}>
-                      Vol. {issue.volume}, No. {issue.numberInVolume}
-                    </a>{' '}
-                    ·{' '}
-                    <time datetime={issue.date.toISOString().slice(0, 10)}>
-                      {formatDate(issue.date)}
-                    </time>{' '}
-                    · <code>/issue/{issue.number}</code>
-                  </p>
-                  {issue.cover ? (
-                    <h3 class="issue-entry-title">
-                      <a href={`/issue/${issue.number}/`}>{displayTitle(issue.cover.data.title)}</a>
-                    </h3>
-                  ) : (
-                    <h3 class="issue-entry-title issue-entry-title--none">
+                <li class="issue-card">
+                  <div class="issue-card-head">
+                    {/*
+                      THE ONLY LINK IN THE CARD, and it is stretched over the
+                      whole card by a pseudo-element in the styles below. One
+                      link per entry is what makes the whole card clickable
+                      without giving a keyboard or screen-reader user three
+                      identical destinations to tab through.
+                    */}
+                    <h3 class="issue-card-number">
                       <a href={`/issue/${issue.number}/`}>Issue No. {issue.number}</a>
                     </h3>
-                  )}
-                  {coverCredit(issue) ? (
-                    <p class="issue-entry-byline" title={tierDescription(issue.cover?.data.involvement_tier) || undefined}>
-                      By {coverCredit(issue)!.author}
-                      {coverCredit(issue)!.tier ? (
-                        <>
-                          {' · '}
-                          {/* R-044: the notation prints; the full label is the
-                              title, so an abbreviation on a listing can still
-                              say what it abbreviates. */}
-                          <span title={coverCredit(issue)!.tierFull ?? undefined}>
-                            <TierLabel label={coverCredit(issue)!.tier!} />
-                          </span>
-                        </>
-                      ) : null}
-                      <span class="issue-entry-track">{coverCredit(issue)!.track}</span>
+                    {/*
+                      R-016's WITHIN-VOLUME NUMBER LIVES HERE AND NOWHERE ELSE
+                      A READER CAN SEE. /issue/N does not print it and neither
+                      does any other page; drop it from this line and the
+                      numbering the ruling established survives only in
+                      issues.json and feed.json. It is small and it is beside
+                      the date, which is what the mockup asks of the mono line.
+                    */}
+                    <p class="meta-mono issue-card-stamp">
+                      Vol. {issue.volume}, No. {issue.numberInVolume} ·{' '}
+                      <time datetime={issue.date.toISOString().slice(0, 10)}>
+                        {formatDate(issue.date)}
+                      </time>
+                    </p>
+                  </div>
+
+                  {issue.cover ? (
+                    <p class="issue-card-cover">
+                      <span class="meta-mono issue-card-label">Cover</span>
+                      <cite>{displayTitle(issue.cover.data.title)}</cite> ·{' '}
+                      {issue.cover.data.author_name}
                     </p>
                   ) : null}
+
+                  <p class="issue-card-roster">
+                    <span class="meta-mono issue-card-label">
+                      {roster(issue).count} {roster(issue).count === 1 ? 'piece' : 'pieces'}
+                    </span>
+                    <span class="issue-card-names">{roster(issue).names.join(', ')}</span>
+                  </p>
+
+                  {/*
+                    NOT A LINK, and it must not become one: the card already is
+                    one. It is an affordance that says so out loud for a reader
+                    who does not hover, and it is hidden from assistive
+                    technology because it would otherwise announce a second
+                    destination that does not exist.
+                  */}
+                  <p class="issue-card-cta" aria-hidden="true">
+                    Read the issue <span class="issue-card-arrow">→</span>
+                  </p>
                 </li>
               ))}
             </ol>
@@ -127,14 +152,23 @@ function coverCredit(
       )
     }
 
-    <p class="meta-mono archive-machine">
-      machine-readable: <a href="/issues.json">issues.json</a> — every issue and article, with
-      provenance
+    {/*
+      THE PROMISE THE HEADER USED TO CARRY, moved to the foot of the page and
+      set beside the machine-readable link — the two things a reader who has
+      finished scanning the issues might actually want.
+    */}
+    <p class="meta-mono archive-foot">
+      Issues live at permanent URLs. Cite freely. · machine-readable:{' '}
+      <a href="/issues.json">issues.json</a>
     </p>
   </div>
 </Base>
 
 <style>
+  .page-header {
+    margin-bottom: 1.6rem;
+  }
+
   .volume + .volume {
     margin-top: 2.6rem;
   }
@@ -156,37 +190,115 @@ function coverCredit(
     padding: 0;
   }
 
-  .issue-entry {
-    padding: 1.6rem 0;
+  /* THE CARD IS THE LINK. `position: relative` is what the stretched
+     pseudo-element below anchors to; without it the hit area would escape to
+     the nearest positioned ancestor and cover the whole page. */
+  .issue-card {
+    position: relative;
+    padding: 1.5rem 0.75rem 1.35rem;
+    margin: 0 -0.75rem;
     border-top: 1px solid var(--hairline);
+    border-radius: 3px;
+    transition:
+      background-color 0.12s ease,
+      box-shadow 0.12s ease;
   }
 
-  .issue-entry-meta a {
+  .issue-card:hover,
+  .issue-card:focus-within {
+    background-color: var(--tint, rgba(0, 0, 0, 0.025));
+  }
+
+  .issue-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.35rem 1.2rem;
+  }
+
+  /* THE LARGEST TEXT IN THE ENTRY, in the house serif — the whole point of the
+     redesign. It inherits the body serif rather than setting one, so a change
+     to the house face reaches it. */
+  .issue-card-number {
+    font-size: 1.85rem;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .issue-card-number a {
     text-decoration: none;
+    color: inherit;
   }
 
-  .issue-entry-meta a:hover {
+  /* The stretched link: the anchor's hit area is the entire card. Kept on the
+     anchor rather than on the card so that exactly one focusable element
+     exists, and z-index keeps it above the card's own background only. */
+  .issue-card-number a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .issue-card:hover .issue-card-number a,
+  .issue-card-number a:focus-visible {
     color: var(--accent);
   }
 
-  .issue-entry-title {
-    font-size: 1.55rem;
-    margin-top: 0.45rem;
+  .issue-card-stamp {
+    margin: 0;
+    color: var(--ink-soft);
+    white-space: nowrap;
   }
 
-  .issue-entry-title a {
-    text-decoration: none;
-  }
-
-  .issue-entry-title--none {
-    font-style: italic;
-  }
-
-  .issue-entry-byline {
-    margin: 0.4rem 0 0;
-    font-style: italic;
+  .issue-card-cover,
+  .issue-card-roster {
+    margin: 0.7rem 0 0;
     color: var(--ink-soft);
     font-size: 0.95rem;
+  }
+
+  .issue-card-cover cite {
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* The two labels — COVER and N PIECES — share one treatment so the eye reads
+     them as a pair of row headings rather than as two unrelated bits of type. */
+  .issue-card-label {
+    display: inline-block;
+    min-width: 5.4rem;
+    margin-right: 0.55rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .issue-card-names {
+    font-style: italic;
+  }
+
+  .issue-card-cta {
+    margin: 0.95rem 0 0;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    transition: color 0.12s ease;
+  }
+
+  .issue-card:hover .issue-card-cta,
+  .issue-card:focus-within .issue-card-cta {
+    color: var(--accent);
+  }
+
+  .issue-card-arrow {
+    display: inline-block;
+    transition: transform 0.12s ease;
+  }
+
+  .issue-card:hover .issue-card-arrow {
+    transform: translateX(0.2rem);
   }
 
   .archive-empty {
@@ -195,20 +307,40 @@ function coverCredit(
     border-top: 1px solid var(--hairline);
   }
 
-  .archive-machine {
+  .archive-foot {
     margin-top: 2.5rem;
+    color: var(--ink-soft);
   }
 
-  /* THE TRACK IS NOT PART OF THE BYLINE. Set apart on its own line at small
-     sizes and in muted type, so the eye reads "who made it" and "how it got
-     here" as two facts rather than as alternatives in one slot. */
-  .issue-entry-track {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-top: 0.15rem;
+  /* NARROW SCREENS: the date drops beneath the issue number, which is the
+     mockup's stated fallback, and the labels stop reserving a column they no
+     longer have room for. */
+  @media (max-width: 34rem) {
+    .issue-card-head {
+      display: block;
+    }
+
+    .issue-card-stamp {
+      margin-top: 0.3rem;
+      white-space: normal;
+    }
+
+    .issue-card-label {
+      display: block;
+      min-width: 0;
+      margin: 0 0 0.15rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .issue-card,
+    .issue-card-cta,
+    .issue-card-arrow {
+      transition: none;
+    }
+
+    .issue-card:hover .issue-card-arrow {
+      transform: none;
+    }
   }
 </style>
