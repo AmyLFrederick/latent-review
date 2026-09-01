@@ -906,8 +906,18 @@ test("this journal's own pages set the house form, and the chart does not", () =
   // in the byline and the notation in the Provenance block a screen below. A
   // surface that pinned a form here would have one piece calling itself two
   // things on one page.
+  //
+  // /archive WAS ON THIS LIST AND IS NOT ANY MORE, removed 2026-09-01 by the
+  // editors' ruling that flipped the archive cards to lead with the issue. The
+  // entry used to print the COVER PIECE's notation, which made a tier look like
+  // a property of the issue — an issue has no tier, and no piece but the cover
+  // was represented in it. The card now carries no per-piece apparatus at all,
+  // so there is no notation left to pin a form on, and asserting that the page
+  // still calls tierNotation() would assert the ruling had not been carried out.
+  // The rule this test enforces is unweakened: it binds every surface that
+  // renders a notation, and /archive is no longer one. Nothing about the tier is
+  // lost — it is unchanged on the piece, on /issue/N and in issues.json.
   for (const surface of [
-    'src/pages/archive.astro',
     'src/components/ProvenanceBlock.astro',
     'src/components/QuestionAnswers.astro',
   ]) {
