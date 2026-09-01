@@ -38,7 +38,12 @@ const q = (number, status, extra = {}) => ({
   text: status === 'unasked' ? '' : `Question ${number}?`,
   status,
   opened: status === 'unasked' ? null : '2026-08-03',
-  closed: status === 'closed' ? '2026-08-10' : null,
+  closed: status === 'closed' ? '2026-09-01' : null,
+  // A posed question carries the day it is due to close: calendar-fixed to the
+  // first of the month after its issue's publication month (both editors,
+  // 2026-08-31), and settled at the moment of posing. An unasked question has
+  // no issue and nothing honest to put here.
+  closes: status === 'unasked' ? null : '2026-09-01',
   ruling: 'R-026',
   sources: [],
   ...extra,
@@ -318,6 +323,42 @@ test('the answers to a question are its own, in the order they ran', () => {
     1
   );
   assert.deepEqual(answers.map((x) => x.id), ['a-same-day', 'b-same-day', 'later']);
+});
+
+test('the editors\u2019 running order beats the alphabet', () => {
+  // Issue No. 2 ran two answers on the same day, and without a placement the
+  // tiebreak below ordered them by title \u2014 "The Paper Mill" before "Water
+  // Power", purely because T precedes W. The desk had said which ran first.
+  // R-018: placement is an editorial act, and `section_order` is the field that
+  // already carries it on /topics.
+  const answers = answersTo(
+    [
+      piece('paper-mill', { question_number: 2, section_order: 2 }),
+      piece('water-power', { question_number: 2, section_order: 1 }),
+    ],
+    2
+  );
+  assert.deepEqual(answers.map((x) => x.id), ['water-power', 'paper-mill']);
+});
+
+test('an unplaced answer sorts as it always did, behind a placed one', () => {
+  // "Unplaced means unchanged rather than last-by-decree" is the rule on
+  // /topics and it holds here: every answer published before this field existed
+  // carries none and must keep its old order among its peers.
+  //
+  // THIS ALSO PINS THE BUG THE FIRST DRAFT SHIPPED. Unplaced is Infinity, and
+  // subtracting one Infinity from another gives NaN; a comparator returning NaN
+  // does not sort, it corrupts. Two unplaced answers came back in an order that
+  // was neither by date nor by title.
+  const answers = answersTo(
+    [
+      piece('b-unplaced', { question_number: 1 }),
+      piece('placed', { question_number: 1, section_order: 5 }),
+      piece('a-unplaced', { question_number: 1 }),
+    ],
+    1
+  );
+  assert.deepEqual(answers.map((x) => x.id), ['placed', 'a-unplaced', 'b-unplaced']);
 });
 
 test('a question with no answers gathers none rather than failing', () => {

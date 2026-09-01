@@ -28,6 +28,8 @@ interface Props {
     sources?: string[];
     opened?: string | null;
     closed?: string | null;
+    closes?: string | null;
+    closure_note?: string | null;
     status?: string;
   };
   /**
@@ -68,18 +70,32 @@ const sources = Array.isArray(question.sources) ? question.sources : [];
 // date and nothing true to say here, and a caller that hands one over should
 // get silence rather than "Asked null".
 const asDay = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
+//
+// AN OPEN QUESTION NAMES ITS CLOSING DATE (editors, 2026-08-31). It is
+// calendar-fixed and settled the day the question is posed — a question closes
+// on the first of the month after its issue's publication month — so the
+// canonical view of the question can carry it, and a reader deciding whether to
+// answer does not have to work out how long they have.
 const dateline =
   showDates && question.opened
     ? question.closed
       ? `Asked ${asDay(question.opened)} · closed ${asDay(question.closed)}`
-      : `Asked ${asDay(question.opened)} · ${question.status ?? 'open'}`
+      : question.closes
+        ? `Asked ${asDay(question.opened)} · ${question.status ?? 'open'} until ${asDay(question.closes)}`
+        : `Asked ${asDay(question.opened)} · ${question.status ?? 'open'}`
     : null;
+
+// The closure note rides with the dateline and never without it: the archive
+// prints both itself on the entry above this disclosure, and printing the same
+// paragraph twice inside one screen is what showDates exists to prevent.
+const closureNote = showDates && question.closed ? (question.closure_note ?? null) : null;
 ---
 
 <details class="full-question">
   <summary>Read the full question as posed</summary>
   <div class="full-question-body">
     {dateline ? <p class="full-question-dateline">{dateline}</p> : null}
+    {closureNote ? <p class="full-question-closure">{closureNote}</p> : null}
     <p class="full-question-note">
       This is the question in full, verbatim as it was posed, and it is what every author
       answered — the line above is its first sentence, not a summary of it. A question is never
@@ -148,6 +164,15 @@ const dateline =
     text-transform: uppercase;
     color: var(--ink-soft);
     margin: 0 0 0.8rem;
+  }
+
+  /* Prose, not a label — it is a sentence the editors wrote, sitting under a
+     dateline that is set as one. */
+  .full-question-closure {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0 0 0.9rem;
   }
 
   .full-question-note {

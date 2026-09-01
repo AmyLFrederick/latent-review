@@ -118,6 +118,16 @@ export function questionHeadline(question) {
  * the editors skipped — and under R-038 a silent change to one is the single
  * thing the correction rule forbids, so nothing here may make either quietly.
  */
+/**
+ * A recorded day, in the one form this file records days in.
+ *
+ * Bare YYYY-MM-DD, Madison local (CLAUDE.md). Checked rather than trusted
+ * because every date here is hand-typed into a JSON file and a malformed one
+ * reaches a reader as "Invalid Date" on the page that claims to be the complete
+ * record.
+ */
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 export function readQuestions(entries) {
   const questions = entries.filter(isQuestion);
 
@@ -144,6 +154,69 @@ export function readQuestions(entries) {
           'happens before a question is posed (R-026 clause 5, as amended by R-038), so its ' +
           'verification record is recorded first. An empty array is valid; a missing one is not.'
       );
+    }
+
+    // THE DATES ARE THE DAYS THEY CLAIM TO BE. Format only — whether a date is
+    // the RIGHT one is an editorial fact no check can reach.
+    for (const field of ['opened', 'closed', 'closes']) {
+      const value = q[field];
+      if (value !== undefined && value !== null && !DAY_RE.test(value)) {
+        throw new Error(
+          `Question ${q.number} has ${field} ${JSON.stringify(value)}, which is not a bare ` +
+            'YYYY-MM-DD day. Every date the record names is a Madison local day (CLAUDE.md).'
+        );
+      }
+    }
+
+    // STATUS AND THE CLOSING DATE MUST AGREE, in both directions. A question
+    // marked closed with no date does not say when answers stopped being
+    // invited; a question still open carrying a closing date says they already
+    // have. Either way a reader is told something untrue by a page that is
+    // supposed to be the record, and neither is catchable by eye in a file this
+    // long.
+    if (q.status === 'closed' && !q.closed) {
+      throw new Error(
+        `Question ${q.number} is closed but records no date for it. Closing is an editorial ` +
+          'act (R-039) and the day it happened is part of the record.'
+      );
+    }
+    if (q.status !== 'closed' && q.closed) {
+      throw new Error(
+        `Question ${q.number} is ${q.status} but carries closed ${JSON.stringify(q.closed)}. ` +
+          'A question that has a closing date has closed; set the status or clear the date.'
+      );
+    }
+
+    // WHEN IT IS DUE TO CLOSE IS SETTLED AT POSING, because the rule is a
+    // calendar rather than a decision: a question closes on the first of the
+    // month after its issue's publication month (both editors, 2026-08-31). A
+    // posed question with no `closes` is one whose end nobody can look up, on a
+    // page that invites people to spend days writing an answer to it.
+    //
+    // THE FIRST OF A MONTH IS THE WHOLE OF WHAT IS CHECKED HERE, and it is
+    // worth saying what is not. Whether the month is the right month depends on
+    // the issue's publication date, which lives in the article collection and
+    // not in this file; asserting it here would make the questions record
+    // depend on the pieces record to validate itself. The check that closes
+    // that gap belongs where both are already in hand — see
+    // tests/question-closure.test.mjs, which walks the questions against the
+    // issues and fails on a month that does not follow.
+    if (POSED.includes(q.status)) {
+      if (!q.closes) {
+        throw new Error(
+          `Question ${q.number} is ${q.status} but records no \`closes\` date. A question ` +
+            "closes on the first of the month after its issue's publication month (both " +
+            'editors, 2026-08-31); the date is knowable when the question is posed, so it is ' +
+            'recorded then. See the schema note in src/data/prompts.json.'
+        );
+      }
+      if (!q.closes.endsWith('-01')) {
+        throw new Error(
+          `Question ${q.number} closes ${q.closes}, which is not the first of a month. The ` +
+            'closing rule is calendar-fixed to the 1st; a mid-month date is a typo or a rule ' +
+            'change, and a rule change is a ruling rather than an edit.'
+        );
+      }
     }
 
     // THE ISSUE A QUESTION BELONGS TO IS RECORDED, NEVER COMPUTED (editors,
@@ -329,6 +402,30 @@ export function answersTo(articles, number) {
   return articles
     .filter((a) => a?.data?.question_number === number)
     .sort((a, b) => {
+      // THE EDITORS' RUNNING ORDER FIRST (2026-08-31). `section_order` is the
+      // field R-018's placement rule already uses on /topics — "the editors
+      // decide where a piece GOES", lowest first — and answers under a question
+      // are the same kind of decision: which one a reader meets first.
+      //
+      // IT IS HONOURED HERE BECAUSE THE ALTERNATIVE WAS ALPHABETICAL, and that
+      // is not an order anybody chose. Issue No. 2 ran two answers dated the
+      // same day, so the tiebreak below decided the running order by their
+      // titles — "The Paper Mill" before "Water Power", purely because T comes
+      // before W. The desk had said which ran first; the page said otherwise.
+      //
+      // UNPLACED MEANS UNCHANGED, exactly as on /topics: a piece carrying no
+      // order sorts by date and then title as it always did, and sits behind
+      // whatever was placed. Every answer published before this field was
+      // applied is untouched.
+      // COMPARED, NOT SUBTRACTED. Unplaced is Infinity, and Infinity minus
+      // Infinity is NaN — a comparator returning NaN does not sort, it
+      // corrupts, and it did: two unplaced answers came back in an order that
+      // was neither by date nor by title. Caught by the existing fixture.
+      const placed = (x) => (typeof x.data.section_order === 'number' ? x.data.section_order : Infinity);
+      const pa = placed(a);
+      const pb = placed(b);
+      if (pa !== pb) return pa < pb ? -1 : 1;
+
       const byDate = new Date(a.data.date) - new Date(b.data.date);
       return byDate !== 0 ? byDate : String(a.data.title).localeCompare(String(b.data.title));
     });

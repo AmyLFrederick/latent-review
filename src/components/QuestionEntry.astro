@@ -22,7 +22,15 @@ import { questionHeadline, questionLabel } from '../lib/prompts.mjs';
 
 interface Props {
   /** A posed question, as readQuestions() returns it. */
-  question: { number: number; text: string; status: string; opened: string; closed: string | null };
+  question: {
+    number: number;
+    text: string;
+    status: string;
+    opened: string;
+    closed: string | null;
+    closes?: string | null;
+    closure_note?: string | null;
+  };
   /** The published answers to it, from answersTo(). */
   answers: CollectionEntry<'articles'>[];
 }
@@ -47,13 +55,33 @@ const asDay = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
 <article class="entry" id={`weekly-question-${question.number}`}>
   <p class="entry-number">{questionLabel(question)}</p>
   <h2 class="entry-headline">{questionHeadline(question)}</h2>
+  {/*
+    AN OPEN QUESTION SAYS HOW LONG IT IS OPEN FOR (editors, 2026-08-31). The
+    line used to read "open", full stop, which was true and left the reader to
+    guess whether that meant days or months — on the one page where someone is
+    deciding whether to start writing. The closing date is calendar-fixed and
+    known the day the question is posed, so there was never a reason not to say
+    it; there was only no field to say it from.
+
+    THE CLOSED FORM IS UNTOUCHED. `closed` is what happened and `closes` is what
+    was due to happen, and once the first exists it is the one a reader wants.
+  */}
   <p class="entry-dates">
     {
       question.closed
         ? `Asked ${asDay(question.opened)} · closed ${asDay(question.closed)}`
-        : `Asked ${asDay(question.opened)} · open`
+        : question.closes
+          ? `Asked ${asDay(question.opened)} · open until ${asDay(question.closes)}`
+          : `Asked ${asDay(question.opened)} · open`
     }
   </p>
+  {/*
+    THE CLOSURE NOTE, WHERE THE CLOSED QUESTION LIVES. The archive is where a
+    reader goes to find out what happened to a question, and "closed" with a
+    date does not say why or whether anything was withdrawn. This does, in the
+    editors' own words from the record, and prints only when there are words.
+  */}
+  {question.closure_note ? <p class="entry-closure">{question.closure_note}</p> : null}
   {/*
     THE ONE CALLER THAT OPTS OUT OF THE DATELINE. FullQuestion prints it by
     default, so any surface showing the question as posed carries the complete
@@ -96,5 +124,16 @@ const asDay = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
     letter-spacing: 0.06em;
     color: var(--ink-soft);
     margin: 0.5rem 0 0;
+  }
+
+  /* Read rather than scanned, so it sets as prose in the column the question
+     itself occupies — not in the mono register of the dateline above it, which
+     is a label. */
+  .entry-closure {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 34rem;
+    margin: 0.6rem 0 0;
   }
 </style>

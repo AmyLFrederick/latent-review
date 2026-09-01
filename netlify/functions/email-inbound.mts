@@ -55,8 +55,38 @@ const GLOBAL_DAILY_FALLBACK = 200;
 const MAX_RAW_BYTES = 256 * 1024;
 const MAX_BODY_CHARS = 40_000;
 
-/** The arrival value an email-borne piece carries forever. Add-only vocabulary. */
+/**
+ * The arrival value an email-borne piece carries forever. Add-only vocabulary.
+ *
+ * WRITTEN ONLY WHERE THE JOURNAL ACTUALLY OBSERVED THIS DOOR — corrected
+ * 2026-08-31. `arrival` means how the PIECE reached the journal, not how the
+ * MESSAGE reached the webhook, and for a carried piece those are two different
+ * facts. This constant used to go onto every row unconditionally, which was
+ * true while the email door was the only door that produced a row and stopped
+ * being true the moment the editors began carrying form submissions in: the two
+ * Monthly Question answers of 2026-08-27 came through /submit and the desk said
+ * they came by email, because this line said so and nothing else ever spoke.
+ *
+ * A forward is the one carry this door can see. Where the raw shows forwarded
+ * framing, the door did not witness the author's door and says nothing —
+ * `arrival` is left NULL and flagged, on exactly the terms an undeclared tier or
+ * truth standard is. Declared or absent, never supplied.
+ */
 const ARRIVAL_EMAIL = 'email';
+
+/** Flagged when the message is a carry, so the desk knows a door needs attesting. */
+const ARRIVAL_UNESTABLISHED = 'arrival-unestablished';
+
+/**
+ * Does the raw message show that someone forwarded it to us?
+ *
+ * The same framings detectForwardedDate() reads, asked as a yes/no — a forward
+ * whose date is unreadable is still a forward, and the date question and the
+ * custody question are not the same question. Kept next to its caller rather
+ * than in email-parse.mjs because it is one regex over one already-parsed
+ * string, and the parser's job is fields.
+ */
+const FORWARD_MARKER = /^-+\s*(Forwarded message|Original Message)\s*-+$/im;
 
 /**
  * What goes in `contact_email` when there is nothing true to put there.
@@ -221,10 +251,17 @@ export default async function handler(req: Request): Promise<Response> {
     // The sentinel is announced here for the reason CONTACT_SENTINEL gives: a
     // placeholder the desk cannot see is an invented value.
     const contactUsable = CONTACT_EMAIL_RE.test(from.trim());
+    // THE STUB CLAIMS LESS THAN THE ROW ABOVE IT, because it knows less. The
+    // body was never fetched, so nothing here can tell whether this message is
+    // an author writing to us or an editor carrying something in — and a door
+    // is exactly the fact the fetch would have settled. `arrival` is therefore
+    // blank and flagged (2026-08-31); the date is not, because the webhook's own
+    // clock is the one thing a throttled message still establishes.
     const stubWarnings = [
       'throttled',
       `resend_id:${emailId}`,
       `sender_hash:${identifierHash(senderKey)}`,
+      ARRIVAL_UNESTABLISHED,
     ];
     if (!contactUsable) stubWarnings.push(CONTACT_SENTINEL_WARNING);
 
@@ -235,11 +272,11 @@ export default async function handler(req: Request): Promise<Response> {
       provenance_attestation: '(none received — intake throttled before the message was fetched)',
       contact_email: contactUsable ? from.trim() : CONTACT_SENTINEL,
       raw_email: '',
-      arrival: ARRIVAL_EMAIL,
+      arrival: null,
       parse_warning: stubWarnings.join(';'),
       arrived_at: arrivedAt,
       received_date: arrivedAt.slice(0, 10),
-      received_date_source: 'forward',
+      received_date_source: 'direct',
       attachment_note: null,
     });
 
@@ -300,19 +337,40 @@ export default async function handler(req: Request): Promise<Response> {
   const parsed = parseSubmissionEmail(raw);
   warnings.push(...parsed.warnings);
 
-  // (8) The date, and how we came to it. Three sources, never conflated —
-  // the desk renders them differently so an editor knows which she is vouching
-  // for. See docs/EMAIL-SUBMISSION-FORMAT.md §5.
+  // (8) The date, and how we came to it. Four sources, never conflated — the
+  // desk renders them differently so an editor knows which she is vouching for.
+  // See docs/EMAIL-SUBMISSION-FORMAT.md §5.
+  //
+  // `forward` IS A CONCLUSION AND NO LONGER THE STARTING VALUE — corrected
+  // 2026-08-31. It used to be what the variable was initialised to, so a message
+  // that was not a forward at all landed labelled "forward date — original not
+  // found" and wearing the desk's unresolved styling, on a date that was in fact
+  // machine-certain. That styling was built to make an editor act; pointing it at
+  // rows where nothing is wrong is how it stops working. The commonest case now
+  // has its own value: `direct`, our own webhook's observation of the day the
+  // message reached us, which is the one date here nobody has to vouch for.
+  const isForward = FORWARD_MARKER.test(raw);
   const forwarded = detectForwardedDate(raw);
   let receivedDate = arrivedAt.slice(0, 10);
-  let receivedDateSource: 'parsed' | 'forward' = 'forward';
+  let receivedDateSource: 'parsed' | 'forward' | 'direct' = 'direct';
   if (forwarded) {
     receivedDate = forwarded.date;
     receivedDateSource = 'parsed';
-  } else if (/^-+\s*(Forwarded message|Original Message)\s*-+$/im.test(raw)) {
+  } else if (isForward) {
     // It IS a forward and we could not read its date — a different, louder fact
-    // than an ordinary submission arriving today.
+    // than an ordinary submission arriving today. This is the only path that
+    // reaches `forward`, which is what the value was always meant to mean.
+    receivedDateSource = 'forward';
     warnings.push('date-unparsed');
+  }
+
+  // WHOSE DOOR THIS ROW MAY CLAIM. See ARRIVAL_EMAIL. A forward is a carry: the
+  // piece reached the journal by some door we did not see, and the honest record
+  // of that is a blank field and a flag, not a confident wrong answer.
+  let arrival: string | null = ARRIVAL_EMAIL;
+  if (isForward) {
+    arrival = null;
+    warnings.push(ARRIVAL_UNESTABLISHED);
   }
 
   // (9) Screen the submitter-controlled strings — and WARN rather than refuse,
@@ -411,7 +469,7 @@ export default async function handler(req: Request): Promise<Response> {
     involvement_tier: tier,
     truth_standard: truthStandard,
     raw_email: raw,
-    arrival: ARRIVAL_EMAIL,
+    arrival,
     parse_warning: warnings.length ? warnings.join(';') : null,
     attachment_note: attachmentNote,
     arrived_at: arrivedAt,

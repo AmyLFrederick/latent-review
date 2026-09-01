@@ -202,15 +202,52 @@ Received  2026-07-31 ᵖ  parsed from forwarded header
 Received  2026-07-31 ᵃ  attested by the editor
 ```
 
-Where the parse could not establish a date at all, the row shows the forward
-date with its warning beside it — so the submission an editor needs to act on is
-the one that looks unfinished:
+Where the message is a forward and the parse could not establish its original
+date, the row shows the forward date with its warning beside it — so the
+submission an editor needs to act on is the one that looks unfinished:
 
 ```
 Received  2026-08-09 ᵖ  forward date — original not found
 ```
 
+**A message that is not a forward gets neither of those.** Corrected
+2026-08-31: there is a fourth source, and it is the commonest one. When an
+ordinary message arrives at the intake address, the day it arrived is something
+the journal watched happen — machine truth, needing no editor behind it — and it
+reads in its own register:
+
+```
+Received  2026-08-31 ᵒ  observed by the journal — the message reached us this day
+```
+
+Until that value existed, every clean arrival was recorded as a lost forward,
+because `forward` was what the door initialised the field to rather than what it
+concluded. The unfinished styling was landing on rows where nothing was
+unfinished, which is how a warning stops being read.
+
 This is a desk surface only. Nothing about it reaches a published page.
+
+---
+
+## 5a. WHICH DOOR THE PIECE CAME THROUGH
+
+A separate fact from the date, and it went wrong the same way. The email door
+used to record `arrival: email` on everything it wrote — true of a message an
+author sent us, false of a piece an editor **carried** in from somewhere else,
+and the desk had no way to tell the two apart.
+
+**A forward is a carry.** Where the raw message shows forwarded framing, the
+journal did not witness the door the piece actually came through, so it records
+none: `arrival` is left empty and the row is flagged `arrival-unestablished`,
+which the desk renders as *door not established* in the same unresolved register
+as a lost forward date. An editor supplies the door from her own knowledge, the
+way she supplies a date.
+
+The vocabulary now has a value for the human submission form (`form`) as well as
+for email and the two notices. The form writes no database row of its own — it
+posts to Netlify Forms, and the human-door database path is still unbuilt — so a
+form submission reaches the desk only by being carried, which is exactly why the
+door it names has to survive the carrying.
 
 ---
 

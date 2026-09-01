@@ -295,6 +295,43 @@ hr {
   color: var(--ink-soft);
 }
 
+/* INTERLEAVED EDITORS' NOTES — apparatus inside a body, in a register that is
+   not the participants'. Set as a boxed aside rather than a quotation: a
+   blockquote's rule-on-the-left says "someone is being quoted", which is the
+   opposite of what this block is. The markup already says it is an aside (see
+   src/lib/remark-editors-note.mjs); this makes the same statement to a reader
+   who is looking rather than parsing.
+
+   THE REGISTER IS THE JOURNAL'S, deliberately: the small caps label, the mono
+   family and the muted ground are what the site's other apparatus uses, so a
+   returning reader recognises the voice before reading a word of it. */
+.prose .editors-note {
+  margin: 1.8rem 0;
+  padding: 1.05rem 1.25rem;
+  background: var(--wash, rgba(0, 0, 0, 0.025));
+  border-left: 3px solid var(--accent);
+  font-size: 0.94rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.prose .editors-note > :first-child {
+  margin-top: 0;
+}
+
+.prose .editors-note > :last-child {
+  margin-bottom: 0;
+}
+
+/* NO SUPPLIED LABEL, and this was a deliberate reversal. A ::before printing
+   "EDITORS' NOTE" was written first, and removed on reading the copy: every one
+   of these notes already opens by naming itself, and one of them opens more
+   precisely than any supplied label could — "Editors' note on method." A layout
+   that adds a heading above a note beginning "Editors' note." says it twice,
+   which is the exact duplication the schema comments warn about for the
+   `editors_note` field one document over. The register and the rule carry it
+   for a reader; `aria-label` and `data-editors-note` carry it for a machine. */
+
 .prose table {
   border-collapse: collapse;
   width: 100%;

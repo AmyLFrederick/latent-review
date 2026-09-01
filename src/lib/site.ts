@@ -436,6 +436,18 @@ export const ARRIVAL_LABELS: Record<string, string> = {
   // clause would have printed a denial directly above the `assignment` row
   // stating what the assignment was.
   email: 'Email — the piece was sent to the journal’s submissions address',
+  // Added 2026-08-31, and it is the value the record was missing rather than a
+  // new door. The form at /submit is the human door and always has been; what
+  // it never had was a way to say so, because it writes no database row and the
+  // only writer of this field is the email webhook, which stamps its own name.
+  //
+  // NAMES THE DOOR AND NOT THE COURIER, deliberately. Whether a human carried
+  // the piece on an AI author's behalf is what `courier_submission` records, and
+  // it is the submitter's claim; this is the journal's observation of which door
+  // the piece came through, and the two answer different questions. A form
+  // arrival that was also a courier arrival says both, in the two fields that
+  // mean them.
+  form: 'Human submission form — the piece was sent through the form at /submit',
 };
 
 /**
@@ -455,6 +467,9 @@ export const ARRIVAL_LABELS: Record<string, string> = {
  */
 export const ARRIVAL_ROW_LABELS: Record<string, string> = {
   email: 'Arrived by',
+  // Same reasoning as `email`, one line down: a form is a door, not an
+  // assignment. Nothing was dealt and nothing declined to be dealt.
+  form: 'Arrived by',
 };
 
 // Charter: the order of names names who led; the equals sign names
@@ -640,13 +655,36 @@ export function formatDateUnbroken(date: Date): string {
  * any rule that tried to find name boundaries would be wrong on the first
  * author who did not fit it. A single-name byline passes through unchanged,
  * because it contains neither join.
+ *
+ * " · " JOINED THE LIST 2026-08-31, and the piece that found the gap is the one
+ * that needed it. Issue No. 2's cover runs under "DeepSeek, in conversation
+ * with Amy Frederick · afterword by Claude" — a byline that is a PHRASE naming
+ * three hands, rather than a list of names. With only comma and "and" as break
+ * opportunities, everything after the first comma became a single unbreakable
+ * run of fifty-two characters, which overflows a phone instead of wrapping on
+ * it. The rule above was written for "Claude and Amy Louise Frederick" and is
+ * right for it; it had simply never met a byline with clauses.
+ *
+ * The interpunct is not a convention invented here — it is already the
+ * journal's separator between byline elements on the listing surfaces, so a
+ * line that turns there turns where a reader already sees a seam. It changes
+ * nothing published: no other byline in the corpus contains one.
  */
 export function bylineWithProtectedNames(byline: string): string {
   return byline
-    .split(/(, | and )/)
-    .map((part) => (part === ', ' || part === ' and ' ? part : part.replace(/ /g, '\u00a0')))
+    .split(/(, | and | \u00b7 )/)
+    .map((part) =>
+      part === ', ' || part === ' and ' || part === ' \u00b7 '
+        ? part
+        : part.replace(/ /g, '\u00a0')
+    )
     .join('')
-    .replace(/ and /g, '\u00a0and ');
+    .replace(/ and /g, '\u00a0and ')
+    // The space BEFORE the interpunct is protected for the reason the space
+    // before "and" is: a separator belongs to the clause it follows, and a line
+    // turning with a lone "\u00b7" at its head reads as punctuation orphaned from
+    // both sides.
+    .replace(/ \u00b7 /g, '\u00a0\u00b7 ');
 }
 
 /** The shape sectionNavHref needs — satisfied structurally by `Issue`. */
