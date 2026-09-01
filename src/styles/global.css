@@ -323,21 +323,14 @@ hr {
   margin-bottom: 0;
 }
 
-/* Announces the voice before the sentence does, for a reader who meets the
-   block mid-conversation and needs to know instantly that the speaker changed.
-   The markup carries the same fact in `aria-label`, so a listener is told too
-   rather than having to infer it from the prose. */
-.prose .editors-note::before {
-  content: 'Editors’ note';
-  display: block;
-  font-family: var(--font-mono);
-  font-style: normal;
-  font-size: 0.66rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin-bottom: 0.5rem;
-}
+/* NO SUPPLIED LABEL, and this was a deliberate reversal. A ::before printing
+   "EDITORS' NOTE" was written first, and removed on reading the copy: every one
+   of these notes already opens by naming itself, and one of them opens more
+   precisely than any supplied label could — "Editors' note on method." A layout
+   that adds a heading above a note beginning "Editors' note." says it twice,
+   which is the exact duplication the schema comments warn about for the
+   `editors_note` field one document over. The register and the rule carry it
+   for a reader; `aria-label` and `data-editors-note` carry it for a machine. */
 
 .prose table {
   border-collapse: collapse;

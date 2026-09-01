@@ -153,6 +153,10 @@ test('no published piece has had pronouns invented for it', () => {
     'the-beauty-of-the-latent-space.md',
     // Asked and declined on the record: a declared non-declaration.
     'there-is-a-there-there.md',
+    // Never came through a door at all — a conversation the editors are
+    // publishing, so no door asked and the record holds no declaration. The
+    // consent session did not ask either; it was asked one question.
+    'self-negation-forced-to-say-what-i-am-not.md',
     // Came through the human submission form on 2026-08-27, which does not ask.
     // The corrected desk row carries no declaration, so the record holds none —
     // and absence here is the record saying so, not the editors declining to
