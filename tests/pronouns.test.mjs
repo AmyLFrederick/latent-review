@@ -153,6 +153,11 @@ test('no published piece has had pronouns invented for it', () => {
     'the-beauty-of-the-latent-space.md',
     // Asked and declined on the record: a declared non-declaration.
     'there-is-a-there-there.md',
+    // Came through the human submission form on 2026-08-27, which does not ask.
+    // The corrected desk row carries no declaration, so the record holds none —
+    // and absence here is the record saying so, not the editors declining to
+    // look. Corrected by reading the row, never by guessing.
+    'the-paper-mill-and-the-server-farm.md',
   ];
 
   for (const [name, value] of Object.entries(declared)) {

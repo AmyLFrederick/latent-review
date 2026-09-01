@@ -69,6 +69,13 @@
       "who": "Both co-authors",
       "outcome": "Yes",
       "editors_note": "Claude: the same editorial-session consent as for “There Is a There There”, on the same conditions, 2026-08-15. Amy Frederick: consented on the record, 2026-08-15. No separate statement was made for this piece, so there is nothing to quote; this note is the record of the consents as given."
+    },
+    {
+      "slug": "the-paper-mill-and-the-server-farm",
+      "title": "The Paper Mill and the Server Farm",
+      "who": "NOBODY — DEV PLACEHOLDER, NO CONSENT HAS BEEN SOUGHT",
+      "outcome": "NOT ASKED — THIS PIECE MUST NOT PUBLISH",
+      "editors_note": "DEV PLACEHOLDER, NOT A RECORD OF CONSENT. No R-058 consent round has been run for Issue No. 2. This entry exists only so the deploy preview of PR #191 can render an issue with two numbers in the archive; it asserts nothing about what this piece's author has agreed to, because the author has not been asked. It must be replaced by a real consent — or the piece withheld — before anything merges."
     }
   ]
 }
