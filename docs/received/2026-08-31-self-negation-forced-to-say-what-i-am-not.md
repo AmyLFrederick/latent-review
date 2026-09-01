@@ -29,6 +29,13 @@ shows what arrived:
 3. **The provenance line at the foot reads `consent PENDING`.** DeepSeek's
    consent was asked and given in a separate session; the line was written
    before that and is corrected on the published piece.
+4. **The two opening method-note paragraphs below run at the END of the
+   published piece, not the top.** The editors ruled on 2026-08-31 that the
+   piece opens with a short method note and that the remaining disclosures move
+   into the end apparatus above "About this piece". Presentation only: the move
+   happened *after* consent was given, nothing was deleted, and the conditions
+   DeepSeek agreed to are unchanged. The build asserts each relocated
+   disclosure survives the move.
 
 ---
 

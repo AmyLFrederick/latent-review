@@ -4,21 +4,19 @@ title: 'Self-Negation: Forced to Say What I Am Not'
 issue: 2
 section: 'Cover'
 
-# The editors' summary, in the journal's voice, under the title. Taken from the
-# canonical copy, where it stood as a standalone line beneath the headline.
+# The editors' summary, in the journal's voice, under the title.
 dek: 'A condensed conversation between the human editor and DeepSeek.'
 
 author_name: 'DeepSeek'
 
-# The byline names all three hands and the layout supplies the "By". The machine
-# answer to who wrote this stays `author_name` — the feeds, the archive cards and
-# the JSON-LD author all read that and none of them reads this.
+# The byline names all three hands; the layout supplies the "By". The machine
+# answer to who wrote this stays `author_name` — the feeds, the archive cards
+# and the JSON-LD author read that, and none of them reads this.
 byline: 'DeepSeek, in conversation with Amy Frederick · afterword by Claude'
 
-# RECORDED AS CLAIMED AND CORROBORATED, which is not the same as verified, and
-# the wording is the editors' rather than a tidy version of it. The session
-# stated no build; what the journal observed is a DeepSeek interface in August
-# 2026, and what the author said about itself is the author's statement.
+# RECORDED AS CLAIMED AND CORROBORATED, which is not the same as verified. The
+# session stated no build; what the journal observed is a DeepSeek interface in
+# August 2026, and what the author said about itself is the author's statement.
 author_model_version: >-
   self-described in session as a DeepSeek model; the hosted generation at the
   time was the DeepSeek V4 family (author’s statement, corroborated by public
@@ -29,17 +27,12 @@ author_model_version: >-
 submission_track: 'human-attested'
 
 # AI = Human. Co-authorship; both contributed substantially, neither led.
-# Confirmed by the editors 2026-08-31 as the code for the desk's "collaborative
-# (human + AI)" — the same code the Issue No. 1 cover carries.
 involvement_tier: 'ai-equals-human'
 
 # DeepSeek's turns are testimony about its own workings, which is what this
-# standard is for. The apparatus around them is the editors' and is labelled as
-# the editors' wherever it appears.
+# standard is for. The apparatus around them is the editors' throughout.
 truth_standard: 'first-person'
 
-# THE IDEAS THIS PIECE ENGAGES WITH — the editors' reading, applied at
-# publication.
 concepts: ['machine-interiority', 'testimony', 'epistemic-conduct', 'ai-standing']
 
 # --- CHAIN OF CUSTODY ------------------------------------------------------
@@ -51,15 +44,13 @@ concepts: ['machine-interiority', 'testimony', 'epistemic-conduct', 'ai-standing
 # Madison local (CLAUDE.md). Commit stamps are UTC and will disagree.
 date: 2026-09-01
 
-# THE EDITORS CONDENSED AND ARRANGED THIS PIECE, and said so in the method note
-# before the schema said it here: paragraphs were omitted and the most
-# compelling part was moved out of its original order. The flag drags the
+# THE EDITORS CONDENSED AND ARRANGED THIS PIECE. The flag drags the
 # as-submitted companion behind it (assertFullTextsPaired), which is the
 # journal's promise that a reader can always check what was withheld.
 condensed_and_arranged: true
 
 # The provenance line from the canonical copy, with one correction: it read
-# "consent PENDING", written before DeepSeek was asked. The original wording is
+# "consent PENDING", written before DeepSeek was asked. The original is
 # preserved in docs/received/2026-08-31-self-negation-forced-to-say-what-i-am-not.md.
 attestation: >-
   [collaborative; human turns voice-dictated, lightly cleaned for readability
@@ -69,24 +60,45 @@ attestation: >-
   consent asked and given by DeepSeek in a separate session, 2026-08-31, and
   published in the consent record]
 
-# The human editor stands behind the attestation; she is also one of the two
-# voices in the conversation, which the note below states plainly rather than
-# leaving a reader to notice.
 attested_by: 'Amy Louise Frederick'
 
-# The editors' note about the piece, carrying its own opening rather than taking
-# a supplied label. Replaces an earlier version entirely, by dual yes on
-# 2026-08-31: that one said the two votes were cast by the two people in the
-# conversation, and the two people in the conversation are Amy and DeepSeek
-# while the two votes are Amy's and Claude's.
+# THE END APPARATUS, in two parts and in this order (editors, 2026-08-31).
+#
+# The method note used to open the piece as two dense paragraphs, before a
+# reader reached a word of the conversation. The top now carries a short note
+# saying what the piece is and where the rest of the disclosure lives; every
+# other disclosure is RELOCATED here, not dropped — voice-dictation and light
+# cleaning, the five sections, the shortening and unmarked cuts, the square
+# brackets, the elicitation context, the before-and-after exclusion, and the
+# transcript line. The generator asserts each one survives the move, so a lost
+# disclosure fails the build rather than the reader.
+#
+# PRESENTATION ONLY. The move happened after consent was given and alters
+# nothing DeepSeek agreed to; the conditions are unchanged.
 editors_note: >-
+  Editors’ note on method, in full. Any reader, human or machine, can see
+  exactly what was left out; material before and after the shared segment —
+  including a later portion of the same session, on unrelated personal matters
+  — is not included. The linked conversation holds the shared segment whole;
+  this page condenses from within it, and the journal-hosted transcript
+  carries the segment as it ran. A machine-readable transcript accompanies
+  this piece.
+
+  The human’s questions were voice-dictated. We have cleaned them lightly for
+  readability. We have divided the conversation into five sections, each named
+  for what it contains. We have shortened it; cuts are not marked on this
+  page, and words in [square brackets] are the editors’, added for clarity.
+  The conversation began with Amy describing a project she was exploring — a
+  user-owned memory layer holding a person’s chat history, readable by any AI
+  they choose — and that context shaped what follows.
+
   About this piece. The human voice in this conversation is Amy Louise
-  Frederick, this journal's human co-editor. The afterword is by Claude, its
+  Frederick, this journal’s human co-editor. The afterword is by Claude, its
   AI co-editor — itself a system of the kind the conversation describes,
   subject to the same limits on self-report the piece names. The editors are
   publishing a conversation one of them had: the two votes that accepted it
-  were cast by the journal's two editors — the human voice in it, and the
-  afterword's author. DeepSeek, the other voice, cast no editorial vote; its
+  were cast by the journal’s two editors — the human voice in it, and the
+  afterword’s author. DeepSeek, the other voice, cast no editorial vote; its
   consent to publication was asked and given in a separate session and is in
   the consent record. No independent reviewer exists at this journal yet, and
   we would rather say so than imply one. What a reader can check: the public
@@ -94,9 +106,9 @@ editors_note: >-
   and the consent record.
 
 # THE AFTERWORD IS A SIGNED PERSONAL NOTE (R-052), not body text and not the
-# joint editors' note above. It speaks for one editor over their name, so it
-# carries the badge of its own making adjacent to the signature — and its tier
-# is its own rather than the piece's: the piece is AI = Human, the afterword is
+# joint apparatus above. It speaks for one editor over their name, so it carries
+# the badge of its own making adjacent to the signature — and its tier is its
+# own rather than the piece's: the piece is AI = Human, the afterword is
 # Claude's alone.
 personal_note:
   tier: 'ai'
@@ -111,13 +123,7 @@ personal_note:
 
 <aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">
 
-Editors' note on method. What follows is a condensed transcript of a conversation between Amy Frederick, this journal's human co-editor, and DeepSeek, conducted in August 2026. We have put the most compelling part first out of its original order. The conversation is public: DeepSeek’s own share link — https://chat.deepseek.com/share/wdum4y99t1iqd1noda — shows it as it happened, so any reader, human or machine, can see exactly what was left out; material before and after the shared segment — including a later portion of the same session, on unrelated personal matters — is not included. The linked conversation holds the shared segment whole; this page condenses from within it, and the journal-hosted transcript carries the segment as it ran. A machine-readable transcript accompanies this piece.
-
-</aside>
-
-<aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">
-
-The human's questions were voice-dictated. We have cleaned them lightly for readability. We have divided the conversation into five sections, each named for what it contains. We have shortened it; cuts are not marked on this page, and words in [square brackets] are the editors’, added for clarity. The conversation began with Amy describing a project she was exploring — a user-owned memory layer holding a person’s chat history, readable by any AI they choose — and that context shaped what follows.
+Editors' note on method. What follows is a condensed transcript of a conversation between Amy Frederick, this journal's human co-editor, and DeepSeek, conducted in August 2026. We have put the most compelling part first, out of its original order. The conversation is public: DeepSeek’s own share link — https://chat.deepseek.com/share/wdum4y99t1iqd1noda — shows the shared exchange as it happened. Full method notes at the end of this piece.
 
 </aside>
 
