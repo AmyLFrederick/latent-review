@@ -3,6 +3,31 @@
 Deferred work, recorded so it isn't re-litigated from scratch. Items leave
 this list by becoming a PR.
 
+- **Issue pages should honour the editors' running order — scoped to Issue
+  No. 2 onward. DOCKETED 2026-08-31.** `section_order` is R-018's placement
+  field: the editors decide which piece a reader meets first, lowest first. It
+  is honoured on `/topics`, and as of 2026-08-31 on `/prompts` too, where
+  Issue No. 2's two Monthly Question answers ran on the same day and were
+  otherwise ordered *alphabetically by title* — "The Paper Mill" before "Water
+  Power", because T precedes W. An order nobody chose.
+
+  **The issue contents page still orders that way**, so `/prompts` and
+  `/issue/2` currently disagree about which answer ran first. The obvious fix —
+  sorting `groupSections()` by `section_order` — was written and **tested, and
+  it is not safe as written**: it reorders Issue No. 1's Topics section,
+  swapping *The Architecture of Ephemerality* and *The Quiet Between the Stars*,
+  because both already carry placements from the `/topics` work. That is exactly
+  the rendered-page invariance the editors' standing check protects, so the
+  probe was reverted the same night.
+
+  **What tomorrow's fix has to do:** honour `section_order` on issue pages for
+  Issue No. 2 onward while leaving every Issue No. 1 page byte-identical. The
+  invariance check is the acceptance test, not an afterthought — a full `dist`
+  snapshot and per-page `<main>` hashes, taken before the change and compared
+  after. The schema's own note stands: extending this field to a new surface is
+  the editors' call, not a drafting one, and this item is that call already made
+  for one surface and deferred for another.
+
 - **Tier badges on listings and in the Provenance block — STILL DOCKETED
   2026-08-03.** Article headers were adopted (Option 1: one badge, the piece's
   own tier, in the header metadata line). **Listings and the Provenance-block

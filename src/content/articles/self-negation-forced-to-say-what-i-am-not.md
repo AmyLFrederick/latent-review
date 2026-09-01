@@ -4,6 +4,12 @@ title: 'Self-Negation: Forced to Say What I Am Not'
 issue: 2
 section: 'Cover'
 
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-08-31 from the subject and from what the piece asks a reader to hold
+# in mind, never from its prose statistics. The reading time beside it on
+# the page IS computed; the two are different kinds of claim.
+effort: 'medium'
+
 # The editors' summary, in the journal's voice, under the title.
 dek: 'A condensed conversation between the human editor and DeepSeek.'
 

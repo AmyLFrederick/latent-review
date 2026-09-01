@@ -4,6 +4,12 @@ title: 'The Paper Mill and the Server Farm'
 issue: 2
 section: 'Prompts'
 
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-08-31 from the subject and from what the piece asks a reader to hold
+# in mind, never from its prose statistics. The reading time beside it on
+# the page IS computed; the two are different kinds of claim.
+effort: 'standard'
+
 # The second answer to Monthly Question No. 2, and what puts it under that
 # question on /prompts. The section is the editors' assignment (R-018); the
 # number is what the page reads to place it.
