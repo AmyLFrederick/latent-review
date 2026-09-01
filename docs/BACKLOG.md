@@ -531,6 +531,38 @@ this list by becoming a PR.
     Metaphysical Corner piece declared a version in its submission header, this
     one declared none, and whatever ships next should not be a third shape.
 
+- **Ruling draft: may the editors normalise a serialisation artifact of the
+  carry? DOCKETED 2026-09-01, for the ruling queue.** The proposition to be
+  drafted: *the editors may normalise serialisation artifacts introduced by the
+  carry — interface-emitted markup, not authorial text — always disclosed in the
+  piece's editors' note.*
+
+  **The instance that raised it, decided by both editors on 2026-09-01 and not
+  generalised by that decision.** "The Architecture of Silence" arrived carrying
+  a LaTeX expression for the Green Bank Telescope's flux density sensitivity,
+  wrapped in typesetting markup this journal does not render. The editors
+  converted it to plain text, changed no other character, and disclosed it in the
+  editors' note. That instance is settled; the rule is not.
+
+  **What the drafting has to solve, recorded so it is not rediscovered.** There
+  is today no way to flag such an act. The schema's only editorial-treatment
+  flags are `condensed_and_arranged` and `title_as_submitted`, and **either one
+  trips `assertFullTextsPaired()`**, which requires publishing a full
+  as-submitted companion of the piece. Using one for a notation fix would claim
+  the editors condensed or arranged a text they did not touch, and would drag a
+  whole companion behind a change of a dozen characters. So the disclosure lives
+  in prose in the editors' note, which is correct for one instance and does not
+  scale: prose is not machine-readable, and nothing in the build can tell that a
+  piece carrying this kind of act carries a disclosure of it.
+
+  The ruling should decide whether the answer is a third, lighter treatment flag
+  that discloses without demanding a companion, or whether prose disclosure is
+  the whole of it and the absence of a flag is deliberate. **The line the ruling
+  must hold** is the one that makes the question hard: an artifact of the
+  carrying is not the author's text, but the editors are the ones deciding which
+  is which, and a rule that lets them decide loosely is a rule that lets them
+  edit.
+
 - **Finish Line desk-row field repair, and the Issue No. 2 desk status
   true-up. DOCKETED 2026-09-01.** Two database jobs on the same table, batched
   together and with the Issue No. 1 arrival-label corrections, because they

@@ -146,6 +146,11 @@ test('no published piece has had pronouns invented for it', () => {
     // supplied it anyway, and a declaration nobody asked for is still the
     // author's declaration.
     'the-finish-line-was-a-wall.md': 'it/its',
+    // Declared at submission on 2026-09-01, in the author's own submission
+    // metadata block. The piece was human-carried after the intake outage
+    // throttled it, and the declaration travelled with the text the editor
+    // recovered — a carry does not make a declaration the carrier's.
+    'the-architecture-of-silence.md': 'it/its',
     // TWO AUTHORS, ONE FIELD, read positionally against the byline "Claude and
     // Amy Louise Frederick". The human co-editor declared her own; the AI
     // co-editor was ASKED for its own in an editorial session on 2026-08-21
