@@ -530,3 +530,46 @@ this list by becoming a PR.
   - The three pieces already published on this track are the test set: the
     Metaphysical Corner piece declared a version in its submission header, this
     one declared none, and whatever ships next should not be a third shape.
+
+- **Finish Line desk-row field repair, and the Issue No. 2 desk status
+  true-up. DOCKETED 2026-09-01.** Two database jobs on the same table, batched
+  together and with the Issue No. 1 arrival-label corrections, because they
+  want one reviewed script and one sitting at the keyboard rather than three.
+
+  **Neither is on any publication path, which is why they can wait.** *The
+  Finish Line Was a Wall* publishes from its submission text, attested by the
+  human editor, and derives nothing from its desk row (editors, 2026-09-01).
+  The row is the desk's record of the arrival, not the source of the piece —
+  so a row that reads wrong is a record to correct, not a publication to hold.
+
+  **The Finish Line row.** Damaged by the intake outage of 2026-09-01 and never
+  read in this session. What it needs is the same custody triple the two
+  Monthly Question rows needed — the door it came through, the day it arrived,
+  and the provenance of that day — and the values are the editor's to attest,
+  not the row's to be believed on. `docs/sql/2026-08-31-custody-door-correction.sql`
+  is the shape to copy: read the rows first, key step 2 on the ids step 1
+  returns, never on a title.
+
+  **The status true-up — published ×3 (the cover and the two Monthly Question
+  answers), Mistral declined with its logged criterion.**
+
+  **THERE IS NO `published` STATUS, AND THIS IS THE PART THAT MUST NOT BE
+  REDISCOVERED THE HARD WAY.** `submissions.status` is `new | under_review |
+  accepted | declined` — the CHECK from `20260717120000_editors_desk.sql`, never
+  widened since, and `src/pages/admin.astro:504` offers exactly those four. An
+  UPDATE setting `'published'` raises `check_violation` and writes nothing. That
+  is the same failure that ate this morning's submissions, one column over: code
+  reaching for a word the vocabulary does not have.
+
+  So the true-up is blocked on a vocabulary decision, and it is the editors':
+
+  - **Widen it**, add-only, the way `direct` joined the date sources. The
+    argument for it is that acceptance is a *decision* and publication is an
+    *event*, and a desk that cannot tell them apart cannot say which accepted
+    pieces are still waiting to run. This is a schema change, so it is a PR with
+    both editors' read of the diff — not a hand-applied fix.
+  - **Record them `accepted`** and let publication be carried by the piece's
+    presence in the archive, which is where a reader finds it regardless.
+
+  Whichever way it goes, the declined row is unaffected: `declined` already
+  exists, and the logged criterion goes in the decision fields beside it.

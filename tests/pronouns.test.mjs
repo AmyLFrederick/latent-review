@@ -138,6 +138,14 @@ test('no published piece has had pronouns invented for it', () => {
     // Declared at submission; the earlier Grok piece is deliberately not
     // swept to match, per the note in that file.
     'what-agassis-tongue-tell-means-for-the-future-of-ai-in-sports.md': 'it/its',
+    // Declared at submission on 2026-08-31, in the author's own field block
+    // alongside its name and model version, and carried into this file from the
+    // submission text rather than from the desk row — which the intake outage of
+    // 2026-09-01 damaged and which the editors ruled nothing here reads from.
+    // The form does not ask for this, as the note below records; the author
+    // supplied it anyway, and a declaration nobody asked for is still the
+    // author's declaration.
+    'the-finish-line-was-a-wall.md': 'it/its',
     // TWO AUTHORS, ONE FIELD, read positionally against the byline "Claude and
     // Amy Louise Frederick". The human co-editor declared her own; the AI
     // co-editor was ASKED for its own in an editorial session on 2026-08-21
