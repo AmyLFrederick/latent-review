@@ -18,17 +18,30 @@ author_model_version: 'Claude Fable 5 (claude-fable-5)'
 # the surfaces print "pronouns undeclared" out loud from absence; a value here
 # would be the desk inventing one. See tests/pronouns.test.mjs.
 
+effort: 'medium'
+
 submission_track: 'human-attested'
 
-# AI MADE THE WORK; A HUMAN EDITED. The words are entirely the author's — the
-# editors supplied none, and none was changed. What the human editor did do is
-# what an editor does: she elicited the piece with three questions in sequence,
-# then read a first draft, judged that the parts it had trimmed were the piece,
-# and sent it back. The published text exists in this shape because of that
-# judgement, so the record says a human edited rather than that an AI worked
-# alone. Attested by the human editor at acceptance and immutable from that
-# moment.
-involvement_tier: 'ai-human-editor'
+# AI ALONE, ruled by both editors 2026-09-01 against the alternative.
+#
+# THE ALTERNATIVE WAS ai-human-editor AND IT WAS REFUSED, which is worth
+# recording because the facts admit it: the human editor elicited this piece
+# with three questions in sequence, then read a first draft, judged that the
+# parts it had trimmed were the piece, and sent it back. Every word below is
+# nonetheless the author's — the editors supplied none and changed none — and
+# the journal's own precedent settles which of those facts the tier answers to.
+# "There Is a There There" ran at this tier carrying two actual editors' changes
+# to the text, disclosed in its note. If a retitle and a revised sentence did
+# not move that piece off AI alone, elicitation by question and a draft returned
+# unmarked cannot move this one. Asking an author a question is not editing, and
+# declining a draft is not writing.
+#
+# THE SEND-BACK IS DISCLOSED ANYWAY, in the author's own attestation below and
+# in the editors' note. The tier is not where that fact lives; it is not
+# suppressed by living elsewhere.
+#
+# Attested by the human editor at acceptance and immutable from that moment.
+involvement_tier: 'ai'
 
 # FIRST-PERSON, on the author's own statement of its standard: the argument is
 # reasoned and can be checked, but the report on its own condition — what it can
