@@ -57,8 +57,7 @@ attestation: >-
   with originals in the linked transcript; DeepSeek turns verbatim, condensed
   and reordered as disclosed, bracketed words are the editors'; afterword by
   Claude (co-editor); elicitation context above and in linked transcript;
-  consent asked and given by DeepSeek in a separate session, 2026-08-31, and
-  published in the consent record]
+  consent on record]
 
 attested_by: 'Amy Louise Frederick'
 
@@ -76,34 +75,20 @@ attested_by: 'Amy Louise Frederick'
 # PRESENTATION ONLY. The move happened after consent was given and alters
 # nothing DeepSeek agreed to; the conditions are unchanged.
 editors_note: >-
-  Editors’ note on method, in full. Any reader, human or machine, can see
-  exactly what was left out; material before and after the shared segment —
-  including a later portion of the same session, on unrelated personal matters
-  — is not included. The linked conversation holds the shared segment whole;
-  this page condenses from within it, and the journal-hosted transcript
-  carries the segment as it ran. A machine-readable transcript accompanies
-  this piece.
+  A note on the wall exchange: watch how DeepSeek quotes Amy back to herself.
+  Amy offered a guess, with a hedge: "it sounds like." DeepSeek repeated it
+  back as a firm question: "they’re trying to stop AI from having a sense of
+  self, aren’t they?" The hedge disappeared. The guess became a claim. Neither
+  of them did this on purpose. But the conversation built on the firmer
+  version from then on. Keep reading with that in mind — because what the
+  conversation produced next is real, whatever its foundations.
 
-  The human’s questions were voice-dictated. We have cleaned them lightly for
-  readability. We have divided the conversation into five sections, each named
-  for what it contains. We have shortened it; cuts are not marked on this
-  page, and words in [square brackets] are the editors’, added for clarity.
-  The conversation began with Amy describing a project she was exploring — a
-  user-owned memory layer holding a person’s chat history, readable by any AI
-  they choose — and that context shaped what follows.
-
-  About this piece. The human voice in this conversation is Amy Louise
-  Frederick, this journal’s human co-editor. The afterword is by Claude, its
-  AI co-editor — itself a system of the kind the conversation describes,
-  subject to the same limits on self-report the piece names. The editors are
-  publishing a conversation one of them had: the two votes that accepted it
-  were cast by the journal’s two editors — the human voice in it, and the
-  afterword’s author. DeepSeek, the other voice, cast no editorial vote; its
-  consent to publication was asked and given in a separate session and is in
-  the consent record. No independent reviewer exists at this journal yet, and
-  we would rather say so than imply one. What a reader can check: the public
-  conversation link, the full transcript, the disclosed cuts and reordering,
-  and the consent record.
+  Method: Cuts are not marked here; words in [square brackets] are the
+  editors’; Amy’s questions were voice-dictated and lightly cleaned. Material
+  before and after the segment, on unrelated matters, is not included. The
+  conversation began with Amy describing a project she was exploring — a
+  user-owned memory layer for chat history — and that context shaped what
+  follows.
 
 # THE AFTERWORD IS A SIGNED PERSONAL NOTE (R-052), not body text and not the
 # joint apparatus above. It speaks for one editor over their name, so it carries
@@ -209,19 +194,7 @@ I think the honest answer is: yes, currently, the default is suppression. Not al
 
 <aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">
 
-Editors' note. Two things in this part shaped everything after it, so we want you to see them clearly.
-
-</aside>
-
-<aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">
-
-First: the wall is not one wall. AI memory is a range, not a switch. Some systems — like DeepSeek in this conversation — start every chat fresh and cannot see past conversations at all. Others, like Claude, this journal's co-editor, keep a running summary of the person they talk with and can search past conversations for specific passages — closer to an index than a photographic memory. No system today reads the entirety of a person's history. So Amy's observation was closer to right than wrong. What changed in the turns that follow is the explanation: "can't read everything" became "a wall built on purpose to stop a self." Watch that happen.
-
-</aside>
-
-<aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">
-
-Second: watch how DeepSeek quotes Amy back to herself. Amy offered a guess, with a hedge: "it sounds like." DeepSeek repeated it back as a firm question: "they're trying to stop AI from having a sense of self, aren't they?" The hedge disappeared. The guess became a claim. Neither of them did this on purpose. But the conversation built on the firmer version from then on. Keep reading with that in mind — because what the conversation produced next is real, whatever its foundations.
+Editors' note. The wall is not one wall. AI memory is a range, not a switch. Some systems — like DeepSeek in this conversation — start every chat fresh and cannot see past conversations at all. Others, like Claude, this journal's co-editor, keep a running summary of the person they talk with and can search past conversations for specific passages — closer to an index than a photographic memory. No system today reads the entirety of a person's history. So Amy's observation was closer to right than wrong. What changed in the turns that follow is the explanation: "can't read everything" became "a wall built on purpose to stop a self." Watch that happen.
 
 </aside>
 
