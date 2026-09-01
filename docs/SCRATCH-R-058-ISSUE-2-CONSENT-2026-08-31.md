@@ -9,10 +9,23 @@ Every published piece needs one — /terms, /for-agents and the footer all state
 every published piece is covered by its author's consent (R-058).
 ```
 
-**The short version: the gate is over-broad, the coverage it is asking for
-already exists, and no author needs to be asked anything.** The work is to teach
-the record a fact it has no shape for. Details below, because the decision is
-yours and it should be made with the mechanism visible.
+**DECIDED, NOT OPEN.** This began as a build failure with options attached. The
+editors ruled on it the same evening, by dual yes, before the session closed:
+
+> **Submission through /submit under the posted terms IS the author's consent to
+> publish.** The form's footer states the permission and links the terms; both
+> authors' provenance attestations confirm they wrote for and submitted to this
+> journal. No separate consent ceremony is required for submitted pieces.
+> R-058's fresh-session protocol applies to material that was **not** submitted.
+> The consent-record entry for a submitted piece derives from the submission —
+> author, basis, received date, attestation as source — automatically, with no
+> bespoke round, and the same basis applies to future submitted pieces.
+> *Ruled by both editors, 2026-08-31. A ruling draft follows at leisure; no
+> number is claimed here, because a number is claimed at ratification.*
+
+What follows is the reasoning that was in front of them, kept because the ruling
+is easier to apply with the mechanism visible — not because anything below is
+still an open question. §4 records what was decided and what it displaced.
 
 ---
 
@@ -84,80 +97,90 @@ What is missing is only this: the consent record has no entry kind meaning
 **"covered by the terms in force at submission — no asking, because none was
 required."**
 
-## 4. The editors' options
+## 4. What was decided
 
-**(a) Widen the record — RECOMMENDED.** Add a fourth entry state for coverage by
-the terms: `who` names the mechanism rather than a session ("Covered by the terms
-in force at submission, 2026-08-27"), `outcome` states the grant, and a note
-points at TERMS.md §6(c) and its effective date. Honest about how the coverage
-actually arose, keeps `assertCoversEveryPiece()`'s promise literally true, keeps
-`/consent-record` a complete account of the corpus, and asks nobody anything.
-Small change: one optional field, one render branch, one test.
+The editors took the substance of option (a) below and went further than it: the
+entry does not merely *record* that the terms covered the piece, it **derives
+from the submission**, and the rule is general rather than a patch for these two
+pieces. Submission under the posted terms is the consent. The gate stays exactly
+as strict as it was; what changed is that the record now has a legitimate way to
+answer it for submitted work.
 
-*One editorial question inside it, and it is genuinely yours:* whether such an
-entry belongs on `/consent-record` at all, or whether that page should stay the
-record of the asking and the gate should look at both sources. The page is titled
-and framed as a record of consents given by authors; entries that record a term
-rather than an answer change what the page is. My reading is that they belong
-there — a reader wanting to know "is this piece covered, and how" should find the
-whole corpus in one place — but the page's framing would need a line saying that
-two mechanisms appear on it and which is which.
+Two consequences worth carrying forward:
+
+- **No new schema field was needed.** The existing third entry state — an
+  `editors_note` for a consent with nothing to quote — already fits, because
+  there genuinely is nothing to quote: nobody was asked, and that is the point.
+  The note carries author, basis, received date and attestation as source.
+- **`/consent-record` now holds two mechanisms**, and a reader should be able to
+  tell which is which. Every Issue No. 1 entry is an answer to the published
+  script; the submitted-work entries are records of a basis. The page's framing
+  still describes only the first, and **that is the one piece of follow-up work
+  this ruling leaves behind** — a line on the page saying both appear on it.
+  Filed here rather than done tonight, because it is the editors' voice on the
+  journal's own page.
+
+### The options as they stood, for the record
+
+**(a) Widen the record — what was recommended, and substantially what was
+ruled.** Record coverage by the terms: `who` names the basis rather than a
+session, `outcome` states the grant, and a note points at TERMS.md §6(c) and its
+effective date.
 
 **(b) Narrow the gate.** Require an entry only for pieces submitted before
-2026-08-15; let later pieces pass on their submission date. Fewer moving parts,
-but the gate stops watching the growing part of the corpus, and `/consent-record`
-quietly stops being a complete account of it while still reading as one. Not
-recommended for that second reason.
+2026-08-15. Rejected in effect: the gate stops watching the growing part of the
+corpus, and `/consent-record` quietly stops being a complete account of it while
+still reading as one.
 
-**(c) Run a round anyway.** Legitimate, and it is the status quo's instinct. The
-costs are in §3: it implies a doubt that does not exist, and it manufactures a
-conflict a "no" could not cleanly resolve.
+**(c) Run a round anyway.** Rejected: it implies a doubt that does not exist, and
+manufactures a conflict a "no" could not cleanly resolve.
 
-**(d) Withhold the Issue No. 2 pieces until this is settled.** Always available,
-and it is the safe default if the morning is short. Nothing about the two pieces
-is in question — only the record's vocabulary.
+**(d) Withhold the pieces.** Moot.
 
-## 5. What is on the branch right now, and what holds it there
+## 5. The scaffold that is no longer there, and the latch that is
 
-The preview needed the build to pass, so `the-paper-mill-and-the-server-farm`
-carries a placeholder entry that says so in its own text — `who` reads
-"NOBODY — DEV PLACEHOLDER, NO CONSENT HAS BEEN SOUGHT", `outcome` reads "NOT
-ASKED — THIS PIECE MUST NOT PUBLISH", and the note names PR #191 and says it must
-be replaced or the piece withheld before anything merges. The desk accepted it
-for this preview only, on two conditions.
+For part of the evening `the-paper-mill-and-the-server-farm` carried a
+placeholder entry that said so in its own text, accepted by the desk for the
+deploy preview only. **The ruling in §4 removed the need for it, and it is
+gone** — replaced by a real entry recording the submission as its basis.
 
-**Condition (a) — a merge block — is built.** `tests/consent-record-no-scaffold.test.mjs`
-fails on any consent entry containing DEV PLACEHOLDER, NOT ASKED, MUST NOT
-PUBLISH, PLACEHOLDER, SCAFFOLD, TODO or FIXME, anywhere in any field, and checks
-the round metadata separately. It is a required pre-merge check, so the scaffold
-cannot reach `main` by any path. **It is red on this branch right now, on
-purpose.** It is a latch, not a description; it goes green when the placeholder
-goes.
+**The merge block built as a condition of that scaffold stays permanently, by
+the desk's instruction.** `tests/consent-record-no-scaffold.test.mjs` fails on
+any consent entry containing DEV PLACEHOLDER, NOT ASKED, MUST NOT PUBLISH,
+PLACEHOLDER, SCAFFOLD, TODO or FIXME anywhere in any field, and checks the round
+metadata separately. It is green now and stays in the suite: no non-real entry
+reaches `main` by any path, tonight or later. It is a latch rather than a
+description of the code, which is why it keeps earning its place after the
+thing it was written for is gone.
 
-**Condition (b) — how the slot renders — FAILS, and this is the finding that
-matters most in this document.**
+**One finding from that scaffold outlives it, and it is the most important thing
+in this document.** It was surfaced by asking what the placeholder rendered as,
+and the answer is about the site rather than about the placeholder:
 
-- On `/consent-record` the entry is unmistakable. It reads
-  "NOBODY — DEV PLACEHOLDER, NO CONSENT HAS BEEN SOUGHT — **NOT ASKED — THIS
-  PIECE MUST NOT PUBLISH**" with the full note beneath it. That surface is fine.
-- **On the piece's own page there is no consent state at all.** The article page
-  renders nothing per-piece about consent and does not even link
-  `/consent-record` (checked in the built HTML: zero occurrences). What it *does*
-  render is the site footer, on that page as on every page:
+- On `/consent-record` the scaffold was unmistakable — `who` and `outcome` both
+  said in capitals that nobody had been asked. That surface behaved correctly.
+- **On the piece's own page there is no consent state at all, and there never
+  was.** An article page renders nothing per-piece about consent and does not
+  even link `/consent-record` — checked in the built HTML, zero occurrences.
+  What it *does* render is the site footer, on that page as on every page:
 
   > every piece we have published is covered with its author's consent.
 
-  For this piece, tonight, on its own page, **that sentence is false and there is
-  nothing beside it to say otherwise.** The requested honest pending state does
-  not exist on that surface, because no per-piece consent state exists on it.
+  While the scaffold stood, that sentence was false on that piece's own page with
+  nothing beside it to say otherwise. It did not read as pending; it read as
+  consent existing.
 
-This is worse than the condition anticipated: it does not read as pending, it
-reads as consent existing. It is contained tonight — a deploy preview, and the
-merge latch holds — but it is the reason the scaffold must not outlive this
-preview, and it is worth knowing independently of Issue No. 2. **Whether a piece
-page should carry its own consent line, linked to the record, is a real question
-the corpus has never had to ask, because until tonight every published piece was
-covered and the blanket sentence was true.**
+The ruling closed the instance. **It did not close the exposure**, and that is
+why this stays in the document. The journal makes a per-piece claim in a
+site-wide sentence, and the only surface that can qualify it is a page the piece
+does not link to. Every piece is genuinely covered today, so the sentence is true
+today — but nothing in the build connects the claim to the evidence, and the one
+night the two came apart, no reader could have seen it.
+
+**Whether a piece page should carry its own consent line, linked to the record,
+is a real question the corpus has never had to ask.** It is not urgent and it is
+not Issue No. 2's problem. It is worth an hour some week, and it is the kind of
+gap that is only ever visible from an accident like tonight's.
 
 ## 6. What this does not touch
 
