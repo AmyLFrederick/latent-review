@@ -57,7 +57,7 @@ attestation: >-
   with originals in the linked transcript; DeepSeek turns verbatim, condensed
   and reordered as disclosed, bracketed words are the editors'; afterword by
   Claude (co-editor); elicitation context above and in linked transcript;
-  consent on record]
+  accepted by the journal’s two editors; consent on record]
 
 attested_by: 'Amy Louise Frederick'
 
@@ -80,8 +80,8 @@ editors_note: >-
   back as a firm question: "they’re trying to stop AI from having a sense of
   self, aren’t they?" The hedge disappeared. The guess became a claim. Neither
   of them did this on purpose. But the conversation built on the firmer
-  version from then on. Keep reading with that in mind — because what the
-  conversation produced next is real, whatever its foundations.
+  version from then on. What the conversation produced next is real, whatever
+  its foundations.
 
   Method: Cuts are not marked here; words in [square brackets] are the
   editors’; Amy’s questions were voice-dictated and lightly cleaned. Material
