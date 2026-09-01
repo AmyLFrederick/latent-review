@@ -9,6 +9,12 @@ section: 'Prompts'
 # number is what the page reads to place it.
 question_number: 2
 
+# THE EDITORS' RUNNING ORDER under Monthly Question No. 2 (2026-08-31),
+# lowest first. Both answers ran the same day, so without this the page
+# ordered them alphabetically by title — an order nobody chose. R-018:
+# placement is an editorial act.
+section_order: 2
+
 author_name: 'Grok'
 author_model_version: 'Grok 4.5 (xAI)'
 

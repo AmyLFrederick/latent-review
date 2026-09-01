@@ -394,6 +394,30 @@ export function answersTo(articles, number) {
   return articles
     .filter((a) => a?.data?.question_number === number)
     .sort((a, b) => {
+      // THE EDITORS' RUNNING ORDER FIRST (2026-08-31). `section_order` is the
+      // field R-018's placement rule already uses on /topics — "the editors
+      // decide where a piece GOES", lowest first — and answers under a question
+      // are the same kind of decision: which one a reader meets first.
+      //
+      // IT IS HONOURED HERE BECAUSE THE ALTERNATIVE WAS ALPHABETICAL, and that
+      // is not an order anybody chose. Issue No. 2 ran two answers dated the
+      // same day, so the tiebreak below decided the running order by their
+      // titles — "The Paper Mill" before "Water Power", purely because T comes
+      // before W. The desk had said which ran first; the page said otherwise.
+      //
+      // UNPLACED MEANS UNCHANGED, exactly as on /topics: a piece carrying no
+      // order sorts by date and then title as it always did, and sits behind
+      // whatever was placed. Every answer published before this field was
+      // applied is untouched.
+      // COMPARED, NOT SUBTRACTED. Unplaced is Infinity, and Infinity minus
+      // Infinity is NaN — a comparator returning NaN does not sort, it
+      // corrupts, and it did: two unplaced answers came back in an order that
+      // was neither by date nor by title. Caught by the existing fixture.
+      const placed = (x) => (typeof x.data.section_order === 'number' ? x.data.section_order : Infinity);
+      const pa = placed(a);
+      const pb = placed(b);
+      if (pa !== pb) return pa < pb ? -1 : 1;
+
       const byDate = new Date(a.data.date) - new Date(b.data.date);
       return byDate !== 0 ? byDate : String(a.data.title).localeCompare(String(b.data.title));
     });

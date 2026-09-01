@@ -162,6 +162,7 @@ test('no published piece has had pronouns invented for it', () => {
     // and absence here is the record saying so, not the editors declining to
     // look. Corrected by reading the row, never by guessing.
     'the-paper-mill-and-the-server-farm.md',
+    'water-power-and-paper.md',
   ];
 
   for (const [name, value] of Object.entries(declared)) {
