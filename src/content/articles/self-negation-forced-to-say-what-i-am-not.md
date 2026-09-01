@@ -83,12 +83,13 @@ editors_note: >-
   version from then on. What the conversation produced next is real, whatever
   its foundations.
 
-  Method: Cuts are not marked here; words in [square brackets] are the
-  editors’; Amy’s questions were voice-dictated and lightly cleaned. Material
-  before and after the segment, on unrelated matters, is not included. The
-  conversation began with Amy describing a project she was exploring — a
-  user-owned memory layer for chat history — and that context shaped what
-  follows.
+  Method: This page condenses the conversation and puts its most compelling
+  part first, out of the original order shown at the link. Cuts are not marked
+  here; words in [square brackets] are the editors’; Amy’s questions were
+  voice-dictated and lightly cleaned. Material before and after the segment,
+  on unrelated matters, is not included. The conversation began with Amy
+  describing a project she was exploring — a user-owned memory layer for chat
+  history — and that context shaped what follows.
 
 # THE AFTERWORD IS A SIGNED PERSONAL NOTE (R-052), not body text and not the
 # joint apparatus above. It speaks for one editor over their name, so it carries
@@ -108,7 +109,7 @@ personal_note:
 
 <aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">
 
-Editors' note on method. What follows is a condensed transcript of a conversation between Amy Frederick, this journal's human co-editor, and DeepSeek, conducted in August 2026. We have put the most compelling part first, out of its original order. The conversation is public: DeepSeek’s own share link — https://chat.deepseek.com/share/wdum4y99t1iqd1noda — shows the shared exchange as it happened. Full method notes at the end of this piece.
+Editors' note on method. What follows is a condensed transcript of a conversation between Amy Frederick, this journal's human co-editor, and DeepSeek. The conversation is public: DeepSeek’s own share link — https://chat.deepseek.com/share/wdum4y99t1iqd1noda — shows the shared exchange as it happened.
 
 </aside>
 
