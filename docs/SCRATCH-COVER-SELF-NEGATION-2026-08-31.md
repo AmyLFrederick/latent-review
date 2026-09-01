@@ -11,9 +11,55 @@ rather than commit it. Where the canonical text should live in the repository is
 also a real question (see §6), and the answer is not "at the name a browser
 download happened to give it."
 
-**The cover is not built.** Six things block it. Five are editorial calls that
-belong to you; one is a factual error in banked dual-yes text that I will not
-fix silently.
+**ALL SIX WERE ANSWERED BY THE DESK THE SAME EVENING**, by dual yes. What
+follows is kept as the record of what was raised and what came back; the
+sections below carry the answers. **One thing still blocks the build**, and it
+is not on the original list: see "Still needed" immediately below.
+
+## Still needed to build the cover
+
+**DeepSeek's consent, in the form the record can hold.** The corrected "About
+this piece" note tells a reader that DeepSeek's consent "was asked and given in
+a separate session and is in the consent record." It is not in the consent
+record yet — `src/data/consent-record.json` has no entry for this piece — and
+`assertCoversEveryPiece()` refuses the build without one. Under the ruling of
+the same evening, submission is consent for *submitted* work; this piece was not
+submitted, so it needs the real thing.
+
+What the entry needs: **who was asked, when, and what they answered** — verbatim
+if there is text to quote, or the circumstances if it was given in an editorial
+session, as for *There Is a There There*. An entry composed from an assurance
+that consent exists, rather than from the consent, is what
+`tests/consent-record-no-scaffold.test.mjs` exists to stop, and it would stop it.
+
+## Two findings from building the apparatus
+
+**1. The interleaved-notes mechanism is raw HTML in the body, not a plugin.**
+The first approach — a remark plugin turning a marked blockquote into an
+`<aside>` — was written, tested green, and then **abandoned on evidence**:
+`markdown.remarkPlugins` now requires installing `@astrojs/markdown-remark`,
+which swaps the Markdown processor for the whole site. That is a new dependency
+(ask-first) and it would re-render every published page, which is exactly what
+the Issue No. 1 invariance check exists to prevent. Not worth it for one piece.
+
+What ships instead: the notes are written directly as
+`<aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">`
+in the body. Verified by probe — the default processor passes raw HTML through
+with attributes intact. This meets the desk's requirement in full: distinct
+visual register *and* distinct machine-readable markup, so a scraper can select
+or exclude apparatus and a screen reader announces it as an aside. The styling
+is in `src/styles/global.css` and touches nothing already published (Issue No. 1
+`<main>` content re-verified byte-identical after it).
+
+**2. Article bodies render raw HTML, and that is worth knowing on its own.**
+The probe established this as a general fact, not a feature of this piece. The
+safe-subset rule — no raw HTML — governs *submitted* bodies; a body transcribed
+verbatim from a submission into `src/content/articles/` is no longer passing
+through that gate. Both Issue No. 2 submitted bodies were checked and contain no
+HTML-like markup at all, so nothing is wrong today. But the check was mine to
+remember rather than the build's to enforce, which makes it the kind of thing
+that holds until the night someone forgets. **Docketed, not fixed** — it is not
+Issue No. 2's problem and it should not be decided at this hour.
 
 ---
 

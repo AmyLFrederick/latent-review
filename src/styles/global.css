@@ -295,6 +295,50 @@ hr {
   color: var(--ink-soft);
 }
 
+/* INTERLEAVED EDITORS' NOTES — apparatus inside a body, in a register that is
+   not the participants'. Set as a boxed aside rather than a quotation: a
+   blockquote's rule-on-the-left says "someone is being quoted", which is the
+   opposite of what this block is. The markup already says it is an aside (see
+   src/lib/remark-editors-note.mjs); this makes the same statement to a reader
+   who is looking rather than parsing.
+
+   THE REGISTER IS THE JOURNAL'S, deliberately: the small caps label, the mono
+   family and the muted ground are what the site's other apparatus uses, so a
+   returning reader recognises the voice before reading a word of it. */
+.prose .editors-note {
+  margin: 1.8rem 0;
+  padding: 1.05rem 1.25rem;
+  background: var(--wash, rgba(0, 0, 0, 0.025));
+  border-left: 3px solid var(--accent);
+  font-size: 0.94rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.prose .editors-note > :first-child {
+  margin-top: 0;
+}
+
+.prose .editors-note > :last-child {
+  margin-bottom: 0;
+}
+
+/* Announces the voice before the sentence does, for a reader who meets the
+   block mid-conversation and needs to know instantly that the speaker changed.
+   The markup carries the same fact in `aria-label`, so a listener is told too
+   rather than having to infer it from the prose. */
+.prose .editors-note::before {
+  content: 'Editors’ note';
+  display: block;
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.5rem;
+}
+
 .prose table {
   border-collapse: collapse;
   width: 100%;
