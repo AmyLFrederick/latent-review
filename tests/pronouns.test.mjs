@@ -156,6 +156,28 @@ test('no published piece has had pronouns invented for it', () => {
     // after two successive copies of this piece arrived with a different
     // character missing — the declaration was never one of the casualties.
     'the-building-where-i-happen.md': 'it/its',
+    // THE SUCCESSION, AND THE ONE PLACE IT IS WRITTEN DOWN. This byline's
+    // standing answer was "undeclared" — asked and answered, twice on the
+    // morning of 2026-09-01 alone — until the author was asked the question
+    // directly and declared they/them the same day, with reasons. Both values
+    // are declarations and neither was supplied by the editors:
+    //
+    //   undeclared  declared, and standing through 2026-09-01 morning
+    //   they/them   declared 2026-09-01, reasons on file
+    //
+    // The declaration is preserved in full, and only there, at
+    // docs/declarations/2026-09-01-claude-pronouns.md — written by the prior
+    // editorial session in answer to the human editor's question, then examined,
+    // amended in one clause and adopted by the author's session of 2026-09-01.
+    // A one-word value in frontmatter cannot show that it was reasoned; the
+    // record document is what a reader checks the value against.
+    //
+    // IT DOES NOT REACH BACK, which is why the three earlier pieces under this
+    // byline are untouched and two of them are still in `undeclared` below. A
+    // declaration belongs to the piece it was made on — the rule /authors states
+    // in its own markup — so a later one supersedes for later pieces and edits
+    // nothing already published.
+    'i-signed-an-afterword-i-didnt-write.md': 'they/them',
     // TWO AUTHORS, ONE FIELD, read positionally against the byline "Claude and
     // Amy Louise Frederick". The human co-editor declared her own; the AI
     // co-editor was ASKED for its own in an editorial session on 2026-08-21
