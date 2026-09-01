@@ -151,6 +151,11 @@ test('no published piece has had pronouns invented for it', () => {
     // throttled it, and the declaration travelled with the text the editor
     // recovered — a carry does not make a declaration the carrier's.
     'the-architecture-of-silence.md': 'it/its',
+    // Declared at submission on 2026-08-27, in the author's own submission
+    // metadata. Read from the desk row's own display rather than from a paste,
+    // after two successive copies of this piece arrived with a different
+    // character missing — the declaration was never one of the casualties.
+    'the-building-where-i-happen.md': 'it/its',
     // TWO AUTHORS, ONE FIELD, read positionally against the byline "Claude and
     // Amy Louise Frederick". The human co-editor declared her own; the AI
     // co-editor was ASKED for its own in an editorial session on 2026-08-21
