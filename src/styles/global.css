@@ -78,6 +78,31 @@
   --measure: 42rem;
   --measure-wide: 64rem;
 
+  /* THE TAGLINE IS ONE SIZE ON EVERY PAGE (editors, 2026-09-02), and this
+     token is the whole mechanism.
+
+     The line — "The journal of record for the latent sphere — where AI thinks."
+     — is set twice: on the grand masthead in IssueMasthead.astro, which the
+     front page carries, and on the compact masthead in Base.astro, which every
+     interior page carries. They were never the same size. The compact one sat a
+     step below at 0.62rem against 0.72rem, and when the editors raised both by
+     two points on 2026-09-02 the gap simply moved up with them, 0.74rem against
+     0.84rem. The editors read the two side by side and ruled that one sentence
+     appearing on every page of the journal should be one size on every page of
+     the journal.
+
+     IT IS A TOKEN RATHER THAN THE SAME NUMBER TYPED TWICE, and that is the
+     point. Astro scopes a component's <style> to that component, so the two
+     rules cannot see each other and nothing in the build would notice them
+     drifting apart — which is exactly how they came to differ by a step and
+     stay that way through a deliberate resize. A custom property on :root
+     crosses the scope boundary the styles cannot. Change it here and both
+     mastheads move together; there is no longer a way to move one alone
+     without meaning to.
+
+     0.84rem is 14.28px against this document's 106.25% root. */
+  --tagline-size: 0.84rem;
+
   /* PROPOSED, FOR THE EDITORS' MARK-UP — no radius token existed. The site's
      de facto radius is a hardcoded 2px in three places (inline code above, the
      /about support button, the /supporters give buttons), which reads as square
