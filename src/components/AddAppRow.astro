@@ -62,6 +62,26 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    /*
+      CENTRED HERE RATHER THAN INHERITED, and the reason is scoping. Base.astro
+      centres the footer with `footer p { text-align: center }`, which Astro
+      compiles with ITS OWN component id on both selectors — so it reaches
+      every <p> the layout writes and reaches none that a component writes.
+      This row is a component, so it arrived left-aligned in a stack where
+      everything else is centred.
+
+      Restating the rule is the fix rather than reaching across the boundary
+      (`:global(footer p)` from here, or a `.footer-app` case added to
+      Base.astro): a component that can only be laid out correctly by the
+      layout that happens to hold it is a component that breaks the moment it
+      moves. The row carries its own alignment.
+
+      THE UNIT IS THE ICON AND THE WORDS TOGETHER. The anchor below is
+      inline-flex, so it shrinks to the width of its contents and this rule
+      centres that whole box — mini and text as one thing, not a centred line
+      of text with a picture hanging off its left.
+    */
+    text-align: center;
   }
 
   .footer-app a {
@@ -70,6 +90,10 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
     gap: 0.5rem;
     color: var(--accent);
     text-decoration: none;
+    /* The letterspacing above puts a trailing space after the final letter,
+       which is real width and pulls the centred unit a hair to the left. Taken
+       off the right so the optical centre is the geometric one. */
+    margin-right: -0.14em;
   }
 
   .footer-app a:hover span,
