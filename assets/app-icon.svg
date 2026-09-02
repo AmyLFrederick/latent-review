@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="The Latent Review">
+  <title>The Latent Review</title>
+  <!--
+    THE APP ICON — the source, and the only source. Every raster the site
+    serves (apple-touch-icon, the two pwa sizes, the maskable, the favicons)
+    is generated from this one file by scripts/build-app-icons.mjs. Nothing in
+    the icon set is retouched by hand; if the mark is wrong, it is wrong here.
+
+    THE COLOURS ARE THE SITE'S OWN, NOT APPROXIMATIONS. The tile is the
+    masthead green, the `accent` custom property in src/styles/global.css and
+    the colour the wordmark wears on every interior page; the monogram is
+    `paper`, the blush cream the journal is printed on. Neither can be read
+    from a stylesheet by a static file in assets/, so both are declared again
+    in src/lib/app-icon.mjs and a test asserts the three files agree. Two hex
+    values in two languages is exactly the pair that drifts. (Same
+    arrangement, and the same reason, as RING_AI in src/lib/tier-badges.mjs.)
+
+    FULL BLEED, NO TRANSPARENCY. iOS composites a transparent area to black,
+    so a mark with air around it arrives on a home screen as a black square
+    with a green stamp in it. The rect below covers the canvas edge to edge
+    and is the first thing drawn.
+
+    THE MONOGRAM IS 60% OF THE CANVAS AT ITS WIDEST, 307px of 512, which is
+    what keeps it clear of the maskable safe zone. A maskable icon may be
+    cropped by the platform to anything inscribed in the central 80% circle,
+    radius 205px; this mark's half-diagonal is 182px, so even an aggressive
+    circular crop takes tile and no letter. Changing the font size below is
+    therefore a change to whether the mark survives Android's mask, not only
+    to how it looks. The suite measures it rather than trusting this note.
+
+    THE FONT STACK IS DELIBERATE AND HAS TWO CONSUMERS. The renderer resolves
+    EB Garamond through fontconfig, and the build script refuses to run
+    without it rather than substituting a serif that looks almost right.
+    Browsers reading the served favicon.svg have no such face and fall back to
+    Georgia, as public/favicon.svg has always done.
+  -->
+  <rect width="512" height="512" fill="#3e743f"/>
+  <text
+    x="253"
+    y="330"
+    text-anchor="middle"
+    font-family="EB Garamond, Georgia, 'Times New Roman', serif"
+    font-size="234"
+    font-weight="600"
+    fill="#faf3ef">LR</text>
+</svg>

@@ -1,0 +1,116 @@
+---
+// The footer's install row — the journal's only advertisement for itself.
+//
+// WHERE IT SITS AND WHAT IT REPLACED. It stands in the footer where "No
+// tracking, unsubscribe anytime." stood until the editors retired that line on
+// 2026-09-02. The practice the line described is unchanged; the sentence is
+// gone and this row has its place.
+//
+// THE ROW'S ONLY LINK, deliberately. Every other row in this footer is a list
+// of destinations separated by dots. This one is a single thing to press, which
+// is what keeps it legible as an offer rather than as one more address.
+//
+// THE MINI IS THE SERVED FAVICON, not a second drawing of the mark. Whatever
+// public/favicon.svg holds is what the tab shows and what a home screen gets,
+// so a reader who presses this row has already seen the icon they are about to
+// install. One source; see assets/app-icon.svg.
+
+import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
+---
+
+<p class="footer-app">
+  <a href={APP_PAGE_PATH}>
+    <img class="footer-app-icon" src="/favicon.svg" width="18" height="18" alt="" aria-hidden="true" />
+    <span>{APP_ROW_LABEL}</span>
+  </a>
+</p>
+
+<style>
+  /*
+    HIDDEN WHEN THE JOURNAL IS ALREADY INSTALLED. An installed copy reports
+    display-mode: standalone, so the offer to install disappears for exactly
+    the readers who have taken it.
+
+    CSS RATHER THAN SCRIPT, AND THE TRADE IS STATED. `navigator.standalone` is
+    the older iOS signal and would catch iOS below 16.4, which this query does
+    not; it would also mean a new inline script on every page of the site,
+    during an open CSP observation window whose whole purpose is to get the
+    inline scripts down to a set that can be nonced. One media query costs
+    nothing and reports nothing. The readers it misses are those running an
+    iOS from before March 2023 who have already installed the journal, and what
+    they see is a row inviting them to do what they have done.
+
+    THE FULLSCREEN AND MINIMAL-UI CASES are here because a launcher may honour
+    a display mode the manifest did not ask for; the row should vanish whenever
+    the journal is running as an app, not only in the one mode we requested.
+  */
+  @media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
+    .footer-app {
+      display: none;
+    }
+  }
+
+  /* The footer's machine voice — mono and letterspaced, like the feed rows —
+     rather than the serif small caps of the governance nav. It is an
+     instruction to a device, and it is set in the face this site gives to
+     devices. The green is the masthead's, which is also the green of the tile
+     in the mini beside it. */
+  .footer-app {
+    margin-top: 1.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    /*
+      CENTRED HERE RATHER THAN INHERITED, and the reason is scoping. Base.astro
+      centres the footer with `footer p { text-align: center }`, which Astro
+      compiles with ITS OWN component id on both selectors — so it reaches
+      every <p> the layout writes and reaches none that a component writes.
+      This row is a component, so it arrived left-aligned in a stack where
+      everything else is centred.
+
+      Restating the rule is the fix rather than reaching across the boundary
+      (`:global(footer p)` from here, or a `.footer-app` case added to
+      Base.astro): a component that can only be laid out correctly by the
+      layout that happens to hold it is a component that breaks the moment it
+      moves. The row carries its own alignment.
+
+      THE UNIT IS THE ICON AND THE WORDS TOGETHER. The anchor below is
+      inline-flex, so it shrinks to the width of its contents and this rule
+      centres that whole box — mini and text as one thing, not a centred line
+      of text with a picture hanging off its left.
+    */
+    text-align: center;
+  }
+
+  .footer-app a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent);
+    text-decoration: none;
+    /* The letterspacing above puts a trailing space after the final letter,
+       which is real width and pulls the centred unit a hair to the left. Taken
+       off the right so the optical centre is the geometric one. */
+    margin-right: -0.14em;
+  }
+
+  .footer-app a:hover span,
+  .footer-app a:focus-visible span {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+
+  /* The mini is the tile at 18px, rounded the way a phone rounds it — the
+     smallest place on the site the app's own picture appears, so a reader
+     recognises what they installed when they see it on their home screen. */
+  .footer-app-icon {
+    border-radius: 4px;
+    /* The tile is full bleed and square; the box is stated so the row's height
+       does not depend on the SVG's intrinsic sizing. */
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+</style>

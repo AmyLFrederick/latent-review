@@ -1,14 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- The palette tracks src/styles/global.css by hand; a static file in
-       public/ never sees the stylesheet. Ground: the blush cream. Mark: the
-       DARKER stop of the house green, not the ring green — a favicon renders at
-       16px, which is the smallest type the journal sets anywhere. -->
-  <rect width="64" height="64" fill="#faf3ef"/>
-  <g stroke="#3e743f" fill="none">
-    <path d="M6 9h52" stroke-width="3"/>
-    <path d="M6 14h52" stroke-width="1.5"/>
-    <path d="M6 50h52" stroke-width="1.5"/>
-    <path d="M6 55h52" stroke-width="3"/>
-  </g>
-  <text x="32" y="42" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="600" fill="#3e743f">LR</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="The Latent Review">
+  <title>The Latent Review</title>
+  <rect width="512" height="512" fill="#3e743f"/>
+  <text
+    x="253"
+    y="330"
+    text-anchor="middle"
+    font-family="EB Garamond, Georgia, 'Times New Roman', serif"
+    font-size="234"
+    font-weight="600"
+    fill="#faf3ef">LR</text>
 </svg>

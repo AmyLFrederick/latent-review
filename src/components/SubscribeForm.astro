@@ -45,19 +45,24 @@ const source = variant === 'footer' ? 'web-form-footer' : 'web-form';
     <button type="submit">Subscribe</button>
   </form>
   {/*
-    "Issue No. 1, delivered when it exists" was removed 2026-08-03: it was a
-    pre-launch promise and Issue No. 1 has run, so it had been describing a
-    state of the world that ended on 08-02. What remains is what the note is
-    actually for — the terms a reader is agreeing to.
+    THE NOTE IS RETIRED (editors, 2026-09-02). It read "No tracking, unsubscribe
+    anytime." and had been shrinking for months — "Issue No. 1, delivered when
+    it exists" left it on 2026-08-03 when Issue No. 1 ran, "confirmed opt-in" on
+    2026-08-22 with the step it named — and the editors have now retired the
+    last of it.
 
-    "Confirmed opt-in" left the line on 2026-08-22 with the confirmation step it
-    named. The other two promises are unchanged and are the ones a reader is
-    actually weighing before typing an address: what we do with it, and how
-    easily they can undo this.
+    THE PRACTICE IS UNCHANGED AND THE SENTENCE IS GONE. We still do not track,
+    and every issue still carries an unsubscribe link that works on the first
+    press. What ended is the promising, not the keeping: the claim is in the
+    terms, where it is binding, rather than under a field, where it is
+    reassurance.
+
+    IT IS RETIRED IN BOTH VARIANTS, which is the whole component. The editors'
+    note gave the footer as the place they were looking at; this is one element
+    and one sentence, and leaving it standing on the homepage would have made
+    the journal say a thing on one page it had decided to stop saying on the
+    rest.
   */}
-  <p class="subscribe-note">
-    No tracking, unsubscribe anytime.
-  </p>
   <p class="subscribe-status" role="status" aria-live="polite"></p>
   {/*
     THE DONE PANEL IS RENDERED HERE AND HIDDEN, not built in JavaScript, so
@@ -90,7 +95,6 @@ const source = variant === 'footer' ? 'web-form-footer' : 'web-form';
       event.preventDefault();
       const block = form.parentElement;
       const status = block?.querySelector('.subscribe-status');
-      const note = block?.querySelector<HTMLElement>('.subscribe-note');
       const done = block?.querySelector<HTMLElement>('.subscribe-done');
       const button = form.querySelector('button');
       const email = new FormData(form).get('email');
@@ -110,7 +114,6 @@ const source = variant === 'footer' ? 'web-form-footer' : 'web-form';
           // for any other client, but this one has them already, marked up.
           form.reset();
           form.hidden = true;
-          if (note) note.hidden = true;
           status.textContent = '';
           done.hidden = false;
           return;
@@ -185,13 +188,6 @@ const source = variant === 'footer' ? 'web-form-footer' : 'web-form';
   .subscribe-form button:disabled {
     opacity: 0.5;
     cursor: default;
-  }
-
-  .subscribe-note {
-    font-size: 0.8rem;
-    font-style: italic;
-    color: var(--ink-soft);
-    margin: 0.8rem 0 0;
   }
 
   .subscribe-status {
@@ -290,9 +286,5 @@ const source = variant === 'footer' ? 'web-form-footer' : 'web-form';
   .subscribe--footer .subscribe-form {
     border-bottom: 0;
     padding-bottom: 0;
-  }
-
-  .subscribe--footer .subscribe-note {
-    font-size: 0.75rem;
   }
 </style>
