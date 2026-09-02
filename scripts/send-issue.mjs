@@ -22,9 +22,24 @@
 //
 // THE DEKS ARE REUSED, NEVER GENERATED. A dek is the editors' two-sentence
 // summary written for the piece's own page; the digest prints that same
-// sentence and writes nothing of its own. A piece in a digest section without
-// one stops the run by name — see the check below. This script will not
-// substitute a first paragraph, and it will not summarise a piece itself.
+// sentence and writes nothing of its own. This script will not summarise a
+// piece itself, and it will not put machine-written prose in the journal's
+// voice into a mail addressed to the list.
+//
+// A MISSING DEK NO LONGER STOPS THE SEND — editors' dual-yes 2026-09-02, and
+// this supersedes the halt that stood here from 2026-08-13. The halt reasoned
+// that a missing dek is editorial copy nobody has written yet, so the script
+// should say whose turn it is rather than improvise. The first half of that is
+// still true; the conclusion was wrong. A dek is apparatus about a piece, and
+// the piece itself is finished, published and linked — holding an entire
+// issue's mail hostage to a line of apparatus puts the smallest possible unit
+// of editorial copy in front of the whole send.
+//
+// The two halves were always separable and are now separated: the script does
+// not halt, and it does not fabricate. Where a dek is absent the digest simply
+// proceeds without one. It never falls back to generated prose, and it never
+// writes a summary of its own to fill the gap — that prohibition is the part
+// of the 2026-08-13 decision that survives intact, and it is not negotiable.
 //
 // Content comes from the LIVE site (issues.json), so the digest can only ever
 // link to what is actually published, and can only ever print a dek that is
@@ -288,10 +303,12 @@ function escapeHtml(s) {
 }
 
 // The dek: the editors' own summary of the piece, as published on its page.
-// Guarded by the check below, so by the time anything calls this the value is
-// known to be there.
+// Returns the empty string where a piece has none — since 2026-09-02 that is a
+// send that proceeds rather than a send that stops, so this can no longer
+// assume the field is there. Callers omit the block entirely on empty; nothing
+// is generated to fill it.
 function dek(article) {
-  return article.dek.trim();
+  return (article.dek ?? '').trim();
 }
 
 // The email is part of the journal's provenance surface: the tier appears
@@ -320,29 +337,30 @@ const sections = DIGEST_SECTIONS.map((name) => ({
 
 if (sections.length === 0) fail(`issue ${issueNumber} has no articles in ${DIGEST_SECTIONS.join(' / ')} — nothing to send`);
 
-// THE RUN STOPS RATHER THAN IMPROVISING. A missing dek is a piece of editorial
-// copy that has not been written yet, and there are exactly two things this
-// script could do about it: print something else, or say whose turn it is. It
-// says whose turn it is. Falling back to the first paragraph would make the
-// digest silently half one format and half the other, which is the outcome the
-// editors changed the format to avoid; writing a summary here would put
-// machine-generated prose in the journal's voice into a mail that goes to the
-// whole list, unreviewed.
+// A MISSING DEK IS REPORTED, NOT ENFORCED — editors' dual-yes 2026-09-02.
 //
-// This fires on a DRY RUN, which is the point: the dry run is how the editors
-// learn which deks they owe, well before anything is addressed to anyone.
+// This used to call fail() and stop the run by name. It no longer does: a dek
+// is apparatus about a piece, the piece itself is published and linked, and an
+// issue's whole mail should not wait on the smallest unit of editorial copy on
+// the page. What the check keeps is the half that was doing real work — telling
+// the editors, on a DRY RUN, which deks are missing, in time to write them
+// before anything is addressed to anyone.
+//
+// WHAT IS STILL FORBIDDEN IS UNCHANGED AND IS THE POINT OF THE NOTICE. The
+// script does not fall back to generated prose and does not summarise a piece
+// itself. It proceeds without the dek, printing nothing in its place. The
+// prohibition on fabrication was never the same rule as the halt; only the halt
+// is gone.
 const missingDeks = sections.flatMap((s) =>
   s.items.filter((a) => !a.dek || !a.dek.trim()).map((a) => ({ section: s.name, article: a }))
 );
 if (missingDeks.length > 0) {
-  console.error(`error: ${missingDeks.length} piece(s) in issue ${issueNumber} have no dek, and the digest prints deks (editors, 2026-08-13):`);
+  console.warn(`notice: ${missingDeks.length} piece(s) in issue ${issueNumber} have no dek. The send proceeds; nothing is written in their place.`);
   for (const { section, article } of missingDeks) {
-    console.error(`  - ${section}: ${displayTitle(article.title)}`);
-    console.error(`    ${article.url}`);
+    console.warn(`  - ${section}: ${displayTitle(article.title)}`);
+    console.warn(`    ${article.url}`);
   }
-  fail(
-    'a dek is the editors’ to write, never this script’s. Add `dek:` to the piece’s frontmatter, deploy, and re-run — the digest will not fall back to a first paragraph or generate a summary.'
-  );
+  console.warn('  A dek is the editors’ to write, never this script’s. It will not be generated.');
 }
 
 const coverStory = issue.cover_story;
@@ -438,7 +456,7 @@ function articleHtml(article, { isCover, sectionName }) {
     <h2 style="margin:0 0 10px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
       <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(displayTitle(article.title))}</a>
     </h2>
-    <p style="margin:0 0 12px;font-family:${SERIF};${APPARATUS_FACE}font-size:16px;line-height:1.6;color:${INK};">${escapeHtml(dek(article))}</p>
+    ${dek(article) ? `<p style="margin:0 0 12px;font-family:${SERIF};${APPARATUS_FACE}font-size:16px;line-height:1.6;color:${INK};">${escapeHtml(dek(article))}</p>` : ''}
     <p style="margin:0 0 4px;font-family:${SERIF};${APPARATUS_FACE}color:${INK_SOFT};font-size:15px;">
       By ${escapeHtml(article.author_name)}
     </p>
@@ -526,8 +544,9 @@ function articleText(article, sectionName) {
   return [
     sectionName.toUpperCase(),
     displayTitle(article.title),
-    '',
-    dek(article),
+    // Omitted rather than blank where a piece has no dek: a stray empty line
+    // in the plain-text part is the text equivalent of the empty <p> above.
+    ...(dek(article) ? ['', dek(article)] : []),
     '',
     `By ${article.author_name} · ${tierLabel(article)} (${article.author_model_version})`,
     '',
