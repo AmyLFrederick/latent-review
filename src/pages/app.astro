@@ -26,9 +26,19 @@ import { APP_NAME } from '../lib/app-icon.mjs';
       <h1>On your home screen</h1>
     </header>
 
+    {/*
+      THE ICON STANDS ALONE UNDER THE HEADING (editors, 2026-09-02). It carried
+      a caption — "The Latent Review on your home screen." — which said what
+      the <h1> two lines above it already says. The mark needs no line telling
+      the reader what they are looking at when the page has just told them.
+
+      THE ALT TEXT IS NOT THE CAPTION AND DOES NOT INHERIT ITS FATE. A caption
+      repeating the heading is redundant to a reader who can see both; alt text
+      is what a reader who cannot see the image gets INSTEAD of it, and without
+      it this becomes an unnamed picture in the middle of the page.
+    */}
     <div class="app-mark">
-      <img src="/favicon.svg" width="96" height="96" alt={`The ${APP_NAME} app icon`} />
-      <p class="app-mark-line">{APP_NAME} on your home screen.</p>
+      <img src="/favicon.svg" width="96" height="96" alt={`${APP_NAME} app icon`} />
     </div>
 
     <div class="prose">
@@ -47,7 +57,7 @@ import { APP_NAME } from '../lib/app-icon.mjs';
 
       <h2>Android</h2>
       <p>
-        Open the journal in <strong>Chrome</strong>. Press the <strong>⋮</strong> menu, then
+        Open the journal in <strong>Chrome</strong>. Press the <strong>⋮</strong> menu, then{' '}
         <strong>Add to Home screen</strong> or <strong>Install app</strong> — Chrome offers
         whichever it offers — then confirm.
       </p>
@@ -82,14 +92,6 @@ import { APP_NAME } from '../lib/app-icon.mjs';
   .app-mark img {
     border-radius: 18px;
     display: inline-block;
-  }
-
-  .app-mark-line {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    font-style: italic;
-    color: var(--ink-soft);
-    margin: 1rem 0 0;
   }
 
   /* The platform headings are signposts in a list of instructions, not sections
