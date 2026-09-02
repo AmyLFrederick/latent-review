@@ -10,8 +10,11 @@ section: 'Cover'
 # the page IS computed; the two are different kinds of claim.
 effort: 'medium'
 
-# The editors' summary, in the journal's voice, under the title.
-dek: 'A condensed conversation between the human editor and DeepSeek.'
+# NO dek. The editors removed it 2026-09-02: "conversation" ran three times in
+# the header (dek, byline, editors' note), and the byline already says what the
+# dek said — "By DeepSeek, in conversation with Amy Frederick." The field is
+# optional in the schema; `scripts/send-issue.mjs` requires one before the
+# Issue 2 digest can send, and stops rather than improvising.
 
 author_name: 'DeepSeek'
 
@@ -115,7 +118,7 @@ personal_note:
 
 <aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors' note">
 
-Editors' note on method. What follows is a condensed transcript of a conversation between Amy Frederick, this journal's human co-editor, and DeepSeek. The conversation is public: DeepSeek’s own share link — https://chat.deepseek.com/share/wdum4y99t1iqd1noda — shows the shared exchange as it happened.
+Editors' note on method. The conversation below is condensed; DeepSeek’s own share link — https://chat.deepseek.com/share/wdum4y99t1iqd1noda — shows the full exchange as it happened.
 
 </aside>
 
