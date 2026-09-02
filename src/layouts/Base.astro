@@ -689,16 +689,46 @@ const currentIssue = await getCurrentIssue();
     line-height: 1.9;
   }
 
-  /* THE WELCOME STATEMENT reads as a sentence, not as a row of links. Measure
-     is capped so it does not run the full footer width on a desk — a paragraph
-     set to the width of a link row is a paragraph nobody finishes — and it
-     carries rule and air above so it separates from the governance nav without
-     needing a heading it should not have. */
+  /* THE WELCOME STATEMENT TAKES THE FOOTER'S FULL WIDTH (editors, 2026-09-02),
+     which is the width every other block in this footer already had.
+
+     It used to cap itself at 34rem inside a .wrap whose content box is 39.5rem,
+     on the reasoning that a paragraph set to the width of a link row is a
+     paragraph nobody finishes. What that produced on a desk was a rule that
+     stopped 93.5px short of the governance row above it and a paragraph set in
+     a narrower column than anything around it — read as a mistake rather than
+     as a measure, which is what the editors saw on the walk. The measure
+     argument is answered instead by `text-wrap: balance` below, which evens the
+     lines rather than shortening them.
+
+     THE WIDTH IS NOT A NUMBER HERE, AND THAT IS THE POINT. There is no
+     `max-width` in this rule now, exactly as there is none in .footer-governance
+     — both take the .wrap's --measure and its padding, so they are the same
+     width because they are bounded by the same thing rather than because two
+     rules were set to agree. A new number would have been a third thing to keep
+     in sync.
+
+     THE `margin` SHORTHAND IS GONE BECAUSE IT NEVER APPLIED. It read
+     `1.6rem auto 0`, asking for space above and for centring, and it was
+     overridden in full by `footer p { margin: 0 }` twenty lines up: Astro
+     scopes both rules, and the attribute it adds to each makes that selector
+     (0,2,2) against this one's (0,2,0). So the paragraph has always sat flush
+     left with no top margin, which is the other half of why it looked wrong.
+     Removing the declaration is verified to change nothing — the computed
+     margins were already 0px on every side.
+
+     THE SPACE ABOVE THE RULE IS THEREFORE THE NAV'S OWN LINE-HEIGHT, not the
+     1.6rem the dead shorthand asked for. That is a spacing question rather than
+     a width one, so it is left exactly as it renders today and flagged to the
+     editors rather than changed on the way past. */
   .footer-welcome {
-    max-width: 34rem;
-    margin: 1.6rem auto 0;
     padding-top: 1.3rem;
     border-top: 1px solid var(--hairline);
+    /* The lines even out instead of running long-long-long-short. Where a
+       browser declines it — Chrome stops balancing past a handful of lines, so
+       the phone's seven-line rendering wraps normally — the paragraph is
+       ordinary text and loses nothing. */
+    text-wrap: balance;
     font-size: 0.92rem;
     line-height: 1.65;
     color: var(--ink-soft);
