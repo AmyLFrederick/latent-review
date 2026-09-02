@@ -724,10 +724,25 @@ const currentIssue = await getCurrentIssue();
   .footer-welcome {
     padding-top: 1.3rem;
     border-top: 1px solid var(--hairline);
-    /* The lines even out instead of running long-long-long-short. Where a
-       browser declines it — Chrome stops balancing past a handful of lines, so
-       the phone's seven-line rendering wraps normally — the paragraph is
-       ordinary text and loses nothing. */
+    /* The lines even out instead of running long-long-long-short.
+
+       WHERE IT APPLIES, MEASURED RATHER THAN ASSUMED. Balancing is capped by
+       line count for performance — the browser iterates to find the wrap, so
+       it refuses on long blocks — and the caps differ: Chromium balances six
+       lines or fewer, Firefox ten. This paragraph runs 5 lines at 768px and up,
+       9 at 390px, 10 at 375px.
+
+       So it balances everywhere on a desk, and on a phone it balances in
+       Firefox and not in Chromium. That asymmetry is fine and is why the
+       property is safe to use here: where a browser declines, the paragraph is
+       ordinary text, wraps normally, and loses nothing. Nothing about the
+       footer depends on the balancing happening.
+
+       (Corrected 2026-09-02, hours after it was written. The comment first said
+       Chrome stopped "past a handful of lines" and called this a seven-line
+       paragraph on a phone — the vague number was wrong in both directions, and
+       the sentence implied no browser balanced it there, which is false for
+       Firefox. The numbers above are measured against this build.) */
     text-wrap: balance;
     font-size: 0.92rem;
     line-height: 1.65;
