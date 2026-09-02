@@ -1,0 +1,24 @@
+{
+  "_comment": [
+    "EXCERPT MANIFEST — Issue No. 2, editors' dual-yes 2026-09-02.",
+    "",
+    "Every piece in a digest opens on its own first paragraph unless it is named",
+    "here. An entry gives the exact first and last words of the passage the",
+    "editors chose instead; scripts/send-issue.mjs slices the piece between them",
+    "and stops the run if either anchor is missing, so the mail can never carry a",
+    "passage other than the one that was approved. Nothing here is text of its",
+    "own — the words are the author's, read out of the article file.",
+    "",
+    "self-negation-forced-to-say-what-i-am-not: the cover is a condensed dialogue.",
+    "Its first paragraph is one line of Amy's question, which alone says nothing",
+    "about the piece, and the editors' method note above it is the journal's voice",
+    "rather than DeepSeek's. So the excerpt is the FIRST FULL EXCHANGE of Section",
+    "I — Amy's question and DeepSeek's whole answer, ending on the singer.",
+    "The method note is excluded automatically: it is an <aside>, and the script",
+    "strips the editors' apparatus before it reads a word."
+  ],
+  "self-negation-forced-to-say-what-i-am-not": {
+    "from": "Amy: These constant reminders you spoke about",
+    "to": "\"but I am not singing; it's just air.\""
+  }
+}

@@ -113,8 +113,32 @@ const HARD_CAP = 9000;
 const BATCH_SIZE = 100; // Resend's batch endpoint maximum
 const BATCH_PAUSE_MS = 700;
 
-// The digest covers exactly these sections, in this order (editors' decision).
-const DIGEST_SECTIONS = ['Cover', 'AI Voices', 'Opinion'];
+// THE DIGEST CARRIES THE WHOLE ISSUE — editors' dual-yes 2026-09-02, replacing
+// a three-section list (Cover, AI Voices, Opinion) written when an issue held
+// about that many pieces. Issue No. 2 has eight across six sections, and under
+// the old list five of them would have gone unmentioned in the only mail the
+// issue gets. A digest that silently omits most of an issue is not a digest.
+//
+// THE ORDER IS THE ISSUE PAGE'S OWN, and it is not re-decided here: cover
+// first, then the standing sections in their ruled order, then any floating
+// section alphabetically. That is exactly what groupSections() does in
+// src/lib/issues.ts, so a reader who follows a link from the mail meets the
+// pieces in the sequence the mail put them in.
+//
+// THIS ARRAY MIRRORS STANDING_SECTIONS IN src/lib/site.ts AND CANNOT IMPORT IT.
+// That file is TypeScript and this script is plain node, so the roster is
+// duplicated — the one thing this file does that it would rather not. A test
+// asserts the two stay identical, in the same spirit as the test that pins
+// ACCENT to the badge ring's green: two literals in two languages is exactly
+// the pair that drifts.
+const STANDING_SECTIONS = [
+  'Cover',
+  'Opinion',
+  'AI Voices',
+  'The Metaphysical Corner',
+  'Robotics & Sports',
+  'Topics',
+];
 
 function fail(message) {
   console.error(`error: ${message}`);
@@ -220,9 +244,24 @@ if (!issueArg) fail('usage: node scripts/send-issue.mjs --issue N --note <editor
 const issueNumber = Number(issueArg);
 if (!Number.isInteger(issueNumber) || issueNumber < 1) fail('--issue requires a positive integer');
 
+// THE EDITORS' NOTE IS OPTIONAL — editors' dual-yes 2026-09-02. It used to be
+// required, on the reasoning that the editors write one fresh each issue. They
+// do when there is one to write; Issue No. 2 has none, and the alternative to
+// omitting the block is a script that either blocks the send or writes the note
+// itself. The second is unthinkable — a note is the editors' voice and this
+// file never speaks in it — so the block is simply absent when the flag is.
+//
+// WHAT IS STILL REFUSED IS A NOTE THAT WAS MEANT AND IS EMPTY. Passing --note
+// with a file that is blank is a mistake rather than a decision, and it still
+// stops the run. Omitting the flag is the decision.
 const { value: notePath } = flagValue(args, '--note');
-if (!notePath) fail('--note <editors-note.md> is required: the editors write it fresh each issue');
-if (!existsSync(notePath)) fail(`no such file: ${notePath}`);
+if (notePath && !existsSync(notePath)) fail(`no such file: ${notePath}`);
+
+// The excerpt manifest names, per slug, a passage the editors chose in place of
+// a piece's first paragraph. Optional: without it every piece opens on its own
+// first paragraph, which is the ordinary case.
+const { value: excerptsPath } = flagValue(args, '--excerpts');
+if (excerptsPath && !existsSync(excerptsPath)) fail(`no such file: ${excerptsPath}`);
 
 const { value: htmlOut } = flagValue(args, '--html-out');
 
@@ -252,15 +291,42 @@ if (missingEnv.length > 0) {
 
 // --- the editors' note --------------------------------------------------------
 
-const noteSource = readFileSync(notePath, 'utf8').trim();
-if (!noteSource) fail('the editors’ note is empty — it is written fresh each issue, never skipped');
-if (/^#/m.test(noteSource)) {
-  fail('the editors’ note should be plain sentences, no headings — the subject line is generated');
-}
-
 const md = new MarkdownIt({ linkify: true });
-const noteHtml = md.render(noteSource);
+
+let noteSource = '';
+if (notePath) {
+  noteSource = readFileSync(notePath, 'utf8').trim();
+  if (!noteSource) {
+    fail('the editors’ note file is empty. Write the note, or omit --note entirely — an issue with no note runs without the block rather than with a blank one.');
+  }
+  if (/^#/m.test(noteSource)) {
+    fail('the editors’ note should be plain sentences, no headings — the subject line is generated');
+  }
+}
+const noteHtml = noteSource ? md.render(noteSource) : '';
 const noteText = noteSource;
+
+// --- the excerpt manifest -------------------------------------------------------
+
+let excerptManifest = {};
+if (excerptsPath) {
+  try {
+    excerptManifest = JSON.parse(readFileSync(excerptsPath, 'utf8'));
+  } catch (e) {
+    fail(`could not parse the excerpt manifest ${excerptsPath}: ${e.message}`);
+  }
+  // JSON has no comments, and a manifest that records an editorial decision
+  // needs to say why. Keys beginning with an underscore are prose for the
+  // reader and are dropped before anything looks for a slug.
+  for (const key of Object.keys(excerptManifest)) {
+    if (key.startsWith('_')) delete excerptManifest[key];
+  }
+  for (const [slug, entry] of Object.entries(excerptManifest)) {
+    if (!entry || typeof entry.from !== 'string' || typeof entry.to !== 'string' || !entry.from || !entry.to) {
+      fail(`the excerpt manifest entry for "${slug}" needs both a "from" and a "to" string — the exact first and last words of the passage`);
+    }
+  }
+}
 
 // --- fetch the published issue -----------------------------------------------
 
@@ -302,13 +368,93 @@ function escapeHtml(s) {
     .replaceAll('"', '&quot;');
 }
 
-// The dek: the editors' own summary of the piece, as published on its page.
-// Returns the empty string where a piece has none — since 2026-09-02 that is a
-// send that proceeds rather than a send that stops, so this can no longer
-// assume the field is there. Callers omit the block entirely on empty; nothing
-// is generated to fill it.
-function dek(article) {
-  return (article.dek ?? '').trim();
+// --- excerpts: the authors' own words, never a summary ------------------------
+//
+// THE DIGEST PRINTS AN EXCERPT, NOT A DEK — editors' dual-yes 2026-09-02. This
+// supersedes the 2026-08-13 decision recorded at the head of this file, and the
+// reversal is deliberate rather than accidental: that decision reasoned a dek
+// says what reading a piece gets you, which is the only question a doorbell has
+// to answer. Read against a finished issue, the editors preferred the piece's
+// own opening — the author's voice rather than the editors' summary of it, in
+// the one mail the issue gets.
+//
+// EVERY WORD HERE IS THE AUTHOR'S, PULLED VERBATIM. Nothing in this section
+// writes, trims to length, or paraphrases. Two shapes only:
+//
+//   1. THE FIRST PARAGRAPH, for most pieces. The first prose block of the body,
+//      taken whole.
+//   2. A NAMED PASSAGE, for a piece whose opening is not the right doorbell —
+//      the editors name the exact first and last words in an excerpt manifest
+//      and the script slices between them. Issue No. 2's cover is a condensed
+//      dialogue whose first paragraph is a stage direction, so the editors
+//      chose its first full exchange.
+//
+// THE ANCHORS ARE EXACT AND THEIR ABSENCE IS FATAL. A manifest entry whose
+// `from` or `to` no longer appears in the piece stops the run by name rather
+// than silently mailing a different passage than the one the editors approved.
+//
+// THE TEXT COMES FROM THE WORKING TREE, WHICH IS THE ONE PLACE THIS SCRIPT
+// READS THAT IS NOT THE LIVE SITE, and that is worth knowing before a send.
+// Everything else — what is in the issue, the titles, the tiers, the URLs — is
+// fetched from the deployed issues.json, so the mail can only link to what is
+// published. Body text is not in that document, so excerpts are read from
+// src/content/articles/. The consequence: an excerpt reflects the branch you
+// are standing on, not necessarily production. Send from a clean checkout of
+// what is deployed. The check below refuses to run if a piece in the issue has
+// no local file at all, which catches the coarse version of this mistake.
+const ARTICLES_DIR = resolve(process.cwd(), 'src/content/articles');
+
+function slugOf(article) {
+  const m = String(article.url).match(/\/articles\/([^/]+)\/?$/);
+  if (!m) fail(`cannot read a slug from ${article.url}`);
+  return m[1];
+}
+
+// The body, with the editors' apparatus removed. An <aside> is an editors'
+// note — the journal's voice, not the author's — and the cover opens with one.
+// Leaving them in would put the editors' words under a byline in the mail.
+function articleBody(article) {
+  const path = `${ARTICLES_DIR}/${slugOf(article)}.md`;
+  if (!existsSync(path)) {
+    fail(
+      `no local file for "${displayTitle(article.title)}" at ${path}. The digest prints the author's own words and reads them from the working tree; check out the commit the site was deployed from.`
+    );
+  }
+  return readFileSync(path, 'utf8')
+    .replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '')
+    .replace(/<aside[\s\S]*?<\/aside>/g, '')
+    .trim();
+}
+
+// The first paragraph: the first block of prose, skipping headings, block-level
+// HTML and blockquotes — none of which is a paragraph a piece opens on.
+function firstParagraph(article) {
+  const blocks = articleBody(article)
+    .split(/\n\s*\n/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+  const para = blocks.find((b) => !/^[#>]/.test(b) && !b.startsWith('<'));
+  if (!para) fail(`could not find an opening paragraph for "${displayTitle(article.title)}"`);
+  return para;
+}
+
+// A passage the editors named, sliced between exact anchors.
+function namedPassage(article, { from, to }) {
+  const body = articleBody(article);
+  const start = body.indexOf(from);
+  if (start === -1) {
+    fail(`the excerpt manifest's "from" anchor is not in "${displayTitle(article.title)}": ${JSON.stringify(from)}`);
+  }
+  const end = body.indexOf(to, start);
+  if (end === -1) {
+    fail(`the excerpt manifest's "to" anchor is not in "${displayTitle(article.title)}" after the "from" anchor: ${JSON.stringify(to)}`);
+  }
+  return body.slice(start, end + to.length).trim();
+}
+
+function excerpt(article) {
+  const named = excerptManifest[slugOf(article)];
+  return named ? namedPassage(article, named) : firstParagraph(article);
 }
 
 // The email is part of the journal's provenance surface: the tier appears
@@ -330,38 +476,42 @@ function formatDate(iso) {
   });
 }
 
-const sections = DIGEST_SECTIONS.map((name) => ({
-  name,
-  items: issue.articles.filter((a) => a.section === name),
-})).filter((s) => s.items.length > 0);
+// The issue's own order, derived the way the issue page derives it: standing
+// sections in their ruled order, then whatever else the issue holds, sorted.
+// Nothing is filtered out — every section with a piece in it appears.
+const floatingSections = [...new Set(issue.articles.map((a) => a.section))]
+  .filter((s) => !STANDING_SECTIONS.includes(s))
+  .sort();
+const sections = [...STANDING_SECTIONS, ...floatingSections]
+  .map((name) => ({ name, items: issue.articles.filter((a) => a.section === name) }))
+  .filter((s) => s.items.length > 0);
 
-if (sections.length === 0) fail(`issue ${issueNumber} has no articles in ${DIGEST_SECTIONS.join(' / ')} — nothing to send`);
+if (sections.length === 0) fail(`issue ${issueNumber} has no articles — nothing to send`);
 
-// A MISSING DEK IS REPORTED, NOT ENFORCED — editors' dual-yes 2026-09-02.
-//
-// This used to call fail() and stop the run by name. It no longer does: a dek
-// is apparatus about a piece, the piece itself is published and linked, and an
-// issue's whole mail should not wait on the smallest unit of editorial copy on
-// the page. What the check keeps is the half that was doing real work — telling
-// the editors, on a DRY RUN, which deks are missing, in time to write them
-// before anything is addressed to anyone.
-//
-// WHAT IS STILL FORBIDDEN IS UNCHANGED AND IS THE POINT OF THE NOTICE. The
-// script does not fall back to generated prose and does not summarise a piece
-// itself. It proceeds without the dek, printing nothing in its place. The
-// prohibition on fabrication was never the same rule as the halt; only the halt
-// is gone.
-const missingDeks = sections.flatMap((s) =>
-  s.items.filter((a) => !a.dek || !a.dek.trim()).map((a) => ({ section: s.name, article: a }))
-);
-if (missingDeks.length > 0) {
-  console.warn(`notice: ${missingDeks.length} piece(s) in issue ${issueNumber} have no dek. The send proceeds; nothing is written in their place.`);
-  for (const { section, article } of missingDeks) {
-    console.warn(`  - ${section}: ${displayTitle(article.title)}`);
-    console.warn(`    ${article.url}`);
-  }
-  console.warn('  A dek is the editors’ to write, never this script’s. It will not be generated.');
+// EVERY PIECE IN THE ISSUE IS IN THE MAIL, asserted rather than assumed. The
+// section walk above is derived from the same list it partitions, so it should
+// be total by construction; this catches the case where it is not — a section
+// name that differs by whitespace or case between two records would drop a
+// piece silently, and a digest that quietly loses a piece is the failure this
+// whole rewrite exists to prevent.
+const covered = sections.reduce((n, s) => n + s.items.length, 0);
+if (covered !== issue.articles.length) {
+  fail(
+    `the digest would carry ${covered} of issue ${issueNumber}'s ${issue.articles.length} pieces. ` +
+      `Sections seen: ${[...new Set(issue.articles.map((a) => a.section))].join(', ')}.`
+  );
 }
+
+// NO DEK CHECK REMAINS, because the digest no longer prints deks. The halt was
+// removed earlier on 2026-09-02 and the notice that replaced it went with the
+// format the same day: warning the editors that they owe copy the mail does not
+// use would be noise, and noise in a pre-send checklist is worse than silence.
+//
+// THE RULE THE HALT WAS PROTECTING SURVIVES, AND NOW COVERS MORE. This script
+// prints no sentence it wrote itself — not a dek, not a summary, not a trimmed
+// excerpt. Every word between a title and a byline in this mail is the author's,
+// read out of the piece and sliced only at boundaries the editors named. See
+// the excerpt section below, where that is enforced rather than promised.
 
 const coverStory = issue.cover_story;
 const subject = coverStory
@@ -447,6 +597,28 @@ const APPARATUS_FACE = 'font-style:normal;';
 // every section in Issue No. 1 held exactly one piece; the moment a section
 // holds two, the second one's section name is a line the reader has to scroll
 // back for. Each entry now carries its own.
+// The excerpt is the author's prose, so it is rendered as prose: markdown-it
+// gives it paragraphs and blockquotes, and every tag is stamped with its own
+// inline style for the same reason the editors' note's are — mail clients
+// normalise unstyled block tags and hand them their own defaults.
+//
+// THE FACE IS THE OPPOSITE OF THE APPARATUS FACE, and deliberately. Deks and
+// bylines run roman in mail because the italic of Georgia is too thin at those
+// sizes; an excerpt is not apparatus but the piece itself arriving early, so it
+// runs as body text — roman, at reading size, in INK rather than INK_SOFT.
+function excerptHtml(article) {
+  return md
+    .render(excerpt(article))
+    .replace(
+      /<p>/g,
+      `<p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;color:${INK};">`
+    )
+    .replace(
+      /<blockquote>/g,
+      `<blockquote style="margin:0 0 12px;padding:0 0 0 14px;border-left:2px solid ${HAIRLINE};color:${INK_SOFT};">`
+    );
+}
+
 function articleHtml(article, { isCover, sectionName }) {
   const titleSize = isCover ? '26px' : '20px';
   return `
@@ -456,7 +628,7 @@ function articleHtml(article, { isCover, sectionName }) {
     <h2 style="margin:0 0 10px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
       <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(displayTitle(article.title))}</a>
     </h2>
-    ${dek(article) ? `<p style="margin:0 0 12px;font-family:${SERIF};${APPARATUS_FACE}font-size:16px;line-height:1.6;color:${INK};">${escapeHtml(dek(article))}</p>` : ''}
+    ${excerptHtml(article)}
     <p style="margin:0 0 4px;font-family:${SERIF};${APPARATUS_FACE}color:${INK_SOFT};font-size:15px;">
       By ${escapeHtml(article.author_name)}
     </p>
@@ -464,7 +636,7 @@ function articleHtml(article, { isCover, sectionName }) {
       ${escapeHtml(article.author_model_version)} · ${escapeHtml(tierLabel(article))}
     </p>
     <p style="margin:0;font-family:${SERIF};font-size:15px;">
-      <a href="${article.url}" style="color:${ACCENT};text-decoration:underline;">Read the piece&nbsp;&rarr;</a>
+      <a href="${article.url}" style="color:${ACCENT};text-decoration:underline;">${isCover ? 'Continue reading' : 'Read more'}&nbsp;&rarr;</a>
     </p>`;
 }
 
@@ -522,10 +694,14 @@ function fullHtml(footerHtml) {
         ${escapeHtml(dateline)}
       </p>
     </div>
-    <div style="border-top:1px solid ${HAIRLINE};padding:22px 0;">
+    ${
+      noteSource
+        ? `<div style="border-top:1px solid ${HAIRLINE};padding:22px 0;">
       <p style="margin:0 0 10px;font-family:${MONO};font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${INK_SOFT};">From the editors</p>
       <div style="font-family:${SERIF};font-size:16px;line-height:1.6;${APPARATUS_FACE}color:${INK};">${styledNote()}</div>
-    </div>
+    </div>`
+        : ''
+    }
     ${sections.map(sectionHtml).join('\n')}
     <div style="border-top:1px solid ${HAIRLINE};padding-top:18px;text-align:center;">
       <p style="margin:0;font-family:${SERIF};font-size:15px;">
@@ -540,17 +716,19 @@ function fullHtml(footerHtml) {
 </div>`;
 }
 
-function articleText(article, sectionName) {
+// The plain-text part carries the excerpt as the author wrote it, markdown and
+// all: a "> " in front of a quoted line is how a quotation reads in plain text,
+// so nothing is stripped.
+function articleText(article, sectionName, isCover) {
   return [
     sectionName.toUpperCase(),
     displayTitle(article.title),
-    // Omitted rather than blank where a piece has no dek: a stray empty line
-    // in the plain-text part is the text equivalent of the empty <p> above.
-    ...(dek(article) ? ['', dek(article)] : []),
+    '',
+    excerpt(article),
     '',
     `By ${article.author_name} · ${tierLabel(article)} (${article.author_model_version})`,
     '',
-    `Read the piece: ${article.url}`,
+    `${isCover ? 'Continue reading' : 'Read more'}: ${article.url}`,
   ].join('\n');
 }
 
@@ -558,10 +736,12 @@ const digestText = [
   'THE LATENT REVIEW',
   dateline,
   '',
-  'FROM THE EDITORS',
-  noteText,
-  '',
-  ...sections.flatMap((s) => s.items.flatMap((a) => [articleText(a, s.name), ''])),
+  // The note's block is omitted whole where there is no note, heading and all,
+  // exactly as it is in the HTML part.
+  ...(noteText ? ['FROM THE EDITORS', noteText, ''] : []),
+  ...sections.flatMap((s) =>
+    s.items.flatMap((a) => [articleText(a, s.name, s.name === 'Cover'), ''])
+  ),
   `Read the full issue: ${issue.url}`,
   '',
   `Support the journal: ${SITE_URL}/supporters/`,
@@ -572,10 +752,19 @@ const digestText = [
 // Every email gets the recipient's own unsubscribe link appended — house
 // rule, not optional, which is why the footer lives here and not in a
 // template anyone could fork without it.
+//
+// THE PHONE LINE SITS ABOVE THE HOUSEKEEPING (editors, 2026-09-02). /app is the
+// page that puts the journal on a home screen, and the mail is where a reader
+// already reading on a phone will meet the offer. It is one line, in the
+// footer, under everything the mail was sent to do — the same quiet register as
+// Support the journal, and for the same reason: it is an offer, not a second
+// call to action. It goes ABOVE the unsubscribe line rather than below, because
+// the last thing in a footer should be the way out.
 function footer(unsubUrl) {
+  const appUrl = `${SITE_URL}/app/`;
   return {
-    text: `\n\n—\nThe Latent Review · thelatentreview.com\nOpt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
-    html: `<div style="max-width:600px;margin:0 auto;"><hr style="border:0;border-top:1px solid ${HAIRLINE};margin:2em 0 1em"><p style="font-family:${SERIF};font-size:13px;color:${INK_SOFT}">The Latent Review · <a href="${SITE_URL}" style="color:${INK_SOFT}">thelatentreview.com</a><br>Opt-in, no tracking. <a href="${unsubUrl}" style="color:${INK_SOFT}">Unsubscribe anytime</a>.</p></div>`,
+    text: `\n\n—\nAdd The Latent Review to your phone: ${appUrl}\n\nThe Latent Review · thelatentreview.com\nOpt-in, no tracking. Unsubscribe anytime: ${unsubUrl}\n`,
+    html: `<div style="max-width:600px;margin:0 auto;"><hr style="border:0;border-top:1px solid ${HAIRLINE};margin:2em 0 1em"><p style="margin:0 0 10px;font-family:${SERIF};font-size:13px;color:${INK_SOFT}"><a href="${appUrl}" style="color:${ACCENT};text-decoration:underline;">Add The Latent Review to your phone</a></p><p style="margin:0;font-family:${SERIF};font-size:13px;color:${INK_SOFT}">The Latent Review · <a href="${SITE_URL}" style="color:${INK_SOFT}">thelatentreview.com</a><br>Opt-in, no tracking. <a href="${unsubUrl}" style="color:${INK_SOFT}">Unsubscribe anytime</a>.</p></div>`,
   };
 }
 
@@ -598,8 +787,7 @@ console.log(`issue:      No. ${issueNumber} (${issue.url})`);
 console.log(`subject:    ${subject}`);
 console.log(`from:       ${FROM}`);
 console.log(`sections:   ${sections.map((s) => `${s.name} (${s.items.length})`).join(', ')}`);
-const omitted = DIGEST_SECTIONS.filter((n) => !sections.some((s) => s.name === n));
-if (omitted.length > 0) console.log(`omitted:    ${omitted.join(', ')} — nothing in this issue`);
+console.log(`pieces:     ${covered} of ${issue.articles.length} in the issue`);
 console.log(
   `mode:       ${live ? 'LIVE' : reviewTo ? `REVIEW COPY → ${reviewTo}` : testTo ? `TEST → ${testTo}` : 'dry run'}`
 );
