@@ -5,6 +5,8 @@ import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '../styles/global.css';
 import SubscribeForm from '../components/SubscribeForm.astro';
+import AddAppRow from '../components/AddAppRow.astro';
+import { THEME_COLOR } from '../lib/app-icon.mjs';
 import {
   SITE_TITLE,
   SITE_TAGLINE,
@@ -92,6 +94,36 @@ const currentIssue = await getCurrentIssue();
     <link rel="canonical" href={canonical.href} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/*
+      THE INSTALLABLE JOURNAL. Everything below is what a phone reads when a
+      reader adds the site to a home screen; every value comes from
+      src/lib/app-icon.mjs and every picture is generated from
+      assets/app-icon.svg, so nothing here is a second opinion about the
+      journal's colours or its mark.
+
+      APPLE READS <link>, NOT THE MANIFEST. iOS has never read `icons` out of a
+      web manifest — it looks for this one tag and scales the file it finds to
+      every size it needs, which is why 180×180 (the largest it asks for) is
+      supplied and the smaller apple sizes are not. Without it iOS screenshots
+      the page and puts that on the home screen.
+
+      THE TWO CAPABLE FLAGS ARE THE SAME FLAG, TWICE. `apple-mobile-web-app-
+      capable` is what iOS still reads; `mobile-web-app-capable` is the
+      standardised spelling that replaced it and that Chromium reads. Neither
+      is redundant yet.
+
+      THE STATUS BAR IS `default`, WHICH MEANS OPAQUE AND LIGHT. The other
+      values put the page underneath the clock and the battery; this journal is
+      a column of text starting at the top of the page, and it would start
+      underneath them.
+    */}
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content={THEME_COLOR} />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content={SITE_TITLE} />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <link rel="alternate" type="application/feed+json" title={SITE_TITLE} href="/feed.json" />
@@ -237,6 +269,18 @@ const currentIssue = await getCurrentIssue();
             </div>
           )
         }
+        {/*
+          THE INSTALL ROW STANDS WHERE THE SUBSCRIBE NOTE STOOD. "No tracking,
+          unsubscribe anytime." sat directly under the field until the editors
+          retired it on 2026-09-02 — the practice unchanged, the sentence gone
+          — and this row takes its place in the stack.
+
+          IT IS OUTSIDE THE SUBSCRIBE CONDITIONAL, not inside it. The one page
+          that hides the footer form is the pre-launch homepage, which is a page
+          like any other and whose reader should be offered the icon like any
+          other. Tied to the form, the row would vanish with it.
+        */}
+        <AddAppRow />
         {/*
           ONE ENTRY PER DESTINATION, AND EVERY DESTINATION KEEPS A PATH. Supporters left
           this row when "Support the journal" below became the way to /supporters: two

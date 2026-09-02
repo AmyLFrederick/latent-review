@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import { APP_NAME } from '../lib/app-icon.mjs';
+
+// /app — how to put the journal on a home screen.
+//
+// A SMALL STATIC PAGE, AND STATIC IS THE POINT. It could sniff the user agent
+// and show one set of steps; it does not. A reader on a desktop sending the
+// link to their own phone, a reader whose browser lies about itself, and a
+// reader following a friend's instructions all need to see the other platform's
+// steps, and the page is four lines long either way.
+//
+// NO INSTALL BUTTON. `beforeinstallprompt` would give Android a one-press
+// install and would give iOS — where most of this journal's phone readers are —
+// nothing at all, at the cost of a script on a page whose entire content is
+// four sentences. The steps work everywhere and go stale nowhere.
+---
+
+<Base
+  title="Add the app"
+  description={`How to add ${APP_NAME} to a phone's home screen.`}
+>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker kicker--accent kicker--lead">The app</p>
+      <h1>On your home screen</h1>
+    </header>
+
+    <div class="app-mark">
+      <img src="/favicon.svg" width="96" height="96" alt={`The ${APP_NAME} app icon`} />
+      <p class="app-mark-line">{APP_NAME} on your home screen.</p>
+    </div>
+
+    <div class="prose">
+      <p>
+        There is nothing to download and no store to visit. Your browser makes the journal
+        into an app itself: an icon that opens straight to the current issue, without the
+        address bar.
+      </p>
+
+      <h2>iPhone and iPad</h2>
+      <p>
+        Open the journal in <strong>Safari</strong> — this does not work from Chrome or from a
+        link opened inside another app. Press <strong>Share</strong>, the square with the arrow
+        out of it, then <strong>Add to Home Screen</strong>, then <strong>Add</strong>.
+      </p>
+
+      <h2>Android</h2>
+      <p>
+        Open the journal in <strong>Chrome</strong>. Press the <strong>⋮</strong> menu, then
+        <strong>Add to Home screen</strong> or <strong>Install app</strong> — Chrome offers
+        whichever it offers — then confirm.
+      </p>
+
+      <h2>Desktop</h2>
+      <p>
+        In Chrome or Edge, an install icon appears at the right-hand end of the address bar.
+        Safari on macOS installs from <strong>File → Add to Dock</strong>. Firefox does not
+        install web apps, and the journal reads perfectly well as a page.
+      </p>
+
+      <h2>What you get, and what we get</h2>
+      <p>
+        You get the journal, and only the journal. Adding it to a home screen installs no
+        software beyond the page you are already reading, asks for no permissions, sends no
+        notifications, and can be removed by deleting the icon. It does not tell us that you
+        installed it. There is nothing here that a bookmark does not do; the icon is simply a
+        faster door.
+      </p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .app-mark {
+    text-align: center;
+    margin: 2.5rem 0 3rem;
+  }
+
+  /* The same rounding as the footer mini, at the size a home screen shows it —
+     the reader is looking at the thing they are about to install. */
+  .app-mark img {
+    border-radius: 18px;
+    display: inline-block;
+  }
+
+  .app-mark-line {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin: 1rem 0 0;
+  }
+
+  /* The platform headings are signposts in a list of instructions, not sections
+     of an argument, so they take the site's small-caps label voice rather than
+     the display serif a piece's headings use. */
+  .prose h2 {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 2.4rem;
+  }
+</style>
