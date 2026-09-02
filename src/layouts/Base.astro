@@ -411,13 +411,23 @@ const currentIssue = await getCurrentIssue();
     text-decoration: none;
   }
 
-  /* 0.74rem — 12.58px against the 17px root — raised one step from 0.62rem by
-     the editors on 2026-09-02. The interior tagline sits a step below the grand
-     one on the front page and keeps that relationship: both moved by the same
-     +0.12rem, so the smaller stays smaller by exactly the interval it had.
-     SIZE ONLY; weight, letterspacing, case, colour and margins are untouched. */
+  /* THE INTERIOR TAGLINE IS THE FRONT PAGE'S TAGLINE, EXACTLY (editors,
+     2026-09-02). It ran a step smaller for as long as it existed — 0.62rem
+     against 0.72rem, and then 0.74rem against 0.84rem when both were raised
+     earlier the same day, the gap moving up intact. Read side by side, that is
+     one sentence appearing on every page of the journal at two different sizes
+     depending on which page you were on. It is now --tagline-size, the same
+     token the grand masthead reads, so there is one tagline size and no way to
+     move one without the other. 0.62rem → 0.74rem → var(--tagline-size).
+
+     SIZE ONLY. Weight, letterspacing, case, colour and the margins that set
+     this line into the compact masthead are untouched. The compact masthead is
+     still the smaller of the two mastheads, because its WORDMARK is smaller —
+     1.6rem against a clamp that starts at 2.6rem. It was only ever the tagline
+     that had to match, and the hierarchy between the two mastheads is carried
+     by the name above it, where it belongs. */
   .masthead-compact-tagline {
-    font-size: 0.74rem;
+    font-size: var(--tagline-size);
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;

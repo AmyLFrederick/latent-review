@@ -122,14 +122,20 @@ const { issue = null } = Astro.props;
     text-decoration: none;
   }
 
-  /* 0.84rem — 14.28px against the 17px root — raised one step from 0.72rem by
-     the editors on 2026-09-02, who read the line as a touch small on both the
-     phone and the desk. SIZE ONLY: the weight, the letterspacing, the case, the
-     colour and the margins are untouched, so the line keeps its proportions and
-     simply sits larger. It moves with the compact tagline in Base.astro and
-     with the section nav, which took the same step on the same read. */
+  /* --tagline-size is 0.84rem — 14.28px against the 17px root — raised from
+     0.72rem by the editors on 2026-09-02, who read the line as a touch small on
+     both the phone and the desk. SIZE ONLY: the weight, the letterspacing, the
+     case, the colour and the margins are untouched, so the line keeps its
+     proportions and simply sits larger.
+
+     THE SIZE IS NOT WRITTEN HERE. It is a token in global.css, shared with the
+     compact masthead in Base.astro, because the same sentence appears on every
+     page of the journal and the editors ruled it one size everywhere. Astro
+     scopes this <style> to this component, so the two rules cannot see each
+     other; the token is what keeps them from drifting. Set it there and both
+     move. The reasoning is recorded beside the token. */
   .masthead-tagline {
-    font-size: 0.84rem;
+    font-size: var(--tagline-size);
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
