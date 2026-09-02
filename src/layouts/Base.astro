@@ -411,8 +411,13 @@ const currentIssue = await getCurrentIssue();
     text-decoration: none;
   }
 
+  /* 0.74rem — 12.58px against the 17px root — raised one step from 0.62rem by
+     the editors on 2026-09-02. The interior tagline sits a step below the grand
+     one on the front page and keeps that relationship: both moved by the same
+     +0.12rem, so the smaller stays smaller by exactly the interval it had.
+     SIZE ONLY; weight, letterspacing, case, colour and margins are untouched. */
   .masthead-compact-tagline {
-    font-size: 0.62rem;
+    font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -496,20 +501,29 @@ const currentIssue = await getCurrentIssue();
          Robotics & Sports
          Prompts · Letters
 
-     THE BREAKPOINT IS 23rem AND THE FIVE PIXELS ABOVE 364px ARE DELIBERATE.
-     Media queries resolve rem against the browser's default 16px rather than
-     this document's root, so 23rem is 368px — four pixels of margin over the
-     measured threshold. Sitting exactly on 364px would mean a font fallback
-     with slightly wider metrics, or a longer label added later, silently
-     reopening the orphan this rule exists to close. The cost is that viewports
-     between 365px and 368px take the extra line a little early; no common
-     device sits in that band, and the narrow rendering is one line taller
-     either way.
+     THE BREAKPOINT MOVED WITH THE TYPE, 23rem → 24rem (editors, 2026-09-02).
+     The 364px above was measured at 0.72rem. The section nav is now 0.78rem,
+     and re-measuring the same way — same headless browser, same build, the
+     declared break switched off so the type's own behaviour shows through —
+     puts the threshold at 380px. Left at 23rem, row 3 would have wrapped by
+     itself between 369px and 379px and orphaned LETTERS on the iPhone SE and
+     every iPhone 12/13/14/15 at 375px. The larger type reopens exactly the hole
+     this rule exists to close, so the number under the rule is re-derived.
 
-     NOTHING ABOVE THE BREAKPOINT MOVES. 375px and up — every iPhone in
-     circulation, every tablet, every desktop — renders the three rows exactly
-     as they did before. This rule cannot reach them. */
-  @media (max-width: 23rem) {
+     THIS IS NOT A NEW DECISION. The ruled layout is unchanged and the reasoning
+     above still governs; only the width at which the browser stops honouring it
+     has moved, because the labels are wider than they were.
+
+     THE FOUR PIXELS ABOVE 380px ARE THE SAME FOUR AS BEFORE. Media queries
+     resolve rem against the browser's default 16px rather than this document's
+     root, so 24rem is 384px — four pixels of margin over the measured
+     threshold, for the same reason the old rule kept four over 364px.
+
+     NOTHING ABOVE THE BREAKPOINT MOVES. 385px and up — the iPhone 12/13/14/15
+     at 390px, the Pixel at 412px, every tablet, every desktop — renders the
+     three rows as one line each. Below it the narrow rendering is one line
+     taller, as before. */
+  @media (max-width: 24rem) {
     .nav-rows li.nav-narrow-solo {
       flex-basis: 100%;
     }
@@ -540,6 +554,39 @@ const currentIssue = await getCurrentIssue();
     text-transform: uppercase;
     text-decoration: none;
     color: var(--accent);
+  }
+
+  /* THE SECTION NAV TAKES A STEP UP, AND ONLY THE SECTION NAV (editors,
+     2026-09-02). The roster read a touch small on the phone and on the desk.
+     0.78rem is 13.26px against the 17px root, a point over the 0.72rem above.
+
+     THE STEP IS A POINT RATHER THAN THE TWO THE TAGLINES TOOK, and the reason
+     is the roster's width, not its legibility. This nav is the one element on
+     the site whose type size decides a layout: three fixed rows that must each
+     hold one line, on a phone, in uppercase at 0.14em. Measured against this
+     build, row 1 — Cover · AI Voices · Opinion · Topics — holds one line down
+     to 332px at 0.72rem, to 345px at 0.78rem, and only to 371px at 0.84rem.
+     The two-point step would therefore have orphaned TOPICS on its own line on
+     every 360px Android in circulation, which is the shape the row-3 note below
+     rules against for LETTERS. The editors took the point and kept the rows.
+     The taglines are prose and wrap freely, so they took the full two.
+
+     WHY THIS SITS HERE RATHER THAN ON `nav a`. That rule is shared: this header
+     and the footer's governance row are both <nav>, and the comment under
+     .footer-governance records that the two are siblings BY INHERITANCE rather
+     than by two rules that agree. The editors' read named the section roster
+     and not the footer, so the override is scoped to .nav-rows and the footer
+     stays at 12.24px — a deliberate difference now, not the shared value it
+     was. If the footer should ever follow, the fix is to move this size onto
+     `nav a` and delete this block, not to add a third rule.
+
+     ON CONTRAST, unchanged: larger type cannot raise a contrast requirement. At
+     13.26px uppercase 600 these are still ordinary text by WCAG's measure —
+     nowhere near the 24px large-text threshold, and 600 is not the bold that
+     would lower it to 18.66px — so they answer to 4.5:1 exactly as before, and
+     --accent still measures 5.07:1. Only the size moves. */
+  .nav-rows a {
+    font-size: 0.78rem;
   }
 
   nav a:hover {

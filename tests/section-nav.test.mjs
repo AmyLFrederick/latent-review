@@ -216,13 +216,25 @@ test('the layout honours the narrow break, at the measured breakpoint', () => {
   assert.match(layout, /entry\.narrowSolo \? 'nav-narrow-solo'/, 'the template ignores narrowSolo');
   assert.match(
     layout,
-    /@media \(max-width: 23rem\) \{\s*\.nav-rows li\.nav-narrow-solo \{\s*flex-basis: 100%;/,
+    /@media \(max-width: 24rem\) \{\s*\.nav-rows li\.nav-narrow-solo \{\s*flex-basis: 100%;/,
     'the narrow break rule is gone or its breakpoint moved'
   );
-  // The breakpoint sits ABOVE the measured 364px threshold, not on it. Media
-  // queries resolve rem against the browser default of 16px, so 23rem is 368px.
-  assert.ok(!/@media \(max-width: (2[0-2]|1\d)rem\)[\s\S]{0,80}nav-narrow-solo/.test(layout),
+  // The breakpoint sits ABOVE the measured threshold, not on it. Media queries
+  // resolve rem against the browser default of 16px, so 24rem is 384px.
+  //
+  // 23rem → 24rem, 2026-09-02: the threshold is a function of the nav's type
+  // size, and the type size changed. At 0.72rem row 3 held one line to 364px
+  // and 23rem/368px cleared it by four; at 0.78rem it holds to 380px, which
+  // 23rem no longer clears — it would have orphaned LETTERS from 369px to
+  // 379px, taking in the 375px iPhones. 24rem/384px restores the same four
+  // pixels of margin over the new threshold. THIS ASSERTION AND THE FONT SIZE
+  // BELOW MOVE TOGETHER; neither is meaningful without the other.
+  assert.ok(!/@media \(max-width: (2[0-3]|1\d)rem\)[\s\S]{0,80}nav-narrow-solo/.test(layout),
     'the narrow breakpoint has dropped below the width the orphan appears at');
+  // The size the breakpoint above was measured against. If this changes, row 3
+  // must be re-measured and the breakpoint re-derived before the test is edited.
+  assert.match(layout, /\.nav-rows a \{\s*font-size: 0\.78rem;/,
+    'the section nav size moved without the narrow breakpoint being re-measured');
 });
 
 test('the Corner has a row to itself, under its full name', () => {
@@ -330,6 +342,12 @@ test('the one property the shared rule does not reach is matched by hand', () =>
     declaration(css, 'nav a', 'letter-spacing'),
     'the footer nav separators no longer track with the links they divide'
   );
+  // THIS NO LONGER MEANS THE TWO NAVS ARE THE SAME SIZE (2026-09-02). It means
+  // the footer container and the shared `nav a` rule agree, which is what keeps
+  // the separators tracking with the links beside them. The header roster now
+  // overrides the shared size in `.nav-rows a` — the editors raised the section
+  // nav and deliberately left the footer where it was — so the two rows differ
+  // by a point on the page while this assertion still holds.
   assert.equal(
     declaration(css, '.footer-governance', 'font-size'),
     declaration(css, 'nav a', 'font-size')
