@@ -373,8 +373,21 @@ const currentIssue = await getCurrentIssue();
           read as a divider slicing the footer in half. The field has since left
           the footer altogether for /subscribe, and the rule that remains is this
           one — at the very end, under the three asks, closing the page.
+
+          IT IS THE DOUBLE BAR NOW (editors, 2026-09-07), the same class the
+          divider above the wordmark carries. The footer opens and closes on the
+          same mark, so the block is bracketed rather than opened heavily and
+          shut with a hairline. `.double-rule` is reused exactly as it stands in
+          global.css — thick over thin, 3px and 1px of --rule — and nothing is
+          defined here to draw it.
+
+          ONE CONSEQUENCE OF THE SWAP, since the two classes are not the same
+          height: .single-rule is a 1px border and .double-rule is a 5px box, so
+          the closing mark is 4px taller than it was. The footer's own
+          padding-bottom is unchanged and still holds it off the bottom of the
+          window.
         */}
-        <hr class="single-rule footer-close" />
+        <hr class="double-rule footer-close" />
       </div>
     </footer>
   </body>
