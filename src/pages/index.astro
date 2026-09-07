@@ -18,7 +18,7 @@ const jsonLd = ldJson(
 );
 ---
 
-<Base grandMasthead hideFooterSubscribe={!issue}>
+<Base grandMasthead>
   <script type="application/ld+json" set:html={jsonLd} is:inline></script>
   <IssueMasthead slot="masthead" issue={issue} />
 

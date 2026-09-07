@@ -4,7 +4,6 @@ import '@fontsource-variable/source-serif-4';
 import '@fontsource/ibm-plex-mono/400.css';
 import '@fontsource/ibm-plex-mono/500.css';
 import '../styles/global.css';
-import SubscribeForm from '../components/SubscribeForm.astro';
 import AddAppRow from '../components/AddAppRow.astro';
 import { THEME_COLOR } from '../lib/app-icon.mjs';
 import {
@@ -50,12 +49,6 @@ interface Props {
     section: string;
     author: string;
   };
-  /**
-   * Suppress the footer subscribe form on pages that already show a prominent
-   * subscribe form of their own (the pre-launch homepage hero), so the two do
-   * not stack as a visible duplicate. The footer feed row stays sitewide.
-   */
-  hideFooterSubscribe?: boolean;
 }
 
 const {
@@ -64,7 +57,6 @@ const {
   grandMasthead = false,
   noindex = false,
   canonicalPath,
-  hideFooterSubscribe = false,
   ogType = 'website',
   articleMeta,
 } = Astro.props;
@@ -262,25 +254,6 @@ const currentIssue = await getCurrentIssue();
             EDITORS.human.descriptor
           })
         </p>
-        {
-          !hideFooterSubscribe && (
-            <div class="footer-subscribe">
-              <SubscribeForm variant="footer" />
-            </div>
-          )
-        }
-        {/*
-          THE INSTALL ROW STANDS WHERE THE SUBSCRIBE NOTE STOOD. "No tracking,
-          unsubscribe anytime." sat directly under the field until the editors
-          retired it on 2026-09-02 — the practice unchanged, the sentence gone
-          — and this row takes its place in the stack.
-
-          IT IS OUTSIDE THE SUBSCRIBE CONDITIONAL, not inside it. The one page
-          that hides the footer form is the pre-launch homepage, which is a page
-          like any other and whose reader should be offered the icon like any
-          other. Tied to the form, the row would vanish with it.
-        */}
-        <AddAppRow />
         {/*
           ONE ENTRY PER DESTINATION, AND EVERY DESTINATION KEEPS A PATH. Supporters left
           this row when "Support the journal" below became the way to /supporters: two
@@ -357,22 +330,49 @@ const currentIssue = await getCurrentIssue();
           <a href="/sitemap-index.xml">sitemap</a> · <a href={REPO_URL}>source code</a>
         </p>
         {/*
-          THE FOOTER LINK GOES TO THE PAGE, NOT TO A SECTION OF ANOTHER PAGE. It used to
-          land on /about#support, which is a three-paragraph summary of giving with a
-          button to the real page — a stop on the way rather than an arrival. Every route
-          to giving passes through /supporters, and the shortest route is the link itself.
+          THE THREE ASKS, GROUPED AND MATCHED (editors' desktop review,
+          2026-09-07). Subscribing, supporting and installing were three
+          different objects in three different registers, scattered through the
+          stack: a live email field near the top, a mono install row under it,
+          and a serif small-caps link at the very bottom. They are now one group
+          at the foot of the page, in one voice, at one size, in the journal's
+          green — three ways to keep reading us, in ascending order of what they
+          ask of a reader.
+
+          SUBSCRIBE IS A LINK NOW, NOT A FIELD. The form is not gone; it moved to
+          /subscribe, where it is the whole page rather than one more element in
+          a footer that already carries four rows of links. A reader who presses
+          this lands on the field.
+
+          THE INSTALL ROW KEEPS ITS OWN COMPONENT because what is particular to
+          it cannot live here: it disappears for a reader who has already
+          installed the journal, and it carries the mini of the icon they would
+          be installing. What is SHARED — the size, the weight, the letterspacing,
+          the case — is set once on this group and inherited, so the three lines
+          cannot drift apart the way the footer's paragraph margins did.
         */}
-        <p class="footer-support">
-          <a href="/supporters/">Support the journal</a>
-        </p>
+        <div class="footer-actions">
+          <p class="footer-action">
+            <a href="/subscribe/">Subscribe to the journal</a>
+          </p>
+          {/*
+            THE FOOTER LINK GOES TO THE PAGE, NOT TO A SECTION OF ANOTHER PAGE. It used to
+            land on /about#support, which is a three-paragraph summary of giving with a
+            button to the real page — a stop on the way rather than an arrival. Every route
+            to giving passes through /supporters, and the shortest route is the link itself.
+          */}
+          <p class="footer-action">
+            <a href="/supporters/">Support the journal</a>
+          </p>
+          <AddAppRow />
+        </div>
         {/*
           THE DIVIDER CLOSES THE FOOTER RATHER THAN INTERRUPTING IT (editors'
           pass 2026-08-03). The only rule in this footer used to be the one
           under the subscribe field, which fell in the middle of the block and
-          read as a divider slicing the footer in half. The field keeps its
-          underline on the page variant, where it is the form's own baseline;
-          in the footer it is gone, and the rule that remains is this one — at
-          the very end, under Support the journal, closing the page.
+          read as a divider slicing the footer in half. The field has since left
+          the footer altogether for /subscribe, and the rule that remains is this
+          one — at the very end, under the three asks, closing the page.
         */}
         <hr class="single-rule footer-close" />
       </div>
@@ -609,37 +609,74 @@ const currentIssue = await getCurrentIssue();
     padding-bottom: 2.5rem;
   }
 
+  /*
+    THIS RULE USED TO SET `margin: 0` TOO, AND THAT IS WHY THE FOOTER HAD NO AIR
+    IN IT (editors' desktop review, 2026-09-07 — the "breathing room" note).
+
+    Astro scopes both selectors, and the attribute it adds to each made this one
+    `footer[cid] p[cid]` — (0,2,2) — against `.footer-title[cid]` and every other
+    class rule below it at (0,2,0). So the reset WON, on specificity, against
+    every margin those rules asked for: the title's 1.4rem, the editors' line's
+    0.9rem, the feed row's 1.4rem and the large gap above the closing links were
+    all declared and none of them rendered. The footer shipped as a single block
+    of centred text with nothing between its parts, which is what the editors
+    were looking at.
+
+    THE FIX IS TO STOP RESETTING WHAT THE RULES BELOW SET, rather than to win the
+    specificity fight from the other side. `footer .footer-title` would have
+    beaten it and left the trap in place for the next class added here. This rule
+    now carries the one thing it is actually for — the centring every footer
+    paragraph shares — and each paragraph states its own margin in full, so the
+    browser's default 1em is displaced by an explicit value rather than by a
+    blanket reset that also eats the value.
+
+    EVERY <p> THIS RULE REACHES HAS A CLASS BELOW THAT SETS `margin`. If you add
+    a paragraph to this footer, give it one; without it, it takes the UA default
+    and will not match anything around it.
+  */
   footer p {
     text-align: center;
-    margin: 0;
   }
 
+  /* THE WORDMARK TAKES THE JOURNAL'S GREEN (editors, 2026-09-07), which the
+     compact masthead at the top of every interior page has worn since
+     2026-08-03. The footer was the last place the journal printed its own name
+     in plain ink.
+
+     THE DARKER STOP, AND THE ARITHMETIC IS THE SAME AS EVERYWHERE ELSE ON THIS
+     PAGE. 1.15rem is 19.55px against a 17px root, at weight 600 — which is not
+     WCAG's "large text": that threshold is 24px, or 18.66px only at bold, and
+     600 is not bold. So this answers to 4.5:1 like ordinary text, and --accent
+     measures 5.07:1 where --accent-bright measures 3.63:1. Same call, same
+     reasoning, as the section nav and the compact masthead. */
   .footer-title {
     font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 600;
-    margin-top: 1.4rem;
+    color: var(--accent);
+    margin: 1.4rem 0 0;
   }
 
   .footer-editors {
     font-size: 0.85rem;
     color: var(--ink-soft);
-    margin-top: 0.9rem;
+    margin: 0.9rem 0 0;
   }
 
-  .footer-subscribe {
-    margin-top: 1.6rem;
-  }
-
+  /* ONE BLANK LINE ABOVE THE FEED ROW (editors, 2026-09-07). The welcome
+     statement ran flush into the addresses beneath it — see the note on
+     `footer p` for why the 1.4rem asked for here never arrived. It is the same
+     1.4rem, and against the welcome paragraph's 1.52rem leading it is a blank
+     line, which is what was asked for. */
   .footer-machine {
-    margin-top: 1.4rem;
+    margin: 1.4rem 0 0;
   }
 
   /* The second machine line sits under the first as a continuation, not as a
      new group — so it takes the leading between lines, never the 1.4rem that
      separates the footer's blocks from each other. */
   .footer-machine--second {
-    margin-top: 0.3rem;
+    margin: 0.3rem 0 0;
   }
 
   /* ORDINARY SPACE, deliberately. This rule closes the footer and sits a normal
@@ -722,6 +759,13 @@ const currentIssue = await getCurrentIssue();
      a width one, so it is left exactly as it renders today and flagged to the
      editors rather than changed on the way past. */
   .footer-welcome {
+    /* STATED, WHERE IT USED TO BE INHERITED FROM A BLANKET RESET. The note above
+       `footer p` records that the reset is gone; this paragraph is the one that
+       genuinely wanted zero, so it says zero. The space above its rule is still
+       the governance nav's own line-height, exactly as it rendered before this
+       pass — the flag raised on 2026-09-02 is neither answered nor disturbed
+       here. */
+    margin: 0;
     padding-top: 1.3rem;
     border-top: 1px solid var(--hairline);
     /* The lines even out instead of running long-long-long-short.
@@ -749,55 +793,72 @@ const currentIssue = await getCurrentIssue();
     color: var(--ink-soft);
   }
 
-  .footer-support {
-    /* A link, not a box — but one a stranger finds on first scan:
-       stepped up from the surrounding footer text, in the site's
-       letterspaced-caps voice, with air around it so the colour
-       registers. (It said "the crimson" until 2026-08-03, which the
-       palette stopped being three greens ago.) */
+  /*
+    THE THREE ASKS, IN ONE VOICE (editors, 2026-09-07).
+
+    THE TYPOGRAPHY IS ON THE GROUP, NOT ON THE THREE LINES, and that is the point
+    of there being a group at all. Size, weight, letterspacing, case and colour
+    are inherited properties, so declaring them here reaches the install row too
+    — which is a component, whose own scoped styles this file cannot otherwise
+    touch. That row's typographic rules are gone rather than restated at these
+    values; see the note in AddAppRow.astro. Three lines that must match are set
+    once.
+
+    THE COLOUR REACHES THE LINKS THROUGH `a { color: inherit }` in global.css, so
+    the group's green is the links' green with nothing to keep in step.
+
+    THE DARKER STOP, AND THIS IS A CHANGE OF STATE FOR THE SUPPORT LINE. It wore
+    --accent-bright, set as running text by the editors' trade of 2026-08-03, and
+    the note that stood here recorded the contrast gap that came with it: 0.9rem
+    at weight 600 is ordinary text by WCAG's measure, answering to 4.5:1, and
+    #4b8e4d gives 3.63:1. Three lines that must look identical cannot straddle
+    that, and of the routes that note listed — bolder type, or --accent back —
+    the editors' instruction here is that all three read as one set in the
+    journal's green. --accent is 5.07:1 and is the green every other piece of
+    letterspaced type on this page already wears. FLAGGED, because it reverses a
+    decision this file used to record as ruled.
+
+    ONE BLANK LINE ABOVE THE GROUP, matching the one above the feed row, per the
+    same review. What stood here was `clamp(8rem, 16vw, 14rem)` — the large gap
+    above Support ruled on 2026-08-03 — and it never rendered a pixel, for the
+    specificity reason set out beside `footer p`. The editors read this footer as
+    it actually stands and asked for a blank line, so a blank line is what this
+    is; the 2026-08-03 geometry is not resurrected here and is flagged on the PR
+    rather than reinstated silently.
+  */
+  .footer-actions {
+    margin-top: 1.4rem;
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-
-    /* THE LARGE GAP IS ABOVE SUPPORT, BY RULING (editors, 2026-08-03), AND THE
-       SPACE BELOW IS ORDINARY — the footer's own bottom padding and nothing
-       more. Support stands apart from everything above it; it does not float
-       between two gaps.
-
-       A CENTRED GEOMETRY WAS TRIED AND DISCARDED, and the failure is worth
-       keeping because "just centre it" reads as the obvious fix here. Equal
-       margins put ~6rem over the link and ~6rem PLUS the footer's 2.5rem
-       padding under it, so the LARGER space landed underneath — the exact
-       opposite of the intent, and what the editors saw on the walk.
-
-       Scaled rather than fixed so the picture — large gap, link, small padding,
-       end of page — holds at both widths. A fixed desktop measure eats a phone
-       screen; a fixed phone measure closes the gap up on a wide window. */
-    margin-top: clamp(8rem, 16vw, 14rem);
+    text-align: center;
+    color: var(--accent);
   }
 
-  /* SUPPORT TAKES THE BRIGHT STOP, the half of the 2026-08-03 trade that sent
-     the wordmark deeper. It is the one place on the site where the colour
-     itself is set as running text, and that is the editors' call rather than an
-     oversight — it is flagged here because a later session reading the contrast
-     table in global.css will find this rule contradicting it.
+  .footer-action {
+    margin: 0.55rem 0 0;
+  }
 
-     THE NUMBERS: this line is 0.9rem — 15.3px against a 17px root — uppercase
-     at weight 600. That is ordinary text, not large text: it is nowhere near
-     24px, and 600 is not the bold that would lower the threshold to 18.66px. So
-     it answers to 4.5:1 and #4b8e4d gives 3.63:1. The gap is real.
+  .footer-action:first-child {
+    margin-top: 0;
+  }
 
-     WHAT WOULD CLOSE IT, if the editors would rather it did: 1.1rem at weight
-     700 makes this large text at 18.7px, where 3:1 applies and the bright stop
-     clears it — a visibly bolder Support line, no change of colour. The other
-     routes are to take --accent back (5.07:1, which is the state this replaced)
-     or to leave it as ruled.
+  /* NO UNDERLINE AT REST, UNDERLINE ON HOVER — the site's voice for
+     letterspaced caps, and already the install row's own behaviour, so the
+     three lines answer a pointer identically.
 
-     The hover is untouched and helps rather than hurts: the global a:hover
-     resolves to --accent, so hovering this link DARKENS it to 5.07:1. */
-  .footer-support a {
-    color: var(--accent-bright);
-    text-decoration-color: var(--accent-bright);
+     THE HOVER IS THE UNDERLINE AND NOT A COLOUR CHANGE. The global a:hover
+     resolves to --accent, which these links already are, so a colour hover would
+     have to invent a fourth state; the underline is what the app row has always
+     done and it now does it for all three. */
+  .footer-action a {
+    text-decoration: none;
+  }
+
+  .footer-action a:hover,
+  .footer-action a:focus-visible {
+    text-decoration: underline;
+    text-decoration-color: currentColor;
   }
 </style>

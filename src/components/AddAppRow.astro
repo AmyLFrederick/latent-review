@@ -1,10 +1,11 @@
 ---
 // The footer's install row — the journal's only advertisement for itself.
 //
-// WHERE IT SITS AND WHAT IT REPLACED. It stands in the footer where "No
-// tracking, unsubscribe anytime." stood until the editors retired that line on
-// 2026-09-02. The practice the line described is unchanged; the sentence is
-// gone and this row has its place.
+// WHERE IT SITS (editors, 2026-09-07). It is the third line of the footer's
+// closing group, under "Subscribe to the journal" and "Support the journal" —
+// three ways to keep reading us, matched. It stood higher up the stack until
+// then, where it had taken the place of "No tracking, unsubscribe anytime."
+// after the editors retired that line on 2026-09-02.
 //
 // THE ROW'S ONLY LINK, deliberately. Every other row in this footer is a list
 // of destinations separated by dots. This one is a single thing to press, which
@@ -20,7 +21,7 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
 
 <p class="footer-app">
   <a href={APP_PAGE_PATH}>
-    <img class="footer-app-icon" src="/favicon.svg" width="18" height="18" alt="" aria-hidden="true" />
+    <img class="footer-app-icon" src="/favicon.svg" width="16" height="16" alt="" aria-hidden="true" />
     <span>{APP_ROW_LABEL}</span>
   </a>
 </p>
@@ -50,18 +51,25 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
     }
   }
 
-  /* The footer's machine voice — mono and letterspaced, like the feed rows —
-     rather than the serif small caps of the governance nav. It is an
-     instruction to a device, and it is set in the face this site gives to
-     devices. The green is the masthead's, which is also the green of the tile
-     in the mini beside it. */
+  /* THE ROW TAKES THE GROUP'S LETTERING RATHER THAN ITS OWN (editors,
+     2026-09-07). Size, weight, letterspacing, case and colour are declared once
+     on .footer-actions in Base.astro and inherit into this component; the
+     declarations that used to sit here are deleted rather than restated at the
+     group's values, because two rules that agree today are two rules that
+     disagree the first time one of them is edited.
+
+     THE MONO WENT WITH THEM, AND THAT IS THE SUBSTANCE OF THE CHANGE. This row
+     was set in the face the site gives to devices — "an instruction to a device"
+     — which was right while it stood alone between a subscribe field and a
+     governance row. It now stands third in a set of three lines the editors
+     asked to read as matched, and a monospace line among two serif ones is the
+     one thing that would stop them matching.
+
+     WHAT REMAINS HERE IS WHAT IS THIS ROW'S ALONE: the mini, the vanishing act
+     when the journal is already installed, its place in the group's rhythm, and
+     its own centring. */
   .footer-app {
-    margin-top: 1.4rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    margin: 0.55rem 0 0;
     /*
       CENTRED HERE RATHER THAN INHERITED, and the reason is scoping. Base.astro
       centres the footer with `footer p { text-align: center }`, which Astro
@@ -84,11 +92,13 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
     text-align: center;
   }
 
+  /* The colour is the group's, reaching this link through `a { color: inherit }`
+     in global.css — so there is no green declared here to fall out of step with
+     the two lines above. */
   .footer-app a {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--accent);
     text-decoration: none;
     /* The letterspacing above puts a trailing space after the final letter,
        which is real width and pulls the centred unit a hair to the left. Taken
@@ -99,18 +109,27 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
   .footer-app a:hover span,
   .footer-app a:focus-visible span {
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: currentColor;
   }
 
-  /* The mini is the tile at 18px, rounded the way a phone rounds it — the
-     smallest place on the site the app's own picture appears, so a reader
-     recognises what they installed when they see it on their home screen. */
+  /* The mini is the tile at the height of the words beside it, rounded the way a
+     phone rounds it — the smallest place on the site the app's own picture
+     appears, so a reader recognises what they installed when they see it on
+     their home screen.
+
+     SIZED IN `em`, NOT IN PIXELS (editors, 2026-09-07). It was a fixed 18px
+     against 12.24px type; the line is 15.3px type now, and an icon that does not
+     track the text is an icon that has to be re-measured every time the group's
+     size moves. 1em is the type's own size, which is what "matched to the text"
+     means and what keeps the three lines reading as one set. The width and
+     height attributes on the tag are the fallback box before CSS lands and are
+     kept close to the rendered size so nothing jumps.
+
+     The tile is full bleed and square, so one value does both axes. */
   .footer-app-icon {
-    border-radius: 4px;
-    /* The tile is full bleed and square; the box is stated so the row's height
-       does not depend on the SVG's intrinsic sizing. */
-    width: 18px;
-    height: 18px;
+    border-radius: 3px;
+    width: 1em;
+    height: 1em;
     display: block;
   }
 </style>

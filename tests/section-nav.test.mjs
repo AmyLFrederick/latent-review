@@ -7,6 +7,7 @@ import {
   DIRECT_OPEN_SECTIONS,
   STANDING_SECTIONS,
   NAV_ROSTER,
+  CONTENTS_SECTION_ORDER,
 } from '../src/lib/site.ts';
 
 // The direct-open nav (ruled 2026-08-02). What is pinned here is the FALLBACK,
@@ -94,14 +95,43 @@ test('Robotics & Sports is a listing section and never direct-opens', () => {
   assert.equal(sectionNavHref('Robotics & Sports', oneItem), '/section/robotics-and-sports/');
 });
 
-test('Topics is still last in the contents order — the catch-all closes an issue', () => {
-  // The new section is a named beat and runs with the named sections. If it
-  // ever lands below Topics, an issue would run its catch-all before a section
-  // defined by its subject, which inverts what the order means.
-  assert.equal(STANDING_SECTIONS[STANDING_SECTIONS.length - 1], 'Topics');
-  assert.ok(
-    STANDING_SECTIONS.indexOf('Robotics & Sports') < STANDING_SECTIONS.indexOf('Topics')
+// THE "TOPICS IS LAST" ASSERTION IS GONE, AND ITS ABSENCE IS THE RECORD OF WHAT
+// CHANGED (editors' desktop review, 2026-09-07).
+//
+// It stood here as: the catch-all closes an issue, so Robotics & Sports — a
+// named beat — must run above it, or an issue would run the section defined by
+// what it is not before a section defined by its subject. That was an assertion
+// about STANDING_SECTIONS, which was the contents order until this pass; it is
+// now the roster and nothing more, and the contents run in the navigation's
+// order, where Topics sits fourth of eight.
+//
+// SO THE INVARIANT IS SPENT RATHER THAN BROKEN. Nothing ruled it — the reasoning
+// was the editors' own, recorded in the array's comment on 2026-08-25 — and the
+// editors have now placed a different requirement above it: that the front page
+// not name the same sections in two orders. Deleted rather than left passing
+// against an array no longer consulted for order, which would have been a green
+// test asserting something the site had stopped doing.
+
+test('the contents order is the navigation roster, read off it rather than restated', () => {
+  // The whole mechanism. If these two ever differ, the front page has gone back
+  // to disagreeing with itself about the shape of the issue.
+  assert.deepEqual(
+    [...CONTENTS_SECTION_ORDER],
+    NAV_ROSTER.map((entry) => entry.section ?? entry.label)
   );
+});
+
+test('every standing section has a place in the contents order', () => {
+  // The roster is the order now, so a standing section missing from it would be
+  // a section that runs after the ones the nav names, sorted alphabetically with
+  // the floating sections — silently, and only in an issue that happened to
+  // carry a piece in it.
+  for (const section of STANDING_SECTIONS) {
+    assert.ok(
+      CONTENTS_SECTION_ORDER.includes(section),
+      `${section} is a standing section with no place in the contents order`
+    );
+  }
 });
 
 test('every direct-open section is a standing section', () => {
@@ -269,24 +299,25 @@ test('nothing in the roster is abbreviated: a section prints the name it has', (
   }
 });
 
-test('the display order does not disturb the order an issue runs in', () => {
-  // The whole reason the roster is its own list. STANDING_SECTIONS is also the
-  // contents order, and the editors' 2026-08-03 nav pass moved AI Voices ahead
-  // of Opinion in the NAV without touching the order an issue runs in.
+test('the display order IS the order an issue runs in', () => {
+  // The reverse of what this test asserted until 2026-09-07, and the reversal is
+  // the editors' instruction: section order drives article order.
+  //
+  // STANDING_SECTIONS is still pinned, because membership is what rulings bind
+  // (R-026 c6, R-027 c3, and Robotics & Sports' own) — but it is pinned as a
+  // roster now. Its ORDER decides nothing, which is why the sections below are
+  // compared as a set against the roster and in sequence against nothing.
+  assert.deepEqual([...STANDING_SECTIONS].sort(), [
+    'AI Voices',
+    'Cover',
+    'Opinion',
+    'Robotics & Sports',
+    'The Metaphysical Corner',
+    'Topics',
+  ]);
   assert.deepEqual(
-    [...STANDING_SECTIONS],
-    [
-      'Cover',
-      'Opinion',
-      'AI Voices',
-      'The Metaphysical Corner',
-      'Robotics & Sports',
-      'Topics',
-    ]
-  );
-  assert.notDeepEqual(
-    NAV_ROSTER.filter((e) => e.section).map((e) => e.section),
-    [...STANDING_SECTIONS]
+    CONTENTS_SECTION_ORDER.filter((s) => STANDING_SECTIONS.includes(s)),
+    NAV_ROSTER.filter((e) => e.section).map((e) => e.section)
   );
 });
 

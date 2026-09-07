@@ -158,24 +158,29 @@ export function sectionUrl(section: string): string {
 }
 
 /**
- * THE NAVIGATION ROSTER, IN DISPLAY ORDER — which is no longer the order an
- * issue's contents run in, and this is where the two part company.
+ * THE NAVIGATION ROSTER, IN DISPLAY ORDER — AND, SINCE THE EDITORS' DESKTOP
+ * REVIEW OF 2026-09-07, THE ORDER AN ISSUE'S CONTENTS RUN IN TOO.
  *
- * STANDING_SECTIONS was doing both jobs. It is the roster AND, by its own
- * comment, "the order an issue's contents run in", and while the nav rendered
- * that array in place the two orders could not disagree. Ruled 2026-08-03: the
- * Corner takes the second row alone under its full name, which puts it after
- * Letters and Prompts — items that do not appear in STANDING_SECTIONS, so they
- * have no place in that order to be moved out of. (When this was written both
- * were also empty of pieces. Prompts no longer is: R-026 makes it a section,
- * and its first answer runs in Issue No. 1, so it appears in that issue's
- * contents after the standing sections, as any section outside the array
- * does.) There is no ordering of STANDING_SECTIONS that
- * expresses this, and reordering it to try would move the Corner in every
- * issue's contents to fix a line break in the nav.
+ * THE TWO USED TO PART COMPANY HERE, and the note that stood in this place
+ * argued for the split: STANDING_SECTIONS was both the roster and "the order an
+ * issue's contents run in", the 2026-08-03 nav pass moved AI Voices ahead of
+ * Opinion and gave the Corner a row of its own, and no ordering of
+ * STANDING_SECTIONS could express a nav arrangement that also contains Prompts
+ * and Letters. Rather than reorder an issue's contents to fix a line break, the
+ * display order was given its own list.
  *
- * So the display order lives here and the contents order stays there. Anything
- * about an issue's shape reads STANDING_SECTIONS; only the nav reads this.
+ * WHAT THE SPLIT COST, WHICH IS WHAT ENDED IT. A reader on the front page meets
+ * this roster and then, immediately below it, the issue's contents — and the
+ * two named the same sections in two different orders. That is not a subtlety
+ * at the desk; it is the front page disagreeing with itself about the shape of
+ * the issue. The editors looked at it on 2026-09-07 and ruled that the list a
+ * reader reads first is the one that governs: section order drives article
+ * order, and CONTENTS_SECTION_ORDER below is that order, derived from this
+ * roster rather than restated beside it.
+ *
+ * STANDING_SECTIONS IS NOW THE ROSTER AND NOTHING ELSE — which is what its
+ * comment always said it was, minus the second job. Membership, validation and
+ * the section pages read it; nothing reads it for order any more.
  *
  * MEMBERSHIP IS EIGHT SINCE 2026-08-25, and every addition has cost a ruling:
  * R-026 clause 6 reopened the roster for Prompts, R-027 clause 3 spent the slot
@@ -283,13 +288,12 @@ export interface NavEntry {
  * same thing the eighth did. R-027 clause 3's one positional requirement,
  * Topics before Letters, holds and is asserted in the suite.
  *
- * This is the NAV's order and not an issue's. STANDING_SECTIONS remains the
- * order an issue's contents run in, and nothing here touches it — reordering
- * that to match this would move the Corner in every issue's contents to fix a
- * line in the navigation. The two lists place the new section differently and
- * that is the split working: it runs above Topics in an issue because Topics is
- * the catch-all, and it takes a row of its own in the nav because its name is
- * too long for row 1.
+ * THIS IS ALSO AN ISSUE'S ORDER NOW (editors, 2026-09-07). A change to this
+ * list is a change to the order every issue's contents run in — including
+ * issues already published, since an issue's shape is derived and never stored.
+ * See CONTENTS_SECTION_ORDER below, and read this row layout as carrying that
+ * consequence: a section moved to fix a line break in the nav moves in the
+ * contents too.
  */
 export const NAV_ROSTER: readonly NavEntry[] = [
   // Row 1.
@@ -316,6 +320,36 @@ export const NAV_ROSTER: readonly NavEntry[] = [
   // reader's voice and it belongs at the end, as in a print magazine.
   { label: 'Letters', href: '/letters/' },
 ];
+
+/**
+ * THE ORDER AN ISSUE'S CONTENTS RUN IN — derived from the nav roster above,
+ * never typed out beside it (editors, 2026-09-07).
+ *
+ * WHY IT IS DERIVED RATHER THAN DECLARED. The whole of the editors' instruction
+ * is that these two orders agree, and two lists that agree today are two lists
+ * that disagree the first time one of them is edited. There is no arrangement
+ * of the nav that this list can fail to match, because it is that arrangement
+ * read off the roster.
+ *
+ * `section ?? label`, AND THE FALLBACK IS DOING REAL WORK. Prompts is a section
+ * (R-026) that keeps a page of its own at /prompts/, so its roster entry carries
+ * an `href` rather than a `section` — see SECTION_PAGE_OVERRIDES. Its label is
+ * its section name, which the suite asserts for every entry that has both, so
+ * the label is a sound name for the section here. Letters names no section any
+ * piece can carry and simply never matches one.
+ *
+ * COVER IS IN THIS LIST AND IS NOT AN ORDINARY MEMBER OF IT. An issue's cover
+ * runs first by the Charter, and it is lifted out of the section grouping before
+ * this order is applied (see groupSections in ./issues). It stays here so that
+ * this list is the roster's order and nothing else — a list with a hole in it
+ * invites the question of what else was left out.
+ *
+ * A SECTION THAT IS NOT ON THE ROSTER runs after everything here, alphabetically,
+ * exactly as it did when this order came from STANDING_SECTIONS.
+ */
+export const CONTENTS_SECTION_ORDER: readonly string[] = NAV_ROSTER.map(
+  (entry) => entry.section ?? entry.label
+);
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
   Cover: 'The piece both editors deem most important in that issue.',

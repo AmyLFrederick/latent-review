@@ -11,25 +11,33 @@ import {
   SUBSCRIBE_DONE_SPAM,
 } from '../lib/subscribe-copy.mjs';
 
-interface Props {
-  /** 'page' for the homepage, 'footer' for the site-wide footer. */
-  variant?: 'page' | 'footer';
-}
+// THE FOOTER VARIANT IS RETIRED (editors, 2026-09-07). This component had two:
+// 'page', for a form that is the point of the page it sits on, and 'footer', for
+// the compact one that stood site-wide. The footer's form has been replaced by a
+// link to /subscribe, so there is one variant left and therefore no variant —
+// the branch is deleted rather than left standing, because a dormant style is an
+// invitation to switch it back on without a decision.
+//
+// THE SERVER STILL ACCEPTS `web-form-footer`, and must: it is written into
+// consent rows already in the record, and FORM_SOURCES in
+// netlify/functions/subscribe.mts is the allowlist those rows are read against,
+// not a list of doors currently standing. Nothing server-side changes here.
+const inputId = 'subscribe-email';
 
-const { variant = 'page' } = Astro.props;
-const inputId = `subscribe-email-${variant}`;
-
-// WHICH DOOR THIS IS, FOR THE CONSENT RECORD. A subscription now begins the
-// moment this form is submitted, so the row it writes has to say where the
-// reader was standing. The server does not trust the value — it accepts these
-// two strings and records anything else as `api` (see FORM_SOURCES in
-// netlify/functions/subscribe.mts) — which is why a hidden field is honest
-// here rather than a claim: it identifies our own two forms and cannot be used
-// to write free text into the record.
-const source = variant === 'footer' ? 'web-form-footer' : 'web-form';
+// WHICH DOOR THIS IS, FOR THE CONSENT RECORD. A subscription begins the moment
+// this form is submitted, so the row it writes has to say where the reader was
+// standing. The server does not trust the value — it accepts the strings in
+// FORM_SOURCES and records anything else as `api` — which is why a hidden field
+// is honest here rather than a claim: it identifies our own form and cannot be
+// used to write free text into the record.
+//
+// LIVE SIGNUPS WILL RECORD `web-form` FROM NOW ON, where they have recorded
+// `web-form-footer` since Issue No. 1 ran. The door genuinely moved; the value
+// says so.
+const source = 'web-form';
 ---
 
-<div class:list={['subscribe', { 'subscribe--footer': variant === 'footer' }]}>
+<div class="subscribe">
   <form class="subscribe-form" method="post" action="/api/subscribe" data-source={source}>
     <input type="hidden" name="source" value={source} />
     <label class="sr-only" for={inputId}>Email address</label>
@@ -255,36 +263,8 @@ const source = variant === 'footer' ? 'web-form-footer' : 'web-form';
     margin: 0.7rem 0 0;
   }
 
-  .subscribe--footer {
-    max-width: 22rem;
-  }
-
-  /* The footer carries the same words at the footer's scale. The rules stay:
-     they are what makes it apparatus rather than a stray paragraph in a
-     column that already has several. */
-  .subscribe--footer .subscribe-done {
-    padding: 1.1rem 0 1.2rem;
-  }
-
-  .subscribe--footer .subscribe-done-heading {
-    font-size: 1.15rem;
-  }
-
-  .subscribe--footer .subscribe-done-lead {
-    font-size: 0.88rem;
-  }
-
-  .subscribe--footer .subscribe-done-spam {
-    font-size: 0.8rem;
-  }
-
-  /* NO RULE UNDER THE FOOTER FIELD (editors' pass 2026-08-03). On the page the
-     underline is the form's baseline and stays. In the footer it was the only
-     horizontal rule in the block, landing mid-way down, where it read as a
-     divider cutting the footer rather than as part of a field. The footer's
-     rule now closes the footer instead — see .footer-close in Base.astro. */
-  .subscribe--footer .subscribe-form {
-    border-bottom: 0;
-    padding-bottom: 0;
-  }
+  /* The footer variant's rules stood here — a narrower measure, a smaller done
+     panel, and no rule under the field. They are deleted with the variant they
+     styled (editors, 2026-09-07); the underline above is the form's own
+     baseline, which is what it always was on a page. */
 </style>

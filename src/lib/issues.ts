@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { STANDING_SECTIONS } from './site';
+import { CONTENTS_SECTION_ORDER } from './site';
 // @ts-expect-error — plain-JS module shared with scripts/send-issue.mjs and tests
 import { deriveVolumes } from './volume.mjs';
 
@@ -29,13 +29,23 @@ export interface Issue {
   sections: { section: string; items: Article[] }[];
 }
 
+// THE CONTENTS RUN IN THE NAVIGATION'S ORDER (editors, 2026-09-07). A reader on
+// the front page meets the section roster and then, directly beneath it, this
+// issue's contents; until now those two lists named the same sections in two
+// different orders, and the front page disagreed with itself about the shape of
+// the issue. The list a reader reads first is the one that governs — see
+// CONTENTS_SECTION_ORDER, which is derived from the roster rather than kept in
+// step with it.
+//
+// THIS WAS STANDING_SECTIONS, and the swap is the whole of the change. Sections
+// the roster does not name still run last, alphabetically, exactly as before.
 function groupSections(rest: Article[]): Issue['sections'] {
-  const floating = [...new Set(rest.map((a) => a.data.section))]
-    .filter((s) => !(STANDING_SECTIONS as readonly string[]).includes(s))
-    .sort();
+  const present = [...new Set(rest.map((a) => a.data.section))];
   const order = [
-    ...(STANDING_SECTIONS as readonly string[]).filter((s) => s !== 'Cover'),
-    ...floating,
+    // Cover is already lifted out by the caller; it is skipped here so that a
+    // stray non-cover piece filed under 'Cover' cannot reappear at the top.
+    ...CONTENTS_SECTION_ORDER.filter((s) => s !== 'Cover' && present.includes(s)),
+    ...present.filter((s) => !CONTENTS_SECTION_ORDER.includes(s)).sort(),
   ];
   return order
     .map((section) => ({ section, items: rest.filter((a) => a.data.section === section) }))
