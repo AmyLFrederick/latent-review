@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro';
+import SubscribeForm from '../components/SubscribeForm.astro';
+import { CADENCE_LINE } from '../lib/site';
+
+// THE SUBSCRIBE DOOR (editors' desktop review, 2026-09-07).
+//
+// WHY THIS PAGE EXISTS. The email field stood in the footer of every page on the
+// site, one element among four rows of links, and the editors replaced it there
+// with a link reading SUBSCRIBE TO THE JOURNAL. The instruction was explicit
+// that the form move rather than go: a journal that stops offering the door
+// while keeping the sign for it has done the one thing this change was not for.
+// So the field is here, and it is the whole of the page — a reader who presses
+// that link arrives at the thing they pressed it for, above the fold at every
+// width, with nothing to scroll past to reach it.
+//
+// THE CADENCE COMES FROM CADENCE_LINE, never from a sentence typed here. It is
+// the journal's own present-tense statement of how often it publishes (R-039,
+// R-055), it renders on the masthead of every issue and in the digest, and it
+// moves when cadence moves. A page that told a prospective subscriber how often
+// mail would arrive, in its own words, would be the one surface that went stale
+// the day the cadence changed.
+//
+// NO PROMISES UNDER THE FIELD. "No tracking, unsubscribe anytime." was retired
+// on 2026-09-02 — the practice unchanged, the claim moved to the terms, where it
+// binds. This page does not reinstate it in different words, in a new place,
+// three weeks later; it links to the terms instead, which is where a reader can
+// hold us to something. The receipt a reader sees after pressing Subscribe still
+// names the unsubscribe link, because at that point it is a fact about the mail
+// they are about to get rather than reassurance offered to win the press.
+//
+// A SIGNUP IS A SUBSCRIPTION, since 2026-08-22 — there is no confirmation step
+// to describe, and this page must not invent one. See src/lib/subscribe-copy.mjs,
+// which holds the words for what actually happens next.
+---
+
+<Base
+  title="Subscribe"
+  description="Each issue of The Latent Review, delivered by email when it publishes."
+>
+  <div class="wrap">
+    <header class="page-header">
+      <p class="kicker kicker--accent kicker--lead">Subscribe</p>
+      <h1>Each issue, when it publishes</h1>
+      <p class="page-note">{CADENCE_LINE}</p>
+    </header>
+
+    <SubscribeForm />
+
+    <div class="prose subscribe-page-note">
+      <p>
+        One email an issue. What we do with the address is set out in the{' '}
+        <a href="/terms/">terms</a>.
+      </p>
+      <p>
+        Reading us by machine instead? The <a href="/rss.xml">RSS</a> and{' '}
+        <a href="/feed.json">JSON</a> feeds carry every piece, and{' '}
+        <a href="/llms.txt">llms.txt</a> maps the site.
+      </p>
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* The note sits under the field rather than above it, so nothing stands
+     between a reader who arrived to subscribe and the field they came for. */
+  .subscribe-page-note {
+    max-width: 30rem;
+    margin: 2.6rem auto 0;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  .subscribe-page-note p + p {
+    margin-top: 1rem;
+  }
+</style>
