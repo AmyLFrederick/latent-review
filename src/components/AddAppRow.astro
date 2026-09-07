@@ -11,17 +11,66 @@
 // of destinations separated by dots. This one is a single thing to press, which
 // is what keeps it legible as an offer rather than as one more address.
 //
-// THE MINI IS THE SERVED FAVICON, not a second drawing of the mark. Whatever
-// public/favicon.svg holds is what the tab shows and what a home screen gets,
-// so a reader who presses this row has already seen the icon they are about to
-// install. One source; see assets/app-icon.svg.
+// THE ICON IS A PHONE, NOT THE MARK (editors, 2026-09-07). It was the served
+// favicon at 1em — the journal's own LR tile, on the reasoning that a reader who
+// pressed this row had already seen the icon they were about to install. What
+// that reasoning missed is the sentence it sits beside: the row does not say
+// "install The Latent Review", it says ADD APP TO PHONE, and the noun the icon
+// should draw is the phone. The tile also came in at 15px of green square beside
+// green type, which read as a smudge rather than as a mark at that size.
+//
+// INLINE SVG RATHER THAN A FILE, so it takes `currentColor` and can only ever be
+// the colour of the words beside it. An <img> cannot inherit colour: the old
+// tile was green because the file was drawn green, which is a second place for
+// the journal's green to live and to fall out of step. There is now no green
+// declared in this component at all.
+//
+// NOT A SECOND DRAWING OF THE MARK, which is what the note this replaces was
+// really protecting against. It is not the mark; assets/app-icon.svg remains the
+// one source for that, and this component no longer draws it.
+//
+// aria-hidden, LIKE THE TILE BEFORE IT. The link's words already say what it
+// does, and an icon that repeats them is a listener hearing "phone" twice.
 
 import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
 ---
 
 <p class="footer-app">
   <a href={APP_PAGE_PATH}>
-    <img class="footer-app-icon" src="/favicon.svg" width="16" height="16" alt="" aria-hidden="true" />
+    {/*
+      A PHONE IN OUTLINE, drawn on a 24-unit grid at the site's hairline weight:
+      a rounded body, and the speaker slot at the top drawn as a short line
+      rather than as a second rounded rectangle, because at 15px a rectangle
+      that small fills in and reads as a blot. There is no home button — a slot
+      and a body is the least a phone can be drawn with and still be a phone.
+
+      `stroke-width` IS 1.6 RATHER THAN 1, and the reason is the scale it is
+      drawn at. A 24-unit icon rendered into 15px divides every stroke by 1.6, so
+      a 1-unit stroke would land under a device pixel and render as a grey ghost
+      beside type set at weight 600. 1.6 units is what puts it back on the line
+      weight the words have.
+
+      `vector-effect` IS DELIBERATELY ABSENT. It would hold the stroke at one
+      screen pixel regardless of scale, which is right for a diagram and wrong
+      here: this icon must get heavier when the type does, or it stops matching
+      the line it sits on.
+    */}
+    <svg
+      class="footer-app-icon"
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="6" y="2" width="12" height="20" rx="2.5" />
+      <line x1="10.5" y1="5.5" x2="13.5" y2="5.5" />
+    </svg>
     <span>{APP_ROW_LABEL}</span>
   </a>
 </p>
@@ -86,7 +135,7 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
 
       THE UNIT IS THE ICON AND THE WORDS TOGETHER. The anchor below is
       inline-flex, so it shrinks to the width of its contents and this rule
-      centres that whole box — mini and text as one thing, not a centred line
+      centres that whole box — icon and text as one thing, not a centred line
       of text with a picture hanging off its left.
     */
     text-align: center;
@@ -112,22 +161,27 @@ import { APP_PAGE_PATH, APP_ROW_LABEL } from '../lib/app-icon.mjs';
     text-decoration-color: currentColor;
   }
 
-  /* The mini is the tile at the height of the words beside it, rounded the way a
-     phone rounds it — the smallest place on the site the app's own picture
-     appears, so a reader recognises what they installed when they see it on
-     their home screen.
-
-     SIZED IN `em`, NOT IN PIXELS (editors, 2026-09-07). It was a fixed 18px
-     against 12.24px type; the line is 15.3px type now, and an icon that does not
+  /* SIZED IN `em`, NOT IN PIXELS (editors, 2026-09-07). An icon that does not
      track the text is an icon that has to be re-measured every time the group's
      size moves. 1em is the type's own size, which is what "matched to the text"
      means and what keeps the three lines reading as one set. The width and
      height attributes on the tag are the fallback box before CSS lands and are
      kept close to the rendered size so nothing jumps.
 
-     The tile is full bleed and square, so one value does both axes. */
+     THE BOX IS SQUARE AND THE PHONE IS NOT, which is deliberate and is how the
+     viewBox is drawn. A 1em × 1em box against a 24-unit square viewBox scales
+     one unit to one sixteenth of the type size; the body inside it runs 6→18
+     across and 2→22 down, so it renders about 9.6px wide and 12.75px tall
+     against 15.3px type — a phone standing at roughly the cap height of the
+     words, with its own air either side. Setting the box to the ink's width
+     instead would not narrow it: `preserveAspectRatio` defaults to fitting the
+     square viewBox inside whatever box it is given, so a narrower box shrinks
+     the whole drawing rather than trimming the margin.
+
+     THE ROUNDING WENT WITH THE TILE. The corner radius that used to be declared
+     here was the phone's rounding drawn onto a square picture of the app; the
+     phone now has its own corners, in the path. */
   .footer-app-icon {
-    border-radius: 3px;
     width: 1em;
     height: 1em;
     display: block;
