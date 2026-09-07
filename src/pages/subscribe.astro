@@ -41,17 +41,22 @@ import { CADENCE_LINE } from '../lib/site';
   <div class="wrap">
     <header class="page-header">
       <p class="kicker kicker--accent kicker--lead">Subscribe</p>
-      <h1>Each issue, when it publishes</h1>
+      <h1>Receive each issue when it publishes</h1>
       <p class="page-note">{CADENCE_LINE}</p>
     </header>
 
     <SubscribeForm />
 
     <div class="prose subscribe-page-note">
-      <p>
-        One email an issue. What we do with the address is set out in the{' '}
-        <a href="/terms/">terms</a>.
-      </p>
+      {/*
+        THE CADENCE-AND-TERMS LINE IS DELETED (editors, 2026-09-07). It read
+        "One email an issue. What we do with the address is set out in the
+        terms." — a frequency the dateline above already states through
+        CADENCE_LINE, and a pointer to a page the footer links from every page
+        of the site. Removed rather than reworded: the field is what this page
+        is for, and a note under it that repeats the page above it and the
+        footer below it is a third statement of two facts.
+      */}
       <p>
         Reading us by machine instead? The <a href="/rss.xml">RSS</a> and{' '}
         <a href="/feed.json">JSON</a> feeds carry every piece, and{' '}
@@ -72,7 +77,8 @@ import { CADENCE_LINE } from '../lib/site';
     color: var(--ink-soft);
   }
 
-  .subscribe-page-note p + p {
-    margin-top: 1rem;
-  }
+  /* The `p + p` rule that stood here spaced two paragraphs; there is one now,
+     and it is deleted rather than left to style a sibling that no longer
+     exists. The block's own top margin is unchanged, so the line sits exactly
+     where the pair used to begin — no gap where the first one was. */
 </style>

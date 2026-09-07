@@ -754,20 +754,27 @@ const currentIssue = await getCurrentIssue();
      Removing the declaration is verified to change nothing — the computed
      margins were already 0px on every side.
 
-     THE SPACE ABOVE THE RULE IS THEREFORE THE NAV'S OWN LINE-HEIGHT, not the
-     1.6rem the dead shorthand asked for. That is a spacing question rather than
-     a width one, so it is left exactly as it renders today and flagged to the
-     editors rather than changed on the way past. */
+     THE SPACE ABOVE IS THE NAV'S OWN LINE-HEIGHT, not the 1.6rem the dead
+     shorthand asked for. That is a spacing question rather than a width one, so
+     it is left exactly as it renders today and flagged to the editors rather
+     than changed on the way past.
+
+     THE RULE ABOVE THIS PARAGRAPH IS GONE (editors, 2026-09-07). A hairline sat
+     here, directly under the governance row, and the two paragraphs of notes
+     above are largely about how it looked — where it stopped, what it lined up
+     with. It was the only rule inside the footer: the nav block above carries
+     its own borders, and .footer-close draws the one that ends the page.
+     Between them this one was a third horizontal line in a short column,
+     dividing a footer that reads as one block.
+
+     THE SPACING IT CARRIED STAYS. `padding-top` is untouched, so nothing above
+     or below moves — the line is subtracted and the air it stood in is not. */
   .footer-welcome {
     /* STATED, WHERE IT USED TO BE INHERITED FROM A BLANKET RESET. The note above
        `footer p` records that the reset is gone; this paragraph is the one that
-       genuinely wanted zero, so it says zero. The space above its rule is still
-       the governance nav's own line-height, exactly as it rendered before this
-       pass — the flag raised on 2026-09-02 is neither answered nor disturbed
-       here. */
+       genuinely wanted zero, so it says zero. */
     margin: 0;
     padding-top: 1.3rem;
-    border-top: 1px solid var(--hairline);
     /* The lines even out instead of running long-long-long-short.
 
        WHERE IT APPLIES, MEASURED RATHER THAN ASSUMED. Balancing is capped by
