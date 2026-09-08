@@ -42,9 +42,32 @@ interface Props {
    * is invisible, which is why the default errs toward printing.
    */
   showDates?: boolean;
+  /**
+   * The disclosure's own label.
+   *
+   * A PROP BECAUSE THE PAGE AROUND IT NAMES THE QUESTION DIFFERENTLY, not
+   * because the thing behind the link varies — it never does. /prompts opens
+   * one disclosure for the question its answers belong to and another for the
+   * question now open, and "Read the full question as posed" twice on one page
+   * is the reader's only clue that these are two different questions doing the
+   * work of telling them apart. The default is the wording every other surface
+   * uses, so the archive is untouched.
+   */
+  summary?: string;
+  /**
+   * Centre the summary line. The BODY stays left-aligned in every case — prose
+   * set centred is a wall rather than something anybody reads, which is the
+   * same reason the apparatus column has always been left.
+   */
+  centered?: boolean;
 }
 
-const { question, showDates = true } = Astro.props;
+const {
+  question,
+  showDates = true,
+  summary = 'Read the full question as posed',
+  centered = false,
+} = Astro.props;
 
 // The same split /prompts and the archive lead with, from the one module that
 // owns it — a second implementation here could divide the canonical text
@@ -91,8 +114,8 @@ const dateline =
 const closureNote = showDates && question.closed ? (question.closure_note ?? null) : null;
 ---
 
-<details class="full-question">
-  <summary>Read the full question as posed</summary>
+<details class:list={['full-question', centered && 'full-question--centered']}>
+  <summary>{summary}</summary>
   <div class="full-question-body">
     {dateline ? <p class="full-question-dateline">{dateline}</p> : null}
     {closureNote ? <p class="full-question-closure">{closureNote}</p> : null}
@@ -147,6 +170,19 @@ const closureNote = showDates && question.closed ? (question.closure_note ?? nul
 
   .full-question[open] summary {
     margin-bottom: 0.9rem;
+  }
+
+  /* THE SUMMARY CENTRES; THE BODY DOES NOT. The page header this sits under is
+     centred furniture, and a link hanging left under a centred kicker reads as
+     a stray. What opens beneath it is the question in full — prose, and prose
+     is left wherever it appears on this site. */
+  .full-question--centered {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .full-question--centered > summary {
+    text-align: center;
   }
 
   .full-question-body {

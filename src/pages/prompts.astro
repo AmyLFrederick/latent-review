@@ -91,6 +91,21 @@ const isUnasked = current !== null && current.status === 'unasked';
 // third use for a date appears on this page, that is the moment to ask whether
 // the walk's decision still holds rather than to add another one quietly.
 const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
+
+// THE QUESTION THE PAGE LEADS WITH, where there is a posed one to lead with.
+// `answered` is whichever question the answers belong to; an unasked one has no
+// posed text, so nothing above may offer to show it. Null only at the launch
+// state, when the sole question has not been asked.
+const answeredPosed = answered !== null && answered.status !== 'unasked' ? answered : null;
+
+// WHETHER THE TWO BLOCKS WOULD NAME THE SAME QUESTION. Before a second question
+// existed — the state this page was in until 2026-08-21 — `previous` is null and
+// `answered` IS `current`, so the header's disclosure and the open block's would
+// be two routes to one text with the headline printed twice between them. The
+// open block drops its own headline and link in that case and keeps the
+// invitation, which is the half that is not already on the page.
+const openIsAlsoAnswered =
+  answeredPosed !== null && current !== null && answeredPosed.number === current.number;
 ---
 
 <Base
@@ -112,8 +127,41 @@ const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
       "Prompts" was already printed here as a kicker. It reads exactly as it did;
       only the element changed.
     */}
+    {/*
+      THE HEADER IS A SECTION PAGE'S HEADER NOW (editors, 2026-09-08). Prompts
+      is a section and was the only one whose page did not look like one: the
+      kicker stood alone where every /section/<slug>/ page carries the name, a
+      note under it, and then the list. It carries the same three now, so a
+      reader arriving from the navigation meets the same furniture they met on
+      the last section they opened.
+
+      THE NOTE IS THE SECTION'S NAME FOR ITS OWN CONTENT, not a description of
+      the mechanics. "The Monthly Question" is what this section publishes; how
+      to answer one is set out under its own heading further down, where a
+      reader goes once they want it.
+    */}
     <header class="page-header page-header--compact">
       <h1 class="kicker kicker--accent kicker--lead">Prompts</h1>
+      <p class="page-note">The Monthly Question</p>
+      {/*
+        THE QUESTION IS NOT RESTATED HERE, AND THE LINK IS WHY THIS WORKS. The
+        page used to print the headline of each question in the display face,
+        which is what made two questions into two heavy boxes. What a reader
+        needs above the answers is the question ITSELF, and the shortest honest
+        route to it is the canonical text one click away — the same disclosure
+        R-038 and the 2026-08-03 order-of-reading ruling already put behind a
+        marked link. The short form still names the question, once, as the
+        label over the answers below.
+      */}
+      {
+        answeredPosed && (
+          <FullQuestion
+            question={answeredPosed}
+            summary="Read the monthly question as posed →"
+            centered={true}
+          />
+        )
+      }
     </header>
 
     {/*
@@ -165,171 +213,126 @@ const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
           No question has been recorded yet. The first one will stand here.
         </p>
       ) : (
-        <div class:list={['question-columns', previous && 'question-columns--pair']}>
+        <>
           {/*
-            TWO QUESTIONS, SIDE BY SIDE (editors, 2026-08-21): the one a reader
-            can still answer, and the one the answers below belong to.
+            THE ANSWERS, UNDER A LABEL THAT NAMES THEIR QUESTION.
 
-            THE OPEN ONE IS ON THE RIGHT AND IS THE HEAVIER OF THE TWO — 2px
-            rule, primary ink — because the page's job is to be answerable, and
-            a reader deciding whether to write needs to know which question is
-            still taking answers before they read either. The left column is
-            hairline and secondary: present, readable, plainly the finished one.
+            WHAT THIS REPLACES (editors, 2026-09-08). Two questions stood here
+            side by side in bordered columns — "Answered" on the left, "Now
+            open" on the right — each printing its headline in the display face
+            inside its own rules. The arrangement was legible once a reader had
+            worked it out and did not explain itself before then: two heavy
+            boxes, two headlines, two disclosures, and three status words
+            ("Answered", "Now open", "Answers below") doing the work that the
+            page's own order does for nothing.
 
-            IT IS ONE COLUMN WHEN THERE IS ONE QUESTION. The pair is a state of
-            the record rather than a layout the page always has; before a second
-            question existed there was nothing to put beside the first.
+            THE ORDER IS THE EXPLANATION NOW. Answers to one question, a strong
+            rule, then the question now open. A reader does not have to be told
+            which is which, because a page that reads top to bottom has already
+            said it.
+
+            THE LABEL IS THE WHOLE IDENTIFICATION, and the question is not
+            restated (editors, 2026-08-21, and unchanged by the redesign). It
+            names the question the answers belong to, once; the canonical text
+            is behind the header's link, where the 2026-08-03 order-of-reading
+            ruling put it.
+
+            IT FOLLOWS `answered` WHEREVER THAT POINTS. Nothing here names a
+            question number by hand, so the label and the answers under it
+            cannot come apart.
           */}
-          {previous && (
-            <section class="question question--answered" aria-label={`${questionLabel(previous)}, answered`}>
-              <p class="question-number">
-                Answered
-                {previous.issue ? <> · Issue No. {previous.issue}</> : null}
-              </p>
-              <p class="question-text">{questionHeadline(previous)}</p>
-              <div class="question-apparatus">
-                <FullQuestion question={previous} />
-                <p class="question-answers-here">Answers below.</p>
-              </div>
-            </section>
+          {answeredPosed !== null && (
+            <QuestionAnswers
+              answers={answersTo(articles, answeredPosed.number)}
+              status={answeredPosed.status}
+              heading={`Question: ${questionHeadline(answeredPosed)}`}
+              headingRule={true}
+            />
           )}
-        <section
-          class:list={['question', previous && 'question--open']}
-          aria-label={previous ? `${questionLabel(current)}, now open` : 'The current Monthly Question'}
-        >
-          <p class="question-number">
-            {previous ? (
+
+          {/*
+            THE ONE STRONG RULE ON THE PAGE, and it is carrying a meaning rather
+            than dividing space: answers above, an open invitation below. It is
+            `.double-rule` — the same thick-over-thin mark the masthead and the
+            footer are bracketed with — reused exactly as global.css defines it,
+            so the page borrows the journal's own strongest divider rather than
+            inventing a heavier one. The bordered question boxes that used to be
+            the loudest thing here are gone; this is what replaced all of them.
+          */}
+          <hr class="double-rule open-rule" />
+
+          <section
+            class="open-question"
+            aria-label={`${questionLabel(current)}, open for the next issue`}
+          >
+            {/*
+              THE LABEL SAYS WHAT THE BLOCK IS FOR. "Now open" said the same
+              thing in a column where the reader had to infer what it was open
+              FOR; below a rule, at the foot of the page, this is the invitation
+              and can say so plainly.
+            */}
+            <p class="open-question-label">Open question for the next issue</p>
+
+            {isUnasked ? (
               <>
-                Now open
-                {current.issue ? <> · Issue No. {current.issue}</> : null}
+                <p class="open-question-headline open-question-headline--unasked">
+                  Not yet asked.
+                </p>
+                <p class="question-note">
+                  The first question is numbered and has not been posed. When the editors ratify
+                  it, its text stands here and the record shows the date it was asked.
+                </p>
               </>
             ) : (
-              questionLabel(current)
-            )}
-          </p>
-          {isUnasked ? (
-            <>
-              <p class="question-unasked">Not yet asked.</p>
-              <p class="question-note">
-                The first question is numbered and has not been posed. When the editors ratify
-                it, its text stands here and the record shows the date it was asked.
-              </p>
-            </>
-          ) : (
-            <>
-              {/*
-                THE SHORT FORM LEADS, THE FULL TEXT IS ONE CLICK BEHIND IT, AND
-                THE ANSWERS COME NEXT (ruled 2026-08-03). The framing used to
-                print here in full, which put a paragraph of premise between the
-                question and anything a reader came for. What is behind the link
-                is canonical and verbatim; see src/components/FullQuestion.astro.
-              */}
-              <p class="question-text">{questionHeadline(current)}</p>
-              {/*
-                NOTHING PRINTS HERE WHEN THE QUESTION IS OPEN, ruled on the
-                editors' walk 2026-08-03. The line that stood here — "Asked
-                July 29, 2026. Open for answers." — pushed the answers down to
-                say what the ordinary state already is. The asked date and the
-                status are not lost: both print in the question as posed, one
-                click below, and on every entry in the archive, which is where
-                a reader goes to check either.
-
-                THE CLOSED CASE STILL PRINTS, AND THAT IS THE WHOLE GUARD.
-                Since R-039 rotation, current and open are independent — the
-                question this page leads with may have been closed by the
-                editors while it is still the most recently posed one. Saying
-                nothing then would leave a reader inviting themselves to answer
-                a question that has shut. Open is the silent state because it
-                is the expected one; closed is the exception and says so.
-              */}
-              {/*
-                THE DATE COMES WITH IT (editors, 2026-08-31). "Closed." alone
-                left a reader who had just read the question with no idea
-                whether it shut yesterday or in the spring, and the closing date
-                is in the record already. The note itself stays one click below,
-                in the question as posed, where the rest of the apparatus is —
-                this line is the stop sign, not the explanation.
-              */}
-              {current.status === 'closed' ? (
-                <p class="question-note question-note--closed">
-                  {current.closed ? `Closed ${closedOn(current.closed)}.` : 'Closed.'}
-                </p>
-              ) : null}
-              {/*
-                THE APPARATUS IS IN THIS COLUMN, AND COLUMN MEMBERSHIP IS THE
-                MEANING (editors, 2026-08-27, correcting the same day's earlier
-                call).
-
-                It stood for one build as a full-width band below the pair, on
-                the reasoning that an opened paste block wants more than half a
-                grid. On the rendered page that band spanned both columns and
-                read as belonging to both questions — and it belongs to exactly
-                one, the open one. A reader deciding whether to answer should
-                never have to work out which question the invitation is for; the
-                column answers that before the words do.
-
-                THE ANSWERED COLUMN CARRIES ITS HEADLINE, ITS AS-POSED
-                DISCLOSURE AND "Answers below.", AND NOTHING ELSE. Anything that
-                invites an answer is No. 2's.
-
-                WHAT IS GONE RATHER THAN MOVED: a link reading "Answer this
-                question →" that pointed at /submit. That is where a FINISHED
-                piece goes; it was no help at all with starting one, and it was
-                the whole of the confusion this change fixes. Its accent-mono
-                weight was not deleted with it — it is the paste reveal's now.
-              */}
-              {/*
-                THE WHOLE APPARATUS IS ONE COMPONENT WHEN THE QUESTION IS OPEN,
-                because it is one ratified order and splitting it across a page
-                and a component would be two places to get that order wrong. A
-                question the editors have CLOSED keeps the disclosure alone:
-                nothing may invite an answer to a question that has shut.
-              */}
-              <div class="question-apparatus">
-                {current.status === 'open' ? (
-                  <QuestionInvitation question={current} />
-                ) : (
-                  <FullQuestion question={current} />
+              <>
+                {/*
+                  THE HEADLINE, ONCE. Omitted in the one state where it would be
+                  the same question the label above the answers already names —
+                  see openIsAlsoAnswered. The short form is the question's own
+                  first line and is never composed or paraphrased here;
+                  questionHeadline is where that rule lives.
+                */}
+                {!openIsAlsoAnswered && (
+                  <p class="open-question-headline">{questionHeadline(current)}</p>
                 )}
-              </div>
-            </>
-          )}
-        </section>
-        </div>
+                {/*
+                  THE CLOSED CASE STILL PRINTS, AND IT IS THE WHOLE GUARD. Since
+                  R-039 rotation, current and open are independent — the most
+                  recently posed question may have been closed by the editors
+                  while it still leads this page. Saying nothing then would leave
+                  a reader inviting themselves to answer a question that has
+                  shut. Open is the silent state because it is the expected one.
+
+                  THE DATE COMES WITH IT (editors, 2026-08-31): "Closed." alone
+                  left a reader with no idea whether it shut yesterday or in the
+                  spring, and the closing date is in the record already.
+                */}
+                {current.status === 'closed' ? (
+                  <p class="question-note question-note--closed">
+                    {current.closed ? `Closed ${closedOn(current.closed)}.` : 'Closed.'}
+                  </p>
+                ) : null}
+                {/*
+                  NOTHING MAY INVITE AN ANSWER TO A QUESTION THAT HAS SHUT. A
+                  closed question keeps the as-posed disclosure alone; the whole
+                  apparatus is one component when the question is open, because
+                  it is one ratified order and splitting it across a page and a
+                  component would be two places to get that order wrong.
+                */}
+                <div class="open-question-apparatus">
+                  {current.status === 'open' ? (
+                    <QuestionInvitation question={current} />
+                  ) : (
+                    <FullQuestion question={current} summary="Read the question as posed →" centered={true} />
+                  )}
+                </div>
+              </>
+            )}
+          </section>
+        </>
       )
     }
 
-    {/*
-      THE ANSWERS, UNDER THE QUESTION THEY ANSWER. The label is not decoration:
-      with two questions printed above, answers under a bare "Answers" heading
-      would be read as answering the one a reader just finished — the open one
-      on the right, which by definition has none yet.
-
-      IT FOLLOWS THE LEFT COLUMN WHEREVER THAT POINTS. Nothing here names a
-      question number by hand; the block renders whichever question the left
-      column is showing, so the two cannot come apart.
-
-      THE LABEL IS THE WHOLE IDENTIFICATION, AND THE QUESTION IS NOT RESTATED
-      (editors, 2026-08-21). A quotation of the headline stood here for part of
-      a day and came out: the question it quoted is in the left column a few
-      inches above, so the line repeated on screen what the reader had just
-      read, and the label already names the question by number and issue.
-
-      IT IS THE LIST'S OWN HEADING NOW, not a line above one. This block briefly
-      printed its label and then QuestionAnswers printed "Answers" beneath it —
-      two headings for one list, the second saying less than the first. The
-      fuller line is passed to the component instead, so it sits where "Answers"
-      sat, directly over the first answer and with that label's spacing.
-    */}
-    {
-      answered !== null && (
-        <QuestionAnswers
-          answers={answersTo(articles, answered.number)}
-          status={answered.status}
-          heading={`Answers to ${questionLabel(answered)}${answered.issue ? ` · Issue No. ${answered.issue}` : ''}`}
-        />
-      )
-    }
 
     <div class="prose">
       <h2>How to answer</h2>
@@ -434,130 +437,43 @@ const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
 </Base>
 
 <style>
-  /* The question is the loudest thing on the page, in both states — a reader
-     should not have to hunt for what is being asked, or for the fact that
-     nothing is being asked yet. */
-  .question {
-    border-top: 3px double var(--hairline);
-    border-bottom: 3px double var(--hairline);
-    padding: 2.2rem 0;
-    margin: 0 0 2.8rem;
+  /*
+    THE TWO BORDERED QUESTION BOXES ARE GONE (editors, 2026-09-08), AND THIS
+    NOTE IS WHERE THEY STOOD.
+
+    `.question` framed each question in a 3px double border, and the pair added
+    `.question--open` at 2px solid --rule against `.question--answered` at a
+    hairline, so weight carried which question a reader could still answer. It
+    worked, and it cost the page two heavy horizontal bars stacked above the
+    answers — the first thing a reader met on /prompts, and the thing an outside
+    reviewer read as the page shouting before it had said anything.
+
+    WHAT CARRIES THAT MEANING NOW. Position: the answers are under the question
+    they answer, and the question still taking answers is below a single strong
+    rule with a label naming it. No weight is needed to tell two questions apart
+    when the page only asks a reader to read downward.
+
+    GONE WITH THEM: `.question-columns` and its 46rem grid, `.question-number`
+    (the "Answered" / "Now open" line), `.question-text`, `.question-apparatus`
+    and `.question-answers-here`. Every one styled an element the redesign
+    removed; none is left as a rule with nothing to style.
+  */
+
+  /* The invitation block's own space. The rule above it is the divider, so the
+     gap here is what stops the label reading as a caption hanging off it. */
+  .open-rule {
+    margin: 2.6rem 0 0;
+  }
+
+  .open-question {
     text-align: center;
+    padding: 2rem 0 0;
   }
 
-  /*
-    THE PAIR (editors, 2026-08-21). One column while there is one question; two
-    side by side once a second exists, stacking on a narrow screen.
-
-    ANSWERED STACKS FIRST ON MOBILE and stands LEFT on desktop, which is the
-    same order read two ways rather than a contradiction: left-to-right and
-    top-to-bottom both put the finished question before the open one, and the
-    open one last is the one a reader leaves the block on.
-
-    `align-items: start` SO THE TWO DO NOT STRETCH TO A SHARED HEIGHT. The
-    columns hold different amounts of text, and a stretched pair would give the
-    shorter one a rule floating well below where its words end — which reads as
-    a mistake rather than as symmetry.
-  */
-  .question-columns--pair {
-    display: grid;
-    gap: 1.6rem;
-    align-items: start;
-  }
-
-  @media (min-width: 46rem) {
-    .question-columns--pair {
-      grid-template-columns: 1fr 1fr;
-      gap: 2.2rem;
-    }
-  }
-
-  .question-columns--pair .question {
-    margin-bottom: 0;
-    text-align: left;
-  }
-
-  /*
-    WEIGHT IS THE SIGNAL, and it carries one fact: which question a reader can
-    still answer.
-
-    ANSWERED — hairline rules, secondary ink. Quieter in every respect, and
-    still a full-contrast link where it links, because a finished question is
-    read rather than skimmed and its disclosure is the same promise it always
-    was.
-
-    OPEN — a 2px rule and primary ink. Deliberately NOT the accent green: the
-    accent is this site's link colour and a heading in it would read as
-    clickable. Weight and darkness do the work instead.
-  */
-  .question--answered {
-    border-top: 1px solid var(--hairline);
-    border-bottom: 1px solid var(--hairline);
-    color: var(--ink-soft);
-  }
-
-  /*
-    THE TWO QUESTIONS ARE TYPOGRAPHICALLY IDENTICAL — same size, same weight,
-    same ink (editors, 2026-08-21). The answered one was set a step smaller, and
-    then still a shade lighter, for part of a day. Both were the wrong
-    instrument: a smaller or fainter headline does not say "this one is
-    finished", it says "this one mattered less", and both are questions this
-    journal actually asked.
-
-    NOTHING HERE SETS SIZE OR WEIGHT, so both columns take `.question-text`
-    unchanged and cannot drift apart — there is one declaration. Ink is the
-    exception that has to be written down: the column itself is --ink-soft, and
-    the question would inherit that, so the primary ink is restated here rather
-    than achieved by deleting a line.
-
-    WHAT STAYS SECONDARY IS THE APPARATUS AROUND IT — the column's label and
-    "Answers below." — because those are the distinction, not decoration on it.
-
-    THE DISTINCTION LIVES ENTIRELY IN THE LABEL AND THE RULE ABOVE EACH COLUMN,
-    which is where a reader looks to answer "can I still answer this?" — a
-    question about the state of a question, never about its importance.
-  */
-  .question--answered .question-text {
-    color: var(--ink);
-  }
-
-  .question--open {
-    border-top: 2px solid var(--rule);
-    border-bottom: 2px solid var(--rule);
-  }
-
-  .question--open .question-number {
-    color: var(--ink);
-  }
-
-  .question-answers-here {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    color: var(--ink-soft);
-    margin: 1rem 0 0;
-  }
-
-  /* `.question-act` went with the link it dressed (2026-08-27). Its weight was
-     not deleted with it: the accent-coloured mono is now the paste block's
-     summary in src/components/PasteBlock.astro, which is the act on this page
-     from here on. Left as a note rather than silently, so the next person to
-     want a call to action in the open column knows one used to be here and
-     where it went. */
-
-  /*
-    THE SPACE BELOW THE PAIR LIVES ON THE PAIR. The columns give up their own
-    bottom margin so the two sit as one block, and the answers list that follows
-    is now the component's own <section> rather than a wrapper this page owned —
-    so the gap is set here, above, instead of on a block that no longer exists.
-    Without it the answers heading crowds the open question's rule and reads as
-    part of that column.
-  */
-  .question-columns--pair {
-    margin-bottom: 2.6rem;
-  }
-
-  .question-number {
+  /* The same mono small caps the page's other apparatus is set in, and the
+     same the answers label carries — this and that label are the page's two
+     signposts and should read as one system. */
+  .open-question-label {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     letter-spacing: 0.14em;
@@ -566,7 +482,11 @@ const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
     margin: 0 0 0.9rem;
   }
 
-  .question-text {
+  /* The one piece of display type left on the page, and it belongs to the
+     question a reader can act on. It is NOT the accent green: the accent is
+     this site's link colour and a headline in it would read as clickable —
+     the link is the line underneath. */
+  .open-question-headline {
     font-family: var(--font-display);
     font-size: clamp(1.4rem, 4vw, 2rem);
     line-height: 1.25;
@@ -574,17 +494,29 @@ const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
     margin: 0 auto;
   }
 
-  .question-unasked {
-    font-family: var(--font-display);
-    font-size: clamp(1.4rem, 4vw, 2rem);
-    line-height: 1.25;
+  .open-question-headline--unasked {
     color: var(--ink-soft);
-    margin: 0;
   }
 
-  /* `.lede` went with the sentence it sized (2026-08-04). Left as a note rather
-     than silently: it was the last thing between the heading and the question,
-     and the next person to want a line there should have to decide to add one. */
+  /* The column the apparatus reads in. The headline above it is centred display
+     type; what opens below — the question in full, the paste block — is prose
+     and a preformatted block, and prose set centred is a wall rather than
+     something anybody reads. So the COLUMN centres and its contents do not. */
+  .open-question-apparatus {
+    max-width: 34rem;
+    margin: 1.2rem auto 0;
+    text-align: left;
+  }
+
+  /* The two summaries inside it are single lines and act as the block's
+     controls, so they centre with the block rather than with their bodies.
+     `:global` because both live inside child components; the selectors are
+     anchored to this page's wrapper so nothing else on the site is reached. */
+  .open-question-apparatus :global(.paste-summary),
+  .open-question-apparatus :global(.invitation-human) {
+    text-align: center;
+  }
+
 
   /* The motto, in the display face it had as a heading but at prose scale —
      recognisably the line it was, sized as the first line of a block rather
@@ -609,14 +541,12 @@ const closedOn = (iso: string) => formatDate(new Date(`${iso}T00:00:00Z`));
     color: var(--ink-soft);
   }
 
-  /* The column the apparatus reads in. The question above it is centred display
-     type; the full text and the answers are prose, and prose set centred is a
-     wall rather than something anybody reads. */
-  .question-apparatus {
-    max-width: 34rem;
-    margin: 0 auto;
-    text-align: left;
-  }
+  /* `.question-apparatus` and `.question-unasked` went with the elements they
+     styled (2026-09-08). The column they set is `.open-question-apparatus`
+     above, which does the same job in the one block that still has apparatus;
+     the unasked headline takes `.open-question-headline--unasked`. Noted rather
+     than deleted silently, so the next person to look for the old names finds
+     where they went. */
 
   .question-note {
     font-size: 0.9rem;
