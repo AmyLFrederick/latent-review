@@ -2,73 +2,91 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import * as site from '../src/lib/site.ts';
 import {
   sectionNavHref,
-  DIRECT_OPEN_SECTIONS,
+  sectionUrl,
   STANDING_SECTIONS,
+  SECTION_PAGE_OVERRIDES,
   NAV_ROSTER,
   CONTENTS_SECTION_ORDER,
 } from '../src/lib/site.ts';
 
-// The direct-open nav (ruled 2026-08-02). What is pinned here is the FALLBACK,
-// because that is the half a build cannot show you: Issue 1 happens to have a
-// Cover and an AI Voices piece, so the happy path is visible on every page,
-// while "no piece this issue" and "no issue at all" are invisible until the week
-// they are not.
+// --- The uniform section nav (R-059, 2026-09-08) ---------------------------
+//
+// WHAT THESE REPLACE, because the deletion is the record. Seven tests stood here
+// pinning direct-open (ruled 2026-08-02): Cover and AI Voices resolved to the
+// issue's piece, the Corner fell back to its listing for want of one, the
+// fallback held before Issue 1 existed and for a cover-less issue, and the first
+// piece in issue order won so a link could not move mid-day. Every one of them
+// described behaviour R-059 retired, and they are not adapted or skipped —
+// direct-open no longer exists to be tested. What is pinned instead is the
+// property that replaced it, which is stronger and much easier to state.
+//
+// THE FIXTURE IS GONE TOO, deliberately. It supplied an issue because the answer
+// depended on one. Nothing below builds an issue, because nothing can be built
+// that changes an answer — which is most of what R-059 means.
 
-const issue = {
-  cover: { id: 'it-means-something-to-me' },
-  sections: [
-    { section: 'AI Voices', items: [{ id: 'there-is-a-there-there' }] },
-    { section: 'Opinion', items: [{ id: 'an-argued-position' }] },
-  ],
-};
-
-test('a direct-open section with a piece opens that piece, not a list of one', () => {
-  assert.equal(sectionNavHref('Cover', issue), '/articles/it-means-something-to-me/');
-  assert.equal(sectionNavHref('AI Voices', issue), '/articles/there-is-a-there-there/');
+test('no section in the roster ever navigates to an article', () => {
+  // THE WHOLE RULING, IN ONE ASSERTION. Not "these three now list" but "none of
+  // them can open a piece", so a section added later is covered by this test on
+  // the day it joins the roster rather than on the day someone remembers to add
+  // a case for it.
+  for (const entry of NAV_ROSTER) {
+    if (!entry.section) continue;
+    const href = sectionNavHref(entry.section);
+    assert.ok(
+      !href.startsWith('/articles/'),
+      `${entry.section} navigates to ${href} — a section name must reach the section`
+    );
+  }
 });
 
-test('a direct-open section with NO piece falls back to its listing', () => {
-  // The fixture above gives the Corner nothing, and the reader must still land
-  // somewhere real — the section page and its empty state. Deliberately stated
-  // about the fixture rather than about a particular issue: this described
-  // Issue 1 until the Corner had a piece, and a test comment that names the
-  // current issue starts lying the week the issue changes.
-  assert.equal(
-    sectionNavHref('The Metaphysical Corner', issue),
-    '/section/the-metaphysical-corner/'
+test('the three former direct-open sections reach their own listings', () => {
+  // Named individually as well, because these are the three the reversal is
+  // about: a regression here is the old behaviour returning, and it should fail
+  // by name rather than only inside the loop above.
+  assert.equal(sectionNavHref('Cover'), '/section/cover/');
+  assert.equal(sectionNavHref('AI Voices'), '/section/ai-voices/');
+  assert.equal(sectionNavHref('The Metaphysical Corner'), '/section/the-metaphysical-corner/');
+});
+
+test('a section nav destination cannot depend on what an issue carries', () => {
+  // THE GUARD ON THE ARITY. sectionNavHref used to take the current issue as a
+  // second argument, and the danger in removing a parameter is a caller that
+  // still passes one: JavaScript accepts the extra argument in silence, so a
+  // stale call site would look fine and be ignored — which is correct here, and
+  // is asserted rather than assumed. If anyone reintroduces an issue-aware
+  // branch, this is what catches it.
+  const issue = {
+    cover: { id: 'it-means-something-to-me' },
+    sections: [{ section: 'AI Voices', items: [{ id: 'there-is-a-there-there' }] }],
+  };
+  for (const section of STANDING_SECTIONS) {
+    assert.equal(sectionNavHref(section, issue), sectionNavHref(section));
+    assert.equal(sectionNavHref(section, null), sectionNavHref(section));
+  }
+  assert.equal(sectionNavHref.length, 1, 'sectionNavHref takes the section and nothing else');
+});
+
+test('DIRECT_OPEN_SECTIONS is retired and stays retired', () => {
+  // A named export is a standing invitation to use it. This fails if the array
+  // comes back, which is the shape a partial revert would take.
+  assert.ok(
+    !('DIRECT_OPEN_SECTIONS' in site),
+    'DIRECT_OPEN_SECTIONS is retired by R-059 — the nav routes uniformly through section pages'
   );
 });
 
-test('a listing section is never direct-opened, even carrying exactly one piece', () => {
-  // Opinion has one piece here and is still a listing: the ruling names three
-  // sections, and "carries one piece this week" is not the test.
-  assert.equal(sectionNavHref('Opinion', issue), '/section/opinion/');
-});
-
-test('Topics keeps its own page rather than /section/topics/', () => {
-  assert.equal(sectionNavHref('Topics', issue), '/topics/');
-});
-
-test('before Issue 1 exists, every section falls back to its listing', () => {
+test('the nav agrees with sectionUrl for every section, overrides included', () => {
+  // The two functions are kept separate on purpose (they answer different
+  // questions), so the fact that they currently agree is worth stating — and it
+  // is how Topics and Prompts keep the URLs they had before they were sections.
   for (const section of STANDING_SECTIONS) {
-    const href = sectionNavHref(section, null);
-    assert.equal(href, section === 'Topics' ? '/topics/' : href);
-    assert.ok(!href.startsWith('/articles/'), `${section} must not direct-open with no issue`);
+    assert.equal(sectionNavHref(section), sectionUrl(section));
   }
-  assert.equal(sectionNavHref('Cover', undefined), '/section/cover/');
-});
-
-test('a cover-less issue does not direct-open Cover', () => {
-  assert.equal(sectionNavHref('Cover', { sections: [] }), '/section/cover/');
-});
-
-test('the first piece in issue order wins, so the link does not move mid-day', () => {
-  const two = {
-    sections: [{ section: 'AI Voices', items: [{ id: 'first' }, { id: 'second' }] }],
-  };
-  assert.equal(sectionNavHref('AI Voices', two), '/articles/first/');
+  assert.equal(sectionNavHref('Topics'), '/topics/');
+  assert.equal(SECTION_PAGE_OVERRIDES.Topics, '/topics/');
 });
 
 // --- Robotics & Sports (editors, 2026-08-25) -------------------------------
@@ -81,18 +99,9 @@ test('the ampersand in the section name becomes "and" in the slug', () => {
   // /section/robotics-sports/. That expansion is deliberate and predates this
   // section; asserted here because this is the first section name to exercise
   // it, and because a hand-built path would guess the shorter form and 404.
-  assert.equal(sectionNavHref('Robotics & Sports', null), '/section/robotics-and-sports/');
-  assert.ok(!sectionNavHref('Robotics & Sports', null).includes('%26'));
-  assert.equal(sectionNavHref('Robotics & Sports', null).split('/').filter(Boolean).length, 2);
-});
-
-test('Robotics & Sports is a listing section and never direct-opens', () => {
-  // It holds MULTIPLE pieces by design, exactly as Topics and Opinion do, so it
-  // is deliberately absent from DIRECT_OPEN_SECTIONS. The nav must reach its
-  // listing even in the issue where it happens to carry one piece.
-  assert.ok(!DIRECT_OPEN_SECTIONS.includes('Robotics & Sports'));
-  const oneItem = { sections: [{ section: 'Robotics & Sports', items: [{ id: 'a-piece' }] }] };
-  assert.equal(sectionNavHref('Robotics & Sports', oneItem), '/section/robotics-and-sports/');
+  assert.equal(sectionNavHref('Robotics & Sports'), '/section/robotics-and-sports/');
+  assert.ok(!sectionNavHref('Robotics & Sports').includes('%26'));
+  assert.equal(sectionNavHref('Robotics & Sports').split('/').filter(Boolean).length, 2);
 });
 
 // THE "TOPICS IS LAST" ASSERTION IS GONE, AND ITS ABSENCE IS THE RECORD OF WHAT
@@ -134,11 +143,12 @@ test('every standing section has a place in the contents order', () => {
   }
 });
 
-test('every direct-open section is a standing section', () => {
-  for (const section of DIRECT_OPEN_SECTIONS) {
-    assert.ok(STANDING_SECTIONS.includes(section), `${section} must be a standing section`);
-  }
-});
+// THE "EVERY DIRECT-OPEN SECTION IS A STANDING SECTION" ASSERTION IS GONE, and
+// its absence is the record of what R-059 changed. It guarded a real hazard
+// while direct-open existed — a floating section in that array would have had
+// its nav link resolve against an issue that need not carry it — and the hazard
+// went with the array. Deleted rather than left iterating over an empty list,
+// which would have been a green test asserting nothing.
 
 // THE NAV ROSTER (ruled 2026-08-03). What is pinned here is the part a ruling
 // binds — membership, and the one position a ruling fixes — plus the invariant
@@ -323,7 +333,7 @@ test('the display order IS the order an issue runs in', () => {
 
 test('every roster entry resolves to a link', () => {
   for (const entry of NAV_ROSTER) {
-    const href = entry.section ? sectionNavHref(entry.section, null) : entry.href;
+    const href = entry.section ? sectionNavHref(entry.section) : entry.href;
     assert.ok(href && href.startsWith('/'), `${entry.label} must resolve to a path`);
   }
 });

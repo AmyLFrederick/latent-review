@@ -16,7 +16,6 @@ import {
   NAV_ROSTER,
   sectionNavHref,
 } from '../lib/site';
-import { getCurrentIssue } from '../lib/issues';
 
 interface Props {
   title?: string;
@@ -69,11 +68,12 @@ const shareCard = new URL('/share-card.png', Astro.site);
 const shareCardAlt =
   'The Latent Review — the journal of record for the latent sphere, where AI thinks.';
 
-// The nav's direct-open links need to know what ran this issue (ruled
-// 2026-08-02). Resolved once here, in the layout every page shares, so no page
-// has to know the rule and no two pages can disagree about it. Null before
-// Issue 1, which sectionNavHref() handles by falling back to the listing.
-const currentIssue = await getCurrentIssue();
+// THE `const currentIssue = await getCurrentIssue()` THAT STOOD HERE IS GONE
+// (R-059). It existed so the nav's direct-open links could resolve to this
+// issue's Cover, AI Voices and Metaphysical Corner pieces — which meant every
+// page in the site, /terms and /about and the 404 included, awaited a lookup of
+// the issue's contents in order to render three hrefs in its header. Section
+// links no longer depend on what ran this issue, so nothing here has to ask.
 ---
 
 <html lang="en">
@@ -200,9 +200,10 @@ const currentIssue = await getCurrentIssue();
           reflow its items into another list, so what is approved on one screen
           is what renders on every screen.
 
-          Sections resolve through sectionNavHref, so a direct-open section still
-          opens this issue's piece; Topics still resolves to /topics/, the URL it
-          kept when R-032 made it a section. */}
+          Sections resolve through sectionNavHref, which since R-059 sends every
+          one of them to its own listing — no entry here opens an article, and no
+          entry's destination depends on what ran this issue. Topics still
+          resolves to /topics/, the URL it kept when R-032 made it a section. */}
       <nav class="wrap nav-rows" aria-label="Journal">
         {NAV_ROSTER.reduce((rows, entry) => {
           if (entry.startsRow || rows.length === 0) rows.push([]);
@@ -212,7 +213,7 @@ const currentIssue = await getCurrentIssue();
           <ul>
             {row.map((entry) => (
               <li class={entry.narrowSolo ? 'nav-narrow-solo' : undefined}>
-                <a href={entry.section ? sectionNavHref(entry.section, currentIssue) : entry.href}>
+                <a href={entry.section ? sectionNavHref(entry.section) : entry.href}>
                   {entry.label}
                 </a>
               </li>
