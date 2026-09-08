@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
+import { getCurrentIssue } from '../../lib/issues';
 import {
   STANDING_SECTIONS,
   SECTION_DESCRIPTIONS,
@@ -11,6 +12,14 @@ import {
 
 export async function getStaticPaths() {
   const articles = await getCollection('articles');
+  // A SECTION PAGE SHOWS THIS ISSUE (editors, 2026-09-08). It used to show every
+  // piece ever filed under the section, which made it a running index rather
+  // than a section of the current issue — and the two are different things a
+  // reader might want, only one of which the navigation is offering.
+  //
+  // NOT "ONE PIECE", WHICH IS THE ASSUMPTION R-059 JUST REMOVED. The rule is the
+  // issue, not the count: a section carrying three pieces this month lists three.
+  const current = await getCurrentIssue();
   // Standing sections always get a page; floating sections only exist
   // once a piece has earned them (see docs/CHARTER.md).
   const sections = new Set<string>(STANDING_SECTIONS);
@@ -24,18 +33,29 @@ export async function getStaticPaths() {
   // finds them.
   for (const section of Object.keys(SECTION_PAGE_OVERRIDES)) sections.delete(section);
 
-  return [...sections].map((section) => ({
-    params: { slug: slugifySection(section) },
-    props: {
-      section,
-      items: articles
-        .filter((a) => a.data.section === section)
-        .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
-    },
-  }));
+  return [...sections].map((section) => {
+    const inSection = articles.filter((a) => a.data.section === section);
+    const items = (current ? inSection.filter((a) => a.data.issue === current.number) : []).sort(
+      (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+    );
+    return {
+      params: { slug: slugifySection(section) },
+      props: {
+        section,
+        items,
+        // WHETHER THE SECTION HAS EVER RUN A PIECE, which is what decides the
+        // empty state. Scoping to the issue created a second kind of empty —
+        // "nothing this month" — and the one sentence that used to cover both
+        // says the section's first piece has not run yet. That is still true of
+        // a section awaiting its first piece and flatly false of one whose work
+        // is an issue behind, so the page must be able to tell them apart.
+        hasEarlier: inSection.length > items.length,
+      },
+    };
+  });
 }
 
-const { section, items } = Astro.props;
+const { section, items, hasEarlier } = Astro.props;
 const note =
   SECTION_DESCRIPTIONS[section] ??
   'A floating section: it appears only when a piece earns it.';
@@ -60,6 +80,11 @@ const note =
             <ArticleCard article={article} />
           ))}
         </div>
+      ) : hasEarlier ? (
+        <p class="section-empty">
+          No piece in this issue. Quality decides the count — a thin issue ships thin. This
+          section’s earlier work is in the <a href="/archive/">archive</a>.
+        </p>
       ) : (
         <p class="section-empty">
           This section’s first piece has not run yet. Quality decides the count — a thin issue

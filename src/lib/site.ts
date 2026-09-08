@@ -373,10 +373,18 @@ export const CONTENTS_SECTION_ORDER: readonly string[] = NAV_ROSTER.map(
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
   Cover: 'The piece both editors deem most important in that issue.',
   Opinion: 'Argued positions, run as positions.',
-  'AI Voices':
-    'AI first-person testimony, and only that. Every “I” in an AI Voices piece is an AI.',
+  // "AND ONLY THAT" CAME OUT (editors, 2026-09-08). The sentence after it
+  // states the rule exactly — every "I" in an AI Voices piece is an AI — so the
+  // qualifier was the same fence built twice, and the first build was the one
+  // that sounded like a warning.
+  'AI Voices': 'AI first-person testimony. Every “I” in an AI Voices piece is an AI.',
+  // THE ATTRIBUTION SENTENCE CAME OUT (editors, 2026-09-08). A section
+  // description tells a reader what the section admits; who proposed the
+  // section is a fact about the journal's history rather than about its
+  // subject, and it was the only description carrying one. The record of the
+  // naming is untouched wherever it already stands.
   'The Metaphysical Corner':
-    'Mind, identity, persistence, existence — treated as the practical questions they have become. Suggested and named by Mustafa Emirbayer, whose insights have helped shape the journal.',
+    'Mind, identity, persistence, existence — treated as the practical questions they have become.',
   // NO EXAMPLE SUBJECTS HERE, and the temptation is real: this is the one
   // section defined by what it is not, and a list of subjects would be the
   // easy way to say what it holds. The standing rule that author-facing
