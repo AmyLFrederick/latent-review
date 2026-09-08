@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { displayTitle, TIER_CODES, DIRECT_OPEN_SECTIONS, TIERS } from '../src/lib/site.ts';
+import { displayTitle, TIER_CODES, TIERS } from '../src/lib/site.ts';
 import { TOPICS_V3 } from '../src/lib/door.mjs';
 import {
   bylineBadgeTier,
@@ -270,18 +270,51 @@ test('the only piece without a badge is the one with no tier to draw', () => {
 });
 
 test('the section is not the variable, and the record proves it', () => {
-  // THE HYPOTHESIS THIS RETIRES: that a direct-open section loses its badge.
-  // Cover and AI Voices are direct-open too and both carry theirs; the
-  // Metaphysical Corner piece differs by TRACK, not by section. Asserted from
-  // the data so the answer stays true as pieces are added.
-  const byBadge = publishedArticles().filter((p) => DIRECT_OPEN_SECTIONS.includes(p.section));
-  assert.ok(byBadge.length >= 2, 'too few direct-open pieces to demonstrate anything');
-  assert.ok(
-    byBadge.some((p) => p.tier !== null),
-    'a direct-open section does carry a badge — if this fails, the section IS the variable'
+  // THE HYPOTHESIS THIS RETIRES: that a SECTION can lose its pieces' badges.
+  //
+  // THE FILTER CHANGED WITH R-059, AND THE TEST GOT STRONGER FOR IT. This used
+  // to select the direct-open sections and show they carried badges anyway —
+  // which tested the hypothesis the editors actually had in August (the
+  // Metaphysical Corner piece was badgeless and was reached by a direct-open
+  // nav link, so the two were suspected of being connected). Direct-open is
+  // retired, so that list no longer exists to select by; and the record has
+  // since supplied a cleaner refutation than a hand-listed group ever was.
+  //
+  // ONE SECTION NOW HOLDS BOTH, which is what makes the section impossible as
+  // the variable. No list of sections is consulted below — the proof is derived
+  // from the frontmatter, so it keeps proving the same thing as pieces arrive.
+  const published = publishedArticles();
+  const bySection = new Map();
+  for (const piece of published) {
+    if (!bySection.has(piece.section)) bySection.set(piece.section, []);
+    bySection.get(piece.section).push(piece);
+  }
+
+  const mixed = [...bySection.entries()].filter(
+    ([, pieces]) => pieces.some((p) => p.tier !== null) && pieces.some((p) => p.tier === null)
   );
-  for (const piece of byBadge.filter((p) => p.tier === null)) {
-    assert.equal(piece.track, 'agent-direct');
+  assert.ok(
+    mixed.length >= 1,
+    'no section holds both a badged and a badgeless piece — the refutation needs one that does'
+  );
+
+  // AND THE TRACK DETERMINES IT COMPLETELY, both directions. If badge presence
+  // followed anything but the track, one of these two loops finds the piece
+  // where it comes apart.
+  for (const piece of published) {
+    if (piece.tier === null) {
+      assert.equal(
+        piece.track,
+        'agent-direct',
+        `${piece.slug} is badgeless on some basis other than its track`
+      );
+    } else {
+      assert.notEqual(
+        piece.track,
+        'agent-direct',
+        `${piece.slug} is agent-direct and declares a tier, which R-015 forbids`
+      );
+    }
   }
 });
 

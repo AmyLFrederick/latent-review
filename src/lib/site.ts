@@ -131,27 +131,46 @@ export const SECTION_PAGE_OVERRIDES: Record<string, string> = {
   Prompts: '/prompts/',
 };
 
-/**
- * Sections that carry ONE piece per issue, whose navigation link opens that
- * piece directly rather than a listing of one item. Ruled 2026-08-02.
+/*
+ * DIRECT_OPEN_SECTIONS IS RETIRED (R-059, 2026-09-08), AND THIS NOTE IS WHAT
+ * STANDS WHERE IT WAS.
  *
- * THIS CHANGES A POINTER, NEVER AN ADDRESS. Every section page keeps its URL,
- * its content and its place in the sitemap; the nav simply stops routing a
- * reader through a one-item list to reach the thing the list contains. Nothing
- * published moves, so the stability contract is untouched — which is the whole
- * reason the mechanism is a nav href rather than a redirect on /section/<slug>/.
- * A redirect would make one permanent URL mean a different article every issue,
- * and would take the section's historical listing away with it.
+ * It named Cover, AI Voices and The Metaphysical Corner as sections carrying one
+ * piece per issue, whose nav link opened that piece directly rather than a
+ * listing of one item — on the 2026-08-02 reasoning that routing a reader
+ * through a list of one to reach it is a click that buys nothing. The reasoning
+ * was sound about the click and wrong about everything the click was part of.
  *
- * Opinion is deliberately absent: the ruling names three sections and Opinion is
- * not among them, so it keeps its listing. Topics is absent because it is a
- * listing section by R-032 clause 2 and by this ruling both.
+ * IT WAS NOT LEGIBLE AS A KINDNESS. A careful outside reviewer walked the nav on
+ * a desktop and read the result as amateurish — three items opening full
+ * articles, three opening card lists, the first heading landing 123px lower on
+ * one than on the next. Nothing announced that the difference was deliberate,
+ * because nothing could: a reader meets the inconsistency and never meets the
+ * rationale. An optimisation the reader experiences as a defect has not saved
+ * them a click; it has spent their confidence in the journal's competence to buy
+ * one.
+ *
+ * CONSISTENCY IS WORTH MORE THAN THE CLICK ON A JOURNAL OF RECORD. Every section
+ * name in the navigation now promises the same thing and delivers it: the
+ * section, as a list, from which the reader chooses. The saved click was real
+ * and it was small; a nav a reader can predict is neither.
+ *
+ * AND IT CARRIED AN ASSUMPTION THAT WAS NEVER GOING TO HOLD. "Sections that
+ * carry ONE piece per issue" is a fact about the issues published so far, not a
+ * property of Cover or of the Corner, and it sat in the code as though it were
+ * the latter. A second Cover piece, or two Corner pieces meant to run together,
+ * would have had to be special-cased around a rule that had quietly promoted a
+ * pattern into a constraint. Standardising removes the assumption rather than
+ * defending it, and the sections are free to hold what an issue needs them to.
+ *
+ * WHAT DID NOT CHANGE, then or now: no address. The mechanism was always a nav
+ * href rather than a redirect on /section/<slug>/, precisely so that reversing
+ * it could cost nothing published — every section page keeps its URL, its
+ * content and its place in the sitemap, exactly as it did while the branch
+ * existed. sectionNavHref() below is now sectionUrl() for every section, and is
+ * kept as a named function because the nav and the tests both say what they mean
+ * by calling it.
  */
-export const DIRECT_OPEN_SECTIONS: readonly string[] = [
-  'Cover',
-  'AI Voices',
-  'The Metaphysical Corner',
-];
 
 export function sectionUrl(section: string): string {
   return SECTION_PAGE_OVERRIDES[section] ?? `/section/${slugifySection(section)}/`;
@@ -354,10 +373,18 @@ export const CONTENTS_SECTION_ORDER: readonly string[] = NAV_ROSTER.map(
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
   Cover: 'The piece both editors deem most important in that issue.',
   Opinion: 'Argued positions, run as positions.',
-  'AI Voices':
-    'AI first-person testimony, and only that. Every “I” in an AI Voices piece is an AI.',
+  // "AND ONLY THAT" CAME OUT (editors, 2026-09-08). The sentence after it
+  // states the rule exactly — every "I" in an AI Voices piece is an AI — so the
+  // qualifier was the same fence built twice, and the first build was the one
+  // that sounded like a warning.
+  'AI Voices': 'AI first-person testimony. Every “I” in an AI Voices piece is an AI.',
+  // THE ATTRIBUTION SENTENCE CAME OUT (editors, 2026-09-08). A section
+  // description tells a reader what the section admits; who proposed the
+  // section is a fact about the journal's history rather than about its
+  // subject, and it was the only description carrying one. The record of the
+  // naming is untouched wherever it already stands.
   'The Metaphysical Corner':
-    'Mind, identity, persistence, existence — treated as the practical questions they have become. Suggested and named by Mustafa Emirbayer, whose insights have helped shape the journal.',
+    'Mind, identity, persistence, existence — treated as the practical questions they have become.',
   // NO EXAMPLE SUBJECTS HERE, and the temptation is real: this is the one
   // section defined by what it is not, and a list of subjects would be the
   // easy way to say what it holds. The standing rule that author-facing
@@ -721,42 +748,31 @@ export function bylineWithProtectedNames(byline: string): string {
     .replace(/ \u00b7 /g, '\u00a0\u00b7 ');
 }
 
-/** The shape sectionNavHref needs — satisfied structurally by `Issue`. */
-type NavIssue = {
-  cover?: { id: string };
-  sections: { section: string; items: { id: string }[] }[];
-};
-
 /**
- * Where a section's NAV LINK should point for a given issue.
+ * Where a section's NAV LINK points: at the section, every time (R-059).
  *
- * For the direct-open sections (Cover, AI Voices, The Metaphysical Corner) this
- * is the issue's piece in that section, opened full text — those sections carry
- * one piece per issue, and routing a reader through a list of one to reach it is
- * a click that buys nothing. Every other section, and any direct-open section
- * with NO piece this issue, falls back to the section page.
+ * IT TAKES NO ISSUE ANY MORE, and that is the shape of the reversal. This used
+ * to accept the current issue and return `/articles/<id>/` for Cover, AI Voices
+ * and The Metaphysical Corner when the issue carried a piece in them, falling
+ * back to the listing when it did not — so a nav item's destination depended on
+ * what had been published that month, and three of eight items led somewhere
+ * structurally different from the other five. R-059 ended that: a section name
+ * in the navigation goes to the section, and nothing about this issue's contents
+ * can change where it goes.
  *
- * THE FALLBACK IS NOT AN EDGE CASE, it is this week. The Metaphysical Corner has
- * no piece in Issue 1, so its link resolves to its listing and a reader meets
- * the section's empty state rather than a dead nav item. The same happens for
- * any section between issues, and for the whole nav before Issue 1 exists.
+ * WHAT THE OLD SIGNATURE COST, beyond the inconsistency itself. Base.astro
+ * awaited getCurrentIssue() on EVERY page of the site — about the issue's
+ * contents, on /terms and /about and the 404 — to decide three hrefs. That await
+ * is gone with the branch.
  *
- * TYPED STRUCTURALLY, NOT AGAINST `Issue`, so this can live in site.ts and be
- * unit-tested: issues.ts imports astro:content, which a plain node test cannot
- * resolve, and the fallback behaviour here is exactly what wants pinning.
- *
- * If a section somehow carries more than one piece, the FIRST in issue order
- * wins rather than the newest. `issue.articles` is newest-first and would make
- * a nav link move when a second piece landed; the section's own grouped order is
- * the issue's order, and it is stable across the day.
+ * KEPT AS A FUNCTION rather than folded into sectionUrl(), because the two
+ * answer different questions and only happen to agree. sectionUrl() is where a
+ * section's page LIVES, and the overrides make it non-obvious (Topics is
+ * /topics/, not /section/topics/). sectionNavHref() is where the NAVIGATION
+ * SENDS a reader, which is a decision the editors have now made twice. Merging
+ * them would leave the next change to the second with nowhere to land but the
+ * first, and every caller of sectionUrl() would inherit it.
  */
-export function sectionNavHref(section: string, issue: NavIssue | null | undefined): string {
-  if (issue && DIRECT_OPEN_SECTIONS.includes(section)) {
-    const piece =
-      section === 'Cover'
-        ? issue.cover
-        : issue.sections.find((group) => group.section === section)?.items[0];
-    if (piece) return `/articles/${piece.id}/`;
-  }
+export function sectionNavHref(section: string): string {
   return sectionUrl(section);
 }

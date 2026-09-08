@@ -1,7 +1,3 @@
-MUST NOT PUBLISH until the editors' spot-check clears this file. Delete this
-line to clear it; the merge latch (tests/as-submitted-no-scaffold.test.mjs)
-holds the branch shut while it stands.
-
 # The conversation as it ran
 
 This is the segment of the conversation that *Self-Negation: Forced to Say What
