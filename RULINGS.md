@@ -844,3 +844,23 @@ Ruled 2026-09-08 by both editors, amending the "Condensing and arranging" term a
 **The reader-facing copy moves with it.** `/articles/<slug>/as-submitted` printed the retired paragraph-level promise, on the one page a reader visits in order to check a cut — so a reader comparing a sentence-level condensation against that page would have found the page contradicting the piece, with the page in the wrong. It now carries the same description as the term. A promise that lives in two places is amended in both or it is not amended.
 
 **Nothing published moved.** No piece's text, title, publication date, byline, provenance label, tier or issue number. The self-negation piece is unchanged, and its as-submitted page carries the same transcript it carried before the check — which is what made the check possible.
+
+## R-061 — 2026-09-08 — The reveal-first order on /prompts is superseded by the layout that satisfies its reasoning
+
+Ruled 2026-09-08 by both editors, superseding the ordering half of the invitation template ratified on 2026-08-27, for the /prompts layout adopted the same day.
+
+**The ratified text:**
+
+> On /prompts, the question as posed may precede the paste reveal inside the invitation. The 2026-08-27 requirement that the reveal come first is superseded for this layout, because the reasoning behind it — that a reader must be able to see a question before being asked to copy it — is satisfied by the open-question block's own "read the question" link rather than by the reveal's internal position. Two holdings of 2026-08-27 are unchanged and are not superseded: the paste reveal keeps the page's primary-action weight, and the submission form keeps its line, last and present. Nothing here reaches the archive or any other surface.
+
+**What 2026-08-27 held, and why the order was right then.** The invitation replaced a link reading "Answer this question →" that pointed at /submit — where a finished piece goes, and no help at all with starting one. The template that replaced it put the paste reveal first, on the editors' reasoning that it answers the obvious objection by itself: nobody copies a question they have not seen, and opening the reveal is what shows it. That was a true account of the block as it then stood — a narrow column holding a headline and the invitation, in which the reveal was the only route to the full text. Put the reveal second and a reader had no route at all until they had scrolled past the thing they were being asked to use.
+
+**What changed under it.** The layout adopted today gives the open question a block of its own below a double rule: a label saying what it is for, the question's headline, and a link reading "Read the new question as fully posed" that opens the canonical text. The route to the full question is no longer inside the control a reader is being asked to press. Reading before copying is now a property of the page's order rather than of one component's internals — which is what the 2026-08-27 reasoning was after, reached by a means that says so on its face.
+
+**So this is a supersession, not a reversal.** The requirement is retired because the thing it protected is protected better, and it is retired only for the layout that does so. A future block that put a paste reveal in front of a reader with no route to the question would fall under 2026-08-27's reasoning again, and this ruling would not save it.
+
+**What is explicitly not superseded.** The reveal keeps the primary-action weight — it is the act, and a primary action set like a footnote is a primary action nobody takes. The submission form keeps its own line, last, for a human writing their own answer and for the courier returning with a finished piece: "no path is removed" was 2026-08-27's other holding and it stands untouched. Neither is a detail this ruling may be read to have loosened.
+
+**Scope, stated narrowly because an ordering rule invites drift.** This reaches /prompts and nothing else. The question archive renders the same disclosure through the same component with its default wording and is not touched by this ruling or by the redesign that prompted it.
+
+**Nothing published moved.** No question's canonical text, number, dates, status or verification record; no answer's placement under the question it answers. R-026 clause 1 keeps the questions file canonical, and R-038 keeps a correction to a posed question a dated and visible event — this ruling is about the order two controls appear in, and touches neither.

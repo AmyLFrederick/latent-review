@@ -609,14 +609,23 @@ test('the invitation is rendered only for a question still taking answers', () =
   // the as-posed disclosure alone.
   //
   // THE GUARD IS UNCHANGED BY THE 2026-09-08 REDESIGN; only the shape around it
-  // is. The assertion no longer matches the exact one-line <FullQuestion> call,
-  // which now carries a summary and a centred flag — matching a whole call
-  // signature made this test fail on presentation and say nothing about the
-  // guard. What is pinned is the branch: the invitation on `open`, the bare
-  // disclosure otherwise.
+  // is. This used to match the whole one-line <FullQuestion question={current} />
+  // call, which now carries a summary and a centred flag and wraps across four
+  // lines — so the assertion failed on a line break and said nothing whatever
+  // about the guard. Pinning a formatter's output is not pinning a rule.
+  //
+  // WHAT IS PINNED IS THE BRANCH: the invitation on `open`, and on any other
+  // status a disclosure of `current` and no invitation with it.
   const page = promptsTemplate();
   assert.match(page, /current\.status === 'open' \? \(\s*<QuestionInvitation/);
-  assert.match(page, /\) : \(\s*<FullQuestion question=\{current\}/);
+
+  const closedBranch = page.slice(page.indexOf("current.status === 'open' ?"));
+  const elseArm = closedBranch.slice(closedBranch.indexOf(') : ('), closedBranch.indexOf(')}'));
+  assert.match(elseArm, /<FullQuestion[\s\S]*?question=\{current\}/, 'the closed branch no longer shows the question as posed');
+  assert.ok(
+    !elseArm.includes('QuestionInvitation'),
+    'a closed question is offered an invitation to answer it'
+  );
 });
 
 test('the invitation belongs to one question, and the page says which', () => {
@@ -677,28 +686,45 @@ test('the invitation holds the ratified order, in one place', () => {
   // component rather than three elements on the page because one ratified
   // order split across two files is two places to get it wrong.
   //
-  // ONE PAIR OF THIS ORDER SWAPPED ON 2026-09-08, and the swap is the reason
-  // this comment is longer than the test. 2026-08-27 ratified the reveal FIRST
-  // — paste block, then the question as posed — on the reasoning that nobody
-  // copies a question they have not seen, and opening the paste block is what
-  // shows it. That reasoning was about a block in a narrow column with nothing
-  // above it but a headline: the reveal was the only route to the full text, so
-  // it had to lead or there was no route.
+  // THE PAIR SWAPPED UNDER R-061 (2026-09-08), which supersedes the ordering
+  // half of the 2026-08-27 template and says why. 2026-08-27 ratified the
+  // reveal FIRST — paste block, then the question as posed — on the reasoning
+  // that nobody copies a question they have not seen, and opening the paste
+  // block is what shows it. That was a true account of a block in a narrow
+  // column with nothing above it but a headline: the reveal was the only route
+  // to the full text, so it had to lead or there was no route at all.
   //
-  // The redesign gives the open question a block of its own with the disclosure
-  // named on its face ("Read the new question"), so reading before copying is
-  // now the order of the PAGE rather than a property of one control — which is
-  // what the 2026-08-27 reasoning was after. The primary-action weight stays on
-  // the paste reveal, where that ruling put it.
+  // R-061's holding is that the reasoning is satisfied by other means in this
+  // layout — the open-question block carries its own "read the question" link,
+  // so reading before copying is a property of the PAGE's order rather than of
+  // one component's internals. It is a supersession scoped to this layout, not
+  // a general licence: a block that put a reveal in front of a reader with no
+  // route to the question would fall under 2026-08-27's reasoning again.
   //
-  // WHAT DID NOT MOVE: the submission form is still last, and still present.
-  // "No path is removed" was 2026-08-27's other holding and is untouched.
+  // WHAT R-061 EXPLICITLY DOES NOT TOUCH, and what the second assertion below
+  // is therefore still guarding: the primary-action weight stays on the reveal,
+  // and the submission form is still last and still present.
   const source = readFileSync('src/components/QuestionInvitation.astro', 'utf8');
   const reveal = source.indexOf('<PasteBlock');
   const posed = source.indexOf('<FullQuestion');
   const human = source.indexOf('invitation-human');
   assert.ok(posed > 0 && reveal > posed, 'the reveal no longer follows the as-posed disclosure');
   assert.ok(human > reveal, 'the submission-form line no longer comes last');
+
+  // The two holdings R-061 carries forward unchanged, asserted rather than
+  // described — a supersession that quietly took more than it said it took is
+  // the failure this pins. `lead` is what gives the reveal the accent-mono
+  // weight it inherited from the call to action it replaced.
+  assert.match(
+    source.slice(reveal, human),
+    /lead=\{true\}/,
+    'the paste reveal lost the primary-action weight R-061 leaves it'
+  );
+  assert.match(
+    source.slice(human),
+    /href="\/submit\/"/,
+    'the submission-form line no longer reaches the submission form'
+  );
 });
 
 test('the old submission-form call to action is gone from the open question', () => {

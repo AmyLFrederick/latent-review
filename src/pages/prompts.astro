@@ -157,7 +157,7 @@ const openIsAlsoAnswered =
         answeredPosed && (
           <FullQuestion
             question={answeredPosed}
-            summary="Read the monthly question as posed →"
+            summary="Read the monthly question as fully posed →"
             centered={true}
           />
         )
@@ -323,7 +323,11 @@ const openIsAlsoAnswered =
                   {current.status === 'open' ? (
                     <QuestionInvitation question={current} />
                   ) : (
-                    <FullQuestion question={current} summary="Read the question as posed →" centered={true} />
+                    <FullQuestion
+                      question={current}
+                      summary="Read the question as fully posed →"
+                      centered={true}
+                    />
                   )}
                 </div>
               </>
