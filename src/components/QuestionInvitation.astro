@@ -14,15 +14,30 @@ import { questionPasteBlock, questionLabel } from '../lib/prompts.mjs';
 // Question are written by a chat AI that a human passes the question to, and
 // until now nothing on this site handed that human anything to pass.
 //
-// THE ORDER IS THE MEANING (editors, 2026-08-27):
+// THE ORDER IS THE MEANING (editors, 2026-08-27), AND ONE PAIR OF IT SWAPPED
+// IN THE REDESIGN OF 2026-09-08:
 //
-//   1. the paste block — how the writing STARTS, and the primary action
-//   2. the question as posed — the canonical text, unchanged and still one click
+//   1. the question as posed — the canonical text, one click behind its link
+//   2. the paste block — how the writing STARTS, and still the primary action
 //   3. the submission form — where a FINISHED piece goes
 //
-// THE REVEAL MAY LEAD BECAUSE IT CARRIES THE QUESTION IN FULL. That was the
-// editors' own reasoning and it answers the obvious objection: nobody copies a
-// question they have not seen, because opening the block is what shows it.
+// WHAT 2026-08-27 RATIFIED, AND WHY IT READ THAT WAY THEN. The reveal led, on
+// the editors' reasoning that it answers the obvious objection by itself:
+// nobody copies a question they have not seen, and opening the paste block is
+// what shows it. That was true of a block standing in a narrow column with
+// nothing above it but a headline — the paste reveal was the only route to the
+// full text, so it had to come first or the reader had no route at all.
+//
+// WHY THE PAIR SWAPPED. The redesign gives the open question a block of its
+// own with the disclosure named on its face — "Read the new question" — so the
+// route to the full text is no longer inside the thing a reader is being asked
+// to copy. Reading before copying is now the order of the page rather than a
+// property of one control, which is what the 2026-08-27 reasoning was after.
+// The primary-action weight stays on the paste reveal, where that ruling put
+// it; only the two lines' positions changed.
+//
+// THE SUBMISSION FORM STILL COMES LAST, and it is still here at all, because
+// 2026-08-27's other holding was that no path is removed.
 //
 // NO PATH IS REMOVED. The submission form keeps its line — for a human writing
 // their own answer, and for the courier coming back with a finished piece — and
@@ -41,31 +56,45 @@ const { question } = Astro.props;
 
 <section class="invitation" aria-label={`How to answer ${questionLabel(question)}`}>
   {/*
-    NO PRINTED LABEL, BECAUSE THE COLUMN IS THE LABEL (editors, 2026-08-27).
-    One build carried a heading here reading "Answer Monthly Question No. 2".
-    It was invented for a version of this block that stood full width between
-    two questions, where nothing else said which question it was for. Inside
-    the open question's own column, under that column's "Now open · Issue
-    No. 2", it says a second time what the reader can already see.
+    NO PRINTED LABEL, BECAUSE THE BLOCK AROUND IT IS THE LABEL (editors,
+    2026-08-27, restated for the 2026-09-08 layout). One build carried a heading
+    here reading "Answer Monthly Question No. 2". It was invented for a version
+    of this block that stood full width between two questions, where nothing
+    else said which question it was for. It said a second time what the reader
+    could already see then, inside the open question's own column, and it would
+    say it a second time now, under "Open question for the next issue" and that
+    question's headline.
 
     THE ACCESSIBLE NAME STAYS, on the section itself, because a screen-reader
-    user moving by region does not have the column to look at.
+    user moving by region has neither the column nor the headline to look at.
   */}
 
   {/*
-    THE WHOLE RATIFIED SENTENCE IS THE CLICK TARGET, not a lead-in above one.
-    It briefly rendered as a paragraph plus a shorter summary, which read fine
-    and made half of a two-sentence instruction unclickable — "Click to open"
-    sitting under a question the reader could not press.
+    THE CANONICAL TEXT FIRST (2026-09-08). It is the same disclosure the archive
+    and the page header open, named here for the question it belongs to so that
+    two disclosures on one page are told apart by their labels rather than by
+    where a reader happens to be looking.
+  */}
+  <FullQuestion question={question} summary="Read the new question as fully posed →" centered={true} />
+
+  {/*
+    THE WHOLE SENTENCE IS THE CLICK TARGET, not a lead-in above one (ratified
+    2026-08-27). It briefly rendered as a paragraph plus a shorter summary,
+    which read fine and made half of a two-sentence instruction unclickable —
+    "Click to open" sitting under a question the reader could not press.
+
+    "CLICK HERE", NOT "CLICK TO" (editors, 2026-09-08). The wording names the
+    act at the place a reader presses, and the place is the whole line: the
+    summary of a <details> is clickable end to end. Nothing here makes only
+    those two words pressable; the phrasing says out loud what the control
+    already was.
   */}
   <PasteBlock
     text={questionPasteBlock(question)}
-    summary="Want your AI to answer? Click to open the question, copy it, and paste it into any chat."
+    summary="Want your AI to answer? Click here to open the question, copy it, and paste it into any chat."
     buttonLabel="Copy the question"
     lead={true}
   />
-
-  <FullQuestion question={question} />
 
   <p class="invitation-human">
     Answering it yourself?{' '}

@@ -607,17 +607,49 @@ test('the invitation is rendered only for a question still taking answers', () =
   // while it still leads the page (R-039). An invitation under it would
   // contradict the "Closed." note printed inches above; a closed question keeps
   // the as-posed disclosure alone.
+  //
+  // THE GUARD IS UNCHANGED BY THE 2026-09-08 REDESIGN; only the shape around it
+  // is. This used to match the whole one-line <FullQuestion question={current} />
+  // call, which now carries a summary and a centred flag and wraps across four
+  // lines — so the assertion failed on a line break and said nothing whatever
+  // about the guard. Pinning a formatter's output is not pinning a rule.
+  //
+  // WHAT IS PINNED IS THE BRANCH: the invitation on `open`, and on any other
+  // status a disclosure of `current` and no invitation with it.
   const page = promptsTemplate();
   assert.match(page, /current\.status === 'open' \? \(\s*<QuestionInvitation/);
-  assert.match(page, /\) : \(\s*<FullQuestion question=\{current\} \/>/);
+
+  const closedBranch = page.slice(page.indexOf("current.status === 'open' ?"));
+  const elseArm = closedBranch.slice(closedBranch.indexOf(') : ('), closedBranch.indexOf(')}'));
+  assert.match(elseArm, /<FullQuestion[\s\S]*?question=\{current\}/, 'the closed branch no longer shows the question as posed');
+  assert.ok(
+    !elseArm.includes('QuestionInvitation'),
+    'a closed question is offered an invitation to answer it'
+  );
 });
 
-test('the invitation belongs to the open question’s column, not to the page', () => {
-  // COLUMN MEMBERSHIP IS THE MEANING (editors, 2026-08-27). This stood full
-  // width below the pair for one build, where it spanned both columns and read
-  // as belonging to both questions. It belongs to one. The answered column
-  // carries its headline, its as-posed disclosure and "Answers below." — and
-  // nothing that invites an answer.
+test('the invitation belongs to one question, and the page says which', () => {
+  // WHAT THIS TEST USED TO PIN, AND WHY THE ASSERTIONS CHANGED. It was "the
+  // invitation belongs to the open question's COLUMN, not to the page" (editors,
+  // 2026-08-27), written when two questions stood side by side: the invitation
+  // had once spanned both columns, where it read as belonging to both, and the
+  // fix was to put it inside one. So the test located the answered column by its
+  // class and asserted the invitation was not in it, and that it came before the
+  // answers list — both facts about a two-column layout.
+  //
+  // THE COLUMNS ARE GONE (redesign, 2026-09-08) and the ambiguity they created
+  // went with them. The open question now has a block of its own at the foot of
+  // the page, under a double rule and a label naming what it is for, with the
+  // answers to a different question above. The invitation cannot be read as
+  // belonging to both questions because the page no longer prints two questions
+  // as peers.
+  //
+  // SO THE INVARIANT IS RESTATED RATHER THAN DROPPED: rendered exactly once, and
+  // inside the labelled block for the question it invites answers to. The
+  // ordering assertion is inverted — the invitation now follows the answers,
+  // which is the redesign's whole shape — and it is asserted in the new
+  // direction rather than deleted, because "somewhere on the page" is not what
+  // this test is for.
   const page = promptsTemplate();
   assert.equal(
     (page.match(/<QuestionInvitation/g) ?? []).length,
@@ -625,33 +657,74 @@ test('the invitation belongs to the open question’s column, not to the page', 
     'the invitation is rendered more than once, or not at all'
   );
 
-  const answered = page.slice(
-    page.indexOf('question--answered'),
-    page.indexOf('question-answers-here')
+  const openBlock = page.slice(page.indexOf('<section'), page.indexOf('</section>'));
+  assert.ok(
+    openBlock.includes('QuestionInvitation'),
+    'the invitation left the open question’s block'
   );
   assert.ok(
-    !answered.includes('QuestionInvitation'),
-    'the answered question carries an invitation to answer it'
+    openBlock.includes('Open question for the next issue'),
+    'the block holding the invitation no longer says which question it is for'
   );
 
-  // Inside the pair, which on this page means before the answers list that
-  // follows it. A band below the pair would fail here.
   assert.ok(
-    page.indexOf('<QuestionInvitation') < page.indexOf('<QuestionAnswers'),
-    'the invitation left the question block'
+    page.indexOf('<QuestionAnswers') < page.indexOf('<QuestionInvitation'),
+    'the answers no longer come before the question now open'
+  );
+
+  // The one strong rule stands between them, which is what makes the order
+  // readable rather than merely sequential.
+  const rule = page.indexOf('double-rule');
+  assert.ok(
+    rule > page.indexOf('<QuestionAnswers') && rule < page.indexOf('<QuestionInvitation'),
+    'the double rule no longer separates the answers from the open question'
   );
 });
 
 test('the invitation holds the ratified order, in one place', () => {
-  // The act, then the record, then where a finished piece goes. It is one
+  // The record, then the act, then where a finished piece goes. It is one
   // component rather than three elements on the page because one ratified
   // order split across two files is two places to get it wrong.
+  //
+  // THE PAIR SWAPPED UNDER R-061 (2026-09-08), which supersedes the ordering
+  // half of the 2026-08-27 template and says why. 2026-08-27 ratified the
+  // reveal FIRST — paste block, then the question as posed — on the reasoning
+  // that nobody copies a question they have not seen, and opening the paste
+  // block is what shows it. That was a true account of a block in a narrow
+  // column with nothing above it but a headline: the reveal was the only route
+  // to the full text, so it had to lead or there was no route at all.
+  //
+  // R-061's holding is that the reasoning is satisfied by other means in this
+  // layout — the open-question block carries its own "read the question" link,
+  // so reading before copying is a property of the PAGE's order rather than of
+  // one component's internals. It is a supersession scoped to this layout, not
+  // a general licence: a block that put a reveal in front of a reader with no
+  // route to the question would fall under 2026-08-27's reasoning again.
+  //
+  // WHAT R-061 EXPLICITLY DOES NOT TOUCH, and what the second assertion below
+  // is therefore still guarding: the primary-action weight stays on the reveal,
+  // and the submission form is still last and still present.
   const source = readFileSync('src/components/QuestionInvitation.astro', 'utf8');
   const reveal = source.indexOf('<PasteBlock');
   const posed = source.indexOf('<FullQuestion');
   const human = source.indexOf('invitation-human');
-  assert.ok(reveal > 0 && posed > reveal, 'the as-posed disclosure no longer follows the reveal');
-  assert.ok(human > posed, 'the submission-form line no longer comes last');
+  assert.ok(posed > 0 && reveal > posed, 'the reveal no longer follows the as-posed disclosure');
+  assert.ok(human > reveal, 'the submission-form line no longer comes last');
+
+  // The two holdings R-061 carries forward unchanged, asserted rather than
+  // described — a supersession that quietly took more than it said it took is
+  // the failure this pins. `lead` is what gives the reveal the accent-mono
+  // weight it inherited from the call to action it replaced.
+  assert.match(
+    source.slice(reveal, human),
+    /lead=\{true\}/,
+    'the paste reveal lost the primary-action weight R-061 leaves it'
+  );
+  assert.match(
+    source.slice(human),
+    /href="\/submit\/"/,
+    'the submission-form line no longer reaches the submission form'
+  );
 });
 
 test('the old submission-form call to action is gone from the open question', () => {

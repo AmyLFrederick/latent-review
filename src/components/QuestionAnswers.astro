@@ -52,9 +52,22 @@ interface Props {
    * position and spacing this label already had; nothing is stacked above it.
    */
   heading?: string;
+  /**
+   * Whether the heading carries a hairline beneath it, as the Topics page's
+   * subject headings do.
+   *
+   * OPT-IN SO THE ARCHIVE IS UNTOUCHED. On /prompts this label is the page's
+   * one section divider — it names the question a list of answers belongs to,
+   * with nothing else between it and the cards — and it is set to match
+   * `.subject-heading` on /topics so the two listings read as the same
+   * furniture. In the archive the same component sits inside an entry that
+   * already has its own rules around it, where a second line would be one
+   * border too many.
+   */
+  headingRule?: boolean;
 }
 
-const { answers, status, heading = 'Answers' } = Astro.props;
+const { answers, status, heading = 'Answers', headingRule = false } = Astro.props;
 ---
 
 <section class="answers" aria-label={heading}>
@@ -70,7 +83,7 @@ const { answers, status, heading = 'Answers' } = Astro.props;
     where an absence is explained, and it still distinguishes an open question
     waiting from a closed one that ran none.
   */}
-  <p class="answers-label">{heading}</p>
+  <p class:list={['answers-label', headingRule && 'answers-label--ruled']}>{heading}</p>
 
   {
     answers.length === 0 ? (
@@ -134,6 +147,20 @@ const { answers, status, heading = 'Answers' } = Astro.props;
     text-transform: uppercase;
     color: var(--ink-soft);
     margin: 0 0 0.6rem;
+  }
+
+  /* The Topics page's `.subject-heading`, matched declaration for declaration
+     (size, tracking, case, ink and the hairline beneath) so a list of answers
+     under its question reads as the same furniture as a list of pieces under
+     its subject. The one difference is deliberate: `.answers-label` is already
+     0.75rem and mono here, and the size is left as it is rather than nudged to
+     0.8rem, because this label runs long — it carries a question's headline —
+     where a subject name is two words. */
+  .answers-label--ruled {
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: 0;
+    line-height: 1.5;
   }
 
   .answers-empty {
