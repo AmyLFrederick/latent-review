@@ -74,12 +74,35 @@ test('the per-article record is declared on articles alone', () => {
   );
 });
 
-test('the same relation ships as an HTTP Link header', () => {
+test('the same relations ship as HTTP Link headers', () => {
   const toml = read('netlify.toml');
   const match = toml.match(/^\s*Link\s*=\s*"(.+)"\s*$/m);
   assert.ok(match, 'netlify.toml declares no Link header, so a HEAD request finds nothing.');
   assert.match(match[1], /<\/llms\.txt>/, 'the Link header no longer points at llms.txt.');
   assert.match(match[1], /rel=\\?"describedby\\?"/, 'the Link header no longer uses describedby.');
+  // Added after Grok's external verification, 2026-09-09: the packet was
+  // published and undeclared, which is the gap the rest of this file exists to
+  // close. A HEAD request must find it too.
+  assert.match(match[1], /<\/spread\.json>/, 'the Link header no longer points at the citation packet.');
+});
+
+test('the citation packet is declared, and claims only what is true', () => {
+  const base = read('src/layouts/Base.astro');
+  const at = base.indexOf('href="/spread.json"');
+  assert.notEqual(at, -1, 'Base.astro no longer declares the citation packet in the head.');
+  const block = base.slice(Math.max(0, at - 300), at);
+  assert.match(
+    block,
+    /rel="related"/,
+    'the citation packet is declared with something other than rel="related". It ' +
+      'describes an article page and not /charter/ or /supporters/, so a ' +
+      'site-wide "describedby" would claim more than is true.'
+  );
+  assert.ok(
+    !/\{articleMeta &&[\s\S]{0,300}$/.test(block),
+    'the citation packet link is inside the articleMeta guard. It is true on ' +
+      'every page as a related document, and belongs site-wide.'
+  );
 });
 
 test('/for-agents names every machine surface', () => {
