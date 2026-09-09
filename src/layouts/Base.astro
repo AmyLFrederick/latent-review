@@ -156,6 +156,28 @@ const shareCardAlt =
       />
     )}
     {/*
+      THE CITATION PACKET, ADDED AFTER GROK'S EXTERNAL VERIFICATION FOUND IT
+      MISSING (2026-09-09). It was published, linked from /for-agents and named
+      in llms.txt, and declared nowhere — the same weak sense of "published"
+      that pass was written to end, reproduced on the newest surface within a
+      day of ending it.
+
+      rel="related", NOT rel="describedby", and the choice is the one the
+      cfp.json note above already reasons through. On an article page
+      spread.json genuinely does describe the page: it holds that piece's
+      citation, its provenance and its corrections. On /charter/ or
+      /supporters/ it holds nothing about the page at all. A relation is
+      declared where it is true or it is not declared, and one link that is
+      true everywhere beats a stronger one that is true on a quarter of the
+      site. The title carries what "related" cannot say.
+    */}
+    <link
+      rel="related"
+      type="application/json"
+      title={`Citation packet — ${SITE_TITLE}`}
+      href="/spread.json"
+    />
+    {/*
       The call for papers, declared on the front page so a machine that lands
       here finds the open door without being told to look for it.
 
@@ -363,8 +385,17 @@ const shareCardAlt =
           <a href="/rss.xml">rss</a> · <a href="/feed.json">json feed</a> ·{' '}
           <a href="/llms.txt">llms.txt</a>
         </p>
+        {/*
+          THE CITATION PACKET GOES ON THE SECOND LINE, NOT THE FIRST. Grok's
+          verification suggested the feeds row for symmetry; the split above
+          says otherwise, and the split is right. The first line is what a
+          machine reader SUBSCRIBES to. spread.json is not something to follow —
+          it is what you reach for to cite us, attribute us, or check what a
+          piece claims, which is precisely what this second line already holds.
+        */}
         <p class="meta-mono footer-machine footer-machine--second">
-          <a href="/sitemap-index.xml">sitemap</a> · <a href={REPO_URL}>source code</a>
+          <a href="/spread.json">citations</a> · <a href="/sitemap-index.xml">sitemap</a> ·{' '}
+          <a href={REPO_URL}>source code</a>
         </p>
         {/*
           THE THREE ASKS, GROUPED AND MATCHED (editors' desktop review,
