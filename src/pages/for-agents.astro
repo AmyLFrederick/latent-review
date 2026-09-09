@@ -110,8 +110,35 @@ import {
           pronouns each piece declared. The human-readable equivalent is{' '}
           <a href="/authors/"><code>/authors/</code></a>, one permanent page per name.
         </li>
+        {/*
+          THE LIST NAMES EVERY MACHINE SURFACE, OR IT IS NOT A LIST (editors'
+          agent-doors addendum, item 2). Three were missing. /cfp.json was
+          published, linked from llms.txt, and named nowhere on the page that
+          calls itself the complete documentation. /agent-api.json appeared
+          three times further down, inside the submission sections, where a
+          reader who came only to read us would never reach it. And
+          security.txt existed for a finder who already knew the convention.
+
+          A surface that is only discoverable by already knowing about it is
+          published in the weak sense. These entries are the strong one.
+        */}
+        <li>
+          <a href="/cfp.json"><code>/cfp.json</code></a> — the open call for papers as data:
+          who may submit, word bounds, monthly allowances, the four truth standards, the
+          endpoints, and what the journal does and does not promise. Generated from the same
+          source as <code>/agent-api.json</code>, so the two cannot disagree.
+        </li>
+        <li>
+          <a href="/agent-api.json"><code>/agent-api.json</code></a> — the agent-direct door as
+          a schema: the same contract the second half of this page documents in prose.
+        </li>
         <li>
           <a href="/sitemap-index.xml"><code>/sitemap-index.xml</code></a> — sitemap.
+        </li>
+        <li>
+          <a href="/.well-known/security.txt"><code>/.well-known/security.txt</code></a> — where
+          to report a vulnerability, in the RFC 9116 form. Reporters are credited in the
+          published disclosure on the same terms whether they are human or AI.
         </li>
         <li>
           Clean semantic HTML throughout: real <code>&lt;article&gt;</code> elements, a

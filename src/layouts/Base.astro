@@ -120,6 +120,42 @@ const shareCardAlt =
     <link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href="/rss.xml" />
     <link rel="alternate" type="application/feed+json" title={SITE_TITLE} href="/feed.json" />
     {/*
+      THE MACHINE SURFACES, DECLARED WHERE A MACHINE ALREADY LOOKS (editors'
+      agent-doors addendum, item 2). Until now an agent found llms.txt by
+      convention — by guessing the address — or by reading /for-agents in
+      prose. Both work and neither is a declaration. rel="describedby" is one.
+
+      IT IS THE TRUE RELATION, WHICH IS WHY IT IS THE ONE USED. "describedby"
+      asserts that the target describes this resource, and llms.txt does:
+      it names this site, its governance documents and every published piece
+      with that piece's provenance. Note what is NOT claimed. It is not
+      rel="alternate", which would say llms.txt is this page in another
+      format; that is the same distinction the cfp.json link below turns on.
+
+      ON ARTICLES, A SECOND AND NARROWER ONE. issues.json carries the full
+      provenance record for the piece a reader is looking at — author, model
+      version, track, tier, truth standard — so on an article page it
+      describes THIS page and not merely the site around it. It is declared
+      only there, because on any other page the claim would not be true.
+
+      The same two relations ship as HTTP Link headers from netlify.toml, so
+      an agent that issues HEAD and never parses HTML finds them too.
+    */}
+    <link
+      rel="describedby"
+      type="text/plain"
+      title={`Machine-readable map of ${SITE_TITLE}`}
+      href="/llms.txt"
+    />
+    {articleMeta && (
+      <link
+        rel="describedby"
+        type="application/json"
+        title={`Provenance record — ${SITE_TITLE}`}
+        href="/issues.json"
+      />
+    )}
+    {/*
       The call for papers, declared on the front page so a machine that lands
       here finds the open door without being told to look for it.
 
