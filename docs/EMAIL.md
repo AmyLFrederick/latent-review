@@ -63,24 +63,33 @@ Notes:
 
 The subscriber email is a **digest**, not the articles (editors' decision,
 dual-yes 2026-07-18): the web is canonical, the email is the doorbell. Top to
-bottom it is the editors' note, then Cover, AI Voices, and Opinion — each
-piece as its section eyebrow, title, **dek**, byline with provenance tier, and
-a link to its permanent URL. Sections empty in a given issue are simply
-omitted. A quiet "Support the journal" link closes the column, above the
-unsubscribe footer.
+bottom it is the editors' note, then **every section holding a piece** — each
+piece as its section eyebrow, title, excerpt, byline with provenance tier, and
+a link to its permanent URL. A quiet "Support the journal" link closes the
+column, above the unsubscribe footer.
 
-**Deks, not first paragraphs** — editors' decision, dual-yes 2026-08-13,
-superseding that part of the founding decision above. A first paragraph shows
-where a piece starts; a dek says what reading it gets you. The dek is the
-editors' own summary as already published on the piece's page: the digest
-reuses it and never writes one. **A piece in a digest section with no dek stops
-the run by name, on the dry run** — the script will not fall back to a first
-paragraph and will not summarise a piece itself. Write the dek into the piece's
-frontmatter, deploy, and re-run.
+**Every piece in the issue is in the mail.** The digest carries no section
+allow-list; nothing is filtered out. The order is the issue page's own — cover
+first, then the standing sections in their ruled order, then any floating
+section alphabetically — so a reader following a link meets the pieces in the
+sequence the mail put them in. The script asserts the walk is total and stops
+rather than send a digest that quietly lost a piece.
+
+**The authors' own words, never a summary** — editors' dual-yes 2026-09-02,
+superseding the 2026-08-13 decision to print deks. Read against a finished
+issue the editors preferred the piece's own opening to the editors' summary of
+it, in the one mail an issue gets. So the script prints no sentence it wrote
+itself: not a dek, not a summary, not a trimmed excerpt. Every word between a
+title and a byline is the author's, read out of the piece and sliced only at
+boundaries the editors named. Those boundaries live in an excerpt manifest
+passed on the command line — `--excerpts docs/digests/issue-N-excerpts.json`,
+a `from`/`to` pair of exact anchors per slug, which the script fails on if
+either anchor is not in the piece. Where a piece has no entry, its opening
+paragraph runs. **The dek halt is gone with the deks** — a piece without one no
+longer stops the run, and nothing warns about copy the mail does not use.
 
 The script reads the **live site** (`/issues.json`), so a digest can only ever
-link to what is actually published, and can only ever print a dek that is live
-on the piece's page. Deploy the issue first, then send:
+link to what is actually published. Deploy the issue first, then send:
 
 1. Write the editors' note for the issue — 1–3 plain sentences of Markdown, no
    headings (the subject line is generated). Authored fresh by the editors
@@ -88,14 +97,19 @@ on the piece's page. Deploy the issue first, then send:
    committed: it is the only part of the digest that cannot be reconstructed
    from the site afterwards, so a note that lives only on a laptop is a record
    of what the list was told that the journal does not have.
-2. Dry run and read the output:
-   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md`
+2. Name the excerpt passages, where the opening paragraph is not the right one.
+   `docs/digests/issue-N-excerpts.json`, a `from`/`to` pair of exact anchors per
+   slug, with underscore-prefixed keys for prose the JSON cannot otherwise hold.
+   Omitting the flag is not an error and is not a warning — every piece simply
+   runs its opening paragraph — so this is the step that is silent when skipped.
+3. Dry run and read the output:
+   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --excerpts docs/digests/issue-N-excerpts.json`
    (add `--html-out digest.html` to preview the HTML in a browser).
-3. Inbox proof — read the digest as a subscriber reads it, in a real inbox,
-   and check rendering, links, tiers, and deks:
-   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --to you@example.com`
-4. Real send, still manual, still capped:
-   `node scripts/send-issue.mjs --issue N --note docs/issue-notes/issue-N.md --live`
+4. Inbox proof — read the digest as a subscriber reads it, in a real inbox,
+   and check rendering, links, tiers, and excerpts:
+   `node scripts/send-issue.mjs ... --to you@example.com`
+5. Real send, still manual, still capped:
+   `node scripts/send-issue.mjs ... --live`
 
 ### `--to` versus `--test`
 

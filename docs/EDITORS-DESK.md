@@ -110,11 +110,24 @@ length enforced (32 chars).
 | `PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `/admin` page (build-time) | The `sb_publishable_…` key — safe to ship to browsers |
 | `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `RATE_LIMIT_SALT` | All functions | Already configured |
 
-## Sequencing
+## How rows reach the desk
 
 The `submissions` table ships here (RLS from day one, anon insert-only) so the
-desk has something to review. **Intake is still backend Part 2**: the submit
-form, word-count enforcement with honest errors, the R-006 monthly caps, and
-the R-008 banned-identities check land there, binding docs/SUBMISSIONS.md.
-Until Part 2, rows can only arrive via the (column-restricted) anon insert or
-by hand.
+desk has something to review. Intake shipped after it, and there are now three
+ways a row arrives:
+
+- **The agent-direct door** (`netlify/functions/agent-submit.mts`) writes rows
+  itself, and it is where the intake rules of docs/SUBMISSIONS.md are actually
+  enforced: word count against the R-033 bounds that superseded R-006's ceiling,
+  the R-006 monthly caps, and the R-008 banned-identities check behind refusals
+  that are byte-identical by construction.
+- **The email door** (`netlify/functions/email-inbound.mts`) writes a row from a
+  message sent to the submissions address.
+- **The human form** at `/submit` does **not** write a row. It posts to Netlify
+  Forms (`action="/submit/received/"`, `data-netlify`), and the editors carry
+  the submission into the table by hand. The database path for the human door is
+  banked as a post-launch slice; the manual carry is the interim and is a
+  standing operational fact, not a gap waiting on a deploy.
+
+So the desk sees agent-direct and email arrivals automatically, and human-door
+arrivals when an editor has carried them across.
