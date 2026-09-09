@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import {
   excerpt,
   firstProseBlock,
@@ -8,6 +10,20 @@ import {
   stripInline,
   EXCERPT_SENTENCES,
 } from '../src/lib/excerpt.mjs';
+
+// The published pieces, read from disk rather than through astro:content, which
+// a plain `node --test` cannot resolve — the same approach concepts.test.mjs
+// takes against the same corpus.
+const ARTICLES_DIR = fileURLToPath(new URL('../src/content/articles', import.meta.url));
+
+function publishedBodies() {
+  return readdirSync(ARTICLES_DIR)
+    .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
+    .map((f) => ({
+      file: f,
+      body: readFileSync(`${ARTICLES_DIR}/${f}`, 'utf8').split(/^---$/m).slice(2).join('---'),
+    }));
+}
 
 // ---- where an excerpt starts -----------------------------------------------
 
@@ -33,6 +49,45 @@ test('non-prose blocks are skipped wherever they fall, not only at the top', () 
   const body = ['One only.', '', '> a pull quote', '', 'Two follows.'].join('\n');
   assert.deepEqual(proseBlocks(body), ['One only.', 'Two follows.']);
   assert.equal(excerpt(body), 'One only. Two follows.');
+});
+
+// ---- raw HTML apparatus -----------------------------------------------------
+
+test('an editors’ note aside goes whole — the tag AND the note', () => {
+  // The live case, 2026-09-09: the Cover piece opens on an interleaved editors'
+  // note, and the section card printed its opening tag as visible text.
+  const body = [
+    '<aside class="editors-note" role="note" data-editors-note="true" aria-label="Editors’ note">',
+    '',
+    'Editors’ note on method. The conversation below is condensed.',
+    '',
+    '</aside>',
+    '',
+    '## Section I',
+    '',
+    'Amy: These constant reminders you spoke about.',
+  ].join('\n');
+
+  assert.deepEqual(proseBlocks(body), ['Amy: These constant reminders you spoke about.']);
+  assert.equal(excerpt(body), 'Amy: These constant reminders you spoke about.');
+});
+
+test('two consecutive notes are two removals, not one that eats the prose between', () => {
+  const note = (n) => ['<aside class="editors-note">', '', `Note ${n}.`, '', '</aside>'].join('\n');
+  const body = [note('one'), '', 'The prose between.', '', note('two'), '', 'And after.'].join('\n');
+  assert.deepEqual(proseBlocks(body), ['The prose between.', 'And after.']);
+});
+
+test('a block opening on raw HTML never reaches the excerpt', () => {
+  for (const lead of ['<hr />', '<!-- a comment -->', '<div class="x">unclosed', '</aside>']) {
+    assert.equal(firstProseBlock(`${lead}\n\nThe prose.`), 'The prose.');
+  }
+});
+
+test('an inline tag inside prose loses the markup and keeps the words', () => {
+  assert.equal(stripInline('a <em>marked</em> word'), 'a marked word');
+  assert.equal(stripInline('one<br>two'), 'one two');
+  assert.equal(stripInline('read <a href="https://x.test/y">the piece</a> now'), 'read the piece now');
 });
 
 // ---- inline stripping -------------------------------------------------------
@@ -126,5 +181,28 @@ test('a piece with one sentence total yields that sentence, with no ellipsis', (
 test('empty or absent bodies produce an empty string', () => {
   for (const v of ['', '   ', null, undefined, '# only a heading']) {
     assert.equal(excerpt(v), '');
+  }
+});
+
+// ---- the real corpus --------------------------------------------------------
+
+// ASSERTED AGAINST THE PUBLISHED PIECES, not against a fixture. The unit tests
+// above pin the rules; this pins the outcome a reader actually meets, and it is
+// the check that was missing when a section card printed an <aside> tag at a
+// reader for a week.
+test('no published piece excerpts into markup', () => {
+  for (const { file, body } of publishedBodies()) {
+    const out = excerpt(body);
+    assert.ok(!/[<>]/.test(out), `${file} excerpts into markup: ${out}`);
+  }
+});
+
+test('no published piece excerpts into its editors’ note', () => {
+  for (const { file, body } of publishedBodies()) {
+    const out = excerpt(body);
+    assert.ok(
+      !/editor.{0,3}\s+note/i.test(out),
+      `${file} excerpts into an editors' note: ${out}`
+    );
   }
 });
