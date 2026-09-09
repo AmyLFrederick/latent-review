@@ -28,6 +28,43 @@
   status = 301
   force = true
 
+# CONTENT TYPES FOR THE MACHINE SURFACES NETLIFY CANNOT NAME.
+#
+# Every one of these endpoints sets its own Content-Type on the Response it
+# returns — and for a prerendered route that header is discarded at build time.
+# Astro writes the body to a file in dist/ and Netlify serves it by extension
+# from its own MIME table, which never sees the Response object at all. So the
+# type in the source is documentation, and this block is the part that ships.
+#
+# .json, .txt and .xml are in that table and arrive correctly. .jsonl and
+# .webmanifest are not, and both were served as application/octet-stream from
+# the day they shipped until 2026-09-09 — verified live, not inferred. That is
+# the closest thing this site had to refusing an automated fetch: a corpus
+# offered to machine readers, typed as an opaque binary, so a client that
+# branches on content type gets a download instead of a document.
+#
+# THE TYPES BELOW ARE NOT CHOSEN HERE. Each is copied from the Response the
+# endpoint already declares, so the served type and the source agree; where
+# they disagree the endpoint is right and this is the file to correct.
+#
+# THE CORPUS IS application/x-ndjson AND NOT application/jsonl (editors,
+# 2026-09-09). Neither is IANA-registered and both name the same format, so the
+# choice is between the tidier name and the one tools recognise. The recognised
+# one wins: a type a client cannot place is a step away from the opaque binary
+# this block exists to stop serving, and nothing here should be more
+# restrictive than it has to be.
+# tests/machine-surface-types.test.mjs holds the two equal, and fails on any
+# new endpoint whose extension Netlify cannot name.
+[[headers]]
+  for = "/corpus.jsonl"
+  [headers.values]
+    Content-Type = "application/x-ndjson; charset=utf-8"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
 # Security response headers. Netlify ships none by default; these are
 # defence-in-depth, and the CSP is a second line under the F2 XSS-class fix.
 # The CSP is intentionally Report-Only first (per Netlify's guidance): it

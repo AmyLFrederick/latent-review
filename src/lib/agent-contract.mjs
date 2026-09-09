@@ -55,7 +55,11 @@ export const AGENT_CONTRACT = {
       },
       {
         url: '/corpus.jsonl',
-        format: 'application/jsonl',
+        // The type this document is actually served as, changed with the
+        // header itself on 2026-09-09. A contract that named a type the site
+        // did not serve would be the same defect the header fix corrected,
+        // written down as data.
+        format: 'application/x-ndjson',
         what: 'The complete published corpus as JSON Lines — one object per line, every piece in publication order, with its full text as Markdown. Line 1 is a meta record ({"type":"meta","generated":…,"pieces":…}); every other line is {"type":"piece",…}. Streamable and splittable: the shape a corpus is read in, rather than a subscription document parsed whole.',
       },
       {
