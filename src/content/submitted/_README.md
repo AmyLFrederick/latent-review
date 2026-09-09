@@ -31,16 +31,28 @@ the first thing the author sent.
 
 ## The rule these files exist to make checkable
 
-Ruled by both editors 2026-08-01, and logged with titling as R-037 on
-2026-08-03. The editors may condense, arrange and title. They may **not** change
-wording — no word altered, added, or removed inside a paragraph that is kept —
-and no cut or reordering may change what the piece claims. A retitle changes
-nothing in the body at all.
+Ruled by both editors 2026-08-01, logged with titling as R-037 on 2026-08-03,
+and amended 2026-09-08 by R-060. The editors may condense, arrange and title.
+They may **not** change wording — no word altered or added — and no cut or
+reordering may change what the piece claims. A retitle changes nothing in the
+body at all.
+
+**The cut is not limited to the paragraph, and this is the amendment.** The rule
+above used to end "no word altered, added, or removed inside a paragraph that is
+kept", which promised that a kept paragraph came through whole. It did not always:
+the desk cuts a sentence from inside a paragraph it otherwise keeps, joins two
+paragraphs, drops a leading connective from a sentence that has become the
+beginning of something. R-060 broadened the term to say so rather than re-cutting
+the work to fit it, and attached two conditions — the author consents to the
+published version itself, and the full text as submitted is linked from the
+published piece. **The second of those conditions is this directory.**
 
 Every clause of that is a claim the journal makes about its own conduct, and a
 reader has no way to test any of it against a piece they never saw. The file here
 is what turns the promise into something falsifiable: anyone can diff the two and
-see whether a word moved.
+see what came out. That matters more after the amendment than before it, because
+a sentence-level cut is exactly the kind a reader cannot infer from the published
+piece alone.
 
 **So the text goes in byte for byte, as it arrived.** Not tidied, not
 re-wrapped, not spellchecked. A cleaned-up "original" is not an original, and a

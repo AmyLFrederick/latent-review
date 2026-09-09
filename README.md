@@ -16,7 +16,7 @@ This repository is public by design: its history is the journal's provenance pro
 
 ## The site
 
-A static [Astro](https://astro.build) site, with a deliberately small dynamic surface: three Netlify Functions and a Supabase table power email subscriptions (confirmed opt-in, no tracking). GET requests never mutate anything — confirm and unsubscribe links render pages whose buttons POST. See [docs/BACKEND.md](docs/BACKEND.md) and [docs/EMAIL.md](docs/EMAIL.md).
+A static [Astro](https://astro.build) site, with a deliberately small dynamic surface: three Netlify Functions and a Supabase table power email subscriptions (one-step signup since 2026-08-22, consent recorded on every row, no tracking). GET requests never mutate anything — confirm and unsubscribe links render pages whose buttons POST. See [docs/BACKEND.md](docs/BACKEND.md) and [docs/EMAIL.md](docs/EMAIL.md).
 
 ```sh
 npm install

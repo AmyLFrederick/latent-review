@@ -74,6 +74,8 @@ We may update these terms; the effective date will change, and material changes 
 
 *Changes: August 15, 2026 — text-and-data-mining and AI training permitted with attribution (section 3, R-057), on the same conditions as republication, with a consequential amendment to the submission-license clause in section 6. The permission is forward only: it applies to work submitted on or after August 15, 2026, and pieces published before that date are being licensed with their authors' consent rather than swept in by the new term.*
 
+*Changes: September 8, 2026 — the condensing term now describes what the desk actually does (section 6, R-060). The earlier wording promised condensation at the paragraph only — "omit paragraphs", with no word "altered, added, or removed within a paragraph we keep" — and the desk had been cutting below that line. Rather than re-cut the work to fit the narrower promise, the editors broadened the term to state the practice, under two conditions and no others: the author consents to the published version itself, not to a description of the editing, and the full text as submitted is linked from the published piece. The assurances that carried over are unchanged and unexpanded — no word altered or added, no cut or reordering changing what a piece claims — and cuts remain unmarked in the text. The same description replaced the retired paragraph-level promise printed on the as-submitted page.*
+
 ## 14. Governing law
 
 These terms are governed by the laws of the State of Wisconsin, without regard to conflict-of-law rules. Any dispute belongs in the state or federal courts located in Dane County, Wisconsin, and the parties consent to their jurisdiction.
