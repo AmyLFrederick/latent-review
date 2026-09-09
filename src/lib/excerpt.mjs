@@ -13,6 +13,13 @@
 // IT STRIPS RATHER THAN RENDERS. Emphasis, links and code in a two-sentence
 // opening are noise, and a half-open <em> would be a rendering bug. Link TEXT is
 // kept, because the words are the point and the address is not.
+//
+// RAW HTML APPARATUS GOES WHOLE, TAG AND CONTENTS (2026-09-09). A body may open
+// on an interleaved editors' note, written as an <aside> with its text in
+// Markdown between blank lines. That note is the journal talking ABOUT the
+// piece; an excerpt promises the piece's own opening, so neither the tag nor
+// the note belongs on a card. This module skipped it on neither count and the
+// Cover card printed the opening tag as visible text.
 
 /** How many sentences a listing entry shows. */
 export const EXCERPT_SENTENCES = 2;
@@ -34,6 +41,31 @@ const TERMINATORS = '.!?…';
 const CLOSERS = '"\'”’)]»›';
 
 /**
+ * Block-level HTML containers removed WITH THEIR CONTENTS.
+ *
+ * Inline tags are deliberately absent: `<em>` and `<a>` mark words that are
+ * still the writer's, and stripInline keeps those words. A container is the
+ * other thing — apparatus wrapped around text in a register that is not the
+ * piece's — so the words inside it go with the box.
+ */
+const HTML_CONTAINERS = [
+  'aside', 'div', 'section', 'article', 'figure', 'figcaption', 'details',
+  'summary', 'blockquote', 'table', 'nav', 'header', 'footer', 'main',
+  'form', 'iframe', 'video', 'audio', 'script', 'style', 'ul', 'ol', 'dl',
+].join('|');
+
+/**
+ * An opening container tag on its own line through its matching close.
+ *
+ * LAZY, so two consecutive editors' notes are two matches rather than one that
+ * swallows the prose between them — which is the live shape on the Cover piece.
+ */
+const HTML_CONTAINER_BLOCK = new RegExp(
+  `^[ \\t]*<(${HTML_CONTAINERS})\\b[^>]*>[\\s\\S]*?<\\/\\1\\s*>[ \\t]*$`,
+  'gim',
+);
+
+/**
  * The first block of prose in a Markdown body, as plain text.
  *
  * Skips anything that is not a paragraph — headings, rules, images, lists and
@@ -47,6 +79,10 @@ export function proseBlocks(markdown) {
     .replace(/\r\n/g, '\n')
     // Fenced code can contain blank lines, so it must go before the split.
     .replace(/```[\s\S]*?```/g, '')
+    // An HTML container spans blank lines for the same reason and must go for
+    // the same reason: after the split it is three blocks that no per-block
+    // test can recognise as one editors' note.
+    .replace(HTML_CONTAINER_BLOCK, '')
     .split(/\n\s*\n/)
     .map((raw) => raw.trim())
     .filter((block) => {
@@ -56,6 +92,10 @@ export function proseBlocks(markdown) {
       if (/^([-*_]\s*){3,}$/.test(block)) return false; // thematic break
       if (/^!\[/.test(block)) return false; // lone image
       if (/^(-|\*|\+|\d+\.)\s/.test(block)) return false; // list
+      // A block OPENING on raw HTML — an unclosed container, a void element, a
+      // comment, an autolink. Whatever it is, it is not the piece's prose, and
+      // the rule above has already taken the closed containers.
+      if (/^<[a-zA-Z!/]/.test(block)) return false;
       return true;
     });
 }
@@ -68,6 +108,10 @@ export function firstProseBlock(markdown) {
 /** Markdown inline syntax removed, leaving the words. */
 export function stripInline(text) {
   return String(text ?? '')
+    // BACKSTOP, and only that: the containers are gone by now. This catches an
+    // inline tag inside a prose paragraph and keeps the words it marks up. A
+    // space rather than nothing, because "a<br>b" is two words.
+    .replace(/<[^>]+>/g, ' ')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // images
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // links keep their text
     .replace(/`([^`]+)`/g, '$1') // inline code

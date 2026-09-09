@@ -21,7 +21,12 @@ const url = `/articles/${article.id}/`;
 // where the writer already decided a thought ends. Derived from the body at
 // build time rather than stored: an excerpt that can drift from the piece it
 // excerpts is a second source of truth for the piece's own opening.
-const opening = excerpt(article.body);
+//
+// UNLESS THE EDITORS PICKED THE LINE (2026-09-09). `card_excerpt` overrides the
+// derivation and holds the author's words either way — the module's own header
+// has anticipated hand-picked teaser lines since it was written. The derived
+// opening stays the default, and stays right for almost every piece.
+const opening = d.card_excerpt ?? excerpt(article.body);
 ---
 
 <article class="card">

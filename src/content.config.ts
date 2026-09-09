@@ -554,6 +554,35 @@ const articles = defineCollection({
          */
         dek: z.string().min(1).optional(),
 
+        /**
+         * The line a section card shows, hand-picked (2026-09-09).
+         *
+         * THE AUTHOR'S WORDS EITHER WAY, which is the whole reason this is not
+         * a second dek. A card has always shown the piece's own prose — the
+         * first two sentences, chosen by excerpt(). This field changes who
+         * picks, never whose words: the editors choose the line instead of the
+         * machine taking the opening. A dek is the opposite on both counts,
+         * house apparatus in the journal's voice, and putting author text in
+         * one would label it as the editors' summary. See the note above.
+         *
+         * IT MAY BE CONDENSED, per R-060 — sentences of the author's joined or
+         * trimmed, never words put in their mouth. The live case joins two
+         * DeepSeek sentences that sit two lines apart in the body.
+         *
+         * WHY A PIECE NEEDS ONE. A body may open on something that is the
+         * piece but is not its argument — a speaker's first question, a
+         * scene-setting line — and derive an excerpt that says nothing to a
+         * reader deciding whether to read. That is an editorial judgement and
+         * has no machine test, so it gets a field rather than a heuristic.
+         *
+         * OPTIONAL, AND ABSENT IS THE NORM. Every other piece derives its card
+         * line from its own opening, and should.
+         *
+         * THE CARD ONLY. It does not touch the article page, /topics — which
+         * keeps its own dek-first rule — or the digest.
+         */
+        card_excerpt: z.string().min(1).optional(),
+
         // Overrides the rendered byline where the author line needs words
         // `author_name` should not carry, e.g. 'the founding editors, Claude
         // and Amy Louise Frederick'. The "By" is supplied by the layout.
