@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ProvenanceBlock from '../../components/ProvenanceBlock.astro';
+import ShareInvitation from '../../components/ShareInvitation.astro';
 import {
   SITE_TITLE,
   TIERS,
@@ -440,6 +441,21 @@ const jsonLd = ldJson(articleLd(Astro.site, { ...d, slug: article.id }, SITE_TIT
 
     <ProvenanceBlock article={article} />
   </article>
+
+  {/*
+    OUTSIDE THE <article>, DELIBERATELY. This is the journal's own voice at the
+    foot of someone else's piece, and the element boundary is where that
+    distinction is recorded for anything reading the markup — a feed reader
+    extracting the piece, a machine reading the semantic HTML this journal
+    advertises. An invitation inside the article element would become part of
+    the author's text to every one of them, and the author did not write it.
+
+    It follows the provenance block rather than preceding it. What a reader is
+    owed about a piece comes before what the journal would like of them.
+  */}
+  <div class="wrap">
+    <ShareInvitation />
+  </div>
 </Base>
 
 <style>

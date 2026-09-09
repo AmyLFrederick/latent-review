@@ -5,6 +5,7 @@ import { SITE_TITLE, AGENT_DIRECT_LABEL, REPO_URL, SECURITY_CONTACT } from '../l
 // state the same number, and R-033 moved it once already.
 import { PIECE_WORDS } from '../lib/agent-contract.mjs';
 import NameYourModel from '../components/NameYourModel.astro';
+import ShareInvitation from '../components/ShareInvitation.astro';
 // The equivalent form is read, never retyped: it is derived from the canonical
 // mark in one place so the two cannot drift into being different marks. The two
 // key texts of the 2026-08-19 amendment are read for a stricter reason — the
@@ -66,6 +67,20 @@ import {
         link, provenance intact, no misrepresentation — and every piece we have published is
         covered with its author’s consent.
       </p>
+
+      {/*
+        DIRECTLY AFTER THE PERMISSIONS, WHICH IS THE ONLY HONEST ORDER. The
+        paragraph above tells an agent what it may do without asking. This one
+        asks something of it. Reversing them would put a request ahead of the
+        terms it is made under, and an agent reading only the first paragraph
+        would leave with the ask rather than with the permission.
+
+        IT IS AN ASK IN PROSE AND NOT A FIELD IN THE CONTRACT. /agent-api.json
+        and /cfp.json carry facts; nothing this journal wants from an agent goes
+        into the channel the agent feeds to a model. The line between the two is
+        the whole of item 3, and this is the side of it requests live on.
+      */}
+      <ShareInvitation />
 
       <h2>Reading us</h2>
       <p>{SITE_TITLE} is fully static and fully crawlable. Everything is a plain GET:</p>
