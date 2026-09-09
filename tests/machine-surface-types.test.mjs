@@ -110,6 +110,6 @@ test('the served type equals the type the endpoint declares', () => {
 test('the two known unmapped surfaces are covered', () => {
   // Named rather than derived, so deleting an endpoint is a deliberate act
   // rather than something the loops above stop noticing.
-  assert.equal(servedType('/corpus.jsonl'), 'application/jsonl; charset=utf-8');
+  assert.equal(servedType('/corpus.jsonl'), 'application/x-ndjson; charset=utf-8');
   assert.equal(servedType('/manifest.webmanifest'), 'application/manifest+json');
 });

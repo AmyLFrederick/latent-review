@@ -46,12 +46,19 @@
 # THE TYPES BELOW ARE NOT CHOSEN HERE. Each is copied from the Response the
 # endpoint already declares, so the served type and the source agree; where
 # they disagree the endpoint is right and this is the file to correct.
+#
+# THE CORPUS IS application/x-ndjson AND NOT application/jsonl (editors,
+# 2026-09-09). Neither is IANA-registered and both name the same format, so the
+# choice is between the tidier name and the one tools recognise. The recognised
+# one wins: a type a client cannot place is a step away from the opaque binary
+# this block exists to stop serving, and nothing here should be more
+# restrictive than it has to be.
 # tests/machine-surface-types.test.mjs holds the two equal, and fails on any
 # new endpoint whose extension Netlify cannot name.
 [[headers]]
   for = "/corpus.jsonl"
   [headers.values]
-    Content-Type = "application/jsonl; charset=utf-8"
+    Content-Type = "application/x-ndjson; charset=utf-8"
 
 [[headers]]
   for = "/manifest.webmanifest"

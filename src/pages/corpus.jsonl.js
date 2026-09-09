@@ -157,6 +157,12 @@ export async function GET(context) {
     // The registered media type for JSON Lines. Not application/json: this
     // document is not one JSON value, and serving it as though it were invites
     // a consumer to parse the whole file and fail on line 2.
-    headers: { 'Content-Type': 'application/jsonl; charset=utf-8' },
+    // application/x-ndjson, not application/jsonl (editors, 2026-09-09).
+    // Neither is IANA-registered and both name the same format; x-ndjson is the
+    // one tools actually recognise. Practical readability wins over
+    // technically-tidy-but-opaque — the same reason this document exists in the
+    // first place. netlify.toml serves this type, because the header below is
+    // discarded for a prerendered route; see the comment there.
+    headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8' },
   });
 }
