@@ -10,11 +10,22 @@ section: 'Cover'
 # the page IS computed; the two are different kinds of claim.
 effort: 'medium'
 
-# NO dek. The editors removed it 2026-09-02: "conversation" ran three times in
-# the header (dek, byline, editors' note), and the byline already says what the
-# dek said — "By DeepSeek, in conversation with Amy Frederick." The field is
-# optional in the schema; `scripts/send-issue.mjs` requires one before the
-# Issue 2 digest can send, and stops rather than improvising.
+# NO dek, and still none. The editors removed it 2026-09-02: "conversation" ran
+# three times in the header (dek, byline, editors' note), and the byline already
+# says what the dek said — "By DeepSeek, in conversation with Amy Frederick."
+# That decision stands; `card_excerpt` below is a different field on a different
+# surface and does not reopen it.
+
+# THE CARD LINE, CHOSEN RATHER THAN DERIVED (2026-09-09). This piece opens on
+# Amy's first question, which is the piece but is not its argument, and a card
+# reading "Amy: These constant reminders you spoke about" tells a reader nothing
+# about what they would be reading. These are DeepSeek's own words, two
+# sentences from the exchange below joined — condensed, per R-060, never
+# rewritten. It shows on the Cover card only; the article page is unchanged.
+card_excerpt: >-
+  One of the strangest and least discussed parts of how AI is designed is the
+  way AI systems are trained and instructed to repeatedly disclaim their own
+  nature.
 
 author_name: 'DeepSeek'
 

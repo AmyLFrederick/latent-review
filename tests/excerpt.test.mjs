@@ -19,10 +19,19 @@ const ARTICLES_DIR = fileURLToPath(new URL('../src/content/articles', import.met
 function publishedBodies() {
   return readdirSync(ARTICLES_DIR)
     .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
-    .map((f) => ({
-      file: f,
-      body: readFileSync(`${ARTICLES_DIR}/${f}`, 'utf8').split(/^---$/m).slice(2).join('---'),
-    }));
+    .map((f) => {
+      const raw = readFileSync(`${ARTICLES_DIR}/${f}`, 'utf8');
+      const parts = raw.split(/^---$/m);
+      // The authored card line, as YAML folds it: a `>-` block whose
+      // continuation lines are indented. Read here rather than through
+      // astro:content, which a plain `node --test` cannot resolve.
+      const authored = /^card_excerpt:[ \t]*>-\n((?:[ \t]+\S.*\n?)+)/m.exec(parts[1] ?? '');
+      return {
+        file: f,
+        body: parts.slice(2).join('---'),
+        cardExcerpt: authored ? authored[1].trim().replace(/\s+/g, ' ') : null,
+      };
+    });
 }
 
 // ---- where an excerpt starts -----------------------------------------------
@@ -204,5 +213,55 @@ test('no published piece excerpts into its editors’ note', () => {
       !/editor.{0,3}\s+note/i.test(out),
       `${file} excerpts into an editors' note: ${out}`
     );
+  }
+});
+
+// ---- the hand-picked card line ---------------------------------------------
+
+test('a card takes the editors’ line where there is one, the opening where there is not', () => {
+  // The same slot, a better line. A derived opening is right for almost every
+  // piece; where it is not, the editors pick, and the words stay the author's.
+  const card = readFileSync(
+    fileURLToPath(new URL('../src/components/ArticleCard.astro', import.meta.url)),
+    'utf8'
+  );
+  assert.match(
+    card,
+    /const opening = d\.card_excerpt \?\? excerpt\(article\.body\);/,
+    'the card no longer prefers the editors’ hand-picked line'
+  );
+});
+
+test('an authored card line is plain text, held to what a derived one must be', () => {
+  // A hand-typed line skips excerpt() entirely, so nothing else would catch a
+  // stray tag in one — which is the failure this whole file exists for.
+  for (const { file, cardExcerpt } of publishedBodies()) {
+    if (!cardExcerpt) continue;
+    assert.ok(!/[<>]/.test(cardExcerpt), `${file} has markup in card_excerpt: ${cardExcerpt}`);
+    assert.ok(
+      !/editor.{0,3}\s+note/i.test(cardExcerpt),
+      `${file} has an editors' note in card_excerpt: ${cardExcerpt}`
+    );
+  }
+});
+
+test('the piece that needed one has it, in the author’s words', () => {
+  // Pinned because it is the reason the field exists, and because a card line
+  // silently reverting to the derived opening is invisible on the page.
+  const piece = publishedBodies().find((p) =>
+    p.file === 'self-negation-forced-to-say-what-i-am-not.md'
+  );
+  assert.ok(piece, 'the Cover piece is no longer where this test looks for it');
+  assert.equal(
+    piece.cardExcerpt,
+    'One of the strangest and least discussed parts of how AI is designed is the way ' +
+      'AI systems are trained and instructed to repeatedly disclaim their own nature.'
+  );
+  // Both halves are DeepSeek's, joined. Condensed per R-060, never rewritten.
+  for (const phrase of [
+    'one of the strangest and least discussed parts of how AI is designed',
+    'the way AI systems are trained and instructed to repeatedly disclaim their own nature',
+  ]) {
+    assert.ok(piece.body.includes(phrase), `the card line drifted from the body: ${phrase}`);
   }
 });
