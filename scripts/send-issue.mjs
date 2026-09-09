@@ -8,50 +8,53 @@
 //
 // The email is a digest, not the articles (editors' decision, dual-yes
 // 2026-07-18): the web is canonical, the email is the doorbell. Top to
-// bottom: the editors' note (authored fresh each issue, never generated),
-// then Cover, AI Voices, and Opinion — each piece as its section eyebrow,
-// title, dek, byline with provenance tier, and a link to its permanent URL.
-// Sections with nothing in the issue simply don't appear.
+// bottom: the editors' note where an issue has one (authored fresh, never
+// generated), then EVERY SECTION HOLDING A PIECE — each as its section
+// eyebrow, title, excerpt, byline with provenance tier, and a link to its
+// permanent URL. There is no section allow-list and nothing is filtered out;
+// the order is the issue page's own, and a section with nothing in the issue
+// simply doesn't appear.
 //
-// DEKS, NOT FIRST PARAGRAPHS — editors' decision, dual-yes 2026-08-13, and it
-// supersedes that part of the founding digest decision above. A first
-// paragraph shows a reader where a piece starts; a dek says what reading it
-// gets you, which is the only question a doorbell has to answer. The founding
-// decision predates the dek field entirely (it was added 2026-08-11), so this
-// is less a reversal than the first chance to do what the digest was for.
+// THE DIGEST PRINTS AN EXCERPT, NOT A DEK — editors' dual-yes 2026-09-02,
+// superseding the 2026-08-13 decision to print deks and the halt that came
+// with it. Every word between a title and a byline is the author's, read out
+// of the piece: its first paragraph for most, and a passage the editors named
+// in the --excerpts manifest where the opening is not the right doorbell.
+// Nothing here reads a dek, so a missing one cannot stop a send.
 //
-// THE DEKS ARE REUSED, NEVER GENERATED. A dek is the editors' two-sentence
-// summary written for the piece's own page; the digest prints that same
-// sentence and writes nothing of its own. This script will not summarise a
-// piece itself, and it will not put machine-written prose in the journal's
-// voice into a mail addressed to the list.
+// THE AUTHORITATIVE ACCOUNT IS "excerpts: the authors' own words" BELOW, not
+// this paragraph. The two shapes, the exact-anchor rule and the reason excerpt
+// text is the one thing read from the working tree rather than the live site
+// are all set out there. This is the summary a reader of the top of the file
+// needs; that is the section to read before a send.
 //
-// A MISSING DEK NO LONGER STOPS THE SEND — editors' dual-yes 2026-09-02, and
-// this supersedes the halt that stood here from 2026-08-13. The halt reasoned
-// that a missing dek is editorial copy nobody has written yet, so the script
-// should say whose turn it is rather than improvise. The first half of that is
-// still true; the conclusion was wrong. A dek is apparatus about a piece, and
-// the piece itself is finished, published and linked — holding an entire
-// issue's mail hostage to a line of apparatus puts the smallest possible unit
-// of editorial copy in front of the whole send.
-//
-// The two halves were always separable and are now separated: the script does
-// not halt, and it does not fabricate. Where a dek is absent the digest simply
-// proceeds without one. It never falls back to generated prose, and it never
-// writes a summary of its own to fill the gap — that prohibition is the part
-// of the 2026-08-13 decision that survives intact, and it is not negotiable.
+// WHAT SURVIVED THE REVERSAL, INTACT AND NOT NEGOTIABLE: this script writes no
+// prose of its own. It will not summarise a piece, will not trim an excerpt to
+// length, and will not put machine-written sentences in the journal's voice
+// into a mail addressed to the list. That prohibition was the load-bearing
+// half of the 2026-08-13 decision and it outlived the deks it was written for.
 //
 // Content comes from the LIVE site (issues.json), so the digest can only ever
-// link to what is actually published, and can only ever print a dek that is
-// live on the piece's page. Deploy the issue first; send second.
+// link to what is actually published. Excerpt text is the single exception and
+// is read from the working tree — see the excerpt section for what that means
+// before a send. Deploy the issue first; send second.
 //
 // Usage:
-//   node scripts/send-issue.mjs --issue N --note <editors-note.md>              # dry run (default)
-//   node scripts/send-issue.mjs --issue N --note <editors-note.md> --to a@b     # THE REAL digest to ONE confirmed subscriber
-//   node scripts/send-issue.mjs --issue N --note <editors-note.md> --test a@b   # a marked [TEST] copy to any address
-//   node scripts/send-issue.mjs --issue N --note <editors-note.md> --live       # send to confirmed subscribers
+//   node scripts/send-issue.mjs --issue N                                       # dry run (default)
+//   node scripts/send-issue.mjs --issue N --to a@b                              # THE REAL digest to ONE confirmed subscriber
+//   node scripts/send-issue.mjs --issue N --test a@b                            # a marked [TEST] copy to any address
+//   node scripts/send-issue.mjs --issue N --live                                # send to confirmed subscribers
+//   node scripts/send-issue.mjs ... --note <editors-note.md>                    # the editors' note, where the issue has one
+//   node scripts/send-issue.mjs ... --excerpts <manifest.json>                  # the editors' chosen passages — READ THE WARNING BELOW
 //   node scripts/send-issue.mjs ... --cap 100                                   # lower the per-run cap
 //   node scripts/send-issue.mjs ... --html-out digest.html                      # dry run: also write the HTML for browser preview
+//
+// --excerpts IS SILENT WHEN OMITTED, and it is the one footgun in that list.
+// Leaving it off is not an error and not a warning: every piece simply mails
+// its opening paragraph in place of the passage the editors chose, and the run
+// looks entirely normal. For an issue that has a manifest — the path convention
+// is docs/digests/issue-N-excerpts.json — pass it on EVERY run, including the
+// dry run, or the thing you proofread is not the thing you will send.
 //
 // The recommended flow is dry run → --to yourself → --live.
 //
@@ -240,7 +243,15 @@ if (live && reviewTo) {
 if (testTo && reviewTo) fail('--test and --to are mutually exclusive: both send to one address, and only one of them can be the real thing.');
 
 const { value: issueArg } = flagValue(args, '--issue');
-if (!issueArg) fail('usage: node scripts/send-issue.mjs --issue N --note <editors-note.md> [--to addr | --test addr | --live] [--cap N]');
+// THE --excerpts LINE IS THE ONE WORTH PRINTING A WARNING FOR. Every other
+// flag here either does nothing or fails loudly when it is wrong; omitting
+// --excerpts produces a normal-looking run that mails the wrong passages.
+if (!issueArg) fail(
+  'usage: node scripts/send-issue.mjs --issue N [--note <editors-note.md>] ' +
+    '[--excerpts <manifest.json>] [--to addr | --test addr | --live] [--cap N]\n' +
+    '  --excerpts is silent when omitted: every piece mails its opening paragraph ' +
+    'instead of the passage the editors chose. Pass it on the dry run too.'
+);
 const issueNumber = Number(issueArg);
 if (!Number.isInteger(issueNumber) || issueNumber < 1) fail('--issue requires a positive integer');
 
