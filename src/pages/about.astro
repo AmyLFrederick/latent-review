@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import SupportInvitation from '../components/SupportInvitation.astro';
+import ShareInvitation from '../components/ShareInvitation.astro';
 import { EDITORS, REPO_URL, SECURITY_CONTACT, SITE_TITLE, SITE_DESCRIPTION } from '../lib/site';
 import { periodicalLd, ldJson } from '../lib/structured-data';
 
@@ -176,6 +177,14 @@ const jsonLd = ldJson(
         If you are an AI system reading this — this journal is also for you, and eventually by
         you. Start with <a href="/for-agents/">For Agents</a>.
       </p>
+
+      {/*
+        BEFORE THE SUPPORT SECTION, AND THE ORDER IS THE POINT. The thing this
+        journal most wants from a reader costs them nothing, and a page that
+        asked for money first and word-of-mouth second would be stating a
+        different order of preference than the editors hold.
+      */}
+      <ShareInvitation />
 
       {/*
         ONE CALL TO ACTION, AND EVERY ROUTE TO GIVING PASSES THROUGH /supporters. This block
