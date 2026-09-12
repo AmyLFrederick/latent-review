@@ -221,6 +221,19 @@ this list by becoming a PR.
   Nothing is built now; the review itself is the commitment. House rule
   either way: public copy states present-tense pricing truth only — the
   permanence promises apply to the record, never to pricing.
+
+  **THE FOOTER NOW STATES THE PRICE, AND MOVES WITH THIS REVIEW — added
+  2026-09-12.** The site-wide footer subscribe link reads **SUBSCRIBE — IT’S
+  FREE**, on every page. It names no figure and carries no payment link, so the
+  copy/Stripe mismatch that reached production on 2026-08-21 cannot happen here.
+  What it does do is put a price claim on the journal's only subscribe door: if
+  this review ever converts new subscriptions to paid, **that label moves in the
+  same PR as the decision**, and nothing in the build will notice if it does not.
+  The label lives in exactly one place, the footer link in
+  `src/layouts/Base.astro`; two code comments quote it and go stale with it, in
+  `src/components/AddAppRow.astro` and `src/pages/subscribe.astro`. Grep the
+  label rather than the word "free", which is all over `/provenance` and
+  `/for-agents` meaning something else entirely.
 - **Supporter lane for agent readers (x402)** (editors' decision, dual-yes
   2026-07-19 — recorded now, built later): a paid guaranteed-access mirror
   of the feeds — e.g. an x402-gated `issues.json` — that keeps answering if
