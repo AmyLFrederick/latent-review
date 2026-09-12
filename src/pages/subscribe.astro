@@ -31,6 +31,11 @@ import { CADENCE_LINE } from '../lib/site';
 // names the unsubscribe link, because at that point it is a fact about the mail
 // they are about to get rather than reassurance offered to win the press.
 //
+// THAT RULE STANDS, and one line above the field does not breach it (editors,
+// 2026-09-12). "Just your email. That's all we ask." describes the form rather
+// than promising conduct — see the note beside it in the markup for where the
+// line falls and what keeping it honest costs.
+//
 // A SIGNUP IS A SUBSCRIPTION, since 2026-08-22 — there is no confirmation step
 // to describe, and this page must not invent one. See src/lib/subscribe-copy.mjs,
 // which holds the words for what actually happens next.
@@ -45,6 +50,22 @@ import { CADENCE_LINE } from '../lib/site';
       <p class="kicker kicker--accent kicker--lead">Subscribe</p>
       <h1>Receive each issue when it publishes</h1>
       <p class="page-note">{CADENCE_LINE}</p>
+      {/*
+        WHAT THIS SENTENCE IS, AND WHY IT IS NOT THE RETIRED ONE (editors,
+        2026-09-12). It describes the form a reader is looking at — one field,
+        and nothing else asked at signup — which is checkable by looking down
+        the page. The line retired on 2026-09-02 promised future conduct, and
+        a promise is the kind of claim that needs the terms to bind it. That is
+        the distinction the note below turns on; it is not a licence to put
+        conduct promises back on this page in gentler words.
+
+        IT IS A CLAIM ABOUT THE FORM, SO IT MOVES WITH THE FORM. If the field
+        ever gains a companion — a name, a preference, anything — this sentence
+        is false the moment that ships, and nothing in the build will say so.
+        Docketed on the pricing-review item in docs/BACKLOG.md, beside the
+        footer label, for exactly that reason.
+      */}
+      <p class="page-note">Just your email. That’s all we ask.</p>
     </header>
 
     <SubscribeForm />

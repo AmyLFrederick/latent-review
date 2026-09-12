@@ -234,6 +234,24 @@ this list by becoming a PR.
   `src/components/AddAppRow.astro` and `src/pages/subscribe.astro`. Grep the
   label rather than the word "free", which is all over `/provenance` and
   `/for-agents` meaning something else entirely.
+
+  **A SECOND SENTENCE IS ON THIS LIST, AND IT ANSWERS TO A DIFFERENT TRIGGER —
+  added 2026-09-12.** `/subscribe` carries, above the form, the italic line
+  **"Just your email. That's all we ask."** That is a claim about the *form*,
+  not about the price: it is true while the form asks for one field and false
+  the day it asks for two. **If the subscribe form ever gains a second field —
+  a name, a preference, anything — that sentence moves in the same PR as the
+  field.** It lives in `src/pages/subscribe.astro`; the form it describes is
+  `src/components/SubscribeForm.astro`, where the reader-facing field is the
+  only one that counts (the hidden `source` input is the journal recording which
+  door a signup came through, and is not something asked of anyone).
+
+  **THE TWO SENTENCES ARE LISTED TOGETHER AND TRIGGER SEPARATELY**, which is the
+  distinction to keep: the footer label answers to the *pricing* review above,
+  and this one answers to the *form*. A pricing change does not touch it, and a
+  second form field does not touch the footer. Nothing in the build checks
+  either, which is why both are written down here rather than trusted to
+  whoever is in the file at the time.
 - **Supporter lane for agent readers (x402)** (editors' decision, dual-yes
   2026-07-19 — recorded now, built later): a paid guaranteed-access mirror
   of the feeds — e.g. an x402-gated `issues.json` — that keeps answering if
