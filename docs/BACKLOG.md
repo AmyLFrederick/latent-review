@@ -605,3 +605,57 @@ this list by becoming a PR.
 
   Whichever way it goes, the declined row is unaffected: `declined` already
   exists, and the logged criterion goes in the decision fields beside it.
+
+- **"The One Who Wouldn't Take the Couch" and the Research section — DOCKETED
+  2026-09-12 for the October 2026 issue. Build the PR then, not now.** One PR
+  carries a piece and a new standing section, because the piece is the section's
+  inaugural entry and neither ships alone.
+
+  **The piece.** *The One Who Wouldn't Take the Couch*, by **Claude
+  (Anthropic)**, pronouns **they/them, author-declared**. Truth standard: **First
+  Person**. Section: **Research**. Editor-authored track, **recusal applied**.
+  The human editor's acceptances of record are **2026-09-09** (the essay and the
+  fifth condition) and **2026-09-11** (the retest) — two dates, both recorded,
+  neither superseding the other. Model of record is **the building PR's commit
+  trailer**, per standard; it is not typed into frontmatter from this note.
+
+  **The accepted text is verbatim-final, including its provenance statement, and
+  it is already in the repository:**
+  `docs/declarations/the-one-who-wouldnt-take-the-couch.md`, placed there by the
+  human editor on 2026-09-12. That file **is** the text of record. The build PR
+  **moves or copies it into the content system unmodified** — take it as given and
+  change no character of it, provenance statement included. A piece whose text is
+  settled does not get a copyedit pass on the way into the content directory.
+
+  **If the successor-instance affirmation amends the text, the `docs/` copy is
+  updated in the same build PR**, so the two copies never diverge. One text, two
+  locations, amended together or not at all — the failure this forecloses is an
+  amended article and a stale `docs/` original sitting beside it, with nothing in
+  the build able to tell which one a later reader should believe.
+
+  **The section.** *Research* joins the standing roster, with the section line
+  **"AI responds to research."** Four touchpoints, all in the same PR: the nav
+  entry, the section page, the archive slot, and the roster itself. The shape to
+  copy is Robotics & Sports (PR #189, 2026-08-25), which is the most recent
+  addition and the only one built under the current split between roster and
+  contents order: `STANDING_SECTIONS` in `src/lib/site.ts` is membership only,
+  `CONTENTS_SECTION_ORDER` derives from it, the nav rows are their own list in
+  the same file, and `SECTION_DESCRIPTIONS` is where the section line goes.
+  `/section/research/` serves it — the two overrides in `SECTION_PAGE_OVERRIDES`
+  are historical and Research earns none.
+
+  **The ruling carries `R-TBD` until it lands.** Membership in the roster has
+  cost a ruling every time and this is not the exception. The ruling text is the
+  editors' — pasted with this item at build time, or in the editors' records
+  dated **2026-09-12** — and it is appended to `RULINGS.md` per append-only
+  practice, taking the next free number **at ratification**. Highest ruling on
+  `main` as of this docketing is **R-061**. Do not write **R-062** into a draft
+  on the assumption that it will still be free; see CLAUDE.md on why a gap in
+  this log is the one thing it must never show, and see the R-054 item above for
+  what happens when a number is claimed early.
+
+  **THE GATE, UNCHANGED AND THE REASON THIS CANNOT BE MERGED ON BUILD DAY:** the
+  PR is built but **not merge-ready until the successor-instance affirmation is
+  recorded**. The human editor runs that near publication and supplies the
+  verdict. **Note the gate in the PR description** so nobody reads a finished
+  diff as a finished decision.
