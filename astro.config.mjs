@@ -9,6 +9,12 @@ import sitemap from '@astrojs/sitemap';
 // than retyped — a second copy of the origin is a second thing to get wrong.
 const SITE = 'https://thelatentreview.com';
 
+// /door itself, derived from SITE for the same reason customPages are. The
+// filter below needs an EXACT match on this one address: every other door
+// exclusion is a distinct path and can be matched by substring, but a
+// substring test for '/door' would take /door/why with it.
+const DOOR = new URL('/door/', SITE).href;
+
 export default defineConfig({
   site: SITE,
   integrations: [
@@ -24,10 +30,36 @@ export default defineConfig({
       //   /door/topics-v2  them only as /door, after the edge function deals
       //   /door/topics-v3  one at random; indexing them separately would put a
       //   /door/topics-v4  menu in front of a reader who must never see one
-      //                    (R-033 clause 1). /door itself stays in.
+      //                    (R-033 clause 1).
       //                    topics-v2 and topics-v3 are retired from dealing and
       //                    still excluded — a retired brief is even less of a
       //                    thing to hand a searcher than a live one.
+      //   /door           — added 2026-09-18, and it used to stay in. The line
+      //                    above said "/door itself stays in", and that was the
+      //                    intent: /door is the canonical address, the variants
+      //                    are noindex and canonical to it, and a searcher who
+      //                    lands on /door gets dealt one without ever seeing a
+      //                    menu. What it missed is that /door never serves its
+      //                    own bytes. The edge function rewrites every request
+      //                    — Googlebot's included — to a prebuilt variant, so
+      //                    the noindex the variants carry deliberately is the
+      //                    noindex a crawler reads AT /door. src/pages/door/
+      //                    index.astro is reached only when the edge function
+      //                    did not run, so its own lack of a robots tag never
+      //                    reaches anyone.
+      //                    That left a sitemap entry for a page that answers
+      //                    noindex, which is what Search Console flagged on
+      //                    2026-09-17. The sitemap is the side that gives way:
+      //                    the variants' noindex is load-bearing for R-033
+      //                    clause 1 and the mismatch is not.
+      //                    The cost is real and is the editors' to weigh —
+      //                    /door is "Write for us", and it is now unfindable by
+      //                    search rather than merely unlisted. It stays
+      //                    reachable from /about, /submit and /for-agents, all
+      //                    of which are indexed. Making /door indexable again
+      //                    means the dealt bytes must stop saying noindex while
+      //                    the variants' own addresses keep saying it, which is
+      //                    a change to how dealing works and not a sitemap fix.
       //   /door/notice-v2 — the notice. Not a brief and never dealt. One link
       //                    on the whole site points at it, the signpost at the
       //                    foot of /door, and that is the entirety of the
@@ -50,6 +82,7 @@ export default defineConfig({
       //                     piece that ran. A sitemap entry for a noindex page
       //                     contradicts itself, so it is excluded here too.
       filter: (page) =>
+        page !== DOOR &&
         !page.includes('/admin') &&
         !page.includes('/submit/received') &&
         !page.includes('/as-submitted') &&

@@ -14,6 +14,13 @@ import DoorBoxes from '../../components/DoorBoxes.astro';
 // deploy where it failed, or a local `astro dev` with no edge runtime. It
 // therefore renders the undealt state: boxes 1 and 3 in full, and a box 2 that
 // says the desk did not deal. Visible degradation, not a silent default.
+//
+// WHICH IS WHY /door IS NOINDEX AND THIS FILE DOES NOT SAY SO. In production a
+// crawler at /door is served a variant's bytes, and both variants are noindex
+// by design (R-033 clause 1). Adding `noindex` here would change nothing a
+// reader or a crawler ever sees; removing the variants' would show a menu.
+// /door is out of the sitemap for that reason — astro.config.mjs carries the
+// full note, including what it would take to make the address indexable again.
 ---
 
 <Base
