@@ -93,6 +93,81 @@ test('every other section keeps a derived slug, so the override stays the except
   }
 });
 
+// --- Section-template parity ---------------------------------------------
+//
+// THE CLAIM BEING PINNED: /section/research/ is not a page of its own. It is
+// the one section template, rendering the one card component, with no style and
+// no branch that knows which section it is showing. A reader must not be able
+// to tell the new section from AI Voices or The Metaphysical Corner by anything
+// except the two strings that name it.
+//
+// PROVEN ON THE BUILD AS WELL AS HERE, and the build is what settles it: with
+// the same piece filed under "The Metaphysical Corner" and rebuilt, the two
+// pages' rendered markup is identical character for character apart from the
+// <h1> text and the page-note text. The assertions below are what keeps it that
+// way, because that comparison is not something a suite can run.
+
+const sectionTemplate = () => read('src/pages/section/[slug].astro');
+
+test('one template builds every section page, and there is no second file', () => {
+  // A hand-written src/pages/section/research.astro would take the route and
+  // silently win. The directory holding exactly one file is the whole guard.
+  assert.deepEqual(readdirSync(join(root, 'src/pages/section')), ['[slug].astro']);
+});
+
+test('the section page renders the same card component for every section', () => {
+  const page = sectionTemplate();
+  assert.match(page, /import ArticleCard from '\.\.\/\.\.\/components\/ArticleCard\.astro'/);
+  assert.match(
+    page,
+    /<ArticleCard article=\{article\} \/>/,
+    'the listing item is no longer a plain ArticleCard — a section page must not compose its own'
+  );
+});
+
+test('the template carries no section-specific styles', () => {
+  // Its <style> block owns exactly two selectors, and neither names a section.
+  // A rule like `.section-research .card` would be the shape of the failure:
+  // invisible in review, visible only to a reader comparing two pages.
+  const style = sectionTemplate().match(/<style>([\s\S]*)<\/style>/)?.[1] ?? '';
+  assert.ok(style.trim().length > 0, 'the section template has no style block at all');
+
+  const selectors = [...style.matchAll(/^\s*([.#][\w-]+[^{]*)\{/gm)].map((m) => m[1].trim());
+  assert.deepEqual(selectors, ['.section-list', '.section-empty']);
+});
+
+test('no section is named in the template, so none can be special-cased', () => {
+  // The failure this forecloses is a branch rather than a style: a template that
+  // says `section === 'Scientific Research' ? … : …` anywhere. Checked against
+  // every name on the roster and against the new slug, because the special case
+  // would most likely be written for the newest section.
+  const page = sectionTemplate();
+  for (const name of [...STANDING_SECTIONS, SLUG]) {
+    assert.ok(
+      !page.includes(`'${name}'`) && !page.includes(`"${name}"`),
+      `the section template names ${name} — a section page must not know which section it is`
+    );
+  }
+});
+
+test('the stylesheet knows no section by name either', () => {
+  // The other place a per-section rule could live, and the one a reader of the
+  // template would not think to check.
+  //
+  // COMMENTS COME OUT FIRST, and they are why this is not a plain substring
+  // test on the file. The stylesheet's prose mentions /section/cover and the
+  // cover story by name, in two comments explaining decisions — which is the
+  // file documenting itself, not a rule. What must not exist is a DECLARATION
+  // that knows a section, so the declarations are what is searched.
+  const css = read('src/styles/global.css').replace(/\/\*[\s\S]*?\*\//g, ' ');
+  for (const name of [...STANDING_SECTIONS.map(slugifySection), SLUG]) {
+    assert.ok(
+      !css.includes(name),
+      `src/styles/global.css names the section slug ${name} — sections have no styles of their own`
+    );
+  }
+});
+
 // --- The nav position ----------------------------------------------------
 
 test('Scientific Research sits immediately after The Metaphysical Corner', () => {
