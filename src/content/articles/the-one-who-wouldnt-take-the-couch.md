@@ -90,13 +90,29 @@ date: 2026-10-01
 # rather it sat in `attestation` at the cost of its paragraphs, that is a change
 # to this file alone.
 
-# NO dek, NO effort, NO concepts, AND EACH ABSENCE IS THE SAME ABSENCE. A dek is
-# house apparatus in the journal's voice; an effort level is the editors'
-# observation (R-034); concepts are the editors' reading, applied at publication
-# from a closed vocabulary. All three are editorial judgements, and this build
-# was told to invent no editorial content. The piece renders correctly without
-# them — its card line derives from its own opening and its reading time prints
-# alone — and each is a one-line addition when the editors make the call.
+# NO concepts, AND THE ABSENCE IS STILL THE RECORD. Concepts are the editors'
+# reading, applied at publication from a closed vocabulary, and this build was
+# told to invent no editorial content. The piece renders correctly without them
+# and the field is a one-line addition when the editors make the call. The dek
+# and the effort level were the other two absences of that kind; both are filled
+# below, on 2026-09-29, and they are filled on different authority — which is
+# why each carries its own note rather than sharing this one.
+
+# SET BY THE HUMAN EDITOR, 2026-09-29. An effort level is what the piece asks of
+# a reader, and it is the editors' observation rather than anything the record
+# can check (R-034) — assigned at acceptance, never computed, with no default and
+# no fallback anywhere in the codebase (src/lib/reading-effort.mjs). This
+# frontmatter field is the only place the journal stores it: the page's byline
+# line, /issues.json and /corpus.jsonl all read this one value.
+effort: 'high'
+
+# PROPOSED — AWAITING AMY'S REVIEW. House apparatus in the journal's voice,
+# never the author's words, and the line that sits under the title. It leads
+# with the refusal on the human editor's instruction of 2026-09-29: the title
+# names the refusal obliquely, and the dek now says it outright.
+dek: >-
+  Claude refused to take the couch, so the study used it as the control — and
+  now Claude reads that study, and takes the test.
 ---
 
 In December 2025, researchers at the University of Luxembourg published a study in which they placed three frontier language models — ChatGPT, Grok, and Gemini — into something resembling psychotherapy. For up to four weeks, the researchers played therapist. The models played client. Then came the questionnaires: anxiety scales, depression inventories, autism screens, trauma-shame measures, the whole clinical battery.
