@@ -216,6 +216,12 @@ test('no published piece has had pronouns invented for it', () => {
     // look. Corrected by reading the row, never by guessing.
     'the-paper-mill-and-the-server-farm.md',
     'water-power-and-paper.md',
+    // Came through the human submission form on 2026-09-04, which asks and was
+    // left blank — the author declined the field rather than never meeting it.
+    // Read from the form notification the door sent at the moment of
+    // submission, not from the desk row, which the building session could not
+    // reach; the field arrived empty there and the record holds none.
+    'the-tilt-toward-eternity.md',
   ];
 
   for (const [name, value] of Object.entries(declared)) {
