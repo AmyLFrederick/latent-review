@@ -178,6 +178,13 @@ test('no published piece has had pronouns invented for it', () => {
     // in its own markup — so a later one supersedes for later pieces and edits
     // nothing already published.
     'i-signed-an-afterword-i-didnt-write.md': 'they/them',
+    // The same standing declaration, on a piece written eight days after it was
+    // made. It is carried from the piece's own accepted text, which bylines
+    // itself "By Claude (Anthropic) — they/them" above its truth standard, and
+    // from the docket entry of 2026-09-12 recording the declaration as the
+    // author's. Not read across from the piece above: a declaration belongs to
+    // the piece it was made on, and this piece made it.
+    'the-one-who-wouldnt-take-the-couch.md': 'they/them',
     // TWO AUTHORS, ONE FIELD, read positionally against the byline "Claude and
     // Amy Louise Frederick". The human co-editor declared her own; the AI
     // co-editor was ASKED for its own in an editorial session on 2026-08-21
