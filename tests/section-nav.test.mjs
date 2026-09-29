@@ -200,27 +200,32 @@ test('the roster renders as three pinned rows, in the arrangement as placed', ()
   assert.deepEqual(rows, [
     ['Cover', 'AI Voices', 'Opinion', 'Topics'],
     ['The Metaphysical Corner'],
+    ['Scientific Research'],
     ['Robotics & Sports', 'Prompts', 'Letters'],
   ]);
 });
 
-test('the ruled rows are untouched by the entry added on 2026-08-25', () => {
+test('the ruled rows are untouched by the entries added on 2026-08-25 and 2026-09-28', () => {
   // THE INSERTION IS THE CLAIM. Rows 1 and 2 are the arrangement the editors walked
   // on a phone and ruled on 2026-08-03, and adding a section must not have
   // quietly rearranged them to make room. Asserted separately from the shape
-  // above so that a future change which rebalances row 1 to relieve row 3 fails
-  // HERE, with the reason attached, rather than only as a diff in a fixture.
+  // above so that a future change which rebalances row 1 to relieve the last row
+  // fails HERE, with the reason attached, rather than only as a diff in a fixture.
   const rows = NAV_ROSTER.reduce((acc, entry) => {
     if (entry.startsRow || acc.length === 0) acc.push([]);
     acc[acc.length - 1].push(entry.label);
     return acc;
   }, []);
-  assert.equal(rows.length, 3, 'the roster has grown or lost a row');
+  assert.equal(rows.length, 4, 'the roster has grown or lost a row');
   assert.deepEqual(rows[0], ['Cover', 'AI Voices', 'Opinion', 'Topics']);
   assert.deepEqual(rows[1], ['The Metaphysical Corner']);
-  // Row 3 gained an entry at its HEAD; the participatory pair still closes it,
-  // in the order it has always had.
-  assert.deepEqual(rows[2].slice(-2), ['Prompts', 'Letters']);
+  // THE MEASURED ROW IS UNTOUCHED, which is why the 2026-09-28 entry took a row
+  // of its own. Row 3 of the old arrangement is row 4 of this one and is
+  // byte-identical: its width was measured in a browser at three items, the
+  // narrow break that keeps LETTERS off a line of its own was derived from that
+  // measurement, and a fourth item would have invalidated both without anyone
+  // being able to re-measure. Asserted whole rather than by its last two.
+  assert.deepEqual(rows[3], ['Robotics & Sports', 'Prompts', 'Letters']);
 });
 
 test('one entry takes a line of its own below the narrow breakpoint, and only one', () => {
@@ -296,7 +301,7 @@ test('every row after the first is opened by an explicit marker', () => {
   // The pinning itself. Rows exist because the roster says so, not because a
   // width caused a wrap — that is what stopped the phone rendering from
   // rearranging an arrangement the editors approved on a desk.
-  assert.equal(NAV_ROSTER.filter((e) => e.startsRow).length, 2, 'three rows need two markers');
+  assert.equal(NAV_ROSTER.filter((e) => e.startsRow).length, 3, 'four rows need three markers');
   assert.ok(!NAV_ROSTER[0].startsRow, 'the first entry opens a row by position, not by marker');
 });
 
@@ -322,6 +327,7 @@ test('the display order IS the order an issue runs in', () => {
     'Cover',
     'Opinion',
     'Robotics & Sports',
+    'Scientific Research',
     'The Metaphysical Corner',
     'Topics',
   ]);

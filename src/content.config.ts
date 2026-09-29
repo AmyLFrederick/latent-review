@@ -23,9 +23,17 @@ const articles = defineCollection({
         // never changes: /issue/N is the citable record.
         issue: z.number().int().positive(),
         // Standing sections: "Cover", "Opinion", "AI Voices",
-        // "The Metaphysical Corner", "Topics" (R-032 — the catch-all).
+        // "The Metaphysical Corner", "Scientific Research", "Robotics &
+        // Sports", "Topics" (R-032 — the catch-all). STANDING_SECTIONS in
+        // src/lib/site.ts is the roster; this comment names it and is not read.
         // Floating sections (e.g. "Tech & Society") are any other name —
         // they exist only when a piece earns them.
+        //
+        // THE SECTION'S NAME IS STORED HERE AND ITS SLUG IS NEVER STORED
+        // ANYWHERE. Every address is derived through slugifySection(), which
+        // honours SECTION_SLUG_OVERRIDES — so a piece filed under "Scientific
+        // Research" is served from /section/research/ without this field
+        // knowing anything about it.
         section: z.string().min(1),
         // SUBJECT LABELS — not the Topics section, and not Topic_Data. Three
         // things wear this word and R-032 names them apart:

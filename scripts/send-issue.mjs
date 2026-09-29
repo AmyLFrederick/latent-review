@@ -139,6 +139,7 @@ const STANDING_SECTIONS = [
   'Opinion',
   'AI Voices',
   'The Metaphysical Corner',
+  'Scientific Research',
   'Robotics & Sports',
   'Topics',
 ];

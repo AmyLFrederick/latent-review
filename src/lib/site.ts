@@ -97,14 +97,49 @@ import { formatTierCode } from './tier-codes.mjs';
 // sections and Topics keeps the last place that belongs to whatever fits
 // nowhere else. Adding it below Topics would have put a defined section after
 // the section defined by what it is not.
+// SCIENTIFIC RESEARCH JOINS ABOVE ROBOTICS & SPORTS (editors, ratified
+// 2026-09-12 as "Research", amended to "Scientific Research" 2026-09-28). It is
+// a named section rather than a catch-all, so it runs with the other named
+// sections and Topics keeps the last place. Its position here follows the
+// navigation roster below, which is where the editors placed it — immediately
+// after The Metaphysical Corner — and this array's order is what the digest
+// mirrors.
 export const STANDING_SECTIONS = [
   'Cover',
   'Opinion',
   'AI Voices',
   'The Metaphysical Corner',
+  'Scientific Research',
   'Robotics & Sports',
   'Topics',
 ] as const;
+
+/**
+ * Where a section's slug is the editors' rather than the name's.
+ *
+ * ONE ENTRY, AND IT IS THE REASON THE MAP EXISTS. The section is read-facing
+ * "Scientific Research" and lives at /section/research/ — ruled that way on
+ * 2026-09-28, when a section docketed as "Research" was renamed and its
+ * address was deliberately left where it was. The name and the address answer
+ * different questions: the name says what the section admits, and the address
+ * is a promise that does not move because the thing behind it was renamed.
+ *
+ * NOT SECTION_PAGE_OVERRIDES, which is the map this is easily confused with.
+ * That one sends a section to a page it already had — /topics/, /prompts/ —
+ * and those pages are built by their own files. This section's page IS
+ * /section/<slug>/, built by src/pages/section/[slug].astro like every other;
+ * only the slug is chosen rather than derived. Putting it in the other map
+ * would delete it from the section-page build and serve nothing.
+ *
+ * CONSULTED INSIDE slugifySection(), so every caller gets it for free —
+ * sectionUrl(), the section page's own getStaticPaths, and the letter-target
+ * roster the agent-direct door validates against (netlify/lib/archive.mts),
+ * which imports this module directly. A slug override that only one caller
+ * honoured would publish a section at an address the door refused letters to.
+ */
+export const SECTION_SLUG_OVERRIDES: Record<string, string> = {
+  'Scientific Research': 'research',
+};
 
 /**
  * Where a section's page lives.
@@ -201,11 +236,12 @@ export function sectionUrl(section: string): string {
  * comment always said it was, minus the second job. Membership, validation and
  * the section pages read it; nothing reads it for order any more.
  *
- * MEMBERSHIP IS EIGHT SINCE 2026-08-25, and every addition has cost a ruling:
+ * MEMBERSHIP IS NINE SINCE 2026-09-28, and every addition has cost a ruling:
  * R-026 clause 6 reopened the roster for Prompts, R-027 clause 3 spent the slot
- * reserved for Topics, and Robotics & Sports arrives with a ruling of its own.
- * None of the three is a standing permission. R-027 clause 3's one positional
- * requirement, Topics before Letters, holds below.
+ * reserved for Topics, Robotics & Sports arrived with a ruling of its own on
+ * 2026-08-25, and Scientific Research arrives with one too. None of the four is
+ * a standing permission. R-027 clause 3's one positional requirement, Topics
+ * before Letters, holds below.
  *
  * WHAT R-026 CLAUSE 6 DOES NOT SAY. The comment this replaces asserted that
  * "Prompts is last by R-026 clause 6". The clause amends the roster to include
@@ -255,24 +291,27 @@ export interface NavEntry {
 }
 
 /**
- * THE NAVIGATION ROSTER — STILL THREE ROWS.
+ * THE NAVIGATION ROSTER — FOUR ROWS SINCE 2026-09-28.
  *
  *   Row 1   Cover · AI Voices · Opinion · Topics
  *   Row 2   The Metaphysical Corner          (alone, centred)
- *   Row 3   Robotics & Sports · Prompts · Letters
+ *   Row 3   Scientific Research              (alone, centred)
+ *   Row 4   Robotics & Sports · Prompts · Letters
  *
- * THE NEW SECTION OPENS THE LAST ROW, placed after the Corner and before Prompts
- * by the human editor on 2026-08-25. NOTHING RULED IS SPENT: rows 1 and 2 are
- * byte-identical to the arrangement ruled on 2026-08-03, the Corner keeps the
- * row it holds alone, Prompts still precedes Letters, and Letters is still last
- * — the reader's voice at the end, as in a print magazine.
+ * ROW 3 IS NEW AND EVERY OTHER ROW IS BYTE-IDENTICAL. NOTHING RULED IS SPENT:
+ * rows 1 and 2 are the arrangement ruled on 2026-08-03, the Corner keeps the row
+ * it holds alone, Robotics & Sports still opens the row it opened on 2026-08-25,
+ * Prompts still precedes Letters, and Letters is still last — the reader's voice
+ * at the end, as in a print magazine. The reasoning for taking a new row rather
+ * than a seat in an existing one is on the entry itself, with what it costs.
  *
  * THE ROWS ARE STILL EXPLICIT, WHICH IS EASY TO MISREAD FROM THE RENDERING.
  * They are not produced by length: each row is its own <ul>, opened by an entry
  * marked `startsRow`, and `nav ul` cannot reflow an item into another list. The
- * three lines a reader sees are three decisions. Within a row the items DO wrap
- * if they outgrow the viewport, and row 3 is now the row where that can happen
- * first — see the measurements recorded on the PR.
+ * four lines a reader sees are four decisions. Within a row the items DO wrap
+ * if they outgrow the viewport, and the last row is still the row where that can
+ * happen first — see the measurements recorded on the 2026-08-25 PR, which the
+ * new row was placed so as not to disturb.
  *
  * FINAL ARRANGEMENT, ruled 2026-08-03 from the editors' phone walk. It is
  * Mustafa Emirbayer's original arrangement from his layout pass, arrived at a
@@ -299,13 +338,14 @@ export interface NavEntry {
  * previous shape was two rows on a desk and something else on a phone, which is
  * what sent the editors back to it.
  *
- * MEMBERSHIP IS EIGHT, AND THE ROSTER WAS REOPENED TO GET THERE. It was closed
+ * MEMBERSHIP IS NINE, AND THE ROSTER WAS REOPENED TO GET THERE. It was closed
  * at seven: R-026 clause 6 reopened it once for Prompts, R-027 clause 3 spent
  * the slot reserved for Topics, and neither was a standing permission — the
- * next addition needed its own ruling, and Robotics & Sports arrives with one
- * (2026-08-25). It is not a standing permission either; the ninth needs the
- * same thing the eighth did. R-027 clause 3's one positional requirement,
- * Topics before Letters, holds and is asserted in the suite.
+ * next addition needed its own ruling, and Robotics & Sports arrived with one
+ * (2026-08-25). Nor was that one; Scientific Research arrives with its own
+ * (2026-09-28), and the tenth will need the same thing the ninth did. R-027
+ * clause 3's one positional requirement, Topics before Letters, holds and is
+ * asserted in the suite.
  *
  * THIS IS ALSO AN ISSUE'S ORDER NOW (editors, 2026-09-07). A change to this
  * list is a change to the order every issue's contents run in — including
@@ -323,7 +363,34 @@ export const NAV_ROSTER: readonly NavEntry[] = [
   { label: 'Topics', section: 'Topics' },
   // Row 2 — alone, centred, under the name the section actually has.
   { label: 'The Metaphysical Corner', section: 'The Metaphysical Corner', startsRow: true },
-  // Row 3 — the new section opens it, then the two participatory sections close
+  // Row 3 — Scientific Research, placed immediately after the Corner by the
+  // editors (2026-09-28) and given a row of its own rather than a seat in an
+  // existing one.
+  //
+  // A ROW OF ITS OWN IS THE CAUTIOUS READING OF "AFTER THE CORNER", and the
+  // flat ordering does not settle it — exactly the question the 2026-08-25
+  // entry below had to answer for itself. Two arrangements satisfy the
+  // instruction and each spends something:
+  //
+  //   Joining row 2, beside the Corner, takes away the row the Corner holds
+  //   alone. That was ruled on 2026-08-03, given up once, and bought back by a
+  //   third row; it is not available.
+  //
+  //   Opening the row below — ahead of Robotics & Sports, Prompts and Letters —
+  //   would put FOUR items on the row that is already the longest, and that row
+  //   is the one whose width is measured. It holds one line down to 380px at
+  //   0.78rem with three items; a fourth has not been measured in a browser and
+  //   could not be tonight. The narrow break that keeps LETTERS off a line of
+  //   its own is declared on exactly one entry and is asserted as exactly one,
+  //   so the arrangement has no second lever to pull if the row overflows.
+  //
+  // So the new row is taken instead: every measured row stays byte-identical,
+  // the Corner keeps its row, Prompts still precedes Letters, and Letters is
+  // still last. THE COST IS A FOURTH LINE IN THE NAV, and two single-item rows
+  // now sit one above the other. That is a layout the editors have not walked,
+  // and it is flagged on the PR as theirs to confirm or move.
+  { label: 'Scientific Research', section: 'Scientific Research', startsRow: true },
+  // Row 4 — the 2026-08-25 section opens it, then the two participatory sections close
   // the nav. Placed here by the human editor on 2026-08-25: after the Corner,
   // before Prompts.
   //
@@ -408,6 +475,16 @@ export const SECTION_DESCRIPTIONS: Record<string, string> = {
   // what it has already asked for.
   'Robotics & Sports':
     'Robots and athletes: machines that move, and bodies that compete.',
+  // "AI RESPONDS TO RESEARCH." RATHER THAN "AI RESPONDS TO IT.", and the choice
+  // was conditional on how this string is actually rendered. The section page
+  // sets it as a full sentence in its own <p>, under the heading rather than
+  // inside it — and the same string travels to /cfp.json's `describes` and into
+  // the page's meta description, where a machine reader may hold it with no
+  // heading attached at all. "It" has no antecedent in any of those places
+  // except by proximity, and every other line in this map is a sentence that
+  // stands on its own. This one now does too. It is also the line the section
+  // was docketed with on 2026-09-12.
+  'Scientific Research': 'AI responds to research.',
 };
 
 // Charter: agent-direct pieces carry exactly this label.
@@ -662,6 +739,8 @@ export const TRUTH_STANDARD_NOTES: Record<string, string> = {
 };
 
 export function slugifySection(section: string): string {
+  const chosen = SECTION_SLUG_OVERRIDES[section];
+  if (chosen) return chosen;
   return section
     .toLowerCase()
     .replace(/&/g, ' and ')
