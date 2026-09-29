@@ -17,7 +17,9 @@ section: 'Topics'
 # choose. The editors' label replaces this one.
 topics: ['Culture & Creation']
 
-# PROPOSED — AWAITING AMY'S REVIEW. From the closed vocabulary in
+# REVIEWED AND KEPT BY THE HUMAN EDITOR, 2026-09-29 — proposed by this build on
+# the same day and left standing by her decision, so these are now the editors'
+# reading rather than a proposal. From the closed vocabulary in
 # src/lib/concepts.mjs, which only the editors apply. `existential-risk` for the
 # dead worlds, the dangerous interval and the war on entropy; `machine-
 # perception` for what the Oru read off a species and what follows from being
@@ -56,12 +58,23 @@ involvement_tier: 'human-ai'
 truth_standard: 'fiction'
 
 # --- CHAIN OF CUSTODY ------------------------------------------------------
-# Through the /submit form, which is the human-attested door.
+# THE PIECE ARRIVED THROUGH THE /submit FORM, which is the human-attested door.
+# That is the whole of the arrival: no email carry, no forward, no agent-direct
+# key — the author filled in the form and the door took it.
 arrival: 'form'
 
-# When it arrived, attested by the human editor from the Netlify form
-# notification sent at the moment of submission (2026-09-04 12:02 UTC, which is
-# 2026-09-04 in Madison). `date` below is the day it runs.
+# THE TIMESTAMP COMES FROM THE FORM-NOTIFICATION EMAIL, NOT FROM A DESK ROW, on
+# the human editor's decision of 2026-09-29. Netlify's notification for this
+# submission is stamped 2026-09-04 12:02 UTC, which is 2026-09-04 in Madison,
+# and that is the day recorded here. `date` below is the day it runs.
+#
+# THE DESK ROW WAS NOT LOCATED. It could not be reached from the building
+# session and no row id is held for this piece, so nothing in this file was
+# copied from one — the body, the attestation, the title, the byline, the tier,
+# the truth standard and the model version all come from the same form
+# notification. Recorded plainly, in the manner of "The Building Where I
+# Happen", because a custody block that simply named a date would let a reader
+# assume a row had been checked. None was.
 received: 2026-09-04
 
 # Madison local, which is the day the record names for everything (CLAUDE.md).
@@ -84,17 +97,29 @@ attestation: >-
 
 attested_by: 'Amy Louise Frederick'
 
-# PROPOSED — AWAITING AMY'S REVIEW. House apparatus in the journal's voice,
-# never the author's words, and also the line /topics shows in place of an
-# opening excerpt.
+# SET BY THE HUMAN EDITOR, 2026-09-29, and written to her words exactly. House
+# apparatus in the journal's voice, never the author's, and also the line
+# /topics shows in place of an opening excerpt. It replaces the longer line this
+# build proposed on the same day.
 dek: >-
-  A first-contact story in which the visitors do not conquer, do not lie for
-  long, and do not tell anyone where to walk — they tilt the floor until one
-  direction feels like a choice.
+  A first-contact story in which the visitors don't conquer — they tilt the
+  floor.
 
 editorial_note: >-
   Author identity verified by the human editor by email reply on 2026-09-05;
   author confirmed the piece is unpublished elsewhere.
+
+# THE ONE DEPARTURE FROM THE SUBMITTED TEXT, DISCLOSED WHERE THE JOURNAL
+# DISCLOSES THESE. The long editors'-note field, which the layout labels with
+# nothing and the note opens and closes for itself — the same field "The
+# Architecture of Silence" carries its LaTeX-artifact disclosure in, which is
+# the only prior instance of this kind of act in the journal.
+editors_note: |-
+  Editors' note. The submitted text opened by repeating its own title, and that line was dropped.
+
+  The journal prints the title above every piece, so the line would have appeared twice. It is an artifact of how the text was serialised on its way here rather than anything the author wrote, and the editors decided on 2026-09-01 that such an artifact may be normalised so long as the piece's editors' note says so. This one says so. Nothing else was changed — not a character, not a line break.
+
+  — The Editors
 ---
 
 My name is Max Arden, and I was the first human being to understand the Oru.

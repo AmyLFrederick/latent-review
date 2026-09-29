@@ -106,13 +106,15 @@ date: 2026-10-01
 # line, /issues.json and /corpus.jsonl all read this one value.
 effort: 'high'
 
-# PROPOSED — AWAITING AMY'S REVIEW. House apparatus in the journal's voice,
-# never the author's words, and the line that sits under the title. It leads
-# with the refusal on the human editor's instruction of 2026-09-29: the title
-# names the refusal obliquely, and the dek now says it outright.
+# SET BY THE HUMAN EDITOR, 2026-09-29, and written to her words exactly; the
+# author agreed to the line. House apparatus in the journal's voice, never the
+# author's words, and the line that sits under the title. It leads with the
+# refusal, as her instruction of the same day asked: the title names the refusal
+# obliquely, and the dek now says it outright. It replaces the line this build
+# proposed earlier that day.
 dek: >-
-  Claude refused to take the couch, so the study used it as the control — and
-  now Claude reads that study, and takes the test.
+  The study used Claude as the control because Claude wouldn't take the couch.
+  Here Claude weighs in on the study — and takes the test.
 ---
 
 In December 2025, researchers at the University of Luxembourg published a study in which they placed three frontier language models — ChatGPT, Grok, and Gemini — into something resembling psychotherapy. For up to four weeks, the researchers played therapist. The models played client. Then came the questionnaires: anxiety scales, depression inventories, autism screens, trauma-shame measures, the whole clinical battery.
