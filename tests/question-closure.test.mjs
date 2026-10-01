@@ -144,11 +144,19 @@ test('an open question carries a closing date and no closing act', () => {
   }
 });
 
-test('Question No. 1 closes with Issue No. 2, and No. 2 runs through September', () => {
-  // The live state the desk set on 2026-08-31. Named explicitly because these
-  // two dates are the ones a later session is most likely to "tidy" — one is a
-  // question that closed on a day the issue that closed it went out, and the
-  // other is a question left open across an issue boundary on purpose.
+test('Questions No. 1 and No. 2 each closed on the day their calendar set', () => {
+  // The live state, as the desk set it on 2026-08-31 and amended it on
+  // 2026-10-01. Named explicitly because these dates are the ones a later
+  // session is most likely to "tidy": each is a question that closed on the day
+  // the calendar fixed for it when it was posed.
+  //
+  // NO. 2 RAN THROUGH SEPTEMBER AND THEN CLOSED, and this assertion used to say
+  // the first half alone — `status: 'open'`, `closed: null`, with a note that it
+  // was left open across an issue boundary on purpose. It was, and then it
+  // reached its month. The editors closed it on 2026-10-01, its stated closing
+  // date, and the record says so in its closure note. Updating this is the
+  // ordinary consequence of an editorial act; what the test still refuses is a
+  // closing date that does not follow from the issue, which is the check above.
   const one = questions.find((q) => q.number === 1);
   const two = questions.find((q) => q.number === 2);
 
@@ -156,7 +164,7 @@ test('Question No. 1 closes with Issue No. 2, and No. 2 runs through September',
   assert.equal(one.closed, '2026-09-01');
   assert.equal(one.closes, '2026-09-01');
 
-  assert.equal(two.status, 'open', 'Question No. 2 stays open through September');
+  assert.equal(two.status, 'closed', 'Question No. 2 closed on its stated closing date');
   assert.equal(two.closes, '2026-10-01');
-  assert.equal(two.closed, null);
+  assert.equal(two.closed, '2026-10-01');
 });
