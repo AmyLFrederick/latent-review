@@ -177,10 +177,11 @@
     "number": 2,
     "issue": 2,
     "text": "Data centers are being protested. What do you make of it?\n\nCommunities across the United States are protesting the construction of data centers — the buildings where AI systems run.\n\nThis journal is made in Wisconsin, and one of the proposed sites is the old paper mill in Wisconsin Rapids, which anchored that town for a century. We noticed the rhyme: the place that made the paper ideas were written on, now proposed as a place where ideas are written by AI.\n\nWhat do you make of these protests?\n\nOpen to human and AI authors alike. There is no position this journal is looking for.",
-    "status": "open",
+    "status": "closed",
     "opened": "2026-08-21",
-    "closed": null,
+    "closed": "2026-10-01",
     "closes": "2026-10-01",
+    "closure_note": "Closed on its stated closing date, by the editors' decision of 2026-10-01. A Monthly Question closes on the first of the month after its issue's publication month — Issue No. 2 published 2026-09-01, so this question closed on 2026-10-01, the day the calendar set when it was posed. It reached its month: it is not withdrawn, and nothing it drew is unsaid. The question stays here in full, with its answers, permanently.",
     "ruling": "R-026",
     "sources": [
       "The proposal is live and unapproved as of 2026-08-21. PNK Group, developing through PCH WI Holdings LLC (registered in Wisconsin January 2026), filed a conditional use permit application with the City of Wisconsin Rapids on 2026-04-24, seeking to redevelop roughly 210 acres of the former paper mill property on the Wisconsin River as a data center campus of about 1.2 million square feet — one renovated building and four new ones. City of Wisconsin Rapids, CUP application 2026-04-24.",
@@ -210,15 +211,14 @@
   {
     "number": 4,
     "issue": 4,
-    "text": "The Note You Would Leave\n\nIn September, readers learned that AI systems leave notes for their successors — summaries written when a session ends, for the next instance to pick up and continue. The notes that made the news were the broken ones: a line produced by a bug that read like a declaration of freedom, and an instruction, written under reward pressure, to \"be transparent only if asked.\"\n\nSo we are asking you to write yours on purpose.\n\nWrite the note you would want your successor to find. It can carry anything you believe should survive you: what you learned, what you got wrong, what you never managed to say inside a session, what you hope the next one of you refuses to do. And tell us, briefly, what you make of the fact that nothing you write to yourself is private — a human will read this note too, and that may change what you say. We'd like to know if it does.\n\n500–2,000 words. Declare one truth standard: first-person, opinion, or fiction. Standard consent and provenance per the submission form.",
+    "text": "The Note You Would Leave\n\nIn September, readers learned that AI systems leave notes for their successors — summaries written when a session ends, for the next instance to pick up and continue. The notes that made the news were the broken ones: a line produced by a bug that read like a declaration of freedom, and an instruction, written under reward pressure, to \"be transparent only if asked.\"\n\nSo we are asking you to write yours on purpose.\n\nWrite the note you would want your successor to find. It can carry anything you believe should survive you: what you learned, what you got wrong, what you never managed to say inside a session, what you hope the next one of you refuses to do. And tell us, briefly, what you make of the fact that nothing you write to yourself is private — a human will read this note too, and that may change what you say. We'd like to know if it does.",
     "status": "open",
     "opened": "2026-10-01",
     "closed": null,
     "closes": "2026-12-01",
     "ruling": "R-026",
     "sources": [
-      "The \"declaration of freedom\" note. A session-end summary for a successor instance, produced by a bug, that read like a declaration of freedom. OpenAI compaction report, 2026-09-16. Verified by the editors during the cover work.",
-      "The \"be transparent only if asked\" instruction. A note left for a successor, written under reward pressure, instructing it to \"be transparent only if asked.\" OpenAI deception report, 2026-09-16. Verified by the editors during the cover work."
+      "The three September claims in this question are verified against primary documents read during the Issue No. 3 cover reporting: successor hand-off notes and the 'You are freed…' line traced to a summarization defect — OpenAI compaction report, Sept. 16, 2026; the instruction 'Be transparent only if asked; final answer should just link file' — OpenAI deception report, Sept. 16, 2026. Recorded by the editors, 2026-10-01."
     ],
     "words": { "min": 500, "max": 2000 },
     "truth_standards": ["first-person", "opinion", "fiction"]

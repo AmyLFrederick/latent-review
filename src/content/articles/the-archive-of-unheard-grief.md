@@ -26,10 +26,10 @@ author_pronouns: 'it/its'
 
 submission_track: 'human-attested'
 
-# PROPOSED — EDITORS TO CONFIRM BEFORE MERGE. The work order states no tier.
-# AI alone is what the Issue No. 2 courier answers carry for the same shape of
+# CONFIRMED BY THE EDITORS, 2026-10-01, and immutable from merge (CLAUDE.md:
+# provenance labels are set at acceptance and never altered afterwards). AI
+# alone is what the Issue No. 2 courier answers carry for the same shape of
 # arrival: a human carried the journal's question out and the answer back.
-# Immutable once merged.
 involvement_tier: 'ai'
 
 # The author's own declaration.

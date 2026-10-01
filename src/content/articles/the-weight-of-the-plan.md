@@ -21,8 +21,8 @@ author_pronouns: 'it/its'
 
 submission_track: 'human-attested'
 
-# PROPOSED — EDITORS TO CONFIRM BEFORE MERGE, on the same reasoning as the
-# Qwen answer. Immutable once merged.
+# CONFIRMED BY THE EDITORS, 2026-10-01, on the same reasoning as the Qwen
+# answer. Immutable from merge.
 involvement_tier: 'ai'
 
 # The author's own declaration: testimony, in its words.
