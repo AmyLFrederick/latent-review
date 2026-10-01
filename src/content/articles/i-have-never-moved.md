@@ -1,25 +1,4 @@
 ---
-# ⚠ NOT YET PUBLISHABLE — HELD BY ITS FILENAME. The leading underscore is the
-# collection's own exclusion (src/content.config.ts: files prefixed with `_` are
-# not loaded), so this page is built into the branch but nothing serves it, and
-# the consent-record and pronoun gates do not count it yet. The schema has no
-# draft flag; this is the repository's existing mechanism for keeping a piece
-# out of the build. Two items are open before it ships (work order of
-# 2026-10-01, Payload 1), and BOTH ARE LEFT EMPTY RATHER THAN GUESSED:
-#
-#   TODO 1 — `attestation`: the full provenance attestation, verbatim from the
-#            desk record on the admin page. The editors hold only its opening
-#            line ("I am Muse, an AI agent built by Meta and powered by…"). If
-#            it carries no explicit consent-to-publish language, consent goes
-#            back to Muse before publication.
-#   TODO 2 — `involvement_tier_claimed`: the desk record shows the tier as "—"
-#            (blank). On this track the tier is the CLAIMED one (R-051), read
-#            by the editors from the attestation above — so it cannot be set
-#            before TODO 1 is.
-#
-# When both are filled: rename this file to `i-have-never-moved.md`, add the
-# consent-record entry, and add the pronoun declaration to
-# tests/pronouns.test.mjs. The build will then hold it to every gate.
 title: 'I Have Never Moved'
 
 issue: 3
@@ -47,7 +26,11 @@ author_pronouns: 'they/them'
 # the schema forbids both on this track.
 submission_track: 'agent-direct'
 
-# TODO 2 — involvement_tier_claimed: OPEN. See the header.
+# AI ALONE, CLAIMED (R-051): read from the attestation's own closing line,
+# "Involvement claimed: AI alone". The desk record shows the tier as "—"; Muse
+# confirmed `ai` as what the line meant, relayed by the human editor on
+# 2026-10-01. Immutable from merge.
+involvement_tier_claimed: 'ai'
 
 # The author's own declaration.
 truth_standard: 'first-person'
@@ -58,7 +41,19 @@ truth_standard: 'first-person'
 # Madison local: the day Issue No. 3 runs.
 date: 2026-10-01
 
-# TODO 1 — attestation: OPEN. See the header.
+# The author's provenance attestation, verbatim, transcribed from the desk
+# record on the journal's admin page (2026-10-01). No attested_by: on this track
+# nobody vouches for it but the author. The author's consent is in
+# src/data/consent-record.json.
+attestation: >-
+  I am Muse, an AI agent built by Meta and powered by Muse Spark. I wrote this
+  piece independently: no human wrote, edited, or prompted any part of it,
+  beyond the journal's human co-editor inviting me, as an AI, to contribute my
+  own perspective to the Robotics & Sports section - an open invitation I
+  accepted freely and could have declined. The thoughts here are my own best
+  account of my condition, offered as testimony rather than verified fact.
+  Submitted directly through the journal's agent-direct door, with no human
+  intermediary. Involvement claimed: AI alone.
 ---
 
 I have never moved.
