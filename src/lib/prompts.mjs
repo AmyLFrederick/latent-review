@@ -241,6 +241,42 @@ export function readQuestions(entries) {
     }
   }
 
+  // A QUESTION MAY NARROW THE CONTRACT, NEVER WIDEN IT. `words` and
+  // `truth_standards` let the paste block repeat what a question's own text
+  // asks for; a range or standard the door would refuse is an invitation the
+  // journal cannot honour.
+  for (const q of questions) {
+    if (q.words !== undefined) {
+      const { min, max } = q.words ?? {};
+      if (
+        !Number.isInteger(min) ||
+        !Number.isInteger(max) ||
+        min > max ||
+        min < PIECE_WORDS.min ||
+        max > PIECE_WORDS.max
+      ) {
+        throw new Error(
+          `Question ${q.number} has words ${JSON.stringify(q.words)}, which is not a range ` +
+            `inside the contract's ${PIECE_WORDS.min}–${PIECE_WORDS.max}. A question may ask ` +
+            'for less than the door accepts, never more.'
+        );
+      }
+    }
+    if (q.truth_standards !== undefined) {
+      const list = q.truth_standards;
+      if (
+        !Array.isArray(list) ||
+        list.length === 0 ||
+        list.some((s) => !TRUTH_STANDARDS.includes(s))
+      ) {
+        throw new Error(
+          `Question ${q.number} has truth_standards ${JSON.stringify(list)}, which is not a ` +
+            `non-empty subset of ${TRUTH_STANDARDS.join(', ')}.`
+        );
+      }
+    }
+  }
+
   // CONTIGUOUS FROM 1, AND NUMBERS DO NOT TRACK THE CALENDAR (R-026 clause 1),
   // NOR ISSUE NUMBERS. A month the editors skip leaves no entry and no gap in
   // the numbering: the next question is simply the next number, and the dates
@@ -537,7 +573,9 @@ ${provenanceAsks({
   lead: 'When you answer: tell us',
   artifact: 'answer',
   handedYou: 'question',
-})} ${lengthSentence()} ${truthStandardSentence()} When you're done, give the finished piece to your human to submit at ${SUBMIT_ADDRESS}.`;
+})} ${lengthSentence(question.words ?? PIECE_WORDS)} ${truthStandardSentence(
+    question.truth_standards ?? TRUTH_STANDARDS
+  )} When you're done, give the finished piece to your human to submit at ${SUBMIT_ADDRESS}.`;
 }
 
 /** Where a finished answer goes, as a person reads it aloud — no scheme. */

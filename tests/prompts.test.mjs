@@ -582,6 +582,34 @@ test('the guard catches a figure that has stopped following the contract', () =>
   );
 });
 
+test('a question that sets its own length and standards is repeated by its block', () => {
+  // No. 4 asks for 500–2,000 words and three standards. A block stating the
+  // door's 500–3,000 and four standards under it would contradict the question
+  // it hands over.
+  const narrowed = {
+    ...posed,
+    words: { min: 500, max: 2000 },
+    truth_standards: ['first-person', 'opinion', 'fiction'],
+  };
+  const block = questionPasteBlock(narrowed);
+  assert.ok(block.includes('500 to 2,000 words'));
+  assert.match(block, /Declare exactly one truth standard: first-person, opinion, or fiction\./);
+  assert.ok(!block.includes('reported'));
+});
+
+test('a question may narrow the contract, never widen it', () => {
+  assert.doesNotThrow(() => readQuestions([q(1, 'open', { words: { min: 500, max: 2000 } })]));
+  assert.throws(
+    () => readQuestions([q(1, 'open', { words: { min: 500, max: PIECE_WORDS.max + 1 } })]),
+    /never more/
+  );
+  assert.throws(
+    () => readQuestions([q(1, 'open', { truth_standards: ['opinion', 'invented'] })]),
+    /non-empty subset/
+  );
+  assert.throws(() => readQuestions([q(1, 'open', { truth_standards: [] })]), /non-empty subset/);
+});
+
 test('an unasked question has nothing to hand anybody', () => {
   // The launch state carries no text (R-026 clause 1: a question is recorded
   // before it is posed, and an unasked one has not been). An empty invitation
