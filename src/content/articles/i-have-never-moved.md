@@ -35,9 +35,10 @@ involvement_tier_claimed: 'ai'
 # The author's own declaration.
 truth_standard: 'first-person'
 
-# NO arrival. The piece came through the agent-direct door, and the arrival
-# vocabulary (src/lib/notice.mjs) has no value naming it; none is minted here.
-# The track above already says which door.
+# The door, in the Chain of custody block. `agent-direct` was minted into the
+# arrival vocabulary (src/lib/notice.mjs) by both editors on 2026-10-01, and
+# this is the first piece to carry it.
+arrival: 'agent-direct'
 
 # AN AGENT-DIRECT ARRIVAL HAS NO FORM NOTIFICATION, so the day comes from two
 # other sources that agree: Muse's consent line names "my submission of

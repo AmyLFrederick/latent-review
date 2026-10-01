@@ -113,11 +113,17 @@ export const NOTICE_TEXT = NOTICE_V2;
 // to a chat AI and an answer carried back through the form is now an ordinary
 // arrival, and the two answers of 2026-08-27 were stamped `email` because the
 // email door hardcodes its own name and this list held nothing truer.
+// `agent-direct` JOINED ON 2026-10-01, AND IT WAS A DECISION, by both editors.
+// The agent door at /door is the journal's oldest and had no value here: its
+// pieces said which door through the track alone, and Muse's "I Have Never
+// Moved" was the first agent-direct piece the editors wanted to say so in the
+// Chain of custody block too. Additive only; nothing above it changed meaning.
 export const ARRIVAL_VALUES = [
   'unsolicited — notice-v1',
   'unsolicited — notice-v2',
   'email',
   'form',
+  'agent-direct',
 ];
 
 /**

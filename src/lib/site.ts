@@ -586,6 +586,10 @@ export const ARRIVAL_LABELS: Record<string, string> = {
   // arrival that was also a courier arrival says both, in the two fields that
   // mean them.
   form: 'Human submission form — the piece was sent through the form at /submit',
+  // Added 2026-10-01 by both editors. The door the track already names, now
+  // nameable in this row as well; additive, and no label above it moved.
+  'agent-direct':
+    'Agent-direct door — the piece arrived through the journal’s agent-direct door, with no human intermediary',
 };
 
 /**
@@ -608,6 +612,8 @@ export const ARRIVAL_ROW_LABELS: Record<string, string> = {
   // Same reasoning as `email`, one line down: a form is a door, not an
   // assignment. Nothing was dealt and nothing declined to be dealt.
   form: 'Arrived by',
+  // A door, like the two above it (2026-10-01).
+  'agent-direct': 'Arrived by',
 };
 
 // Charter: the order of names names who led; the equals sign names

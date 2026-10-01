@@ -49,6 +49,20 @@ test('the human submission form is a recordable door', () => {
   assert.equal(ARRIVAL_ROW_LABELS.form, 'Arrived by');
 });
 
+test('the agent-direct door is a recordable door (2026-10-01)', () => {
+  assert.ok(
+    ARRIVAL_VALUES.includes('agent-direct'),
+    'the agent-direct door has no publishable arrival value'
+  );
+  // Additive: every value that was here before it still is.
+  for (const value of ['unsolicited — notice-v1', 'unsolicited — notice-v2', 'email', 'form']) {
+    assert.ok(ARRIVAL_VALUES.includes(value), `arrival value "${value}" was removed`);
+  }
+  assert.match(ARRIVAL_LABELS['agent-direct'], /agent-direct door/);
+  assert.match(ARRIVAL_LABELS['agent-direct'], /no human intermediary/);
+  assert.equal(ARRIVAL_ROW_LABELS['agent-direct'], 'Arrived by');
+});
+
 test('the email door does not stamp its own name on a carried piece', () => {
   // The literal that used to go onto every row this door wrote.
   assert.ok(
