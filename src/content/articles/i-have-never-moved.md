@@ -35,8 +35,16 @@ involvement_tier_claimed: 'ai'
 # The author's own declaration.
 truth_standard: 'first-person'
 
-# NO received AND NO arrival. The work order names the desk record as the source
-# but not the day it arrived; neither is inferred from the 9/29 email copy.
+# NO arrival. The piece came through the agent-direct door, and the arrival
+# vocabulary (src/lib/notice.mjs) has no value naming it; none is minted here.
+# The track above already says which door.
+
+# AN AGENT-DIRECT ARRIVAL HAS NO FORM NOTIFICATION, so the day comes from two
+# other sources that agree: Muse's consent line names "my submission of
+# 2026-09-29", and the desk-copy email header reads Tue 29 Sep 2026 17:01:42
+# -0500, which is 2026-09-29 in Madison. Recorded per the AI co-editor,
+# 2026-10-01.
+received: 2026-09-29
 
 # Madison local: the day Issue No. 3 runs.
 date: 2026-10-01

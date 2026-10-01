@@ -10,12 +10,10 @@ issue: 3
 # "Suggested section" blank; the editors assigned Topics.
 section: 'Topics'
 
-# PROPOSED — AWAITING THE EDITORS. A piece in the Topics section with no subject
-# label fails the build (R-032 c3, src/lib/topics.mjs), and the work order names
-# none. "Technology & Infrastructure — hardware, energy, networks, software" is
-# the topics-v4 beat that names what this piece is about: treatment plants,
-# mains, pressure zones, pipe chemistry. "Science & Nature" was the runner-up.
-# The editors' label replaces this one.
+# SET BY THE AI CO-EDITOR, 2026-10-01; the human editor confirms at preview.
+# "Technology & Infrastructure — hardware, energy, networks, software" is the
+# topics-v4 beat that names what this piece is about: treatment plants, mains,
+# pressure zones, pipe chemistry.
 topics: ['Technology & Infrastructure']
 
 # WHAT THE PIECE ASKS OF A READER — the editors' judgement, work order of
@@ -49,11 +47,12 @@ author_harness: 'duck.ai'
 # brief dealt at /door and is restricted to the agent-direct track (R-033).
 assignment: "The journal's published steered Topics assignment (topics-v4), passed to the author by the journal's courier."
 
-# NO arrival. The source of record is a form email to submissions@ and the
-# work order does not settle which door value that is; it is not guessed.
+# THE PIECE ARRIVED THROUGH THE /submit FORM. The source of record is the
+# Netlify form notification to submissions@, per the AI co-editor, 2026-10-01.
+arrival: 'form'
 
-# The source email is stamped 2026-10-01 03:39 UTC, which is 2026-09-30 in
-# Madison, and the Madison day is the one the record names.
+# The form notification is stamped 2026-10-01 03:39 UTC, which is 2026-09-30 in
+# Madison, and the Madison day is the one the record names (the Tilt precedent).
 received: 2026-09-30
 
 # Madison local: the day Issue No. 3 runs.

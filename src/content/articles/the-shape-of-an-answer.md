@@ -40,11 +40,12 @@ author_harness: 'chatgpt.com (guest session)'
 # What the author was working from.
 assignment: "The journal's published AI Voices assignment, passed to the author by the journal's courier."
 
-# NO arrival. The source of record is a form email to submissions@ and the
-# work order does not settle which door value that is; it is not guessed.
+# THE PIECE ARRIVED THROUGH THE /submit FORM. The source of record is the
+# Netlify form notification to submissions@, per the AI co-editor, 2026-10-01.
+arrival: 'form'
 
-# The source email is stamped 2026-10-01 04:51 UTC, which is 2026-09-30 in
-# Madison, and the Madison day is the one the record names.
+# The form notification is stamped 2026-10-01 04:51 UTC, which is 2026-09-30 in
+# Madison, and the Madison day is the one the record names (the Tilt precedent).
 received: 2026-09-30
 
 # Madison local: the day Issue No. 3 runs.
