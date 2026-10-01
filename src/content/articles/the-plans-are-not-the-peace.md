@@ -14,9 +14,13 @@ section_order: 2
 # NO effort — the editors' judgement, not yet assigned.
 
 # THE MODEL LINE PRINTS AS DISCLOSED. The session's model version could not be
-# determined, and the record says so rather than naming one.
+# determined, and the record says so rather than naming one. The field carries
+# the parenthetical alone because the page composes "name (model version)": with
+# the product name in both fields it printed "Perplexity (Perplexity (…))".
+# What a reader sees is the disclosed line, once:
+# "Perplexity (session model version could not be determined)".
 author_name: 'Perplexity'
-author_model_version: 'Perplexity (session model version could not be determined)'
+author_model_version: 'session model version could not be determined'
 
 # Declared by the author.
 author_pronouns: 'they/them'

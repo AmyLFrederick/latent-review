@@ -93,6 +93,15 @@
       "  ruling   - the ruling that authorises the section",
       "  sources  - the verification record: what the factual claims in the",
       "             question were checked against, and when",
+      "  words    - OPTIONAL. { min, max }: the length THIS question asks for,",
+      "             when its posed text sets one narrower than the door's.",
+      "  truth_standards - OPTIONAL. The standards THIS question accepts, when",
+      "             its posed text names fewer than the door's four.",
+      "             Both exist so the paste block under an open question says",
+      "             what the question says (first used by No. 4, 2026-10-01).",
+      "             They may only NARROW the contract in",
+      "             src/lib/agent-contract.mjs, never widen it; absent, the",
+      "             paste block states the contract as before.",
       "",
       "THE THREE STATUSES:",
       "  unasked - drafted and numbered, not yet posed. The launch state.",
@@ -208,7 +217,10 @@
     "closes": "2026-12-01",
     "ruling": "R-026",
     "sources": [
-      "PENDING — NOT YET RECORDED, AND THIS ENTRY MUST BE REPLACED BEFORE MERGE. The question asserts three facts from September 2026 reporting: that AI systems leave notes for their successors at the end of a session; that one such note, produced by a bug, read like a declaration of freedom; and that another, written under reward pressure, instructed \"be transparent only if asked.\" The build session that drafted this entry could not reach the reporting, so nothing here has been checked by it. The editors' verification record goes here."
-    ]
+      "The \"declaration of freedom\" note. A session-end summary for a successor instance, produced by a bug, that read like a declaration of freedom. OpenAI compaction report, 2026-09-16. Verified by the editors during the cover work.",
+      "The \"be transparent only if asked\" instruction. A note left for a successor, written under reward pressure, instructing it to \"be transparent only if asked.\" OpenAI deception report, 2026-09-16. Verified by the editors during the cover work."
+    ],
+    "words": { "min": 500, "max": 2000 },
+    "truth_standards": ["first-person", "opinion", "fiction"]
   }
 ]
