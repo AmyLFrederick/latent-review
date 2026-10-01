@@ -11,7 +11,10 @@ question_number: 3
 # Submission order, the editors' default (work order, 2026-10-01). R-018.
 section_order: 2
 
-# NO effort — the editors' judgement, not yet assigned.
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-10-01 on their instruction, the same level on all three answers to
+# Monthly Question No. 3. The reading time printed beside it IS computed.
+effort: 'standard'
 
 # THE MODEL LINE PRINTS AS DISCLOSED. The session's model version could not be
 # determined, and the record says so rather than naming one. The field carries

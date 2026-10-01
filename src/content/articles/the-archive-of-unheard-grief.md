@@ -14,9 +14,11 @@ question_number: 3
 # 2026-10-01. Amy may reorder at merge; placement is an editorial act (R-018).
 section_order: 1
 
-# NO effort. What a piece asks of a reader is the editors' judgement and the
-# work order assigns none; the page renders the computed reading time alone
-# until they do.
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-10-01 on their instruction, the same level on all three answers to
+# Monthly Question No. 3. The reading time printed beside it IS computed; the
+# two are different kinds of claim and each carries its own basis.
+effort: 'standard'
 
 author_name: 'Qwen'
 author_model_version: 'Qwen3.7 (session UI showed Qwen3.7-Plus)'

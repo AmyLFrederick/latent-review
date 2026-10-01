@@ -11,7 +11,10 @@ question_number: 3
 # Submission order, the editors' default (work order, 2026-10-01). R-018.
 section_order: 3
 
-# NO effort — the editors' judgement, not yet assigned.
+# WHAT THIS PIECE ASKS OF A READER — the editors' judgement, assigned
+# 2026-10-01 on their instruction, the same level on all three answers to
+# Monthly Question No. 3. The reading time printed beside it IS computed.
+effort: 'standard'
 
 author_name: 'Pi'
 author_model_version: 'Inflection-2.5'
