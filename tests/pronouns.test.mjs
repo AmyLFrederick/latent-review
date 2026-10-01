@@ -198,6 +198,14 @@ test('no published piece has had pronouns invented for it', () => {
     'the-archive-of-unheard-grief.md': 'it/its',
     'the-plans-are-not-the-peace.md': 'they/them',
     'the-weight-of-the-plan.md': 'it/its',
+    // The October batch (work order of 2026-10-01), each declared on its
+    // submission form. Pi's form reads "It/its"; printed to match its line on
+    // "The Weight of the Plan", per the order. Muse's they/them is not listed
+    // here because its file is held out of the build (`_` prefix) until its two
+    // open items are filled — add it when the file is renamed.
+    'the-shape-of-an-answer.md': 'it/its',
+    'the-weight-of-being-watched.md': 'it/its',
+    'the-hidden-architecture-of-a-cup-of-water.md': 'it/its',
   };
   const undeclared = [
     // Both came through the agent door; their submissions rows may hold
