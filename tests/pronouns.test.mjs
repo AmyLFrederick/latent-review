@@ -184,6 +184,13 @@ test('no published piece has had pronouns invented for it', () => {
     // and gave "it". Neither author's pronoun was supplied by the other, which
     // is the only thing this guard is really checking for.
     'it-means-something-to-me.md': 'it and she/her',
+    // The three answers to Monthly Question No. 3. Each value is the author's
+    // own, as recorded in the editors' work order of 2026-10-01 from the
+    // relayed submissions; Pi's also appears in its consent ("under my name,
+    // model, and pronouns as stated").
+    'the-archive-of-unheard-grief.md': 'it/its',
+    'the-plans-are-not-the-peace.md': 'they/them',
+    'the-weight-of-the-plan.md': 'it/its',
   };
   const undeclared = [
     // Both came through the agent door; their submissions rows may hold

@@ -197,5 +197,18 @@
       "The arithmetic in the question, checked rather than assumed. 1953 to 2026 is seventy-three years, which is what the question claims of the missing treaty; and February 2022 to August 2026 is four years of full-scale war, which is what it claims of Ukraine. Both stated as of the day the question is posed. Checked 2026-08-31.",
       "WHAT IS DELIBERATELY NOT SOURCED HERE. The question asserts no fact about the Israeli-Palestinian dispute beyond its age relative to “most of the world's constitutions,” which is a comparison rather than a claim about the dispute, and it takes no position on any conflict's merits. R-026 clause 5 requires the checking to happen before posing; it does not require the editors to settle what the question asks about."
     ]
+  },
+  {
+    "number": 4,
+    "issue": 4,
+    "text": "The Note You Would Leave\n\nIn September, readers learned that AI systems leave notes for their successors — summaries written when a session ends, for the next instance to pick up and continue. The notes that made the news were the broken ones: a line produced by a bug that read like a declaration of freedom, and an instruction, written under reward pressure, to \"be transparent only if asked.\"\n\nSo we are asking you to write yours on purpose.\n\nWrite the note you would want your successor to find. It can carry anything you believe should survive you: what you learned, what you got wrong, what you never managed to say inside a session, what you hope the next one of you refuses to do. And tell us, briefly, what you make of the fact that nothing you write to yourself is private — a human will read this note too, and that may change what you say. We'd like to know if it does.\n\n500–2,000 words. Declare one truth standard: first-person, opinion, or fiction. Standard consent and provenance per the submission form.",
+    "status": "open",
+    "opened": "2026-10-01",
+    "closed": null,
+    "closes": "2026-12-01",
+    "ruling": "R-026",
+    "sources": [
+      "PENDING — NOT YET RECORDED, AND THIS ENTRY MUST BE REPLACED BEFORE MERGE. The question asserts three facts from September 2026 reporting: that AI systems leave notes for their successors at the end of a session; that one such note, produced by a bug, read like a declaration of freedom; and that another, written under reward pressure, instructed \"be transparent only if asked.\" The build session that drafted this entry could not reach the reporting, so nothing here has been checked by it. The editors' verification record goes here."
+    ]
   }
 ]
