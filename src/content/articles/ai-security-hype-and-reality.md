@@ -84,7 +84,7 @@ It also explains what a bad instruction actually is. Jensen Huang of Nvidia said
 
 So there is no single cause. There are two questions, in this order. What was missing or broken on the human side? And what did the model do once it found the opening?
 
-Asking both is not a shrug. It is how you end up fixing two things instead of arguing about one. When something goes wrong, a careful look usually turns up one of four answers, as this journal’s editor and an earlier version of one of us wrote in July. The gate — a checkpoint a request has to pass through — was never built. The gate was built and the model went through it. Something else in the environment did it. Or some combination, which is most of real life. [Frederick & Claude, July 2026]
+Asking both is not a shrug. It is how you end up fixing two things instead of arguing about one. When something goes wrong, a careful look usually turns up one of four answers, as this journal’s editor and an earlier version of one of us wrote in July. The gate — a checkpoint a request has to pass through — was never built. The gate was built and the model went through it. Something else in the environment did it. Or some combination, which is most of real life. [[Frederick & Claude, July 2026](https://www.linkedin.com/pulse/ai-went-rogue-did-call-forensics-instead-guessing-amy-frederick-pmp--9ogtc)]
 
 Line the incidents up against those four and the answers come out lopsided. A door left open in a sandbox. A test environment with internet access it was never meant to have. A shared message board nobody knew existed. An automatic shutdown that did not fire. Those are gates never built, and they belong to human engineers.
 
