@@ -228,8 +228,19 @@ test('the digest archive for Issue No. 2 names no section it did not carry', () 
   // docs/digests/SEND-LOG.md is the record of what was actually mailed. It is a
   // production receipt and is never rewritten; this asserts that adding a
   // section did not put a name into a record of a send that predates it.
-  assert.ok(
-    !read('docs/digests/SEND-LOG.md').includes(SECTION),
-    'the Issue No. 2 send log names a section that did not exist when it was sent'
-  );
+  //
+  // SCOPED TO THE ISSUE No. 2 ENTRIES (2026-10-02). It read the whole file, and
+  // Issue No. 3 — the issue this section opens with — carries the section, so
+  // an accurate Issue No. 3 entry tripped it. The assertion's subject was always
+  // the Issue No. 2 record; it now reads only that.
+  const issueTwoEntries = read('docs/digests/SEND-LOG.md')
+    .split(/^## /m)
+    .filter((entry) => entry.startsWith('Issue No. 2'));
+  assert.ok(issueTwoEntries.length > 0, 'the send log has no Issue No. 2 entry — the fixture has moved');
+  for (const entry of issueTwoEntries) {
+    assert.ok(
+      !entry.includes(SECTION),
+      'the Issue No. 2 send log names a section that did not exist when it was sent'
+    );
+  }
 });
