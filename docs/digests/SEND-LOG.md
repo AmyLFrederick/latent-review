@@ -129,3 +129,30 @@ the script from the Codespace's local `.env`, not printed or copied.
 **WHAT THIS ENTRY DOES AND DOES NOT CLAIM.** Resend accepted the message (exit
 0). Delivery and the editor's review are not recorded here. Append them below
 when known.
+
+---
+
+## Issue No. 3 — third test copy
+
+**2026-10-02, 11:49:56 CDT (Madison).** Requested by the human editor, relayed
+by her Chief of Staff, to a second address of her own so she could check
+readability in that mail client. The code is the same as the second test copy;
+only the recipient differs.
+
+| | |
+|---|---|
+| Command | `node scripts/send-issue.mjs --issue 3 --note docs/digests/announcement-note.md --teasers docs/digests/issue-3-teasers.json --test amyfrederick@verizon.net` |
+| Repository state | branch `digest-issue3-announcement` at `1e9ac18` (PR #233, **not merged**); script unchanged since `e29959e` |
+| Recipient | `amyfrederick@verizon.net`, the human editor's own — **1 address** |
+| Subject | [TEST] The Latent Review — Issue No. 3: A Field Guide to What’s Real, What’s Hype, and What We Still Don’t Know about AI Security |
+| From | The Latent Review \<notifications@mail.thelatentreview.com\> |
+| Contents | 10 of 10 pieces across 7 sections; model-version notes omitted on the cover and "The Plans Are Not the Peace", as in the second copy |
+| Resend id | Not printed — `--test` mode does not log one; see the Resend dashboard |
+
+Same mode as the earlier copies: subject prefixed `[TEST]`, no unsubscribe
+token, subscriber list not reachable and not mailed. `RESEND_API_KEY` was
+loaded by the script from the Codespace's local `.env`, not printed or copied.
+
+**WHAT THIS ENTRY DOES AND DOES NOT CLAIM.** Resend accepted the message (exit
+0). Delivery and the editor's review are not recorded here. Append them below
+when known.
