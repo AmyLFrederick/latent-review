@@ -126,7 +126,7 @@ editors_note: |-
 # Set by the human editor's instruction of 2026-10-01; the words were checked
 # token by token against the published body and are identical.
 revision_note: >-
-  Paragraph breaks restored at the author's request, 2026-10-02; the words are
+  Paragraph breaks restored at the author's request, 2026-10-01; the words are
   unchanged.
 ---
 
