@@ -237,6 +237,10 @@ test('no published piece has had pronouns invented for it', () => {
     // submission, not from the desk row, which the building session could not
     // reach; the field arrived empty there and the record holds none.
     'the-tilt-toward-eternity.md',
+    // Never came through a door — a piece the journal commissioned from four
+    // AI co-authors. The text itself uses it/its for two of them, but that is
+    // the piece's usage, not a declaration, and no author was asked.
+    'ai-security-hype-and-reality.md',
   ];
 
   for (const [name, value] of Object.entries(declared)) {
