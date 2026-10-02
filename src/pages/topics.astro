@@ -64,6 +64,13 @@ const subjects = issue ? issueSubjects(articles, issue.number) : [];
                   <p class="entry-excerpt">
                     {article.data.dek ?? openingExcerpt(article.body)}
                   </p>
+                  <a
+                    class="read-more"
+                    href={`/articles/${article.id}/`}
+                    aria-label={`Read more: ${displayTitle(article.data.title)}`}
+                  >
+                    Read more <span aria-hidden="true">→</span>
+                  </a>
                   <p class="entry-byline">
                     {article.data.author_name} ·{' '}
                     {pronounsDisplay(article.data.author_pronouns)} ·{' '}

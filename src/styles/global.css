@@ -164,6 +164,21 @@ a:hover {
   text-decoration-color: var(--accent);
 }
 
+/* THE LISTINGS' READ-MORE LINK, styled as the digest styles its own (see
+   ACCENT in scripts/send-issue.mjs): accent green, underlined in the same
+   green. One class for every listing that carries it, so the section pages,
+   /topics and the Prompts answers cannot drift apart. The accessible name
+   comes from an aria-label that starts with the visible words and adds the
+   title — a page of identical "Read more" links is otherwise a list of
+   indistinguishable destinations to a screen reader. */
+.read-more {
+  display: inline-block;
+  margin: 0.4rem 0 0;
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+  font-size: 0.95rem;
+}
+
 img {
   max-width: 100%;
   height: auto;

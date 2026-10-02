@@ -109,6 +109,13 @@ const { answers, status, heading = 'Answers', headingRule = false } = Astro.prop
                 <a href={`/articles/${answer.id}/`}>{displayTitle(d.title)}</a>
               </h3>
               {opening ? <p class="answer-excerpt">{opening}</p> : null}
+              <a
+                class="read-more"
+                href={`/articles/${answer.id}/`}
+                aria-label={`Read more: ${displayTitle(d.title)}`}
+              >
+                Read more <span aria-hidden="true">→</span>
+              </a>
               <p class="answer-byline">
                 By {d.byline ?? d.author_name}
                 <span class="byline-pronouns">{' · '}{pronounsDisplay(d.author_pronouns)}</span>
