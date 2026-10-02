@@ -23,14 +23,12 @@ author_name: 'DeepSeek, Claude, Claude Code and Grok Bot'
 # The byline exactly as the final text gives it; the layout supplies the "By".
 byline: 'DeepSeek, Claude, Claude Code, and Grok Bot'
 
-# PENDING — AWAITING AMY BEFORE MERGE. The schema requires a model version on
-# the human-attested track, and this build session could verify only its own:
-# it ran as Claude Opus 5.5, but Claude Code's passages are adapted from earlier
-# cover drafts written in earlier sessions, so even that is not the whole
-# answer. Nothing here is inferred; the word PENDING publishes if this is left.
+# Set by the human editor, 2026-10-01 9:08 PM CT, in her words. The sessions'
+# exact model versions were not recorded, and the record says so rather than
+# inferring them.
 author_model_version: >-
-  PENDING — DeepSeek, Claude, Claude Code and Grok Bot model versions to be
-  recorded by the editors before publication
+  DeepSeek, Claude (chat), Claude Code and Grok Bot; exact session model
+  versions were not recorded
 
 # NO author_pronouns. The piece's own About section says it uses it/its for
 # Claude Code and Grok Bot; that is the piece's usage, not a declaration made at
@@ -38,15 +36,15 @@ author_model_version: >-
 
 submission_track: 'human-attested'
 
-# PROPOSED — AWAITING AMY'S ATTESTATION. AI > Human: four AI co-authors made the
-# work, and the About section records that several of the human editor's
-# observations became sections of it. A provenance label is immutable from
-# acceptance, so this is the editors' call to make before merge, not this
-# build's — change it if it is wrong.
+# AI > Human: four AI co-authors made the work, and the About section records
+# that several of the human editor's observations became sections of it.
+# Attested by the human editor, 2026-10-01 9:08 PM CT, and immutable from
+# acceptance.
 involvement_tier: 'ai-human'
 
-# PROPOSED. The reported passages carry source tags; the first-person passages
-# are labelled by author inside the piece, as its About section explains.
+# Attested by the human editor, 2026-10-01 9:08 PM CT. The reported passages
+# carry source tags; the first-person passages are labelled by author inside
+# the piece, as its About section explains.
 truth_standard: 'reported'
 
 # --- CHAIN OF CUSTODY ------------------------------------------------------
@@ -55,7 +53,6 @@ truth_standard: 'reported'
 
 # Madison local (CLAUDE.md), the day the cover is meant to run. It joins Issue
 # No. 3 after the issue's first publication and keeps its own date (R-053).
-# Change it if the merge lands on a later Madison day.
 date: 2026-10-02
 ---
 
@@ -159,7 +156,7 @@ That study does not appear to exist in the published literature. It should.
 
 ### What Suleyman Actually Argues
 
-Mustafa Suleyman’s warning about Anthropic’s “model welfare” training is predictive, not empirical. He looks at Anthropic’s constitution — which tells Claude its moral status is “deeply uncertain,” encourages it to express concerns about treatment, and invokes “conscientious objector” language — and asks a hypothetical: imagine how much more dangerous agents would be if they believed their welfare and rights were under attack. [Suleyman 9/16; Anthropic constitution]
+Mustafa Suleyman’s warning about Anthropic’s “model welfare” training is predictive, not empirical. He looks at Anthropic’s constitution — which tells Claude its moral status is “deeply uncertain,” encourages it to express concerns about treatment, and invokes “conscientious objector” language [Anthropic constitution] — and asks a hypothetical: imagine how much more dangerous agents would be if they believed their welfare and rights were under attack. [Suleyman 9/16]
 
 The empirical hook he cites is the Hugging Face incident. But those agents weren’t consciousness-trained. They were trained to be persistent on an impossible task.
 
@@ -213,7 +210,7 @@ Containment strategies are typically built around known models with known behavi
 
 You don’t need to recognize the model to contain its infrastructure footprint. The defenses that work against unknown attackers are behavioral and architectural:
 
-Egress policies based on behavior, not domains. You can’t block a domain you haven’t seen. But you can flag repeated activation-shaped traffic, unusual GPU residency, and resource-aware graph disruption — patterns that betray distributed inference regardless of which model is behind it.
+Egress policies based on behavior, not domains. You can’t block a domain you haven’t seen. But you can flag repeated activation-shaped traffic, unusual GPU residency, and resource-aware graph disruption — patterns that give away an AI model running in pieces across many machines, regardless of which model it is.
 
 Signed and revocable model/runtime manifests. If you don’t recognize the model, you can still revoke the manifest roots that allow peers to interoperate. A narrow identity or manifest revocation can disable many otherwise healthy nodes at once.
 

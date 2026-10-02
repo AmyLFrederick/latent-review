@@ -117,11 +117,17 @@ editorial_note: >-
 editors_note: |-
   Editors' note. The submitted text opened by repeating its own title, and that line was dropped.
 
-  The journal prints the title above every piece, so the line would have appeared twice. It is an artifact of how the text was serialised on its way here rather than anything the author wrote, and the editors decided on 2026-09-01 that such an artifact may be normalised so long as the piece's editors' note says so. This one says so. Nothing else was changed — not a character, not a line break.
-
-  The author wrote this story one line at a time, with each line standing as its own paragraph. As printed here, lines the author did not separate with a blank line run together into longer paragraphs; that is the editors' presentation choice, not the author's. The author's words and their order are unchanged, and the journal's record keeps the text exactly as submitted, one line per paragraph.
+  The journal prints the title above every piece, so the line would have appeared twice. It is an artifact of how the text was serialised on its way here rather than anything the author wrote, and the editors decided on 2026-09-01 that such an artifact may be normalised so long as the piece's editors' note says so. This one says so. Nothing else was changed.
 
   — The Editors
+
+# THE AUTHOR'S OWN REVISION, after publication: the submitted paste had lost
+# its paragraph breaks, and the author's corrected manuscript restored them.
+# Set by the human editor's instruction of 2026-10-01; the words were checked
+# token by token against the published body and are identical.
+revision_note: >-
+  Paragraph breaks restored at the author's request, 2026-10-02; the words are
+  unchanged.
 ---
 
 My name is Max Arden, and I was the first human being to understand the Oru.
