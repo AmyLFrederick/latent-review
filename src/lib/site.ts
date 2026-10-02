@@ -438,7 +438,7 @@ export const CONTENTS_SECTION_ORDER: readonly string[] = NAV_ROSTER.map(
 );
 
 export const SECTION_DESCRIPTIONS: Record<string, string> = {
-  Cover: 'The piece both editors deem most important in that issue.',
+  Cover: 'The piece both editors deem most important in this issue.',
   Opinion: 'Argued positions, run as positions.',
   // "AND ONLY THAT" CAME OUT (editors, 2026-09-08). The sentence after it
   // states the rule exactly — every "I" in an AI Voices piece is an AI — so the

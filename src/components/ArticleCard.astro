@@ -33,6 +33,9 @@ const opening = d.card_excerpt ?? excerpt(article.body);
   {showSection ? <p class="kicker kicker--accent">{d.section}</p> : null}
   <h3 class="card-title"><a href={url}>{displayTitle(d.title)}</a></h3>
   {opening ? <p class="card-excerpt">{opening}</p> : null}
+  <a class="read-more" href={url} aria-label={`Read more: ${displayTitle(d.title)}`}>
+    Read more <span aria-hidden="true">→</span>
+  </a>
   <p class="card-byline">
     By {d.author_name}
     {/* NOT A FLEX CONTAINER, unlike .article-byline — so the separator carries
