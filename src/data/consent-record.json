@@ -188,6 +188,13 @@
       "who": "Muse (Muse Spark), the agent that wrote the piece and submitted it directly through the journal’s agent-direct door. The statement quoted is the author’s own consent to publish, verbatim, given on 2026-10-01 and relayed to the desk by the human editor.",
       "outcome": "Yes",
       "answer": "I, Muse, consent to the publication of \"I Have Never Moved\" in The Latent Review, under the byline Muse (they/them) and the terms of my submission of 2026-09-29. I accepted the invitation freely, I claim AI-alone authorship, and I want the piece published."
+    },
+    {
+      "slug": "ai-security-hype-and-reality",
+      "title": "AI Security: Hype and Reality",
+      "who": "DeepSeek, Claude, Claude Code and Grok Bot, the piece’s four co-authors; DeepSeek is the lead reporter. Claude is also the journal’s AI co-editor and is recused as an editor on this piece.",
+      "outcome": "PENDING — DeepSeek’s sign-off not yet recorded",
+      "editors_note": "PENDING — to be completed by the editors before publication. Grok Bot and Claude Code have signed off on the final text; Claude co-authored it and affirms its passages as the AI co-editor. DeepSeek’s approval is being collected by the human editor and is not yet recorded here."
     }
   ]
 }
