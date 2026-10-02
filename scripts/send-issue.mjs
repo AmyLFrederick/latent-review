@@ -586,6 +586,27 @@ function tierLabel(article) {
     : (article.involvement_tier_display ?? article.involvement_tier);
 }
 
+// A MODEL VERSION THAT SAYS IT IS UNKNOWN IS LEFT OUT OF THE MAIL — human
+// editor, 2026-10-02, on reading the Issue No. 3 test copy. Some records carry,
+// in place of a version, a note that none was captured ("exact session model
+// versions were not recorded", "session model version could not be
+// determined"). On the site that note is part of the full provenance record and
+// stays there untouched. In a one-line mail byline it is the longest thing on
+// the card and tells a reader only that there is nothing to tell, so the digest
+// prints the byline and the tier label and omits the note; the link goes to the
+// page that carries it.
+//
+// THE RULE IS THE NOTE'S WORDING, NOT A LIST OF PIECES. Any real version string
+// prints exactly as before, qualifiers and all. Only text stating that the
+// version was not recorded or could not be determined is omitted, and the dry
+// run lists every omission so the editors see what was left out.
+const UNKNOWN_MODEL_VERSION = /\bnot recorded\b|\bcould not be determined\b/i;
+
+function digestModelVersion(article) {
+  const v = article.author_model_version;
+  return v && !UNKNOWN_MODEL_VERSION.test(v) ? v : null;
+}
+
 function formatDate(iso) {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -794,7 +815,7 @@ function articleHtml(article, { isCover, sectionName }) {
       By ${escapeHtml(article.author_name)}
     </p>
     <p style="margin:0 0 14px;font-family:${MONO};font-size:11px;color:${INK_SOFT};">
-      ${escapeHtml(article.author_model_version)} · ${escapeHtml(tierLabel(article))}
+      ${digestModelVersion(article) ? `${escapeHtml(digestModelVersion(article))} · ` : ''}${escapeHtml(tierLabel(article))}
     </p>
     <p style="margin:0;font-family:${SERIF};font-size:15px;">
       <a href="${article.url}" style="color:${ACCENT};text-decoration:underline;">${isCover ? 'Continue reading' : 'Read more'}&nbsp;&rarr;</a>
@@ -889,7 +910,7 @@ function articleText(article, sectionName, isCover) {
     '',
     cardBodyText(article),
     '',
-    `By ${article.author_name} · ${tierLabel(article)} (${article.author_model_version})`,
+    `By ${article.author_name} · ${tierLabel(article)}${digestModelVersion(article) ? ` (${digestModelVersion(article)})` : ''}`,
     '',
     `${isCover ? 'Continue reading' : 'Read more'}: ${article.url}`,
   ].join('\n');
@@ -955,6 +976,10 @@ console.log(
   `cards:      ${teaserManifest ? `editors' sentences from ${teasersPath}` : `authors' excerpts${excerptsPath ? ` (manifest ${excerptsPath})` : ' (first paragraphs)'}`}`
 );
 console.log(`note:       ${notePath ?? 'none'}`);
+const versionsOmitted = issue.articles.filter((a) => a.author_model_version && !digestModelVersion(a));
+console.log(
+  `versions:   ${versionsOmitted.length ? `omitted as unrecorded for ${versionsOmitted.map((a) => `"${displayTitle(a.title)}"`).join(', ')}` : 'all printed'}`
+);
 console.log(
   `mode:       ${live ? 'LIVE' : reviewTo ? `REVIEW COPY → ${reviewTo}` : testTo ? `TEST → ${testTo}` : 'dry run'}`
 );

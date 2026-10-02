@@ -187,11 +187,13 @@ const fixtureIndex = {
 
 let server;
 let siteUrl;
+// What the fixture server answers with; one test swaps it and restores it.
+let servedIndex = fixtureIndex;
 before(async () => {
   server = createServer((req, res) => {
     if (req.url === '/issues.json') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(fixtureIndex));
+      res.end(JSON.stringify(servedIndex));
     } else {
       res.writeHead(404);
       res.end();
@@ -319,6 +321,54 @@ test('an issue with a teaser manifest on file refuses a run without --teasers', 
   const r = await runDry(['--note', notePath], { cwd: dir });
   assert.equal(r.code, 1);
   assert.match(r.stderr, /has a teaser manifest at .*Pass it with --teasers/);
+});
+
+test('a model version that says it is unknown is left out of the mail; real ones print unchanged', async () => {
+  // Human editor, 2026-10-02, on the Issue No. 3 test copy. The rule is the
+  // note's wording, not a list of slugs: "not recorded" / "could not be
+  // determined" are omitted, every real version prints exactly as before —
+  // including one with its own parenthetical qualifier.
+  const pieces = [
+    { ...fixtureArticle('fixture-cover', 'Fixture Cover', 'Cover', 'DeepSeek, Claude, Claude Code and Grok Bot'),
+      author_model_version: 'DeepSeek, Claude (chat), Claude Code and Grok Bot; exact session model versions were not recorded',
+      involvement_tier_display: 'AI > Human' },
+    { ...fixtureArticle('fixture-unknown', 'Fixture Unknown', 'Prompts', 'Perplexity'),
+      author_model_version: 'session model version could not be determined',
+      involvement_tier_display: 'AI' },
+    { ...fixtureArticle('fixture-qualified', 'Fixture Qualified', 'Prompts', 'Qwen'),
+      author_model_version: 'Qwen3.7 (session UI showed Qwen3.7-Plus)',
+      involvement_tier_display: 'AI' },
+  ];
+  servedIndex = { ...fixtureIndex, issues: [{ ...fixtureIndex.issues[0], cover_story: pieces[0], articles: pieces }] };
+  try {
+    const dir = mkdtempSync(join(tmpdir(), 'send-issue-'));
+    const teasers = teaserFile(dir, {
+      'fixture-cover': 'Cover sentence.',
+      'fixture-unknown': 'Unknown sentence.',
+      'fixture-qualified': 'Qualified sentence.',
+    });
+    const r = await runDry(['--note', notePath, '--teasers', teasers], { cwd: dir });
+    assert.equal(r.code, 0, r.stderr);
+
+    // Gone from both parts of the mail; byline and tier label kept.
+    for (const out of [r.html, r.stdout]) {
+      assert.ok(!out.includes('were not recorded'), 'the unrecorded-versions note is still in the mail');
+      assert.ok(!out.includes('could not be determined'), 'the undetermined-version note is still in the mail');
+    }
+    assert.match(r.html, /By DeepSeek, Claude, Claude Code and Grok Bot\s*<\/p>\s*<p[^>]*>\s*AI &gt; Human\s*<\/p>/);
+    assert.match(r.html, /By Perplexity\s*<\/p>\s*<p[^>]*>\s*AI\s*<\/p>/);
+    assert.match(r.stdout, /^By DeepSeek, Claude, Claude Code and Grok Bot · AI > Human$/m);
+    assert.match(r.stdout, /^By Perplexity · AI$/m);
+
+    // A real version, qualifier and all, is untouched.
+    assert.ok(r.html.includes('Qwen3.7 (session UI showed Qwen3.7-Plus) · AI'));
+    assert.match(r.stdout, /^By Qwen · AI \(Qwen3\.7 \(session UI showed Qwen3\.7-Plus\)\)$/m);
+
+    // The dry run says what it left out.
+    assert.match(r.stdout, /versions:\s+omitted as unrecorded for "Fixture Cover", "Fixture Unknown"/);
+  } finally {
+    servedIndex = fixtureIndex;
+  }
 });
 
 test('an issue with no teaser manifest still prints the authors’ excerpts', async () => {
