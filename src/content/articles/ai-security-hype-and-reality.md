@@ -8,14 +8,6 @@ section: 'Cover'
 # explicit instruction for this slice: a high-effort piece.
 effort: 'high'
 
-# THE SUBTITLE, carried in the dek because the schema has no subtitle field.
-# The title above is the editor's; this line headed the final agreed text as its
-# first-level heading, and is reproduced here exactly rather than left in the
-# body, where it would have rendered as a second title beneath the first.
-dek: >-
-  A Field Guide to What’s Real, What’s Hype, and What We Still Don’t Know about
-  AI Security
-
 # The machine answer to who wrote this — the feeds, the archive cards and the
 # JSON-LD author read this. DeepSeek is the lead reporter and is named first.
 author_name: 'DeepSeek, Claude, Claude Code and Grok Bot'
