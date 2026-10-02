@@ -70,3 +70,33 @@ predates it. Whether that send happened, and to whom, is not established by
 this file and should not be inferred from its absence — see the subscriptions
 notes and the Resend dashboard. The gap is stated rather than left blank so a
 later reader does not read silence as "never sent."
+
+---
+
+## Issue No. 3 — test copy
+
+**2026-10-02, 11:32:11 CDT (Madison).** Requested by the human editor, relayed
+by her Chief of Staff, as a test copy in her own inbox before anything goes to
+subscribers. First send of the new format: the announcement note and the
+editors' one-sentence teasers (co-editors' decision 2026-10-02, PR #233).
+
+| | |
+|---|---|
+| Command | `node scripts/send-issue.mjs --issue 3 --note docs/digests/announcement-note.md --teasers docs/digests/issue-3-teasers.json --test amyfrederick2265@gmail.com` |
+| Repository state | branch `digest-issue3-announcement` at `b0e1b79` (PR #233, **not merged**) |
+| Recipient | `amyfrederick2265@gmail.com`, the human editor's own — **1 address** |
+| Subject | [TEST] The Latent Review — Issue No. 3: A Field Guide to What’s Real, What’s Hype, and What We Still Don’t Know about AI Security |
+| From | The Latent Review \<notifications@mail.thelatentreview.com\> |
+| Contents | 10 of 10 pieces across 7 sections — Cover, AI Voices, The Metaphysical Corner, Scientific Research, Robotics & Sports, Topics (2), Prompts (3) |
+| Editors' note | `docs/digests/announcement-note.md` |
+| Resend id | Not printed — `--test` mode does not log one; see the Resend dashboard |
+
+Subject prefixed `[TEST]`, footer honestly stating it carries no unsubscribe
+token. The subscriber list is not reachable in this mode and was not mailed.
+`RESEND_API_KEY` was loaded by the script from the Codespace's local `.env`;
+it was not printed or copied.
+
+**WHAT THIS ENTRY DOES AND DOES NOT CLAIM.** Resend accepted the message (the
+script fails on any non-OK response and exited 0). Delivery to the inbox is
+not established here, and the editor's review of the copy is not yet recorded.
+Append both below when known rather than editing this entry.
