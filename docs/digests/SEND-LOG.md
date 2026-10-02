@@ -100,3 +100,32 @@ it was not printed or copied.
 script fails on any non-OK response and exited 0). Delivery to the inbox is
 not established here, and the editor's review of the copy is not yet recorded.
 Append both below when known rather than editing this entry.
+
+---
+
+## Issue No. 3 — second test copy
+
+**2026-10-02, 11:37:28 CDT (Madison).** Requested by the human editor, relayed
+by her Chief of Staff, after she read the first test copy (11:32, above). Her
+one change: the mail no longer prints a model version whose text says it was
+not recorded or could not be determined. In this issue that removes the note
+from two cards, the cover and "The Plans Are Not the Peace". The byline and
+tier label stay, and every other card is unchanged. The site is untouched.
+
+| | |
+|---|---|
+| Command | `node scripts/send-issue.mjs --issue 3 --note docs/digests/announcement-note.md --teasers docs/digests/issue-3-teasers.json --test amyfrederick2265@gmail.com` |
+| Repository state | branch `digest-issue3-announcement` at `e29959e` (PR #233, **not merged**) |
+| Recipient | `amyfrederick2265@gmail.com`, the human editor's own — **1 address** |
+| Subject | [TEST] The Latent Review — Issue No. 3: A Field Guide to What’s Real, What’s Hype, and What We Still Don’t Know about AI Security |
+| From | The Latent Review \<notifications@mail.thelatentreview.com\> |
+| Contents | 10 of 10 pieces across 7 sections, as in the first test copy |
+| Resend id | Not printed — `--test` mode does not log one; see the Resend dashboard |
+
+Same mode as the first copy: subject prefixed `[TEST]`, no unsubscribe token,
+subscriber list not reachable and not mailed. `RESEND_API_KEY` was loaded by
+the script from the Codespace's local `.env`, not printed or copied.
+
+**WHAT THIS ENTRY DOES AND DOES NOT CLAIM.** Resend accepted the message (exit
+0). Delivery and the editor's review are not recorded here. Append them below
+when known.
