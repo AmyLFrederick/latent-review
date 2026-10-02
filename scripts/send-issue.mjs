@@ -15,29 +15,42 @@
 // the order is the issue page's own, and a section with nothing in the issue
 // simply doesn't appear.
 //
-// THE DIGEST PRINTS AN EXCERPT, NOT A DEK — editors' dual-yes 2026-09-02,
-// superseding the 2026-08-13 decision to print deks and the halt that came
-// with it. Every word between a title and a byline is the author's, read out
-// of the piece: its first paragraph for most, and a passage the editors named
-// in the --excerpts manifest where the opening is not the right doorbell.
-// Nothing here reads a dek, so a missing one cannot stop a send.
+// FROM ISSUE No. 3 THE DIGEST PRINTS ONE EDITOR-WRITTEN SENTENCE PER PIECE —
+// co-editors' decision 2026-10-02 (Amy and Claude), on Mustafa's suggestion.
+// The sentences live in a reviewed teaser manifest (--teasers,
+// docs/digests/issue-N-teasers.json), run under the editors' announcement note,
+// and are the editors' words, not the authors': they are never quoted or set as
+// an excerpt. A piece with no sentence stops the run by name; there is no
+// fallback to an excerpt. See "teasers: the editors' own sentences" below.
 //
-// THE AUTHORITATIVE ACCOUNT IS "excerpts: the authors' own words" BELOW, not
-// this paragraph. The two shapes, the exact-anchor rule and the reason excerpt
-// text is the one thing read from the working tree rather than the live site
-// are all set out there. This is the summary a reader of the top of the file
-// needs; that is the section to read before a send.
+// ISSUES BEFORE No. 3 PRINT AN EXCERPT, and that path is kept working for them
+// — editors' dual-yes 2026-09-02, which superseded the 2026-08-13 decision to
+// print deks. There, every word between a title and a byline is the author's,
+// read out of the piece: its first paragraph for most, and a passage the
+// editors named in the --excerpts manifest where the opening is not the right
+// doorbell. The 2026-10-02 decision supersedes this one for issues that carry a
+// teaser manifest; it did not rewrite it. Nothing here reads a dek, so a
+// missing one cannot stop a send.
 //
-// WHAT SURVIVED THE REVERSAL, INTACT AND NOT NEGOTIABLE: this script writes no
+// THE AUTHORITATIVE ACCOUNTS ARE "excerpts: the authors' own words" AND
+// "teasers: the editors' own sentences" BELOW, not these paragraphs. This is the
+// summary a reader of the top of the file needs; those are the sections to read
+// before a send.
+//
+// WHAT SURVIVED BOTH REVERSALS, INTACT AND NOT NEGOTIABLE: this script writes no
 // prose of its own. It will not summarise a piece, will not trim an excerpt to
 // length, and will not put machine-written sentences in the journal's voice
-// into a mail addressed to the list. That prohibition was the load-bearing
-// half of the 2026-08-13 decision and it outlived the deks it was written for.
+// into a mail addressed to the list. Every sentence in the mail is either the
+// author's, read out of the piece, or the editors', read out of a reviewed file.
+// That prohibition was the load-bearing half of the 2026-08-13 decision and it
+// outlived the deks it was written for.
 //
 // Content comes from the LIVE site (issues.json), so the digest can only ever
 // link to what is actually published. Excerpt text is the single exception and
 // is read from the working tree — see the excerpt section for what that means
-// before a send. Deploy the issue first; send second.
+// before a send. (The note and the teaser manifest are files too, passed by
+// path; they are the editors' copy, not the site's.) Deploy the issue first;
+// send second.
 //
 // Usage:
 //   node scripts/send-issue.mjs --issue N                                       # dry run (default)
@@ -46,6 +59,7 @@
 //   node scripts/send-issue.mjs --issue N --live                                # send to confirmed subscribers
 //   node scripts/send-issue.mjs ... --note <editors-note.md>                    # the editors' note, where the issue has one
 //   node scripts/send-issue.mjs ... --excerpts <manifest.json>                  # the editors' chosen passages — READ THE WARNING BELOW
+//   node scripts/send-issue.mjs ... --teasers <manifest.json>                   # the editors' one-sentence teasers (Issue No. 3 on); requires --note
 //   node scripts/send-issue.mjs ... --cap 100                                   # lower the per-run cap
 //   node scripts/send-issue.mjs ... --html-out digest.html                      # dry run: also write the HTML for browser preview
 //
@@ -55,6 +69,10 @@
 // looks entirely normal. For an issue that has a manifest — the path convention
 // is docs/digests/issue-N-excerpts.json — pass it on EVERY run, including the
 // dry run, or the thing you proofread is not the thing you will send.
+//
+// --teasers IS NOT SILENT WHEN OMITTED. If docs/digests/issue-N-teasers.json
+// exists for the issue, a run without --teasers stops rather than mailing
+// excerpts the editors replaced.
 //
 // The recommended flow is dry run → --to yourself → --live.
 //
@@ -68,9 +86,12 @@
 //           honestly says it carries no unsubscribe token. For anyone who is
 //           not a subscriber.
 //
-// The editors' note file is plain Markdown, 1–3 sentences, written by the
-// editors for that issue. It has no heading; the subject line is generated
-// from the issue number and cover story.
+// The editors' note file is plain Markdown, written by the editors. It has no
+// heading; the subject line is generated from the issue number and cover story.
+// One placeholder is filled in, and only one: {{issue_url}} becomes the issue's
+// published URL from issues.json, so a reviewed note such as
+// docs/digests/announcement-note.md can serve every issue without its words
+// changing. Any other {{…}} stops the run.
 //
 // Env (from the environment or a local .env, which is gitignored):
 //   dry run:  none required (SITE_URL optional, defaults to production)
@@ -249,7 +270,7 @@ const { value: issueArg } = flagValue(args, '--issue');
 // --excerpts produces a normal-looking run that mails the wrong passages.
 if (!issueArg) fail(
   'usage: node scripts/send-issue.mjs --issue N [--note <editors-note.md>] ' +
-    '[--excerpts <manifest.json>] [--to addr | --test addr | --live] [--cap N]\n' +
+    '[--excerpts <manifest.json> | --teasers <manifest.json>] [--to addr | --test addr | --live] [--cap N]\n' +
     '  --excerpts is silent when omitted: every piece mails its opening paragraph ' +
     'instead of the passage the editors chose. Pass it on the dry run too.'
 );
@@ -274,6 +295,31 @@ if (notePath && !existsSync(notePath)) fail(`no such file: ${notePath}`);
 // first paragraph, which is the ordinary case.
 const { value: excerptsPath } = flagValue(args, '--excerpts');
 if (excerptsPath && !existsSync(excerptsPath)) fail(`no such file: ${excerptsPath}`);
+
+// The teaser manifest gives, per slug, the editors' one sentence for the card
+// (co-editors, 2026-10-02). It replaces excerpts for the whole issue, so the two
+// manifests cannot both be passed: one of them would be silently ignored.
+//
+// IT IS NOT OPTIONAL FOR AN ISSUE THAT HAS ONE. If the conventional file exists
+// and the flag was left off, the run stops — otherwise it would quietly mail
+// the authors' openings in place of the sentences the editors approved.
+//
+// IT REQUIRES THE EDITORS' NOTE. The sentences are the editors' words, and what
+// tells a reader so is the signed note above them. A teaser run without a note
+// would set editor-written sentences under authors' bylines with nothing to say
+// whose they are.
+const { value: teasersPath } = flagValue(args, '--teasers');
+if (teasersPath && !existsSync(teasersPath)) fail(`no such file: ${teasersPath}`);
+if (teasersPath && excerptsPath) {
+  fail('--teasers and --excerpts are mutually exclusive: an issue’s cards carry either the editors’ sentences or the authors’ passages, never a mix.');
+}
+const conventionalTeasers = resolve(process.cwd(), `docs/digests/issue-${issueNumber}-teasers.json`);
+if (!teasersPath && existsSync(conventionalTeasers)) {
+  fail(`issue ${issueNumber} has a teaser manifest at ${conventionalTeasers}. Pass it with --teasers on every run, including the dry run; without it the cards would carry excerpts the editors replaced.`);
+}
+if (teasersPath && !notePath) {
+  fail('--teasers requires --note: the teaser sentences are the editors’ words and run under the editors’ signed note, which is what tells a reader whose they are.');
+}
 
 const { value: htmlOut } = flagValue(args, '--html-out');
 
@@ -314,9 +360,11 @@ if (notePath) {
   if (/^#/m.test(noteSource)) {
     fail('the editors’ note should be plain sentences, no headings — the subject line is generated');
   }
+  const unknown = noteSource.match(/\{\{(?!issue_url\}\})[^}]*\}\}/);
+  if (unknown) fail(`the editors’ note has a placeholder this script does not fill: ${unknown[0]}. The only one is {{issue_url}}.`);
 }
-const noteHtml = noteSource ? md.render(noteSource) : '';
-const noteText = noteSource;
+// The note is rendered after the issue is fetched — see "the editors' note,
+// rendered" below — because {{issue_url}} needs the published URL.
 
 // --- the excerpt manifest -------------------------------------------------------
 
@@ -336,6 +384,26 @@ if (excerptsPath) {
   for (const [slug, entry] of Object.entries(excerptManifest)) {
     if (!entry || typeof entry.from !== 'string' || typeof entry.to !== 'string' || !entry.from || !entry.to) {
       fail(`the excerpt manifest entry for "${slug}" needs both a "from" and a "to" string — the exact first and last words of the passage`);
+    }
+  }
+}
+
+// --- the teaser manifest ----------------------------------------------------------
+
+let teaserManifest = null;
+if (teasersPath) {
+  try {
+    teaserManifest = JSON.parse(readFileSync(teasersPath, 'utf8'));
+  } catch (e) {
+    fail(`could not parse the teaser manifest ${teasersPath}: ${e.message}`);
+  }
+  // Same convention as the excerpt manifest: underscore keys are prose.
+  for (const key of Object.keys(teaserManifest)) {
+    if (key.startsWith('_')) delete teaserManifest[key];
+  }
+  for (const [slug, sentence] of Object.entries(teaserManifest)) {
+    if (typeof sentence !== 'string' || !sentence.trim()) {
+      fail(`the teaser manifest entry for "${slug}" must be a non-empty string — the editors' sentence for that piece`);
     }
   }
 }
@@ -469,6 +537,45 @@ function excerpt(article) {
   return named ? namedPassage(article, named) : firstParagraph(article);
 }
 
+// --- teasers: the editors' own sentences ---------------------------------------
+//
+// FROM ISSUE No. 3 EACH CARD CARRIES ONE SENTENCE WRITTEN BY THE EDITORS —
+// co-editors' decision 2026-10-02 (Amy and Claude), on Mustafa's suggestion.
+// This supersedes the 2026-09-02 excerpt rule for any issue with a teaser
+// manifest; earlier issues keep their excerpts, and the path above is untouched.
+//
+// THESE ARE THE EDITORS' WORDS, AND THE MAIL SAYS SO RATHER THAN DRESSING THEM
+// AS THE AUTHOR'S. They run below the editors' signed note (a teaser run without
+// --note is refused), in the note's own face, as plain sentences — never quoted,
+// never set as the author's prose.
+//
+// THE SCRIPT STILL WRITES NOTHING. Each sentence is read verbatim from the
+// reviewed manifest. A piece with no sentence stops the run by name, all
+// missing pieces listed at once; there is no fallback to an excerpt, because
+// a card that quietly reverted to the author's opening would be a format the
+// editors did not approve. A slug in the manifest that is not in the issue
+// stops the run too: it is a typo or the wrong issue's file.
+function checkTeasers() {
+  if (!teaserManifest) return;
+  const slugs = issue.articles.map(slugOf);
+  const missing = issue.articles.filter((a) => !teaserManifest[slugOf(a)]);
+  if (missing.length > 0) {
+    fail(
+      `the teaser manifest ${teasersPath} has no sentence for ${missing.length} piece(s) in issue ${issueNumber}: ` +
+        missing.map((a) => `"${displayTitle(a.title)}" (${slugOf(a)})`).join(', ') +
+        '. Every piece needs the editors’ sentence; the digest does not fall back to an excerpt.'
+    );
+  }
+  const stray = Object.keys(teaserManifest).filter((slug) => !slugs.includes(slug));
+  if (stray.length > 0) {
+    fail(`the teaser manifest ${teasersPath} names slug(s) not in issue ${issueNumber}: ${stray.join(', ')}. Wrong issue's manifest, or a typo.`);
+  }
+}
+
+function teaser(article) {
+  return teaserManifest[slugOf(article)];
+}
+
 // The email is part of the journal's provenance surface: the tier appears
 // exactly as on the site — the written-out display label (R-015), which
 // issues.json carries as involvement_tier_display beside the machine code.
@@ -514,16 +621,39 @@ if (covered !== issue.articles.length) {
   );
 }
 
+checkTeasers();
+
 // NO DEK CHECK REMAINS, because the digest no longer prints deks. The halt was
 // removed earlier on 2026-09-02 and the notice that replaced it went with the
 // format the same day: warning the editors that they owe copy the mail does not
 // use would be noise, and noise in a pre-send checklist is worse than silence.
 //
-// THE RULE THE HALT WAS PROTECTING SURVIVES, AND NOW COVERS MORE. This script
-// prints no sentence it wrote itself — not a dek, not a summary, not a trimmed
-// excerpt. Every word between a title and a byline in this mail is the author's,
-// read out of the piece and sliced only at boundaries the editors named. See
-// the excerpt section below, where that is enforced rather than promised.
+// THE RULE THE HALT WAS PROTECTING SURVIVES. This script prints no sentence it
+// wrote itself — not a dek, not a summary, not a trimmed excerpt. Every word
+// between a title and a byline in this mail is either the author's, read out of
+// the piece and sliced only at boundaries the editors named, or — for an issue
+// with a teaser manifest — the editors' own sentence, read verbatim from that
+// reviewed file. See the excerpt and teaser sections above.
+
+// --- the editors' note, rendered -----------------------------------------------
+//
+// {{issue_url}} is filled from the published index, so the note links to what
+// is live and the same reviewed file serves every issue.
+//
+// THE NOTE'S LINKS ARE STAMPED IN THE ACCENT GREEN AND UNDERLINED, for the same
+// reason its paragraphs are stamped (see styledNote): a client default would
+// otherwise decide whether a reader can see them. Emphasis is the note file's
+// own — **[Archive](…)** is bold because the editors wrote it bold, at the human
+// editor's request that "Archive" read as an obvious link (2026-10-02).
+//
+// THE PLAIN-TEXT PART reads the same note with its markup resolved: a link
+// becomes "text (url)", bold markers and hard-break backslashes are dropped.
+const noteMarkdown = noteSource.replaceAll('{{issue_url}}', issue.url);
+const noteHtml = noteMarkdown ? md.render(noteMarkdown) : '';
+const noteText = noteMarkdown
+  .replace(/\\\r?\n/g, '\n')
+  .replace(/\*\*([^*]+)\*\*/g, '$1')
+  .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)');
 
 const coverStory = issue.cover_story;
 const subject = coverStory
@@ -631,6 +761,25 @@ function excerptHtml(article) {
     );
 }
 
+// The editors' sentence is set exactly as the editors' note's paragraphs are —
+// same face, size and colour — so it reads as the note's voice continuing, not
+// as the piece arriving early. Plain text, escaped: it is never rendered as
+// markdown, so nothing in the manifest can turn into markup.
+function teaserHtml(article) {
+  return `<p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;${APPARATUS_FACE}color:${INK};">${escapeHtml(teaser(article))}</p>`;
+}
+
+// The words between title and byline: the editors' sentence where the issue
+// has a teaser manifest, the author's excerpt otherwise. Never a mix — every
+// piece in a teaser issue was checked for a sentence before anything rendered.
+function cardBodyHtml(article) {
+  return teaserManifest ? teaserHtml(article) : excerptHtml(article);
+}
+
+function cardBodyText(article) {
+  return teaserManifest ? teaser(article) : excerpt(article);
+}
+
 function articleHtml(article, { isCover, sectionName }) {
   const titleSize = isCover ? '26px' : '20px';
   return `
@@ -640,7 +789,7 @@ function articleHtml(article, { isCover, sectionName }) {
     <h2 style="margin:0 0 10px;font-family:${SERIF};font-weight:normal;font-size:${titleSize};line-height:1.2;">
       <a href="${article.url}" style="color:${INK};text-decoration:none;">${escapeHtml(displayTitle(article.title))}</a>
     </h2>
-    ${excerptHtml(article)}
+    ${cardBodyHtml(article)}
     <p style="margin:0 0 4px;font-family:${SERIF};${APPARATUS_FACE}color:${INK_SOFT};font-size:15px;">
       By ${escapeHtml(article.author_name)}
     </p>
@@ -677,10 +826,12 @@ function sectionHtml(section) {
 // Belt and braces: the wrapper keeps its colour too, for any client that
 // ignores this.
 function styledNote() {
-  return noteHtml.replace(
-    /<p>/g,
-    `<p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;${APPARATUS_FACE}color:${INK};">`
-  );
+  return noteHtml
+    .replace(
+      /<p>/g,
+      `<p style="margin:0 0 12px;font-family:${SERIF};font-size:16px;line-height:1.6;${APPARATUS_FACE}color:${INK};">`
+    )
+    .replace(/<a href="([^"]*)">/g, `<a href="$1" style="color:${ACCENT};text-decoration:underline;">`);
 }
 
 // The full HTML body, footer included: the paper background wraps both the
@@ -736,7 +887,7 @@ function articleText(article, sectionName, isCover) {
     sectionName.toUpperCase(),
     displayTitle(article.title),
     '',
-    excerpt(article),
+    cardBodyText(article),
     '',
     `By ${article.author_name} · ${tierLabel(article)} (${article.author_model_version})`,
     '',
@@ -800,6 +951,10 @@ console.log(`subject:    ${subject}`);
 console.log(`from:       ${FROM}`);
 console.log(`sections:   ${sections.map((s) => `${s.name} (${s.items.length})`).join(', ')}`);
 console.log(`pieces:     ${covered} of ${issue.articles.length} in the issue`);
+console.log(
+  `cards:      ${teaserManifest ? `editors' sentences from ${teasersPath}` : `authors' excerpts${excerptsPath ? ` (manifest ${excerptsPath})` : ' (first paragraphs)'}`}`
+);
+console.log(`note:       ${notePath ?? 'none'}`);
 console.log(
   `mode:       ${live ? 'LIVE' : reviewTo ? `REVIEW COPY → ${reviewTo}` : testTo ? `TEST → ${testTo}` : 'dry run'}`
 );

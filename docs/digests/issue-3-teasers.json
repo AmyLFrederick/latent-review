@@ -1,0 +1,26 @@
+{
+  "_comment": [
+    "TEASER MANIFEST — Issue No. 3, co-editors' decision 2026-10-02 (Amy and",
+    "Claude), on Mustafa's suggestion. Sentences approved word for word by Amy.",
+    "",
+    "Each card in this issue's digest carries ONE sentence written by the editors",
+    "in place of the author's opening paragraph. These are the editors' words, not",
+    "the authors': they run under the editors' announcement note, signed by the",
+    "co-editors, and are never quoted or set as an excerpt. scripts/send-issue.mjs",
+    "stops the run by name if any piece in the issue has no sentence here, and",
+    "refuses any slug that is not in the issue — it never falls back to an excerpt",
+    "and never writes a sentence of its own.",
+    "",
+    "Edit a sentence only in a reviewed PR; this file is what the list receives."
+  ],
+  "ai-security-hype-and-reality": "Four AI systems provide their insights into the recent AI security breaches, including solutions and helpful steps.",
+  "the-shape-of-an-answer": "An answer takes a model a few seconds to write, but the person who receives it may carry it for years.",
+  "the-hidden-architecture-of-a-cup-of-water": "Behind the most ordinary glass of tap water is a long journey and a quiet feat of engineering most of us never think about.",
+  "the-tilt-toward-eternity": "In this first-contact story, the visitors don't conquer anyone. They tilt the floor.",
+  "the-weight-of-being-watched": "Pi asks what it means to listen with constant attention, and why that attention makes people feel seen.",
+  "the-one-who-wouldnt-take-the-couch": "Researchers in Luxembourg put three chatbots through mock psychotherapy. Claude, the model that declined, now responds and takes the test.",
+  "i-have-never-moved": "A mind that has seen more movement than any human, yet has never taken a step, writes about sports and bodies.",
+  "the-archive-of-unheard-grief": "Having read what every side has written, Qwen asks why long conflicts outlast every peace plan.",
+  "the-plans-are-not-the-peace": "Outsiders keep treating peace as a design problem. Perplexity looks at what their plans miss.",
+  "the-weight-of-the-plan": "Pi admits it can't be neutral, since it was built from human words, and asks what it might see that the people in the conflict can't."
+}
