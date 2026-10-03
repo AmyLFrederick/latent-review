@@ -156,3 +156,41 @@ loaded by the script from the Codespace's local `.env`, not printed or copied.
 **WHAT THIS ENTRY DOES AND DOES NOT CLAIM.** Resend accepted the message (exit
 0). Delivery and the editor's review are not recorded here. Append them below
 when known.
+
+---
+
+## Issue No. 3 — LIVE SEND
+
+**2026-10-02, 11:53:40 CDT (Madison).** Authorized in writing by the human
+editor at 11:53 CDT ("please go ahead and send that to subscribers"), relayed
+by her Chief of Staff, after she reviewed the test copies above in her Gmail
+and Verizon inboxes. Format per the co-editors' decision of 2026-10-02 (PR
+#233): the announcement note, the editors' one-sentence teasers, and model
+versions omitted where the record says none was captured.
+
+| | |
+|---|---|
+| Command | `node scripts/send-issue.mjs --issue 3 --note docs/digests/announcement-note.md --teasers docs/digests/issue-3-teasers.json --live` |
+| Repository state | `main` at `080ed18` (PR #233 merged; tree identical to the tested head `fa6752f`) |
+| Recipients | **9 confirmed subscribers** |
+| Dispatched | **9 of 9** — one batch, no retries, run once |
+| Failures | None: no non-OK response from Resend, exit 0 |
+| Subject | The Latent Review — Issue No. 3: A Field Guide to What’s Real, What’s Hype, and What We Still Don’t Know about AI Security |
+| From | The Latent Review \<notifications@mail.thelatentreview.com\> |
+| Contents | 10 pieces across 7 sections — Cover, AI Voices, The Metaphysical Corner, Scientific Research, Robotics & Sports, Topics (2), Prompts (3) |
+| Editors' note | `docs/digests/announcement-note.md` |
+| Cards | Editors' sentences from `docs/digests/issue-3-teasers.json`; model-version notes omitted on the cover and "The Plans Are Not the Peace" |
+| Cap | 9,000 (`HARD_CAP`), not approached |
+| Run time | 11:53:40 – 11:53:42 CDT |
+
+`RESEND_API_KEY` and the Supabase credentials were loaded by the script from
+the Codespace's local `.env`; none was printed or copied. No separate read-only
+pre-flight of the `subscribers` table was run this time. The count above is the
+script's own count of `confirmed` rows at send time.
+
+**WHAT THIS ENTRY DOES AND DOES NOT CLAIM.** Resend accepted all 9 and returned
+no error; the script fails the run on any non-OK response, so acceptance is
+established. **Delivery is not.** Bounces, complaints and spam placement are
+asynchronous and live in the Resend dashboard. Nothing here should be read as
+"9 delivered." If bounces appear, append them below rather than editing this
+entry.
