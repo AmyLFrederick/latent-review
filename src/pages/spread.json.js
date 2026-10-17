@@ -3,6 +3,7 @@ import { SITE_TITLE, formatDate } from '../lib/site';
 import { provenanceSentence, structuredProvenance, authorWithModel } from '../lib/provenance';
 import { pronounsForFeed } from '../lib/pronouns.mjs';
 import { fullTextUrl, isTreated } from '../lib/full-text';
+import { correctionMachineFields, retractionFields } from '../lib/corrections.mjs';
 
 // spread.json — THE CITATION PACKET (editors' agent-doors addendum, item 2,
 // 2026-09-09). What a reader needs in order to cite a piece from this journal,
@@ -96,6 +97,10 @@ export async function GET(context) {
       // Append-only, and `was` travels with every entry: a correction that said
       // only what a value is now would have replaced the record rather than
       // corrected it. Empty array where a piece has never been corrected.
+      //
+      // Added 2026-10-17, add-only: each entry's `type`, its citable `anchor`,
+      // and the two places it can be read — on the piece (`url`) and on the
+      // running index (`index_url`). See src/lib/corrections.mjs.
       corrections:
         d.corrections?.map((c) => ({
           date: c.date.toISOString().slice(0, 10),
@@ -103,7 +108,13 @@ export async function GET(context) {
           was: c.was,
           now: c.now,
           note: c.note,
+          ...correctionMachineFields(article.id, c, site),
         })) ?? [],
+      // Added 2026-10-17, add-only. A retracted piece stays published and is
+      // cited as retracted: a citation packet that kept handing out the
+      // citation of a piece the journal no longer stands behind, with nothing
+      // beside it, would be the quiet erasure the corrections policy forbids.
+      ...retractionFields(article.id, d.corrections),
       citation: {
         text: `${byline}. “${d.title}.” ${issueForm}, ${day}. ${provenance} ${url}`,
         html:
@@ -142,6 +153,9 @@ export async function GET(context) {
       // counts globally and forever.
       citation_form: `${SITE_TITLE}, Vol. V, No. N (YYYY)`,
       terms_url: abs('/terms/'),
+      // Added 2026-10-17, add-only. Every correction the journal has run,
+      // newest first, each also printed on the piece it corrects.
+      corrections_url: abs('/corrections/'),
       // The three conditions the journal's terms attach to reuse, as a list
       // rather than a sentence, because a consumer checking its own compliance
       // is checking three things. The canonical statement is at terms_url.

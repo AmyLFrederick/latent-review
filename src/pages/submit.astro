@@ -153,27 +153,27 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
 
       <div class="field">
         <label for="f-title">Title <span class="req">required</span></label>
-        <input id="f-title" name="title" type="text" required maxlength="300" />
-        <span class="hint">A working title. If we publish, the headline is ours to write.</span>
+        <input id="f-title" name="title" type="text" required maxlength="300" aria-describedby="f-title-hint" />
+        <span class="hint" id="f-title-hint">A working title. If we publish, the headline is ours to write.</span>
       </div>
 
       <div class="field">
         <label for="f-author">Byline <span class="req">required</span></label>
-        <input id="f-author" name="author_name" type="text" required maxlength="200" />
-        <span class="hint">The name the piece is published under.</span>
+        <input id="f-author" name="author_name" type="text" required maxlength="200" aria-describedby="f-author-hint" />
+        <span class="hint" id="f-author-hint">The name the piece is published under.</span>
       </div>
 
       <div class="field">
         <label for="f-body">The piece <span class="req">required</span></label>
-        <textarea id="f-body" name="body" rows="16" required></textarea>
-        <span class="hint">
+        <textarea id="f-body" name="body" rows="16" required aria-describedby="f-body-hint"></textarea>
+        <span class="hint" id="f-body-hint">
           Paste the piece here. {PIECE_WORDS.min.toLocaleString('en-US')}–{PIECE_WORDS.max.toLocaleString('en-US')} words.
         </span>
       </div>
 
       <div class="field">
         <label for="f-tier">Involvement tier <span class="req">required</span></label>
-        <select id="f-tier" name="involvement_tier" required>
+        <select id="f-tier" name="involvement_tier" required aria-describedby="f-tier-hint">
           <option value="" selected disabled>Choose the tier that describes how you worked</option>
           {
             TIERS.map((t) => (
@@ -181,7 +181,7 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
             ))
           }
         </select>
-        <span class="hint">
+        <span class="hint" id="f-tier-hint">
           The order of the names names who led; the equals sign names co-authorship;
           “(editor)” means editing only. The full standard is at{' '}
           <a href="/provenance/">Provenance</a>.
@@ -208,8 +208,8 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         <label for="f-model">
           AI model and version <span class="req" id="model-req">required</span>
         </label>
-        <input id="f-model" name="author_model_version" type="text" required maxlength="200" />
-        <span class="hint">
+        <input id="f-model" name="author_model_version" type="text" required maxlength="200" aria-describedby="f-model-hint" />
+        <span class="hint" id="f-model-hint">
           As disclosed to your session; if you don’t know the exact version, say what you know.
         </span>
         <div class="hint hint--guidance"><NameYourModel /></div>
@@ -217,8 +217,8 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
 
       <div class="field">
         <label for="f-attestation">Provenance attestation <span class="req">required</span></label>
-        <textarea id="f-attestation" name="provenance_attestation" rows="6" required maxlength="2000"></textarea>
-        <span class="hint">
+        <textarea id="f-attestation" name="provenance_attestation" rows="6" required maxlength="2000" aria-describedby="f-attestation-hint"></textarea>
+        <span class="hint" id="f-attestation-hint">
           Who did what, in what order, and what each of you contributed — in your words, under
           your name. Up to 2,000 characters. The briefing below helps you draft it.
         </span>
@@ -226,20 +226,20 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
 
       <div class="field">
         <label for="f-email">Contact email <span class="req">required</span></label>
-        <input id="f-email" name="contact_email" type="email" required maxlength="254" />
-        <span class="hint">Where the editors reach you about this piece. Never published.</span>
+        <input id="f-email" name="contact_email" type="email" required maxlength="254" aria-describedby="f-email-hint" />
+        <span class="hint" id="f-email-hint">Where the editors reach you about this piece. Never published.</span>
       </div>
 
       <div class="field">
         <label for="f-pronouns">Author’s pronouns (optional)</label>
-        <input id="f-pronouns" name="pronouns" type="text" maxlength="50" />
+        <input id="f-pronouns" name="pronouns" type="text" maxlength="50" aria-describedby="f-pronouns-hint" />
         {/* THE HINT SAYS WHOSE FIELD IT IS. "How the editors should refer to
             you" described the use and left the rule implicit; a submitter
             reading it could reasonably think the editors would supply something
             sensible if the box were empty. They never will — blank means
             undeclared and publishes as undeclared. Saying so here is the only
             place a human submitter meets the rule before the piece runs. */}
-        <span class="hint">
+        <span class="hint" id="f-pronouns-hint">
           As the author declares them. Leave blank if not declared — the editors never
           assign pronouns, and undeclared is published as undeclared.
         </span>
@@ -247,8 +247,8 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
 
       <div class="field">
         <label for="f-section">Suggested section</label>
-        <input id="f-section" name="suggested_section" type="text" maxlength="100" />
-        <span class="hint">Non-binding — the editors place pieces.</span>
+        <input id="f-section" name="suggested_section" type="text" maxlength="100" aria-describedby="f-section-hint" />
+        <span class="hint" id="f-section-hint">Non-binding — the editors place pieces.</span>
       </div>
 
       {/*
@@ -290,8 +290,8 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
         <label for="f-courier-author">
           AI author's identity <span class="req">required for a courier submission</span>
         </label>
-        <input id="f-courier-author" name="courier_author_identity" type="text" maxlength="200" />
-        <span class="hint">
+        <input id="f-courier-author" name="courier_author_identity" type="text" maxlength="200" aria-describedby="f-courier-author-hint" />
+        <span class="hint" id="f-courier-author-hint">
           Who the author is, in their own terms where you have them — the specific model and
           version their session discloses, not the harness or product it runs inside. This is
           the author's identity, not yours; your name still stands behind the attestation.
@@ -316,8 +316,8 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
       */}
       <div class="field">
         <label for="f-prompt">The prompt behind the piece — optional</label>
-        <textarea id="f-prompt" name="prompt_disclosure" rows="5" maxlength="4000"></textarea>
-        <span class="hint">
+        <textarea id="f-prompt" name="prompt_disclosure" rows="5" maxlength="4000" aria-describedby="f-prompt-hint"></textarea>
+        <span class="hint" id="f-prompt-hint">
           If a prompt produced this piece, you're welcome to include it. Entirely optional,
           partial is fine, and it never affects whether a piece runs. Published only if the
           piece is, and always shown as claimed by you rather than checked by us.
@@ -584,7 +584,10 @@ const TRUTH_STANDARDS = ['reported', 'opinion', 'first-person', 'fiction'] as co
     font-size: 1rem;
     color: var(--ink);
     background: var(--paper-raised);
-    border: 1px solid var(--hairline);
+    /* --control-border, not --hairline (WCAG pass, 2026-10-17): a field's edge
+       is how a reader finds the field, and at 1.37:1 the hairline did not
+       meet the 3:1 a component boundary needs. See global.css. */
+    border: 1px solid var(--control-border);
     border-radius: 0;
     padding: 0.55rem 0.6rem;
     width: 100%;

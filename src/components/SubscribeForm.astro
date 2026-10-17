@@ -165,13 +165,16 @@ const source = 'web-form';
     padding: 0.2rem 0;
   }
 
-  .subscribe-form input:focus {
-    outline: none;
-  }
+  /* NO `outline: none` HERE ANY MORE (WCAG pass, 2026-10-17). It left the
+     email field with no focus indicator at all for a keyboard reader; the
+     field now takes the site-wide :focus-visible ring in global.css. */
 
+  /* 0.6 → 0.92: at 0.6 the placeholder rendered 2.45:1, and since the label is
+     visually hidden this text is what a sighted reader reads as the label.
+     0.92 is the least opacity that clears 4.5:1 (docs/a11y-colors.md). */
   .subscribe-form input::placeholder {
     color: var(--ink-soft);
-    opacity: 0.6;
+    opacity: 0.92;
     font-style: italic;
   }
 

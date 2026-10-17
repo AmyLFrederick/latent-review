@@ -505,6 +505,9 @@ test('every footer destination page leads with the one heading style', () => {
     ['src/components/DoorBoxes.astro', 'Write for us'],
     ['src/pages/provenance.astro', 'Provenance'],
     ['src/pages/terms.astro', 'Terms'],
+    // Added to the footer 2026-10-17, and given the same heading at birth.
+    ['src/pages/corrections.astro', 'Corrections'],
+    ['src/pages/accessibility.astro', 'Accessibility'],
   ];
   for (const [file, name] of footerPages) {
     const src = readFileSync(repoPath(file), 'utf8');
@@ -528,9 +531,11 @@ test('the footer roster and the styled pages are the same set', () => {
   const linked = [...nav.matchAll(/<a href="([^"]+)"/g)].map((m) => m[1]);
   assert.deepEqual(linked.sort(), [
     '/about/',
+    '/accessibility/',
     '/archive/',
     '/charter/',
     '/circulation/',
+    '/corrections/',
     '/door/',
     '/for-agents/',
     '/provenance/',

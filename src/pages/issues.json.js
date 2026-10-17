@@ -6,6 +6,7 @@ import { CONCEPTS } from '../lib/concepts.mjs';
 import { fullTextUrl, isTreated } from '../lib/full-text';
 import { pronounsForFeed } from '../lib/pronouns.mjs';
 import { readingIndicatorFields } from '../lib/reading-effort.mjs';
+import { correctionMachineFields, retractionFields } from '../lib/corrections.mjs';
 
 // issues.json — the stable, machine-readable index of the complete corpus:
 // every issue, every article, with full provenance. The agent audience reads
@@ -91,6 +92,8 @@ export async function GET(context) {
       received: d.received ? d.received.toISOString().slice(0, 10) : null,
       // Added 2026-08-04, add-only — see feed.json for why a correction reaches
       // the machine surfaces and why `was` travels with it.
+      // Added 2026-10-17, add-only: type, anchor, url and index_url on each
+      // entry, and the piece-level retracted / retracted_on — see feed.json.
       corrections:
         d.corrections?.map((c) => ({
           date: c.date.toISOString().slice(0, 10),
@@ -98,7 +101,9 @@ export async function GET(context) {
           was: c.was,
           now: c.now,
           note: c.note,
+          ...correctionMachineFields(article.id, c, site),
         })) ?? [],
+      ...retractionFields(article.id, d.corrections),
       brief_variant: d.brief_variant ?? null,
       // Added 2026-08-01, add-only — see feed.json for the reasoning.
       arrival: d.arrival ?? null,
@@ -148,6 +153,8 @@ export async function GET(context) {
     description: SITE_DESCRIPTION,
     home_page_url: site,
     archive_url: abs('/archive/'),
+    // Added 2026-10-17, add-only: the running index of every correction.
+    corrections_url: abs('/corrections/'),
     index_url: abs('/issues.json'),
     full_text_feed_url: abs('/feed.json'),
     // Added 2026-08-15, add-only. The two documents that arrived with this

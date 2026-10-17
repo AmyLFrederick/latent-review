@@ -5,6 +5,7 @@ import { TIER_CODES } from './lib/site';
 import { ARRIVAL_VALUES } from './lib/notice.mjs';
 import { validateTierCode } from './lib/tier-codes.mjs';
 import { assertConceptsKnown } from './lib/concepts.mjs';
+import { CORRECTION_TYPES, DEFAULT_CORRECTION_TYPE, slugifyText } from './lib/corrections.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
 import { EFFORT_LEVEL_IDS } from './lib/reading-effort.mjs';
 
@@ -701,10 +702,27 @@ const articles = defineCollection({
          * AN ARRAY, because a piece may be corrected more than once and each
          * correction is its own event. They are appended, never edited: the same
          * doctrine that governs RULINGS.md, one document down.
+         *
+         * EACH ENTRY HAS A CITABLE ANCHOR, derived and never stored:
+         * c-<slug>-<date>-<slug of `what`> (src/lib/corrections.mjs). Because
+         * entries are never edited, the anchor never moves; two entries that
+         * would share one fail the build.
          */
         corrections: z
           .array(
             z.object({
+              /**
+               * WHAT KIND OF CORRECTION (added 2026-10-17): `correction`,
+               * `clarification`, `provenance-disagreement` or `retraction`.
+               * Defaults to `correction`, which is what every entry written
+               * before the field existed was, so those build unchanged. A
+               * `retraction` marks the whole piece RETRACTED on every surface;
+               * the piece stays online. Vocabulary and meanings live in
+               * src/lib/corrections.mjs.
+               */
+              type: z
+                .enum(CORRECTION_TYPES as [string, ...string[]])
+                .default(DEFAULT_CORRECTION_TYPE),
               date: z.coerce.date(),
               /** What was corrected — the field or claim, named so a reader can find it. */
               what: z.string().min(1),
@@ -869,6 +887,24 @@ const articles = defineCollection({
             message:
               'title_as_submitted is the title the piece ARRIVED under, and it matches the published title. Remove it if the editors did not retitle the piece; absence is how an untouched title is recorded.',
           });
+        }
+        // TWO CORRECTIONS THAT WOULD CITE AS ONE. The anchor is the date plus
+        // the slug of `what` and never an array position, so a pair sharing
+        // both is a pair no citation can tell apart. Caught here, by name.
+        if (data.corrections) {
+          const seen = new Set();
+          for (const [index, c] of data.corrections.entries()) {
+            const key = `${c.date.toISOString().slice(0, 10)}-${slugifyText(c.what)}`;
+            if (!slugifyText(c.what) || seen.has(key)) {
+              ctx.addIssue({
+                code: 'custom',
+                path: ['corrections', index, 'what'],
+                message:
+                  'each correction needs a `what` that gives it its own citable anchor (date + slug of `what`); this one is empty of letters or repeats another correction on the same day. See src/lib/corrections.mjs.',
+              });
+            }
+            seen.add(key);
+          }
         }
         if (data.cover_image && !data.image_credit) {
           ctx.addIssue({

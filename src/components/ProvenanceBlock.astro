@@ -6,6 +6,7 @@ import {
   formatDate,
 } from '../lib/site';
 import { arrivalCaveat, authorshipFor, custodyFor } from '../lib/provenance';
+import { PROMISE_PROVENANCE_BLOCK } from '../lib/corrections.mjs';
 import TierLabel from './TierLabel.astro';
 // @ts-expect-error — plain-JS module shared with the tests
 import { tierNotation } from '../lib/tier-badges.mjs';
@@ -200,10 +201,10 @@ const attestationUnderCustody = d.submission_track === 'agent-direct' ? d.attest
     }
   </section>
 
-  <p class="provenance-note">
-    Provenance is set at acceptance and never altered. Corrections run as visible
-    corrections; the original stays in the record.
-  </p>
+  {/* The promise, from the one constant /corrections quotes it from, so the
+      page that keeps the promise and the block that makes it cannot drift
+      apart (2026-10-17). The words are unchanged. */}
+  <p class="provenance-note">{PROMISE_PROVENANCE_BLOCK}</p>
 </aside>
 
 <style>

@@ -71,6 +71,15 @@
   --hairline: #e0d8c6;
   --rule: #2a251c;
 
+  /* THE EDGE OF A FORM FIELD (WCAG 2.1 AA pass, 2026-10-17). The hairline is
+     a decorative rule at 1.29:1 and stays one; a field boundary is not
+     decoration — it is how a reader finds where to type — and WCAG asks 3:1 of
+     it. This is the hairline's own hue and chroma at a lower CIELAB lightness
+     (L* 86.5 → 60.4), the least that clears 3:1 on the raised ground. It is
+     visibly darker than the hairline, and flagged as such in
+     docs/a11y-colors.md, which lists every colour pair on the site. */
+  --control-border: #999181;
+
   --font-display: 'EB Garamond Variable', 'EB Garamond', Georgia, serif;
   --font-body: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
@@ -248,6 +257,113 @@ hr {
 
 .kicker--accent {
   color: var(--accent);
+}
+
+/* --- Keyboard and motion (WCAG 2.1 AA pass, 2026-10-17) ---------------------
+
+   ONE FOCUS RING FOR THE WHOLE SITE. Until this pass every control relied on
+   the browser's default ring, and one — the subscribe field — had it switched
+   off. This is the journal's green at 2px, offset so it sits on the ground
+   rather than on the control: 5.07:1 on the paper and 5.36:1 on the raised
+   panels, both over the 3:1 a focus indicator needs. :focus-visible, so a
+   mouse click does not draw it and a keyboard always does. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* THE SKIP LINK — the first thing a keyboard reader reaches on every page,
+   and invisible until it is reached. It jumps past the masthead and the
+   three-row section nav to the page's own content. */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -10rem;
+  z-index: 100;
+  padding: 0.5rem 0.9rem;
+  background: var(--paper-raised);
+  color: var(--ink);
+  border: 2px solid var(--accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 0.75rem;
+}
+
+/* The skip link's target takes focus so the next Tab starts inside the page,
+   but it is a region, not a control: a ring drawn around the whole of <main>
+   indicates nothing a reader can act on. */
+main:focus,
+main:focus-visible {
+  outline: none;
+}
+
+/* A READER WHO HAS ASKED FOR LESS MOTION GETS NONE. The site moves very little
+   — colour fades on links, a nudge on the archive cards (which already honours
+   this query), a smooth scroll on the editors' desk — and this stops all of it
+   at once rather than relying on each rule to remember. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- One correction (src/lib/corrections.mjs) ------------------------------
+
+   GLOBAL BECAUSE TWO PAGES PRINT IT. The block is rendered once, by the shared
+   formatter, and printed by the article page and by /corrections. These rules
+   moved here from the article template unchanged (2026-10-17): a scoped rule
+   cannot reach markup injected with set:html, and a class two surfaces share is
+   a rule two surfaces must share. */
+
+.correction + .correction {
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--hairline, currentColor);
+}
+
+.correction p {
+  margin: 0 0 0.4rem;
+}
+
+.correction p:last-child {
+  margin-bottom: 0;
+}
+
+.correction-date {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+/* THE TYPE IS A WORD, never a colour alone. Set in the label voice so it
+   reads as a classification of the entry rather than as part of its text. */
+.correction-type {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* WHAT IT USED TO SAY IS STRUCK, NOT DELETED — the visual form of "the
+   original stays in the record". A reader sees the old value and sees that it
+   is old, in one glance, without having to parse which of two strings is
+   which. The sentence around it says "was published reading", so the strike
+   is never the only cue. */
+.correction-was {
+  text-decoration: line-through;
+  color: var(--ink-soft);
+}
+
+.correction-now {
+  font-weight: 600;
 }
 
 /* Visually hidden, available to assistive tech */

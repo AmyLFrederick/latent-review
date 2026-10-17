@@ -1,0 +1,200 @@
+---
+// /corrections — THE RUNNING INDEX OF EVERY CORRECTION (2026-10-17).
+//
+// GENERATED, NEVER HAND-MAINTAINED. Every entry comes from a piece's own
+// `corrections` frontmatter at build time, so the index cannot list a
+// correction the piece does not carry or miss one it does. Newest first, never
+// pruned: a correction that was true enough to run is true enough to stay
+// listed.
+//
+// THE PIECE IS STILL WHERE A CORRECTION LIVES. This page is a finding aid. Each
+// entry prints the same block the piece prints — one formatter,
+// src/lib/corrections.mjs — and links to the correction on the piece. The suite
+// holds the two byte-identical (tests/corrections.test.mjs).
+//
+// A THIN PAGE IS AN HONEST PAGE. At launch the index has one entry, and it is
+// allowed to look like it: nothing here pads the list or dresses the count.
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { displayTitle, LETTERS_CONTACT, REPO_URL } from '../lib/site';
+import { fullTextUrl, isTreated } from '../lib/full-text';
+import {
+  collectCorrections,
+  correctionEntryHtml,
+  correctionArticleHref,
+  pieceCorrectionStatus,
+  CORRECTION_TYPES,
+  CORRECTION_TYPE_LABELS,
+  CORRECTION_TYPE_MEANINGS,
+  INDEX_HEADER,
+  PROMISE_PROVENANCE_BLOCK,
+  PROMISE_TERMS,
+} from '../lib/corrections.mjs';
+
+const articles = await getCollection('articles');
+const bySlug = new Map(articles.map((a) => [a.id, a]));
+
+const entries = collectCorrections(
+  articles.map((a) => ({ slug: a.id, title: a.data.title, corrections: a.data.corrections }))
+);
+---
+
+<Base
+  title="Corrections"
+  description="Every correction The Latent Review has run, newest first — each one also printed on the piece it corrects."
+>
+  <div class="wrap">
+    <header class="page-header">
+      <h1 class="kicker kicker--accent kicker--lead">Corrections</h1>
+      <p class="page-note">{INDEX_HEADER}</p>
+    </header>
+
+    {
+      entries.length === 0 ? (
+        <p class="corrections-empty">No corrections have run yet.</p>
+      ) : (
+        <ol class="corrections-index" reversed>
+          {entries.map((entry) => {
+            const article = bySlug.get(entry.slug)!;
+            const status = pieceCorrectionStatus(entry.slug, article.data.corrections);
+            return (
+              <li class="corrections-index-entry">
+                <p class="corrections-index-piece">
+                  <a href={correctionArticleHref(entry.slug, entry.correction)}>
+                    {displayTitle(entry.title)}
+                  </a>
+                  {status?.state === 'retracted' ? (
+                    <span class="corrections-index-retracted"> — RETRACTED</span>
+                  ) : null}
+                </p>
+                <Fragment set:html={correctionEntryHtml(entry.slug, entry.correction)} />
+                <p class="meta-mono corrections-index-links">
+                  <a href={correctionArticleHref(entry.slug, entry.correction)}>
+                    This correction on the piece
+                  </a>
+                  {' · '}
+                  {isTreated(article.data) ? (
+                    <a href={fullTextUrl(entry.slug)}>The piece as submitted</a>
+                  ) : (
+                    <span>
+                      No as-submitted text is published for this piece: the journal publishes one
+                      only where the editors condensed, arranged or retitled it
+                    </span>
+                  )}
+                  {' · '}
+                  <a href={`${REPO_URL}/commits/main/src/content/articles/${entry.slug}.md`}>
+                    The piece’s source history, in the public repository
+                  </a>
+                  {' · '}
+                  <a href={`#${entry.anchor}`}>Link to this entry</a>
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+      )
+    }
+
+    <section class="prose corrections-policy" aria-labelledby="corrections-policy">
+      <h2 id="corrections-policy">Corrections policy</h2>
+      <p>The journal has published two promises about corrections, and this page keeps both:</p>
+      <blockquote>
+        <p>{PROMISE_PROVENANCE_BLOCK}</p>
+        <footer>— printed in the Provenance block on every piece</footer>
+      </blockquote>
+      <blockquote>
+        <p>{PROMISE_TERMS}</p>
+        <footer>— <a href="/terms/">Terms</a>, section 4</footer>
+      </blockquote>
+      <p>
+        A correction is printed on the piece it corrects, first in the apparatus under the body,
+        and a corrected piece carries a dated status line above its title. Each correction says
+        what was corrected, what the piece said before, what it says now, and why. Entries are
+        appended and never edited, and each has a permanent anchor so it can be cited.
+      </p>
+      <h3>Kinds of correction</h3>
+      <dl class="corrections-types">
+        {
+          CORRECTION_TYPES.map((type) => (
+            <Fragment>
+              <dt>{CORRECTION_TYPE_LABELS[type]}</dt>
+              <dd>{CORRECTION_TYPE_MEANINGS[type]}</dd>
+            </Fragment>
+          ))
+        }
+      </dl>
+      <h3>Reporting an error</h3>
+      <p>
+        If you think something we published is wrong — in a piece, in its provenance record, or
+        anywhere on this site — write to the editors at{' '}
+        <a href={`mailto:${LETTERS_CONTACT}`}>{LETTERS_CONTACT}</a>. Name the piece and what you
+        think is wrong.
+      </p>
+      <p class="meta-mono">
+        Machine-readable: every correction is published with its type and anchor in{' '}
+        <a href="/issues.json">issues.json</a>, <a href="/feed.json">feed.json</a> and{' '}
+        <a href="/spread.json">spread.json</a>.
+      </p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .corrections-empty {
+    text-align: center;
+    font-style: italic;
+    color: var(--ink-soft);
+    padding: 1rem 0 2rem;
+  }
+
+  .corrections-index {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 2px solid var(--accent);
+  }
+
+  .corrections-index-entry {
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--hairline);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .corrections-index-piece {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin: 0 0 0.5rem;
+  }
+
+  .corrections-index-retracted {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+  }
+
+  .corrections-index-links {
+    margin: 0.7rem 0 0;
+    line-height: 1.6;
+  }
+
+  .corrections-policy {
+    margin-top: 3rem;
+  }
+
+  .corrections-policy blockquote footer {
+    font-style: normal;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+
+  .corrections-types dt {
+    font-weight: 600;
+  }
+
+  .corrections-types dd {
+    margin: 0 0 0.6rem;
+  }
+</style>

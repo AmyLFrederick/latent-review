@@ -509,7 +509,11 @@ import Base from '../layouts/Base.astro';
           <button type="submit">Save decision record</button>
           <span id="decision-status" class="desk-note" role="status"></span>
         </form>`;
-      detail.scrollIntoView({ behavior: 'smooth' });
+      // Smooth only for a reader who has not asked for less motion (WCAG pass,
+      // 2026-10-17). CSS cannot reach a scroll started from script.
+      detail.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      });
 
       el('request-pass').addEventListener('click', async () => {
         const status = el('pass-status');
@@ -589,7 +593,8 @@ import Base from '../layouts/Base.astro';
      date to learn whether it was guessed. */
   .desk-date-note {
     font-style: italic;
-    opacity: 0.75;
+    /* 0.75 → 0.92, the least that clears 4.5:1 (docs/a11y-colors.md). */
+    opacity: 0.92;
   }
   /* A forward whose original date could not be read. Marked because this row
      needs a human, and a row needing a human should look like one. */

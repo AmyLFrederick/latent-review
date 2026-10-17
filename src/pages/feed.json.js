@@ -5,6 +5,7 @@ import { SITE_TITLE, SITE_DESCRIPTION, tierLabel } from '../lib/site';
 import { provenanceLabel } from '../lib/provenance';
 import { fullTextUrl, isTreated } from '../lib/full-text';
 import { pronounsForFeed } from '../lib/pronouns.mjs';
+import { correctionMachineFields, retractionFields } from '../lib/corrections.mjs';
 
 // JSON Feed 1.1, full-text, with a `_provenance` extension on every item:
 // the complete provenance record, machine-readable.
@@ -79,6 +80,12 @@ export async function GET(context) {
           // only on the page is a correction withheld from exactly the readers
           // this journal exists to serve — and `was` travels with it, because
           // the promise is that the original stays in the record.
+          //
+          // Added 2026-10-17, add-only: `type` (correction, clarification,
+          // provenance-disagreement or retraction; `correction` on every entry
+          // written before the field existed), the citable `anchor`, and the
+          // entry's address on the piece (`url`) and on /corrections
+          // (`index_url`). The five fields above are unchanged.
           corrections:
             d.corrections?.map((c) => ({
               date: c.date.toISOString().slice(0, 10),
@@ -86,7 +93,11 @@ export async function GET(context) {
               was: c.was,
               now: c.now,
               note: c.note,
+              ...correctionMachineFields(article.id, c, site),
             })) ?? [],
+          // Added 2026-10-17, add-only: `retracted` and `retracted_on`. A
+          // retracted piece stays in the feed, marked, never dropped.
+          ...retractionFields(article.id, d.corrections),
           brief_variant: d.brief_variant ?? null,
           // Added 2026-08-01, add-only. The other half of the question
           // brief_variant asks: null here and null there means the desk has no
