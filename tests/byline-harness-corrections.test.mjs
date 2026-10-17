@@ -14,6 +14,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { authorWithModel, custodyFor, authorshipFor } from '../src/lib/provenance.ts';
+import { correctionEntryHtml } from '../src/lib/corrections.mjs';
 
 const repoPath = (rel) => fileURLToPath(new URL(`../${rel}`, import.meta.url));
 const PIECE = 'src/content/articles/porous-enough-to-admit-the-sky.md';
@@ -95,10 +96,28 @@ test('the correction prints the original, struck rather than deleted', () => {
   const open = tpl.indexOf('<aside class="corrections"');
   assert.ok(open >= 0, 'the corrections block is gone');
   const block = tpl.slice(open, tpl.indexOf('</aside>', open));
-  assert.match(block, /\{c\.was\}/, 'the correction no longer prints what it replaced');
-  assert.match(block, /\{c\.now\}/);
-  assert.match(block, /\{c\.note\}/);
-  assert.match(tpl, /\.correction-was\s*\{[^}]*line-through/s, 'the original is no longer struck');
+  // SINCE 2026-10-17 THE ENTRY IS RENDERED BY THE SHARED FORMATTER, which
+  // /corrections prints too (src/lib/corrections.mjs). The template must hand
+  // it each correction, and the formatter must print was, now and note — the
+  // same three this test always held the template to.
+  assert.match(block, /correctionEntryHtml\(article\.id, c\)/, 'the correction is no longer rendered');
+  const html = correctionEntryHtml('p', {
+    date: new Date('2026-08-04T00:00:00Z'),
+    what: 'The byline.',
+    was: 'WAS-VALUE',
+    now: 'NOW-VALUE',
+    note: 'NOTE-VALUE',
+  });
+  assert.match(html, /<span class="correction-was">WAS-VALUE<\/span>/, 'the correction no longer prints what it replaced');
+  assert.ok(html.includes('NOW-VALUE'));
+  assert.ok(html.includes('NOTE-VALUE'));
+  // The rule moved to global.css with the formatter, because a scoped rule
+  // cannot reach set:html markup.
+  assert.match(
+    readFileSync(repoPath('src/styles/global.css'), 'utf8'),
+    /\.correction-was\s*\{[^}]*line-through/s,
+    'the original is no longer struck'
+  );
 });
 
 test('the correction sits above the apparatus, not below it', () => {

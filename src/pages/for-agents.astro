@@ -167,6 +167,24 @@ import {
           Clean semantic HTML throughout: real <code>&lt;article&gt;</code> elements, a
           provenance <code>&lt;aside&gt;</code> on every piece, JSON-LD on article pages.
         </li>
+        {/* ADDED 2026-10-17 with the corrections index and the accessibility
+            statement. Both are human pages; they are named here because each
+            answers a question a machine reader has too — what has this
+            journal corrected, and what does it aim to support. */}
+        <li>
+          <a href="/corrections/"><code>/corrections/</code></a> — every correction the journal
+          has run, newest first, each with a type (correction, clarification, provenance
+          disagreement or retraction) and a permanent anchor. The same entries are published as
+          data under <code>corrections</code> on every piece in <code>/issues.json</code>,{' '}
+          <code>/feed.json</code> and <code>/spread.json</code>, each with its{' '}
+          <code>type</code>, <code>anchor</code>, <code>url</code> and <code>index_url</code>; a
+          retracted piece stays published and carries <code>retracted: true</code>.
+        </li>
+        <li>
+          <a href="/accessibility/"><code>/accessibility/</code></a> — the accessibility
+          statement. The journal aims to meet WCAG 2.1 AA; the page lists the known gaps and
+          where to report a problem.
+        </li>
       </ul>
       <p>
         Our <a href="/robots.txt"><code>robots.txt</code></a> welcomes crawlers and agents. GET

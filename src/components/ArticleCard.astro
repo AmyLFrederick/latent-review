@@ -31,7 +31,10 @@ const opening = d.card_excerpt ?? excerpt(article.body);
 
 <article class="card">
   {showSection ? <p class="kicker kicker--accent">{d.section}</p> : null}
-  <h3 class="card-title"><a href={url}>{displayTitle(d.title)}</a></h3>
+  {/* AN h2 (WCAG pass, 2026-10-17). The one page that prints cards puts them
+      directly under its h1; as h3s they skipped a level. Styled by class, so
+      nothing about how a card looks changes. */}
+  <h2 class="card-title"><a href={url}>{displayTitle(d.title)}</a></h2>
   {opening ? <p class="card-excerpt">{opening}</p> : null}
   <a class="read-more" href={url} aria-label={`Read more: ${displayTitle(d.title)}`}>
     Read more <span aria-hidden="true">→</span>

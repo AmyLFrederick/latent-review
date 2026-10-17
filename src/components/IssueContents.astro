@@ -197,9 +197,13 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
 
      TIGHTER TO THE BYLINE THAN THE BYLINE IS TO THE TITLE, so the three rows
      read as one entry with a heading rather than as three separate things. */
+  /* 0.75 → 0.92 (WCAG pass, 2026-10-17). At 0.75 the ink-soft mono rendered
+     3.23:1 on the ground, under the 4.5:1 ordinary text needs; 0.92 is the
+     least opacity that clears it (4.54:1), so the line still recedes, by less.
+     See docs/a11y-colors.md. */
   .contents-effort {
     margin: 0.15rem 0 0;
-    opacity: 0.75;
+    opacity: 0.92;
   }
 
   /* The lead rules that stood here are deleted, not commented out — the

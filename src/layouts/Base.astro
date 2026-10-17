@@ -229,6 +229,9 @@ const shareCardAlt =
     <meta name="twitter:image:alt" content={shareCardAlt} />
   </head>
   <body>
+    {/* THE SKIP LINK (WCAG pass, 2026-10-17). First in the document so it is
+        the first thing a keyboard reader reaches; hidden until focused. */}
+    <a class="skip-link" href="#main">Skip to content</a>
     <header>
       {
         grandMasthead ? (
@@ -281,7 +284,10 @@ const shareCardAlt =
       </nav>
     </header>
 
-    <main>
+    {/* tabindex="-1" so the skip link moves focus here as well as scrolling:
+        without it some browsers scroll to <main> and leave focus on the link,
+        and the next Tab lands back in the nav. */}
+    <main id="main" tabindex="-1">
       <slot />
     </main>
 
@@ -339,6 +345,13 @@ const shareCardAlt =
               either label, so nothing here is amended by changing it. */}
           <a href="/door/">Write for us</a> · <a href="/provenance/">Provenance</a> ·{' '}
           <a href="/terms/">Terms</a>{TERMS_UNDER_LEGAL_REVIEW ? <span> — under legal review</span> : null}
+          {/* CORRECTIONS AND ACCESSIBILITY (2026-10-17). Both are pages a
+              reader looks for at the foot of a page by convention, and the
+              accessibility statement is promised to be reachable from every
+              page — this row is on every page. Appended at the end so no
+              existing entry moves. */}
+          {' '}· <a href="/corrections/">Corrections</a> ·{' '}
+          <a href="/accessibility/">Accessibility</a>
         </nav>
         {/*
           THE WELCOME STATEMENT — ratified by both editors 2026-08-15 and set

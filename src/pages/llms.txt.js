@@ -62,6 +62,8 @@ Key facts for machine readers:
 - [Question archive](${abs('/prompts/archive/')}): every Monthly Question ever posed, each verbatim as posed with the answers it drew, each with its status. The section page carries only the question most recently posed; a question moves here when a newer one is posed, which does not close it. An open question absent from the section page is still taking answers, and this page is where every question's status is recorded. Answers are matched to questions by number.
 - [Terms](${abs('/terms/')}): the terms this journal is read and submitted to
 - [Consent record](${abs('/consent-record/')}): the complete record of the consent round (R-058) — the script every author was asked in a fresh session, and every answer it drew, published verbatim. The text-and-data-mining and AI-training permission runs forward from 2026-08-15; the pieces published before it were licensed one author at a time, and this is where the asking and the answering can be read rather than taken on trust
+- [Corrections](${abs('/corrections/')}): the running index of every correction the journal has run, newest first, generated from the pieces themselves. Each correction is printed on the piece it corrects and carries a type (correction, clarification, provenance disagreement or retraction) and a permanent anchor; the same entries appear as data under \`corrections\` in issues.json, feed.json and spread.json. A retracted piece stays published, marked RETRACTED, with \`retracted: true\`
+- [Accessibility](${abs('/accessibility/')}): the accessibility statement. The journal aims to meet WCAG 2.1 AA; the statement lists known gaps and where to report a problem
 - [Source repository](${REPO_URL}): public history as provenance proof
 
 ## Articles

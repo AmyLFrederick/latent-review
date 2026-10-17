@@ -178,6 +178,10 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
       {
         ladder.map((seg) => (
           <Fragment>
+            {/* THE ACCESSIBLE NAMES START WITH THE VISIBLE WORDS (WCAG 2.5.3,
+                2026-10-17): a voice-control user says "Give yearly" because
+                that is what the button reads, and a name of "Give $10 a year"
+                did not contain it. The prices are unchanged. */}
             <ul class="ladder">
               {seg.leadsWithMonthly && SUPPORT_ANNUAL_URL && (
                 <li>
@@ -185,7 +189,7 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
                     <strong>Annual Supporter</strong> — $10 a year.
                   </p>
                   <p class="act">
-                    <a class="give" href={SUPPORT_ANNUAL_URL} aria-label="Give $10 a year">
+                    <a class="give" href={SUPPORT_ANNUAL_URL} aria-label="Give yearly: $10 a year">
                       Give yearly
                     </a>
                   </p>
@@ -197,7 +201,7 @@ const ladder = LADDER_SEGMENTS.map((s) => ({ ...s, tiers: s.keys.map((k) => tier
                     <strong>Monthly Supporter</strong> — $1 a month.
                   </p>
                   <p class="act">
-                    <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give $1 a month">
+                    <a class="give" href={SUPPORT_MONTHLY_URL} aria-label="Give monthly: $1 a month">
                       Give monthly
                     </a>
                   </p>

@@ -65,9 +65,27 @@ interface Props {
    * border too many.
    */
   headingRule?: boolean;
+  /**
+   * Whether the label is a real heading (an h2) rather than a paragraph — the
+   * WCAG pass, 2026-10-17. On /prompts the answer titles are h3s directly
+   * under the page's h1, a skipped level a screen-reader user navigating by
+   * heading meets as a hole in the outline; the label is the heading that
+   * belongs there. OPT-IN for the archive's reason above: there each entry
+   * already has its own h2 and the label sits correctly as a paragraph.
+   * Looks identical either way — `.answers-label` sets every property a
+   * heading would change.
+   */
+  labelIsHeading?: boolean;
 }
 
-const { answers, status, heading = 'Answers', headingRule = false } = Astro.props;
+const {
+  answers,
+  status,
+  heading = 'Answers',
+  headingRule = false,
+  labelIsHeading = false,
+} = Astro.props;
+const LabelTag = labelIsHeading ? 'h2' : 'p';
 ---
 
 <section class="answers" aria-label={heading}>
@@ -83,7 +101,7 @@ const { answers, status, heading = 'Answers', headingRule = false } = Astro.prop
     where an absence is explained, and it still distinguishes an open question
     waiting from a closed one that ran none.
   */}
-  <p class:list={['answers-label', headingRule && 'answers-label--ruled']}>{heading}</p>
+  <LabelTag class:list={['answers-label', headingRule && 'answers-label--ruled']}>{heading}</LabelTag>
 
   {
     answers.length === 0 ? (
@@ -149,6 +167,10 @@ const { answers, status, heading = 'Answers', headingRule = false } = Astro.prop
 
   .answers-label {
     font-family: var(--font-mono);
+    /* Stated so the label renders the same as an h2 as it does as a <p>: the
+       global heading rule sets the display weight and a tight leading. */
+    font-weight: 400;
+    line-height: 1.65;
     font-size: 0.75rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;

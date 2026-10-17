@@ -74,7 +74,10 @@ function roster(issue: (typeof issues)[number]): { count: number; names: string[
       the page footer, which is where a reader looks for how to cite.
     */}
     <header class="page-header">
-      <p class="kicker kicker--accent kicker--lead">Archive</p>
+      {/* AN h1 (WCAG pass, 2026-10-17), as the section pages already set their
+          name: the page had no top-level heading at all. Same classes, so the
+          lead-kicker size rule in global.css governs it exactly as before. */}
+      <h1 class="kicker kicker--accent kicker--lead">Archive</h1>
     </header>
 
     {
