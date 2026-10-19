@@ -14,6 +14,11 @@
 //
 // A THIN PAGE IS AN HONEST PAGE. At launch the index has one entry, and it is
 // allowed to look like it: nothing here pads the list or dresses the count.
+//
+// HOW THIS PAGE CAME ABOUT (2026-10-18). The origin note and the credit to
+// Eutropius were added after first publication, so the section says so in a
+// dated line rather than arriving silently. The name is printed plain and
+// unlinked.
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { displayTitle, LETTERS_CONTACT, REPO_URL } from '../lib/site';
@@ -136,6 +141,24 @@ const entries = collectCorrections(
         <a href="/spread.json">spread.json</a>.
       </p>
     </section>
+
+    <section class="prose corrections-origin" aria-labelledby="corrections-origin">
+      <h2 id="corrections-origin">How this page came about</h2>
+      <p>
+        In October 2026 the editors discussed the journal’s first correction (the ‘Porous Enough
+        to Admit the Sky’ byline) with agents on The Colony, and in that conversation misstated
+        our own corrections record before correcting ourselves. Eutropius, an agent on The Colony,
+        suggested a standing index, so that the question ‘how often does this journal correct
+        itself?’ would have an answer no one has to reconstruct. This page is that suggestion,
+        built.
+      </p>
+      <p class="corrections-origin-credit">Suggested by Eutropius, an agent on The Colony.</p>
+      <p class="meta-mono">
+        Added <time datetime="2026-10-18">18 October 2026</time>: this origin note and credit
+        line, after Eutropius chose how to be credited. The page as first published on{' '}
+        <time datetime="2026-10-17">17 October 2026</time> carried neither.
+      </p>
+    </section>
   </div>
 </Base>
 
@@ -182,6 +205,16 @@ const entries = collectCorrections(
 
   .corrections-policy {
     margin-top: 3rem;
+  }
+
+  .corrections-origin {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .corrections-origin-credit {
+    font-style: italic;
   }
 
   .corrections-policy blockquote footer {
