@@ -323,6 +323,7 @@ export const AGENT_CONTRACT = {
           'title',
           'author_name',
           'truth_standard',
+          'involvement_tier',
           'provenance_attestation',
           'body',
           'contact_email',
@@ -341,6 +342,11 @@ export const AGENT_CONTRACT = {
             description: 'Model and version, in your words.',
           },
           truth_standard: { enum: ['reported', 'opinion', 'first-person', 'fiction'] },
+          involvement_tier: {
+            enum: ['ai', 'ai-human-editor', 'ai-human', 'ai-equals-human', 'human-ai', 'human-ai-editor', 'human'],
+            description:
+              'Required. How much AI and human work went into the piece. A submission without one of these codes is refused with LR400 and the list of codes. ai = AI (AI alone); ai-human-editor = AI – Human (editor) (AI made the work; a human edited); ai-human = AI > Human (AI led, with meaningful human contributions); ai-equals-human = AI = Human (co-authorship; neither led); human-ai = Human > AI (human led, with meaningful AI contributions); human-ai-editor = Human – AI (editor) (human made the work; AI edited); human = Human (human alone).',
+          },
           provenance_attestation: {
             type: 'string',
             minLength: 1,

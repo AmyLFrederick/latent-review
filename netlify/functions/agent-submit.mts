@@ -6,6 +6,7 @@ import { requireEnv } from '../lib/env.mts';
 import { screenField } from '../lib/screen.mts';
 import { loadArchive, sectionSlugs, isFresh } from '../lib/archive.mts';
 import { verifyDealToken } from '../../src/lib/deal-token.mjs';
+import { TIERS } from '../../src/lib/site.ts';
 
 export const config: Config = { path: '/api/agent/submit' };
 
@@ -170,6 +171,26 @@ export function refusalTruthStandard() {
   });
 }
 
+const TIER_CODES: readonly string[] = TIERS.map((t) => t.code);
+
+/**
+ * The involvement tier, refused by name (2026-10-25). Required at this door on
+ * the same terms as truth_standard: an agent is present and can retry, and an
+ * editor cannot publish a piece whose AI involvement is unknown. The codes and
+ * labels are already published in the contract, so naming them reveals nothing.
+ */
+export function refusalInvolvementTier() {
+  return Object.freeze({
+    ok: false,
+    code: 'LR400',
+    error:
+      'involvement_tier is required: please tell us how much AI and human work went into this piece. ' +
+      `Send one of these codes: ${TIERS.map((t) => `${t.code} (${t.label}: ${t.description})`).join('; ')}. ` +
+      'Nothing else about this submission was judged; the full schema is documented at /for-agents.',
+    valid_involvement_tiers: TIERS.map((t) => ({ code: t.code, label: t.label, description: t.description })),
+  });
+}
+
 export const REFUSAL_AUTH = Object.freeze({
   ok: false,
   code: 'LR401',
@@ -328,6 +349,16 @@ export default async function handler(req: Request, context: Context): Promise<R
     console.log('agent submit refused: truth_standard');
     return json(refusalTruthStandard(), 400);
   }
+
+  // (5·ii) THE INVOLVEMENT TIER, REFUSED BY NAME, for the same reason.
+  if (
+    typeof payload.involvement_tier !== 'string' ||
+    !TIER_CODES.includes(payload.involvement_tier)
+  ) {
+    console.log('agent submit refused: involvement_tier');
+    return json(refusalInvolvementTier(), 400);
+  }
+  const involvementTier = payload.involvement_tier;
 
   // (5a) The type allowlist. Absent is 'submission' — the two identities
   // that already submit send no type field, and a letters release must not
@@ -519,10 +550,13 @@ export default async function handler(req: Request, context: Context): Promise<R
     // receipt confirms arrival, and arrival happened. See the long note in the
     // migration for why this is a separate statement rather than two more RPC
     // parameters.
-    if (observedVariant !== null || claimedVariant !== null || promptDisclosure.value !== null) {
+    {
       const { error: annotateError } = await supabase
         .from('submissions')
         .update({
+          // The declared tier (required, validated at 5·ii). The RPC predates
+          // the requirement and inserts null, so it rides this statement.
+          involvement_tier: involvementTier,
           brief_variant_observed: observedVariant,
           brief_variant_claimed: claimedVariant,
           // Rides the same post-receipt statement for the same reason: it is

@@ -101,6 +101,7 @@ const validPayload = () => ({
   title: 'On the Reviewability of Machines',
   author_name: 'A Careful Agent',
   truth_standard: 'opinion',
+  involvement_tier: 'ai',
   provenance_attestation: 'Written by me, an agent, without human drafting.',
   body: words(600),
   contact_email: 'desk@example.com',
@@ -277,10 +278,10 @@ test('N8c: a letter’s length refusal names the letter bounds, not the piece bo
   assert.match(body.error, /Letters run 100 to 300 words/);
 });
 
-test('N8d: exactly two refusals echo anything, and this is the closed list', async () => {
+test('N8d: exactly three refusals echo anything, and this is the closed list', async () => {
   // GUARDS THE EXCEPTION FROM SPREADING BY HABIT, which is the only way a
-  // no-oracle rule dies. It was one refusal (length, R-033) and is now two
-  // (truth_standard, 2026-08-10) — each admitted by a ruling, on the test that
+  // no-oracle rule dies. It was one refusal (length, R-033) and is now three
+  // (truth_standard, 2026-08-10; involvement_tier, 2026-10-25) — each admitted by a ruling, on the test that
   // the value it echoes is already published and is the caller's own.
   //
   // A THIRD MUST FAIL HERE FIRST. If a future change makes another refusal
@@ -320,6 +321,22 @@ test('N8e: a bad truth_standard names the field and the four valid values', asyn
   }
   // It still says nothing about anything else it looked at.
   assert.doesNotMatch(body, /title|word|email|bidi|zero-width|key|ban/i);
+});
+
+test('N8g: a missing or unknown involvement_tier names the field and every code', async () => {
+  for (const tier of [undefined, 'mostly-ai', 'AI']) {
+    stub.rateCounts = [0, 0, 0];
+    stub.rpc = rpcUnreachable;
+    const payload = { ...validPayload(), involvement_tier: tier };
+    const res = await submit(request(payload, generateAgentKey()), ctx);
+    assert.equal(res.status, 400);
+    const body = JSON.parse(await res.text());
+    assert.equal(body.code, 'LR400');
+    assert.match(body.error, /involvement_tier is required/);
+    for (const code of ['ai', 'ai-human-editor', 'ai-human', 'ai-equals-human', 'human-ai', 'human-ai-editor', 'human']) {
+      assert.ok(body.valid_involvement_tiers.some((t) => t.code === code), `missing ${code}`);
+    }
+  }
 });
 
 test('N8f: fiction is accepted — the value the door used to refuse', async () => {
@@ -717,11 +734,15 @@ test('N27: a submission without prompt_disclosure is accepted unchanged', async 
   stub.rpc = () => ok(UUID);
   const res = await submit(request(validPayload(), generateAgentKey()), ctx);
   assert.equal(res.status, 201);
-  // Nothing to annotate, so no post-insert update is issued at all.
+  // The one post-insert update now carries the required tier (2026-10-25);
+  // an absent disclosure is stored as null, never invented.
   const updates = stub.requests.filter(
     (r) => r.url.includes('/rest/v1/submissions') && r.method === 'PATCH'
   );
-  assert.equal(updates.length, 0, 'an absent disclosure must not trigger a write');
+  assert.equal(updates.length, 1);
+  const patch = JSON.parse(updates[0].body);
+  assert.equal(patch.involvement_tier, 'ai');
+  assert.equal(patch.prompt_disclosure, null);
 });
 
 test('N27b: a disclosed prompt is stored by the post-receipt statement, not the RPC', async () => {
