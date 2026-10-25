@@ -32,6 +32,11 @@ import Base from '../layouts/Base.astro';
         <input id="login-email" type="email" required autocomplete="email" />
         <button type="submit">Send magic link</button>
       </form>
+      <form id="code-form" class="desk-login-form">
+        <label for="login-code">Or type the code from the email</label>
+        <input id="login-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,10}" required />
+        <button type="submit">Sign in with code</button>
+      </form>
       <p id="login-status" class="desk-note" role="status"></p>
     </section>
 
@@ -74,7 +79,13 @@ import Base from '../layouts/Base.astro';
   if (!url || !key) {
     el('desk-config-error').hidden = false;
   } else {
-    const supabase = createClient(url, key);
+    // Implicit flow: the emailed link carries the session in the URL fragment,
+    // so it works even when the link opens in a different browser (e.g. the
+    // Gmail app's in-app browser) than the one that requested it. PKCE would
+    // need the code verifier stored in the requesting browser.
+    const supabase = createClient(url, key, {
+      auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true },
+    });
 
     const login = el('desk-login');
     const app = el('desk-app');
@@ -292,6 +303,34 @@ import Base from '../layouts/Base.astro';
       await supabase.auth.signOut();
       await refresh();
     });
+
+    el('code-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (el('login-email') as HTMLInputElement).value.trim();
+      const token = (el('login-code') as HTMLInputElement).value.trim();
+      const status = el('login-status');
+      if (!email) {
+        status.textContent = 'Enter your editor email above first.';
+        return;
+      }
+      status.textContent = 'Checking code…';
+      const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' });
+      status.textContent = error ? `Code not accepted: ${error.message}` : '';
+      await refresh();
+    });
+
+    // Surface link errors (expired / already-used link) instead of silently
+    // showing the form again, and clean the fragment out of the address bar.
+    {
+      const h = new URLSearchParams(location.hash.slice(1));
+      const q = new URLSearchParams(location.search);
+      const err = h.get('error_description') || q.get('error_description');
+      if (err) {
+        el('login-status').textContent =
+          `That sign-in link didn't work (${err.replace(/\+/g, ' ')}). Request a new one and use it once, or type the code from the email.`;
+        history.replaceState(null, '', location.pathname);
+      }
+    }
 
     supabase.auth.onAuthStateChange(() => void refresh());
 
