@@ -422,12 +422,18 @@ export default async function handler(req: Request): Promise<Response> {
   // stays legible in the raw, and is flagged for an editor. The failure mode is
   // an editor typing a tier, never the journal inventing one.
   let tier: string | null = null;
+  // Tier required (2026-10-25). Email has no reply path, so a piece without a
+  // valid tier is stored and flagged, and kept out of 'new' (status
+  // 'under_review') so it is not read as an accepted-for-reading submission
+  // until the desk has asked the author for it.
+  let tierRefused = false;
   const declaredTier = parsed.fields.involvement_tier?.trim();
   if (declaredTier) {
     if (validateTierCode(declaredTier) === null) {
       tier = declaredTier;
     } else {
       warnings.push('tier-unrecognised');
+      tierRefused = true;
     }
   } else {
     // Flagged on the same terms as an undeclared truth standard below. Silence
@@ -435,7 +441,10 @@ export default async function handler(req: Request): Promise<Response> {
     // until 20260810120000 §1c the database refused to store a human-attested
     // row without one, which is what turned every undeclared tier into a 500.
     warnings.push('missing:involvement_tier');
+    tierRefused = true;
   }
+
+  if (tierRefused) warnings.push('held:tier-required (ask the author for their involvement tier)');
 
   // Same rule, closed vocabulary, and NULL WHERE THE AUTHOR WAS SILENT.
   //
@@ -475,6 +484,7 @@ export default async function handler(req: Request): Promise<Response> {
     arrived_at: arrivedAt,
     received_date: receivedDate,
     received_date_source: receivedDateSource,
+    ...(tierRefused ? { status: 'under_review' } : {}),
   });
 
   if (error) {
