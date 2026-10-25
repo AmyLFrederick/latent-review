@@ -357,11 +357,40 @@ import Base from '../layouts/Base.astro';
       const approved = (r: any) => r.status === 'accepted';
       const published = (r: any) => !!r.published_url;
       const groups: [string, any[]][] = [
-        ['Submissions', rows.filter((r: any) => r.status !== 'accepted' && r.status !== 'declined')],
-        ['Approved, not published', rows.filter((r: any) => approved(r) && !published(r))],
-        ['Approved, published', rows.filter((r: any) => approved(r) && published(r))],
-        ['Not approved', rows.filter((r: any) => r.status === 'declined')],
+        ['Under review', rows.filter((r: any) => r.status !== 'accepted' && r.status !== 'declined')],
+        ['Accepted, awaiting publication', rows.filter((r: any) => approved(r) && !published(r))],
+        ['Published', rows.filter((r: any) => approved(r) && published(r))],
+        ['Declined', rows.filter((r: any) => r.status === 'declined')],
       ];
+      // Live-site check: compare the Published section with the site's own
+      // index (/issues.json — every cover story and article in every issue).
+      const norm = (u: string) => {
+        try { const x = new URL(u, 'https://thelatentreview.com'); return x.pathname.replace(/\/?$/, '/'); } catch { return u; }
+      };
+      let live: Map<string, string> | null = null;
+      try {
+        const res = await fetch('/issues.json', { cache: 'no-store' });
+        if (res.ok) {
+          const idx = await res.json();
+          live = new Map();
+          for (const iss of idx.issues ?? []) {
+            for (const a of [iss.cover_story, ...(iss.articles ?? [])]) if (a?.url) live.set(norm(a.url), a.title ?? a.url);
+          }
+        }
+      } catch { live = null; }
+      const liveFlag = (r: any) => {
+        if (!live || !published(r)) return '';
+        return live.has(norm(r.published_url)) ? ' <span class="desk-live desk-live--ok">✓ live</span>' : ' <span class="desk-live desk-live--bad">⚠ marked published, not on the live site</span>';
+      };
+      const marked = new Set(rows.filter(published).map((r: any) => norm(r.published_url)));
+      const unmarked = live ? [...live].filter(([u]) => !marked.has(u)) : [];
+      const liveReport = !live
+        ? '<p class="desk-note">Live-site check unavailable (could not read /issues.json).</p>'
+        : unmarked.length
+          ? `<div class="desk-live-report"><p><strong>⚠ Live on the site but no queue item is marked published (${unmarked.length}):</strong></p><ul>${unmarked
+              .map(([u, t]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a></li>`)
+              .join('')}</ul><p class="desk-note">Pieces published before the queue existed show here until their queue item gets a Published URL.</p></div>`
+          : '<p class="desk-note">✓ Every live piece matches a queue item marked published.</p>';
       const vote = (v: string | null) => (v ? esc(v) : '—');
       const table = (rs: any[]) =>
         rs.length
@@ -373,7 +402,7 @@ import Base from '../layouts/Base.astro';
                 (r) => `
               <tr data-id="${esc(r.id)}">
                 <td>${esc(new Date(r.created_at).toISOString().slice(0, 10))}</td>
-                <td><a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>${r.type === 'correspondence' ? ' <em>(letter)</em>' : ''}${r.published_url ? ` · <a href="${esc(r.published_url)}" target="_blank" rel="noopener">live</a>` : ''}</td>
+                <td><a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>${r.type === 'correspondence' ? ' <em>(letter)</em>' : ''}${r.published_url ? ` · <a href="${esc(r.published_url)}" target="_blank" rel="noopener">link</a>` : ''}${liveFlag(r)}</td>
                 <td>${esc(r.author_name)}</td>
                 <td>${r.involvement_tier ? (tierHtml(r.involvement_tier) ?? esc(r.involvement_tier)) : '—'}</td>
                 <td>${vote(r.amy_decision)} / ${vote(r.coeditor_decision)}</td>
@@ -385,7 +414,7 @@ import Base from '../layouts/Base.astro';
         </table>`
           : '<p class="desk-note">None.</p>';
       list.innerHTML = groups
-        .map(([label, rs]) => `<section class="desk-group"><h3>${esc(label)} <span class="desk-note">(${rs.length})</span></h3>${table(rs)}</section>`)
+        .map(([label, rs]) => `<section class="desk-group"><h3>${esc(label)} <span class="desk-note">(${rs.length})</span></h3>${label === 'Published' ? liveReport : ''}${table(rs)}</section>`)
         .join('');
       list.querySelectorAll('[data-open]').forEach((a) =>
         a.addEventListener('click', (e) => {
@@ -495,6 +524,24 @@ import Base from '../layouts/Base.astro';
       const { data: s, error } = await supabase.from('submissions').select('*').eq('id', id).single();
       if (error || !s) return;
       const passes = await loadPasses(id);
+      // Add-only status history (table may not exist until its migration is applied).
+      const { data: hist, error: histErr } = await supabase
+        .from('submission_status_history')
+        .select('from_section, to_section, changed_at, changed_by')
+        .eq('submission_id', id)
+        .order('changed_at', { ascending: true });
+      const historyHtml = histErr
+        ? ''
+        : `<section class="desk-history"><h3>Status history</h3>${
+            (hist ?? []).length
+              ? `<ol>${(hist ?? [])
+                  .map(
+                    (h: any) =>
+                      `<li>${esc(new Date(h.changed_at).toLocaleString('en-US', { timeZone: 'America/Chicago', dateStyle: 'medium', timeStyle: 'short' }))} CT — ${h.from_section ? `${esc(h.from_section)} → ` : ''}<strong>${esc(h.to_section)}</strong> · ${esc(h.changed_by)}</li>`
+                  )
+                  .join('')}</ol>`
+              : '<p class="desk-note">No changes logged yet.</p>'
+          }<p class="desk-note">Add-only log: entries cannot be edited or deleted.</p></section>`;
       detail.hidden = false;
       // PRONOUNS RENDER READ-ONLY IN THE METADATA LINE, with no editing control,
       // and the absence of that control is the feature. The rule is that the
@@ -572,7 +619,8 @@ import Base from '../layouts/Base.astro';
           </label>` : ''}
           <button type="submit">Save decision record</button>
           <span id="decision-status" class="desk-note" role="status"></span>
-        </form>`;
+        </form>
+        ${historyHtml}`;
       // Smooth only for a reader who has not asked for less motion (WCAG pass,
       // 2026-10-17). CSS cannot reach a scroll started from script.
       detail.scrollIntoView({
@@ -737,6 +785,19 @@ import Base from '../layouts/Base.astro';
   .desk-status--declined,
   .desk-status--banned {
     color: firebrick;
+  }
+  .desk-live--ok {
+    color: green;
+    font-size: 0.85rem;
+  }
+  .desk-live--bad,
+  .desk-live-report strong {
+    color: firebrick;
+    font-size: 0.9rem;
+  }
+  .desk-history ol {
+    padding-left: 1.2rem;
+    font-size: 0.9rem;
   }
   .desk-body {
     border-left: 3px solid var(--rule);
