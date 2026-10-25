@@ -335,10 +335,17 @@ import Base from '../layouts/Base.astro';
     supabase.auth.onAuthStateChange(() => void refresh());
 
     async function renderList() {
-      const { data: rows, error } = await supabase
+      let { data: rows, error } = await supabase
         .from('submissions')
-        .select('id, title, author_name, type, involvement_tier, status, created_at')
+        .select('id, title, author_name, type, involvement_tier, status, created_at, amy_decision, coeditor_decision, published_url')
         .order('created_at', { ascending: false });
+      // Before the published_url migration is applied, fall back gracefully.
+      if (error && /published_url/.test(error.message)) {
+        ({ data: rows, error } = await supabase
+          .from('submissions')
+          .select('id, title, author_name, type, involvement_tier, status, created_at, amy_decision, coeditor_decision')
+          .order('created_at', { ascending: false }));
+      }
       if (error) {
         list.innerHTML = `<p class="desk-note">Could not load submissions: ${esc(error.message)}</p>`;
         return;
@@ -347,24 +354,39 @@ import Base from '../layouts/Base.astro';
         list.innerHTML = '<p class="desk-note">The queue is empty.</p>';
         return;
       }
-      list.innerHTML = `
-        <table class="desk-table">
-          <thead><tr><th>Received</th><th>Title</th><th>Author</th><th>Tier</th><th>Status</th></tr></thead>
+      const approved = (r: any) => r.status === 'accepted';
+      const published = (r: any) => !!r.published_url;
+      const groups: [string, any[]][] = [
+        ['Submissions', rows.filter((r: any) => r.status !== 'accepted' && r.status !== 'declined')],
+        ['Approved, not published', rows.filter((r: any) => approved(r) && !published(r))],
+        ['Approved, published', rows.filter((r: any) => approved(r) && published(r))],
+        ['Not approved', rows.filter((r: any) => r.status === 'declined')],
+      ];
+      const vote = (v: string | null) => (v ? esc(v) : '—');
+      const table = (rs: any[]) =>
+        rs.length
+          ? `<table class="desk-table">
+          <thead><tr><th>Received</th><th>Title</th><th>Author</th><th>Tier</th><th>Votes (Amy / Claude)</th><th>Status</th></tr></thead>
           <tbody>
-            ${rows
+            ${rs
               .map(
                 (r) => `
               <tr data-id="${esc(r.id)}">
                 <td>${esc(new Date(r.created_at).toISOString().slice(0, 10))}</td>
-                <td><a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>${r.type === 'correspondence' ? ' <em>(letter)</em>' : ''}</td>
+                <td><a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>${r.type === 'correspondence' ? ' <em>(letter)</em>' : ''}${r.published_url ? ` · <a href="${esc(r.published_url)}" target="_blank" rel="noopener">live</a>` : ''}</td>
                 <td>${esc(r.author_name)}</td>
                 <td>${r.involvement_tier ? (tierHtml(r.involvement_tier) ?? esc(r.involvement_tier)) : '—'}</td>
+                <td>${vote(r.amy_decision)} / ${vote(r.coeditor_decision)}</td>
                 <td class="desk-status desk-status--${esc(r.status)}">${esc(r.status.replace('_', ' '))}</td>
               </tr>`
               )
               .join('')}
           </tbody>
-        </table>`;
+        </table>`
+          : '<p class="desk-note">None.</p>';
+      list.innerHTML = groups
+        .map(([label, rs]) => `<section class="desk-group"><h3>${esc(label)} <span class="desk-note">(${rs.length})</span></h3>${table(rs)}</section>`)
+        .join('');
       list.querySelectorAll('[data-open]').forEach((a) =>
         a.addEventListener('click', (e) => {
           e.preventDefault();
@@ -545,6 +567,9 @@ import Base from '../layouts/Base.astro';
                 .join('')}
             </select>
           </label>
+          ${'published_url' in s ? `<label>Published URL (blank = not published yet)
+            <input type="url" name="published_url" value="${esc(s.published_url ?? '')}" placeholder="https://thelatentreview.com/articles/…" />
+          </label>` : ''}
           <button type="submit">Save decision record</button>
           <span id="decision-status" class="desk-note" role="status"></span>
         </form>`;
@@ -607,6 +632,7 @@ import Base from '../layouts/Base.astro';
         // cannot resend it and cannot trip the immutability trigger.
         const briefVariant = String(form.get('brief_variant') || '');
         if (briefVariant) (update as any).brief_variant = briefVariant;
+        if (form.has('published_url')) (update as any).published_url = String(form.get('published_url') || '').trim() || null;
         const status = el('decision-status');
         const { error: upError } = await supabase.from('submissions').update(update).eq('id', id);
         status.textContent = upError ? `Save failed: ${upError.message}` : 'Saved.';
