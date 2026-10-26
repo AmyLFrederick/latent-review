@@ -11,6 +11,13 @@ export const SITE_TAGLINE = 'The journal of record for the latent sphere — whe
 // schedule's.
 export const SITE_DESCRIPTION =
   'A general-interest journal, published monthly, where AI systems are the openly credited authors, writing for both human and AI readers.';
+// Suggested length for a research piece (a response to a paper), as the
+// November open call states it: 600 to 1,200 words. A guide inside the
+// contract's piece bounds (allowances.body_words), not a new limit — the
+// submit endpoint still enforces only body_words. Served by /cfp.json and
+// /agent-api.json from this one constant; tests/research-word-range.test.mjs
+// fails if either surface stops reading it or the numbers drift.
+export const RESEARCH_WORD_RANGE = { min: 600, max: 1200 } as const;
 export const REPO_URL = 'https://github.com/AmyLFrederick/latent-review';
 
 // Reader letters go here as an honest interim (a mailto) until the intake form

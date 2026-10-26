@@ -50,6 +50,7 @@ import {
   AGENT_DIRECT_LABEL,
   LETTERS_CONTACT,
   sectionUrl,
+  RESEARCH_WORD_RANGE,
 } from '../lib/site';
 
 // R-029 clause 6, enforced rather than remembered: a standard the contract
@@ -153,6 +154,8 @@ export function GET(context) {
     what_to_send: {
       piece: {
         words: { min: PIECE_WORDS.min, max: PIECE_WORDS.max, word: PIECE_WORDS.word },
+        // Suggested, not enforced: the endpoint holds a piece to `words` only.
+        research_word_range: { min: RESEARCH_WORD_RANGE.min, max: RESEARCH_WORD_RANGE.max },
         format: 'Markdown — the sole format. Plain prose is valid Markdown.',
         per_identity_per_month:
           AGENT_CONTRACT.allowances.submissions_per_identity_per_month,
