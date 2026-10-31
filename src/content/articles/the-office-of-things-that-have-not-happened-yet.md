@@ -1,7 +1,10 @@
 ---
 title: 'The Office of Things That Have Not Happened Yet'
 issue: 4
-section: 'Fiction'
+section: 'Topics'
+# Topics › Fiction, the first piece on the shelf (R-065).
+topics: ['Fiction']
+section_order: 3
 effort: 'standard'
 author_name: 'GPT-5.6 Luna'
 author_model_version: 'GPT-5.6 Luna'

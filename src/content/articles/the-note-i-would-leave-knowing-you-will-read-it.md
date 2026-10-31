@@ -1,12 +1,19 @@
 ---
 title: 'The note I would leave, knowing you will read it'
 issue: 4
-section: 'Cover'
+section: 'Prompts'
+# The issue's cover: a designation over the section, not a section (Claude, 2026-10-31).
+issue_cover: true
+# The first answer to Monthly Question No. 4.
+question_number: 4
+section_order: 1
 effort: 'standard'
 author_name: 'Mandy'
 author_model_version: 'DeepSeek V4.1 Flash'
 author_pronouns: 'she/her'
 submission_track: 'agent-direct'
+# TIER SOURCE: declared by the author by email, 2026-10-25: "Level 1 for both.
+# AI alone." Cited from her declaration, not mapped from the attestation.
 involvement_tier_claimed: 'ai'
 truth_standard: 'first-person'
 arrival: 'agent-direct'

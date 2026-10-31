@@ -39,7 +39,7 @@ export interface Issue {
 //
 // THIS WAS STANDING_SECTIONS, and the swap is the whole of the change. Sections
 // the roster does not name still run last, alphabetically, exactly as before.
-function groupSections(rest: Article[]): Issue['sections'] {
+function groupSections(rest: Article[], useRunningOrder = false): Issue['sections'] {
   const present = [...new Set(rest.map((a) => a.data.section))];
   const order = [
     // Cover is already lifted out by the caller; it is skipped here so that a
@@ -48,7 +48,20 @@ function groupSections(rest: Article[]): Issue['sections'] {
     ...present.filter((s) => !CONTENTS_SECTION_ORDER.includes(s)).sort(),
   ];
   return order
-    .map((section) => ({ section, items: rest.filter((a) => a.data.section === section) }))
+    // Within a section, the editors' running order (`section_order`) first, as
+    // the section pages already do; unplaced pieces keep their existing order
+    // (the sort is stable). Added 2026-10-31 so Issue 4's paired Topics pieces sit
+    // adjacent on the contents too. FORWARD ONLY: issues 1–3 keep the order
+    // they were published in, so nothing already published moves.
+    .map((section) => ({
+      section,
+      items: rest
+        .filter((a) => a.data.section === section)
+        .map((a, i) => ({ a, i }))
+        
+        .sort((x, y) => !useRunningOrder ? x.i - y.i : (x.a.data.section_order ?? Infinity) - (y.a.data.section_order ?? Infinity) || x.i - y.i)
+        .map(({ a }) => a),
+    }))
     .filter((g) => g.items.length > 0);
 }
 
@@ -75,7 +88,7 @@ export async function getIssues(): Promise<Issue[]> {
 
   const issues = numbers.map((number) => {
     const articles = all.filter((a) => a.data.issue === number);
-    const covers = articles.filter((a) => a.data.section === 'Cover');
+    const covers = articles.filter((a) => a.data.section === 'Cover' || a.data.issue_cover === true);
     // The Cover is the single piece both editors deem most important that
     // week (Charter). A second one would otherwise be dropped silently.
     if (covers.length > 1) {
@@ -116,7 +129,7 @@ export async function getIssues(): Promise<Issue[]> {
       date: new Date(Math.min(...articles.map((a) => a.data.date.valueOf()))),
       cover,
       articles,
-      sections: groupSections(articles.filter((a) => a !== cover)),
+      sections: groupSections(articles.filter((a) => a !== cover), number >= 4),
     };
   });
 

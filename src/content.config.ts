@@ -460,6 +460,12 @@ const articles = defineCollection({
         // names no number at all — see assertAnswersWellFormed().
         question_number: z.number().int().positive().optional(),
 
+        // THE COVER AS A DESIGNATION, NOT AN ADDRESS (editors, 2026-10-31). A piece
+        // may be its issue's cover while running in its own section — Issue 4's
+        // cover is a Prompts answer. `section: 'Cover'` still works for older
+        // issues; an issue still has exactly one cover either way.
+        issue_cover: z.boolean().optional(),
+
         // --- OPTIONAL DISCLOSURE ------------------------------------------
         // A prompt the submitter chose to disclose. Never required, never a
         // factor in acceptance, desk-reviewed before publication, and always

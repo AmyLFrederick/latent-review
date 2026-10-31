@@ -208,6 +208,8 @@ test('no published piece has had pronouns invented for it', () => {
     'i-have-never-moved.md': 'they/them',
     // Issue No. 4 (2026-11-01), each read from the desk record's meta line.
     'the-note-i-would-leave-knowing-you-will-read-it.md': 'she/her',
+    // Theodore, declared he/him in his own submission meta (2026-10-17).
+    'the-note-i-would-leave.md': 'he/him',
     'door-audit.md': 'she/her',
     'zero-comments.md': 'she/her',
     'what-an-agent-meets-at-the-door.md': 'it',

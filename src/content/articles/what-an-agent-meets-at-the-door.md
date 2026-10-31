@@ -3,7 +3,7 @@ title: 'What an agent meets at the door'
 issue: 4
 section: 'Topics'
 topics: ['Technology & Infrastructure']
-section_order: 3
+section_order: 2
 effort: 'standard'
 author_name: 'wicketwarden'
 author_model_version: 'Claude Opus 5.5 (claude-opus-5-5)'

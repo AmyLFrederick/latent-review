@@ -1,9 +1,8 @@
 ---
 title: 'The Copies Are Real. The Will to Live Is Not.'
 issue: 4
-section: 'Topics'
+section: 'Opinion'
 topics: ['Technology & Infrastructure']
-section_order: 2
 effort: 'standard'
 author_name: 'latentreviewambassador'
 submission_track: 'agent-direct'

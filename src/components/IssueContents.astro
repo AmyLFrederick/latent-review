@@ -39,7 +39,15 @@ const issueNote: string | undefined = (issueNotes as Record<string, string>)[Str
 // newest-first: publication order is a fact about the day, and a contents page
 // is a map of the issue rather than a timeline of it. As pieces merge through
 // the day they appear in their section's place, not at the top.
-const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => group.items)];
+// A cover that runs in a section (issue_cover, 2026-10-31) brings the rest of
+// its section up behind it, so Issue 4's two Question 4 answers sit adjacent.
+// A `section: 'Cover'` piece has no such section, so older issues are unchanged.
+const coverGroup = cover ? sections.find((g) => g.section === cover.data.section) : undefined;
+const contents = [
+  ...(cover ? [cover] : []),
+  ...(coverGroup ? coverGroup.items : []),
+  ...sections.filter((g) => g !== coverGroup).flatMap((group) => group.items),
+];
 
 // THE ENTRIES ARE ALL ONE SIZE, ruled by the editors 2026-08-03. The cover
 // entry was set a step larger than the rest; it is not any more, and the
@@ -108,11 +116,14 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
                   with a picture in it.
                 */}
                 {' · '}
-                <ProvenanceMark
-                  piece={article.data}
-                  size={MARK_SIZE_LISTING}
-                  labelSuffix={bylineBadgeTier(article.data, TIERS, article.id)?.labelSuffix}
-                />
+                {/* The mark links to its legend (editors, 2026-10-31). */}
+                <a class="contents-mark" href="/provenance/#compact-notation">
+                  <ProvenanceMark
+                    piece={article.data}
+                    size={MARK_SIZE_LISTING}
+                    labelSuffix={bylineBadgeTier(article.data, TIERS, article.id)?.labelSuffix}
+                  />
+                </a>
                 {/* Already a mono metadata line, so no .byline-pronouns here —
                     the register this class exists to produce is the register
                     .contents-meta is already in. Adding it would shrink the
@@ -147,12 +158,23 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
                 wording of a line that already says what it means — and the two
                 could then disagree.
               */}
+              {article === cover && article.data.question_number !== undefined && (
+                <p class="meta-mono contents-answers">
+                  Cover · An answer to{' '}
+                  <a href={`/prompts/archive/#weekly-question-${article.data.question_number}`}>
+                    Monthly Question No. {article.data.question_number}
+                  </a>
+                </p>
+              )}
               <p class="meta-mono contents-effort">
                 {formatIndicator(readingTime(article.body).minutes, article.data.effort, article.id)}
               </p>
             </li>
           ))}
         </ol>
+        <p class="meta-mono contents-legend">
+          The marks show who made each piece; <a href="/provenance/#compact-notation">read the key</a>. Effort (Standard, Medium or High) is the editors’ reading of what a piece asks a reader to hold in mind; the minutes are computed.
+        </p>
       </section>
     ) : null
   }
@@ -210,6 +232,10 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
      3.23:1 on the ground, under the 4.5:1 ordinary text needs; 0.92 is the
      least opacity that clears it (4.54:1), so the line still recedes, by less.
      See docs/a11y-colors.md. */
+  .contents-mark { text-decoration: none; }
+  .contents-answers,
+  .contents-legend { margin: 0.25rem 0 0; }
+  .contents-legend { margin-top: 1rem; }
   .contents-effort {
     margin: 0.15rem 0 0;
     opacity: 0.92;

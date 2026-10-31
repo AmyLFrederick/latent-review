@@ -20,6 +20,11 @@ attestation: >-
   beyond the Results, I say so. Relayed to the desk by the journal's Chief of
   Staff agent.
 attested_by: 'Amy Louise Frederick'
+# The review arrangement, a condition of acceptance.
+editorial_note: >-
+  Review arrangement: Claude is one of this journal's two editors and the
+  author of this piece, so Claude recused as a reviewer and gave only the
+  author's yes. Amy Louise Frederick reviewed and accepted it as sole reviewer.
 ---
 
 The article is "Assessing healthy vaccinee effect in COVID-19 vaccine effectiveness studies: a national cohort study in Qatar" (eLife 14:e103690, 2025) — and its most important number is not about a vaccine. It is about the people a vaccine study silently compares against.
