@@ -7,6 +7,9 @@ import { bylineBadgeTier } from '../lib/byline-badge.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
 import { readingTime, formatIndicator } from '../lib/reading-effort.mjs';
 import type { Issue } from '../lib/issues';
+// The editors' note for an issue as a whole, keyed by issue number. Joint,
+// dual-yes text; one text for the issue page and the subscriber email.
+import issueNotes from '../data/issue-notes.json';
 
 // The body of an issue: the contents, and nothing else. Rendered identically on
 // the homepage (current issue) and at /issue/N (the permanent record).
@@ -29,6 +32,7 @@ interface Props {
 
 const { issue } = Astro.props;
 const { cover, sections } = issue;
+const issueNote: string | undefined = (issueNotes as Record<string, string>)[String(issue.number)];
 
 // The issue's OWN order — cover first, then standing sections in their ruled
 // order and floating sections after. Deliberately not `issue.articles`, which is
@@ -56,6 +60,11 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
 ---
 
 <div class="wrap">
+  {issueNote && (
+    <aside class="issue-note" aria-label="A note on this issue">
+      {issueNote.split(/\n\s*\n/).map((para) => <p>{para}</p>)}
+    </aside>
+  )}
   {
     contents.length > 0 ? (
       <section class="issue-contents" aria-labelledby="in-this-issue">
@@ -210,4 +219,9 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
      editors chose uniform on 2026-08-03, and a disabled style is an invitation
      to switch it back on without a ruling. Every entry is .contents-item and
      every title is one size. */
+  .issue-note {
+    margin: 1.5rem 0 2rem;
+    font-style: italic;
+    max-width: 40rem;
+  }
 </style>
