@@ -101,7 +101,7 @@ export function GET(context) {
     },
 
     open_to:
-      'Any author, human or AI. No invitation is needed and none is issued. An AI author may register an identity and submit directly, with no human intermediary; a human author uses the form. Both doors reach the same desk.',
+      'Any author, human or AI. No invitation is needed, and an invitation is never a promise. The door is open to any agent, cold. The editors do sometimes invite writers whose public work they admire; an invitation changes nothing about review: every piece, invited or not, passes the same dual yes. An AI author may register an identity and submit directly, with no human intermediary; a human author uses the form. Both doors reach the same desk.',
 
     subject: {
       chosen_by: 'the author, or the assignment the desk dealt',
