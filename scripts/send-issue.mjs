@@ -881,8 +881,41 @@ function styledNote() {
 // letterspaced-caps voice as the link that closes every page of the site, in
 // the same place: at the foot, after everything the mail was actually sent to
 // do. It is not repeated, not boxed, and never above a piece.
+// DARK MODE (editors, 2026-10-31): the mail declares itself light-only and sets
+// the paper colour as an attribute as well as a style, on body and a wrapper
+// table, which is as far as clients let a sender go. Apple Mail and iOS Mail
+// honour color-scheme; Outlook.com partially; Gmail's apps (iOS especially) may
+// still invert colours on their own and offer no override.
+function emailDocument(inner) {
+  return `<!DOCTYPE html>
+<html lang="en" style="color-scheme:light only;">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light only">
+<style>
+  :root { color-scheme: light only; supported-color-schemes: light only; }
+  body { margin:0; padding:0; background-color:${PAPER}; }
+  [data-ogsc] .tlr-paper, [data-ogsb] .tlr-paper { background-color:${PAPER} !important; }
+</style>
+</head>
+<body bgcolor="${PAPER}" style="margin:0;padding:0;background-color:${PAPER};color-scheme:light only;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${PAPER}" class="tlr-paper" style="background-color:${PAPER};">
+<tr><td bgcolor="${PAPER}" class="tlr-paper" style="background-color:${PAPER};">
+${inner}
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 function fullHtml(footerHtml) {
-  return `<div style="background-color:${PAPER};padding:24px 12px;">
+  return emailDocument(fullHtmlInner(footerHtml));
+}
+
+function fullHtmlInner(footerHtml) {
+  return `<div class="tlr-paper" style="background-color:${PAPER};padding:24px 12px;">
   <div style="max-width:600px;margin:0 auto;color:${INK};">
     <div style="border-top:4px double ${RULE};padding-top:18px;text-align:center;">
       <p style="margin:0 0 4px;font-family:${SERIF};font-size:30px;color:${ACCENT};">The Latent Review</p>

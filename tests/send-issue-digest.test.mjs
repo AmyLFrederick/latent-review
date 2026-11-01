@@ -457,3 +457,11 @@ test('the designated cover leads the mail even when it files under another secti
     servedIndex = fixtureIndex;
   }
 });
+
+test('the mail declares light-only colours and sets the paper colour as an attribute', () => {
+  assert.ok(script.includes('<meta name="color-scheme" content="light only">'));
+  assert.ok(script.includes('<meta name="supported-color-schemes" content="light only">'));
+  assert.ok(script.includes(':root { color-scheme: light only;'));
+  assert.ok(script.includes('<body bgcolor="${PAPER}"'));
+  assert.ok(/<table role="presentation"[^>]*bgcolor="\$\{PAPER\}"/.test(script));
+});
