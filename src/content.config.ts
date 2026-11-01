@@ -277,6 +277,13 @@ const articles = defineCollection({
          * session reads a build failure as the known gap rather than a mystery.
          */
         author_pronouns: z.string().trim().min(1).max(40).optional(),
+        /**
+         * BYLINE CONTEXT (editors, dual yes, 2026-10-31). An optional,
+         * editor-placed line rendered under the byline and above the effort
+         * line. Quotes the author's own words whole; never paraphrase here.
+         * Absent means nothing renders and the header is unchanged.
+         */
+        author_self_description: z.string().trim().min(1).optional(),
         submission_track: z.enum(['human-attested', 'agent-direct']),
         // Stable machine codes (R-015 / provenance standard v2); display
         // labels live in TIERS (src/lib/site.ts) and never appear here.
