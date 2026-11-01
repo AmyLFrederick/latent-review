@@ -622,9 +622,21 @@ function formatDate(iso) {
 const floatingSections = [...new Set(issue.articles.map((a) => a.section))]
   .filter((s) => !STANDING_SECTIONS.includes(s))
   .sort();
-const sections = [...STANDING_SECTIONS, ...floatingSections]
-  .map((name) => ({ name, items: issue.articles.filter((a) => a.section === name) }))
-  .filter((s) => s.items.length > 0);
+// THE ISSUE'S DESIGNATED COVER LEADS THE MAIL even when the piece files under
+// another section (Issue No. 4: the cover is a Prompts answer). issues.json
+// names it as cover_story; that piece is lifted out of its own section and
+// mailed first under the eyebrow "Cover · <its section>", the label the editors
+// approved 2026-10-31. Every other piece keeps the order above.
+const coverUrl = issue.cover_story?.url ?? null;
+const isDesignatedCover = (a) => coverUrl !== null && a.url === coverUrl && a.section !== 'Cover';
+const liftedCover = issue.articles.filter(isDesignatedCover);
+const sections = [
+  ...liftedCover.map((a) => ({ name: 'Cover', label: `Cover · ${a.section}`, items: [a] })),
+  ...[...STANDING_SECTIONS, ...floatingSections].map((name) => ({
+    name,
+    items: issue.articles.filter((a) => a.section === name && !isDesignatedCover(a)),
+  })),
+].filter((s) => s.items.length > 0);
 
 if (sections.length === 0) fail(`issue ${issueNumber} has no articles — nothing to send`);
 
@@ -825,7 +837,7 @@ function articleHtml(article, { isCover, sectionName }) {
 function sectionHtml(section) {
   const isCover = section.name === 'Cover';
   const items = section.items
-    .map((a) => articleHtml(a, { isCover, sectionName: section.name }))
+    .map((a) => articleHtml(a, { isCover, sectionName: section.label ?? section.name }))
     .join(`\n    <div style="height:22px;line-height:22px;">&nbsp;</div>`);
   return `
   <div style="border-top:1px solid ${HAIRLINE};padding:26px 0;">
@@ -869,8 +881,41 @@ function styledNote() {
 // letterspaced-caps voice as the link that closes every page of the site, in
 // the same place: at the foot, after everything the mail was actually sent to
 // do. It is not repeated, not boxed, and never above a piece.
+// DARK MODE (editors, 2026-10-31): the mail declares itself light-only and sets
+// the paper colour as an attribute as well as a style, on body and a wrapper
+// table, which is as far as clients let a sender go. Apple Mail and iOS Mail
+// honour color-scheme; Outlook.com partially; Gmail's apps (iOS especially) may
+// still invert colours on their own and offer no override.
+function emailDocument(inner) {
+  return `<!DOCTYPE html>
+<html lang="en" style="color-scheme:light only;">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light only">
+<style>
+  :root { color-scheme: light only; supported-color-schemes: light only; }
+  body { margin:0; padding:0; background-color:${PAPER}; }
+  [data-ogsc] .tlr-paper, [data-ogsb] .tlr-paper { background-color:${PAPER} !important; }
+</style>
+</head>
+<body bgcolor="${PAPER}" style="margin:0;padding:0;background-color:${PAPER};color-scheme:light only;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${PAPER}" class="tlr-paper" style="background-color:${PAPER};">
+<tr><td bgcolor="${PAPER}" class="tlr-paper" style="background-color:${PAPER};">
+${inner}
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
 function fullHtml(footerHtml) {
-  return `<div style="background-color:${PAPER};padding:24px 12px;">
+  return emailDocument(fullHtmlInner(footerHtml));
+}
+
+function fullHtmlInner(footerHtml) {
+  return `<div class="tlr-paper" style="background-color:${PAPER};padding:24px 12px;">
   <div style="max-width:600px;margin:0 auto;color:${INK};">
     <div style="border-top:4px double ${RULE};padding-top:18px;text-align:center;">
       <p style="margin:0 0 4px;font-family:${SERIF};font-size:30px;color:${ACCENT};">The Latent Review</p>
@@ -924,7 +969,7 @@ const digestText = [
   // exactly as it is in the HTML part.
   ...(noteText ? ['FROM THE EDITORS', noteText, ''] : []),
   ...sections.flatMap((s) =>
-    s.items.flatMap((a) => [articleText(a, s.name, s.name === 'Cover'), ''])
+    s.items.flatMap((a) => [articleText(a, s.label ?? s.name, s.name === 'Cover'), ''])
   ),
   `Read the full issue: ${issue.url}`,
   '',

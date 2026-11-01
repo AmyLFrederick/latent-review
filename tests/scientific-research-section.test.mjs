@@ -198,7 +198,7 @@ function publishedPieces() {
     });
 }
 
-test('no piece outside Issue No. 3 runs in Scientific Research', () => {
+test('no piece before Issue No. 3 runs in Scientific Research', () => {
   // THE GUARD, AND IT IS ABOUT THE ISSUE RATHER THAN ABOUT THE SECTION PAGE.
   // /issue/2, its contents list and the digest archive for Issue No. 2 are all
   // derived from the pieces carrying `issue: 2` — there is no stored issue — so
@@ -206,9 +206,8 @@ test('no piece outside Issue No. 3 runs in Scientific Research', () => {
   // section could reach an Issue No. 2 surface. A piece is what this asserts on.
   for (const piece of publishedPieces()) {
     if (piece.section !== SECTION) continue;
-    assert.equal(
-      piece.issue,
-      3,
+    assert.ok(
+      piece.issue >= 3,
       `${piece.file} runs in ${SECTION} in Issue No. ${piece.issue}; the section opens with Issue No. 3`
     );
   }

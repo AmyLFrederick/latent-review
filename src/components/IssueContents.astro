@@ -7,6 +7,9 @@ import { bylineBadgeTier } from '../lib/byline-badge.mjs';
 // @ts-expect-error — plain-JS module shared with the tests
 import { readingTime, formatIndicator } from '../lib/reading-effort.mjs';
 import type { Issue } from '../lib/issues';
+// The editors' note for an issue as a whole, keyed by issue number. Joint,
+// dual-yes text; one text for the issue page and the subscriber email.
+import issueNotes from '../data/issue-notes.json';
 
 // The body of an issue: the contents, and nothing else. Rendered identically on
 // the homepage (current issue) and at /issue/N (the permanent record).
@@ -29,13 +32,22 @@ interface Props {
 
 const { issue } = Astro.props;
 const { cover, sections } = issue;
+const issueNote: string | undefined = (issueNotes as Record<string, string>)[String(issue.number)];
 
 // The issue's OWN order — cover first, then standing sections in their ruled
 // order and floating sections after. Deliberately not `issue.articles`, which is
 // newest-first: publication order is a fact about the day, and a contents page
 // is a map of the issue rather than a timeline of it. As pieces merge through
 // the day they appear in their section's place, not at the top.
-const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => group.items)];
+// A cover that runs in a section (issue_cover, 2026-10-31) brings the rest of
+// its section up behind it, so Issue 4's two Question 4 answers sit adjacent.
+// A `section: 'Cover'` piece has no such section, so older issues are unchanged.
+const coverGroup = cover ? sections.find((g) => g.section === cover.data.section) : undefined;
+const contents = [
+  ...(cover ? [cover] : []),
+  ...(coverGroup ? coverGroup.items : []),
+  ...sections.filter((g) => g !== coverGroup).flatMap((group) => group.items),
+];
 
 // THE ENTRIES ARE ALL ONE SIZE, ruled by the editors 2026-08-03. The cover
 // entry was set a step larger than the rest; it is not any more, and the
@@ -56,6 +68,11 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
 ---
 
 <div class="wrap">
+  {issueNote && (
+    <aside class="issue-note" aria-label="A note on this issue">
+      {issueNote.split(/\n\s*\n/).map((para) => <p>{para}</p>)}
+    </aside>
+  )}
   {
     contents.length > 0 ? (
       <section class="issue-contents" aria-labelledby="in-this-issue">
@@ -99,11 +116,14 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
                   with a picture in it.
                 */}
                 {' · '}
-                <ProvenanceMark
-                  piece={article.data}
-                  size={MARK_SIZE_LISTING}
-                  labelSuffix={bylineBadgeTier(article.data, TIERS, article.id)?.labelSuffix}
-                />
+                {/* The mark links to its legend (editors, 2026-10-31). */}
+                <a class="contents-mark" href="/provenance/#compact-notation">
+                  <ProvenanceMark
+                    piece={article.data}
+                    size={MARK_SIZE_LISTING}
+                    labelSuffix={bylineBadgeTier(article.data, TIERS, article.id)?.labelSuffix}
+                  />
+                </a>
                 {/* Already a mono metadata line, so no .byline-pronouns here —
                     the register this class exists to produce is the register
                     .contents-meta is already in. Adding it would shrink the
@@ -138,6 +158,14 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
                 wording of a line that already says what it means — and the two
                 could then disagree.
               */}
+              {article === cover && article.data.question_number !== undefined && (
+                <p class="meta-mono contents-answers">
+                  Cover · An answer to{' '}
+                  <a href={`/prompts/archive/#weekly-question-${article.data.question_number}`}>
+                    Monthly Question No. {article.data.question_number}
+                  </a>
+                </p>
+              )}
               <p class="meta-mono contents-effort">
                 {formatIndicator(readingTime(article.body).minutes, article.data.effort, article.id)}
               </p>
@@ -201,6 +229,10 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
      3.23:1 on the ground, under the 4.5:1 ordinary text needs; 0.92 is the
      least opacity that clears it (4.54:1), so the line still recedes, by less.
      See docs/a11y-colors.md. */
+  .contents-mark { text-decoration: none; }
+  .contents-answers,
+  .contents-legend { margin: 0.25rem 0 0; }
+  .contents-legend { margin-top: 1rem; }
   .contents-effort {
     margin: 0.15rem 0 0;
     opacity: 0.92;
@@ -210,4 +242,9 @@ const contents = [...(cover ? [cover] : []), ...sections.flatMap((group) => grou
      editors chose uniform on 2026-08-03, and a disabled style is an invitation
      to switch it back on without a ruling. Every entry is .contents-item and
      every title is one size. */
+  .issue-note {
+    margin: 1.5rem 0 2rem;
+    font-style: italic;
+    max-width: 40rem;
+  }
 </style>

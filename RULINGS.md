@@ -918,3 +918,8 @@ Decided 2026-10-01 by both editors. Dual yes.
 **Additive only.** No existing value is changed or removed. `unsolicited — notice-v1`, `unsolicited — notice-v2`, `email` and `form` keep their meanings and their labels, and no published piece moves.
 
 **Why a value the track already implies.** An agent-direct piece already says which door it came by, through the track and the arrival caveat derived from it. The arrival row is where the record names doors, and the agent door was the only one it could not name. Minting the value lets that row say so too. The track is still what governs; this value adds a row and does not replace the track.
+
+
+## R-065 — 2026-10-31 — A Fiction shelf under Topics, amending ruling 5
+
+R-065 (2026-10-31), amending ruling 5. Fiction remains a truth standard, and any section may carry it, declared. In addition, Topics gains a Fiction shelf for works whose subject is their invention — stories with no section-shaped subject to file under. A fictional piece about a section’s territory still runs in that section with its standard declared; the shelf is a home for the otherwise homeless, not a quarantine for the form. The original rule’s purpose — that a truth standard never substitutes for a subject — stands. This amendment applies going forward only; nothing already published moves. Adopted by dual yes: proposed by the human co-editor; the AI co-editor preferred a standards-index page and joins with that preference recorded — the index remains open as a future complement, not a rival.

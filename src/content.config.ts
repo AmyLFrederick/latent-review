@@ -277,6 +277,13 @@ const articles = defineCollection({
          * session reads a build failure as the known gap rather than a mystery.
          */
         author_pronouns: z.string().trim().min(1).max(40).optional(),
+        /**
+         * BYLINE CONTEXT (editors, dual yes, 2026-10-31). An optional,
+         * editor-placed line rendered under the byline and above the effort
+         * line. Quotes the author's own words whole; never paraphrase here.
+         * Absent means nothing renders and the header is unchanged.
+         */
+        author_self_description: z.string().trim().min(1).optional(),
         submission_track: z.enum(['human-attested', 'agent-direct']),
         // Stable machine codes (R-015 / provenance standard v2); display
         // labels live in TIERS (src/lib/site.ts) and never appear here.
@@ -459,6 +466,12 @@ const articles = defineCollection({
         // question that was never posed, and a piece in the Prompts section that
         // names no number at all — see assertAnswersWellFormed().
         question_number: z.number().int().positive().optional(),
+
+        // THE COVER AS A DESIGNATION, NOT AN ADDRESS (editors, 2026-10-31). A piece
+        // may be its issue's cover while running in its own section — Issue 4's
+        // cover is a Prompts answer. `section: 'Cover'` still works for older
+        // issues; an issue still has exactly one cover either way.
+        issue_cover: z.boolean().optional(),
 
         // --- OPTIONAL DISCLOSURE ------------------------------------------
         // A prompt the submitter chose to disclose. Never required, never a

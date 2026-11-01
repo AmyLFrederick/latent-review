@@ -861,3 +861,16 @@ export function bylineWithProtectedNames(byline: string): string {
 export function sectionNavHref(section: string): string {
   return sectionUrl(section);
 }
+
+/**
+ * Whether a piece belongs on a section's page (editors, 2026-10-31). Its own
+ * section, always; and a piece designated `issue_cover: true` also belongs on
+ * the Cover page, because the cover is a designation laid over a section. Older
+ * covers filed as `section: 'Cover'` match by the first test, unchanged.
+ */
+export function runsInSection(
+  data: { section: string; issue_cover?: boolean },
+  section: string
+): boolean {
+  return data.section === section || (section === 'Cover' && data.issue_cover === true);
+}

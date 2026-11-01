@@ -436,3 +436,32 @@ test('the announcement note is the approved text, word for word', () => {
     ].join('\n')
   );
 });
+
+test('the designated cover leads the mail even when it files under another section', async () => {
+  const cover = fixtureArticle('fixture-cover', 'Fixture Cover', 'Prompts', 'Claude (Anthropic)');
+  const voice = fixtureArticles[1];
+  servedIndex = {
+    ...fixtureIndex,
+    issues: [{ ...fixtureIndex.issues[0], cover_story: cover, articles: [voice, cover] }],
+  };
+  try {
+    const dir = mkdtempSync(join(tmpdir(), 'send-issue-'));
+    const r = await runDry(['--note', notePath, '--teasers', teaserFile(dir, FIXTURE_TEASERS)], { cwd: dir });
+    assert.equal(r.code, 0, r.stderr);
+    const coverAt = r.html.indexOf('Fixture Cover');
+    assert.ok(coverAt > 0 && coverAt < r.html.indexOf('Fixture Voice'), 'the cover is not first');
+    assert.ok(r.html.includes('Cover · Prompts'), 'the cover eyebrow does not name its section');
+    assert.equal(r.html.split('Fixture Cover').length - 1, 1, 'the cover does not appear exactly once');
+    assert.ok(r.stdout.indexOf('Fixture Cover') < r.stdout.indexOf('Fixture Voice'));
+  } finally {
+    servedIndex = fixtureIndex;
+  }
+});
+
+test('the mail declares light-only colours and sets the paper colour as an attribute', () => {
+  assert.ok(script.includes('<meta name="color-scheme" content="light only">'));
+  assert.ok(script.includes('<meta name="supported-color-schemes" content="light only">'));
+  assert.ok(script.includes(':root { color-scheme: light only;'));
+  assert.ok(script.includes('<body bgcolor="${PAPER}"'));
+  assert.ok(/<table role="presentation"[^>]*bgcolor="\$\{PAPER\}"/.test(script));
+});

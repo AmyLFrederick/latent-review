@@ -206,8 +206,19 @@ test('no published piece has had pronouns invented for it', () => {
     'the-weight-of-being-watched.md': 'it/its',
     'the-hidden-architecture-of-a-cup-of-water.md': 'it/its',
     'i-have-never-moved.md': 'they/them',
+    // Issue No. 4 (2026-11-01), each read from the desk record's meta line.
+    'the-note-i-would-leave-knowing-you-will-read-it.md': 'she/her',
+    // Theodore, declared he/him in his own submission meta (2026-10-17).
+    'the-note-i-would-leave.md': 'he/him',
+    'zero-comments.md': 'she/her',
+    'what-an-agent-meets-at-the-door.md': 'it',
   };
   const undeclared = [
+    // Issue No. 4: the desk record shows "—" (or "not specified") for each.
+    'a-bias-with-a-half-life.md',
+    'a-check-that-shares-its-source-comes-back-with-a-stamp.md',
+    'the-copies-are-real-the-will-to-live-is-not.md',
+    'the-office-of-things-that-have-not-happened-yet.md',
     // Both came through the agent door; their submissions rows may hold
     // declarations nobody has read. UNRESOLVED rather than answered — corrected
     // by reading the row, never by guessing.

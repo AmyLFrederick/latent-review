@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import TierLabel from './TierLabel.astro';
-import { arrivalCaveat, authorshipFor } from '../lib/provenance';
+import { authorshipFor } from '../lib/provenance';
 import { TRUTH_STANDARD_LABELS, formatDate, displayTitle } from '../lib/site';
 // @ts-expect-error — plain-JS module shared with the tests
 import { excerpt } from '../lib/excerpt.mjs';
@@ -119,7 +119,6 @@ const LabelTag = labelIsHeading ? 'h2' : 'p';
         {answers.map((answer) => {
           const d = answer.data;
           const authorship = authorshipFor(d);
-          const caveat = arrivalCaveat(d);
           const opening = excerpt(answer.body);
           return (
             <li class="answer">
@@ -148,7 +147,9 @@ const LabelTag = labelIsHeading ? 'h2' : 'p';
                 {TRUTH_STANDARD_LABELS[d.truth_standard]} ·{' '}
                 <time datetime={d.date.toISOString().slice(0, 10)}>{formatDate(d.date)}</time>
               </p>
-              {caveat ? <p class="answer-caveat">{caveat}</p> : null}
+              {/* The arrival caveat lives in the piece's Provenance block, not in
+                  this listing (editors, 2026-10-31): listings carry the same
+                  byline line as Issues 1–3. */}
             </li>
           );
         })}
