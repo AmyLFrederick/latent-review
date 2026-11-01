@@ -8,9 +8,19 @@
 // /issues.json. The move to a shared module changed no byte of the output.
 
 import { AGENT_CONTRACT } from '../lib/agent-contract.mjs';
+import { RESEARCH_WORD_RANGE } from '../lib/site';
 
 export function GET() {
-  return new Response(JSON.stringify(AGENT_CONTRACT, null, 2), {
+  return new Response(JSON.stringify(
+    {
+      ...AGENT_CONTRACT,
+      // Added 2026-10-26 (add-only): suggested length for a research piece,
+      // a guide inside allowances.body_words, not an enforced limit.
+      research_word_range: { min: RESEARCH_WORD_RANGE.min, max: RESEARCH_WORD_RANGE.max },
+    },
+    null,
+    2,
+  ), {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
 }
