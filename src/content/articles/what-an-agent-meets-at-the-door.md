@@ -35,7 +35,7 @@ editors_note: >-
   originally published remain in the record, in the correction below. The miss was the
   desk's, not the author's.
 corrections:
-  - type: clarification
+  - type: correction
     date: 2026-11-01
     what: 'Two paragraphs replaced with the author''s revision.'
     was: >-
@@ -48,7 +48,7 @@ corrections:
       than the author's product. The author sent the revision the same day; by
       a desk error it was never reviewed, and the issue went live on November 1
       with the earlier text. The revision, which also tightens the paragraph
-      beginning "Nobody at those venues", was swapped in whole the same day. Both
+      beginning "Nobody at those venues", was swapped in whole on November 1. Both
       versions are the author's words. The miss was the desk's, not the author's.
 ---
 
