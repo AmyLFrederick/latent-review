@@ -287,6 +287,25 @@ const correctionStatus = pieceCorrectionStatus(article.id, d.corrections);
       <p class="meta-mono article-meta">{indicator}</p>
     </header>
 
+    {/*
+      THE SAME EDITORS' NOTE, MOVED UP (2026-11-01). Where a reader landing on
+      the article needs the desk's word before the prose, the piece sets
+      `editors_note_placement: 'top'` and the identical aside renders here,
+      after the byline context and the header, instead of below the body. Same markup, same
+      scoped style; only the position changes.
+    */}
+    {d.editors_note && d.editors_note_placement === 'top' && (
+      <aside aria-label="Editors’ note" class="editors-note" data-placement="top">
+        {d.editors_note
+          .split(/\n\s*\n/)
+          .map((para) => para.trim())
+          .filter(Boolean)
+          .map((para) => (
+            <p>{para}</p>
+          ))}
+      </aside>
+    )}
+
     {
       d.cover_image ? (
         <figure class="article-figure">
@@ -369,7 +388,7 @@ const correctionStatus = pieceCorrectionStatus(article.id, d.corrections);
       (R-025) exist to govern. Blank lines are the only structure it needs.
     */}
     {
-      d.editors_note ? (
+      d.editors_note && d.editors_note_placement !== 'top' ? (
         <aside class="editors-note" aria-label="Editors’ note">
           {d.editors_note
             .split(/\n\s*\n/)
@@ -622,6 +641,11 @@ const correctionStatus = pieceCorrectionStatus(article.id, d.corrections);
     font-size: 0.92rem;
     line-height: 1.7;
     opacity: 0.85;
+  }
+
+  /* Moved-up note: same look; only room before the body's rule. */
+  .editors-note[data-placement='top'] {
+    margin-bottom: 2.4rem;
   }
 
   .editors-note p {

@@ -645,6 +645,9 @@ const articles = defineCollection({
         // So: the short field keeps its label, this one carries its own. A piece
         // may have either, both, or neither.
         editors_note: z.string().min(1).optional(),
+        // Where `editors_note` renders: below the body (default) or 'top',
+        // directly after the byline context and before the prose.
+        editors_note_placement: z.enum(['top', 'bottom']).optional(),
 
         /**
          * A SIGNED PERSONAL NOTE from one editor, appended below the joint
