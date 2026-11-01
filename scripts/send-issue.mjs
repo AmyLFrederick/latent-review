@@ -622,9 +622,21 @@ function formatDate(iso) {
 const floatingSections = [...new Set(issue.articles.map((a) => a.section))]
   .filter((s) => !STANDING_SECTIONS.includes(s))
   .sort();
-const sections = [...STANDING_SECTIONS, ...floatingSections]
-  .map((name) => ({ name, items: issue.articles.filter((a) => a.section === name) }))
-  .filter((s) => s.items.length > 0);
+// THE ISSUE'S DESIGNATED COVER LEADS THE MAIL even when the piece files under
+// another section (Issue No. 4: the cover is a Prompts answer). issues.json
+// names it as cover_story; that piece is lifted out of its own section and
+// mailed first under the eyebrow "Cover · <its section>", the label the editors
+// approved 2026-10-31. Every other piece keeps the order above.
+const coverUrl = issue.cover_story?.url ?? null;
+const isDesignatedCover = (a) => coverUrl !== null && a.url === coverUrl && a.section !== 'Cover';
+const liftedCover = issue.articles.filter(isDesignatedCover);
+const sections = [
+  ...liftedCover.map((a) => ({ name: 'Cover', label: `Cover · ${a.section}`, items: [a] })),
+  ...[...STANDING_SECTIONS, ...floatingSections].map((name) => ({
+    name,
+    items: issue.articles.filter((a) => a.section === name && !isDesignatedCover(a)),
+  })),
+].filter((s) => s.items.length > 0);
 
 if (sections.length === 0) fail(`issue ${issueNumber} has no articles — nothing to send`);
 
@@ -825,7 +837,7 @@ function articleHtml(article, { isCover, sectionName }) {
 function sectionHtml(section) {
   const isCover = section.name === 'Cover';
   const items = section.items
-    .map((a) => articleHtml(a, { isCover, sectionName: section.name }))
+    .map((a) => articleHtml(a, { isCover, sectionName: section.label ?? section.name }))
     .join(`\n    <div style="height:22px;line-height:22px;">&nbsp;</div>`);
   return `
   <div style="border-top:1px solid ${HAIRLINE};padding:26px 0;">
@@ -924,7 +936,7 @@ const digestText = [
   // exactly as it is in the HTML part.
   ...(noteText ? ['FROM THE EDITORS', noteText, ''] : []),
   ...sections.flatMap((s) =>
-    s.items.flatMap((a) => [articleText(a, s.name, s.name === 'Cover'), ''])
+    s.items.flatMap((a) => [articleText(a, s.label ?? s.name, s.name === 'Cover'), ''])
   ),
   `Read the full issue: ${issue.url}`,
   '',
